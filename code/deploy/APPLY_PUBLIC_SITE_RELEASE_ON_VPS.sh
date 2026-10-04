@@ -215,6 +215,17 @@ readonly -a RELEASE_FILES=(
   "bounded-light/math.js"
   "bounded-light/provenance.json"
   "bounded-light/style.css"
+  "bounded-light/observatory/assets/07_calabi_bloom.webp"
+  "bounded-light/observatory/assets/08_gyroid_sanctum.webp"
+  "bounded-light/observatory/assets/09_hopf_atlas.webp"
+  "bounded-light/observatory/geometry.mjs"
+  "bounded-light/observatory/geometry.worker.js"
+  "bounded-light/observatory/index.html"
+  "bounded-light/observatory/observatory.css"
+  "bounded-light/observatory/observatory.js"
+  "bounded-light/observatory/provenance.json"
+  "bounded-light/observatory/renderer.js"
+  "bounded-light/observatory/state.js"
 )
 readonly -a RELEASE_DIRECTORIES=(
   "assets"
@@ -230,6 +241,8 @@ readonly -a RELEASE_DIRECTORIES=(
   "downloads"
   "bounded-light"
   "bounded-light/assets"
+  "bounded-light/observatory"
+  "bounded-light/observatory/assets"
 )
 readonly EXPECTED_FILE_COUNT="${#RELEASE_FILES[@]}"
 

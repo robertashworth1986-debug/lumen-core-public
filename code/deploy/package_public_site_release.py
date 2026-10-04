@@ -228,6 +228,17 @@ RELEASE_PATHS: Final = (
     "dashboard/bounded-light/math.js",
     "dashboard/bounded-light/provenance.json",
     "dashboard/bounded-light/style.css",
+    "dashboard/bounded-light/observatory/assets/07_calabi_bloom.webp",
+    "dashboard/bounded-light/observatory/assets/08_gyroid_sanctum.webp",
+    "dashboard/bounded-light/observatory/assets/09_hopf_atlas.webp",
+    "dashboard/bounded-light/observatory/geometry.mjs",
+    "dashboard/bounded-light/observatory/geometry.worker.js",
+    "dashboard/bounded-light/observatory/index.html",
+    "dashboard/bounded-light/observatory/observatory.css",
+    "dashboard/bounded-light/observatory/observatory.js",
+    "dashboard/bounded-light/observatory/provenance.json",
+    "dashboard/bounded-light/observatory/renderer.js",
+    "dashboard/bounded-light/observatory/state.js",
 )
 
 

@@ -25,6 +25,16 @@ The shared static bundle introduces no login, tracking, telemetry or control
 connection. Website artwork is compressed for delivery; any large-format
 exports are separately labeled enlargements rather than native 16K/20K detail.
 
+The same founder-directed collection now includes `/bounded-light/observatory/`:
+an interactive geometry study with four defined families, three additional
+concept artworks, a bounded point budget, shareable settings and local exports.
+Trefoil tubes, projected Hopf fibers, a trigonometric gyroid approximation and
+superformula shells retain their formulas and assumptions. WebGL rendering and
+a Canvas fallback visualize those mathematical samples; they do not establish
+physical, hardware, quantum, wormhole or performance validation. Share settings
+and exports are user-operated; no account, telemetry or operator endpoint is
+connected. The geometry module has numerical invariant and invalid-input tests.
+
 This is an isolated source candidate, not a live deployment receipt. The
 existing exact-main release approval, signed provenance and SBOM verification,
 production-environment gate, rollback capture and exact live-byte checks remain

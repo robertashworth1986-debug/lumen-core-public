@@ -1,0 +1,47 @@
+{
+  "collection": "Geometry Observatory \u2014 cinematic studies",
+  "artworks": [
+    {
+      "title": "Calabi Bloom",
+      "asset": "assets/07_calabi_bloom.webp",
+      "native_pixels": [
+        1672,
+        941
+      ],
+      "created": "2026-10-04",
+      "method": "OpenAI image_gen, one distinct prompt per artwork",
+      "source_inputs": "Owner-provided LumenCore research themes and authored visual prompts",
+      "state": "CONCEPT ILLUSTRATION",
+      "claim_boundary": "Not a verified mathematical rendering, physical simulation or functioning device",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    },
+    {
+      "title": "Gyroid Sanctum",
+      "asset": "assets/08_gyroid_sanctum.webp",
+      "native_pixels": [
+        1672,
+        941
+      ],
+      "created": "2026-10-04",
+      "method": "OpenAI image_gen, one distinct prompt per artwork",
+      "source_inputs": "Owner-provided LumenCore research themes and authored visual prompts",
+      "state": "CONCEPT ILLUSTRATION",
+      "claim_boundary": "Not a verified mathematical rendering, physical simulation or functioning device",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    },
+    {
+      "title": "Hopf Atlas",
+      "asset": "assets/09_hopf_atlas.webp",
+      "native_pixels": [
+        1672,
+        941
+      ],
+      "created": "2026-10-04",
+      "method": "OpenAI image_gen, one distinct prompt per artwork",
+      "source_inputs": "Owner-provided LumenCore research themes and authored visual prompts",
+      "state": "CONCEPT ILLUSTRATION",
+      "claim_boundary": "Not a verified mathematical rendering, physical simulation or functioning device",
+      "licensing_status": "AI-generated from a founder-provided text brief; no source paper is distributed and no independent copyright or exclusivity determination is claimed."
+    }
+  ]
+}

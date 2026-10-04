@@ -113,6 +113,7 @@ def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
         "build_week/prooflock_console/index.html": "/build_week/prooflock_console/",
         "cohort/index.html": "/cohort/",
         "bounded-light/index.html": "/bounded-light/",
+        "bounded-light/observatory/index.html": "/bounded-light/observatory/",
     }
     path = route_map.get(archive_name)
     if path is None:

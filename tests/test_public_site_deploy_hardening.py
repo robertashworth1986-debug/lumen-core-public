@@ -116,7 +116,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 206
+    assert len(names) == len(set(names)) == 217
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -185,7 +185,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 206
+    assert release_count == 217
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
@@ -855,6 +855,7 @@ def test_apply_rejects_duplicate_manifest_key_before_touching_target(tmp_path):
 @pytest.mark.parametrize("name,mime", [
     ("index.html", "text/html"), ("style.css", "text/css"),
     ("assets/concept.webp", "image/webp"), ("manifest.json", "application/json"),
+    ("observatory/geometry.mjs", "text/javascript"), ("observatory/geometry.worker.js", "application/javascript"),
 ])
 def test_bounded_light_release_rejects_wrong_mime(name, mime):
     verifier = load_module(VERIFY_PATH, "bounded_light_mime")
@@ -868,4 +869,7 @@ def test_bounded_light_audit_uses_canonical_directory_route():
     verifier = load_module(VERIFY_PATH, "bounded_light_route")
     assert verifier.live_url("https://lumen-core.ai", "bounded-light/index.html", "a" * 40) == (
         "https://lumen-core.ai/bounded-light/?release=" + "a" * 40
+    )
+    assert verifier.live_url("https://lumen-core.ai", "bounded-light/observatory/index.html", "a" * 40) == (
+        "https://lumen-core.ai/bounded-light/observatory/?release=" + "a" * 40
     )
