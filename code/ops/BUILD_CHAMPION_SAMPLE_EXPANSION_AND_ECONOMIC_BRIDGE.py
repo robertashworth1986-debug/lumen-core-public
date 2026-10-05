@@ -115,16 +115,28 @@ def now_utc() -> str:
 def read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    return payload if isinstance(payload, dict) else {}
+    def pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("duplicate JSON key in evidence input")
+            result[key] = value
+        return result
+
+    def reject_constant(value: str) -> None:
+        raise ValueError("nonfinite JSON value in evidence input")
+
+    payload = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=pairs,
+                         parse_constant=reject_constant,
+                         parse_float=lambda value: as_float(float(value)))
+    if not isinstance(payload, dict):
+        raise ValueError("evidence input must be a JSON object")
+    return payload
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str, allow_nan=False) + "\n", encoding="utf-8")
 
 
 def write_text(path: Path, text: str) -> None:
@@ -133,21 +145,34 @@ def write_text(path: Path, text: str) -> None:
 
 
 def stable_sha256(payload: Any) -> str:
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str, allow_nan=False).encode("utf-8")).hexdigest()
 
 
 def as_int(value: Any, default: int = 0) -> int:
-    try:
-        return int(float(value))
-    except (TypeError, ValueError):
+    if value is None:
         return default
+    if type(value) is not int or not 0 <= value <= 2**53 - 1:
+        raise ValueError("evidence count must be a nonnegative JSON-safe integer")
+    return value
 
 
 def as_float(value: Any, default: float = 0.0) -> float:
-    try:
-        return float(value)
-    except (TypeError, ValueError):
+    if value is None:
         return default
+    try:
+        if type(value) not in (int, float) or not math.isfinite(value):
+            raise ValueError("evidence score must be a finite number")
+        return float(value)
+    except OverflowError as exc:
+        raise ValueError("evidence score exceeds finite output range") from exc
+
+
+def comparison_counts(row: dict[str, Any]) -> tuple[int, int]:
+    comparisons = as_int(row.get("baseline_comparison_count"))
+    wins = as_int(row.get("candidate_win_count"))
+    if wins > comparisons:
+        raise ValueError("candidate wins cannot exceed baseline comparisons")
+    return comparisons, wins
 
 
 def manifest_rows(manifest: dict[str, Any]) -> list[dict[str, Any]]:
@@ -171,7 +196,10 @@ def lane_manifest_summary(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any
             },
         )
         entry["mapped_rows"] += 1
-        if row.get("ready_for_benchmark"):
+        ready = row.get("ready_for_benchmark", False)
+        if type(ready) is not bool:
+            raise ValueError("benchmark readiness must be a boolean")
+        if ready:
             entry["ready_rows"] += 1
         entry["estimated_rows"] += as_int(row.get("estimated_rows"))
         system = str(row.get("system") or "unknown")
@@ -186,20 +214,25 @@ def lane_scoreboard(sweep: dict[str, Any]) -> dict[str, dict[str, Any]]:
     lanes: dict[str, dict[str, Any]] = {}
     for row in sweep.get("lane_scoreboard", []):
         if isinstance(row, dict):
-            lanes[str(row.get("lane") or "unknown")] = row
+            lane = str(row.get("lane") or "unknown")
+            if lane in lanes:
+                raise ValueError("duplicate lane in replay evidence")
+            lanes[lane] = row
     return lanes
 
 
 def status_for_lane(lane: str, sweep_lane: dict[str, Any], manifest_lane: dict[str, Any]) -> str:
     routes = as_int(sweep_lane.get("routes_replayed"))
-    comparisons = as_int(sweep_lane.get("baseline_comparison_count"))
-    wins = as_int(sweep_lane.get("candidate_win_count"))
+    comparisons, wins = comparison_counts(sweep_lane)
+    mean_delta = as_float(sweep_lane.get("mean_score_delta"))
+    if routes == 0 and comparisons:
+        raise ValueError("replay comparisons require a positive route count")
     target = LANE_TARGETS.get(lane, {})
     target_routes = as_int(target.get("target_routes"), 30)
     target_comparisons = as_int(target.get("target_comparisons"), 120)
     if routes == 0:
         return "adapter_needed_before_claim"
-    if comparisons == 0 or wins == 0 or as_float(sweep_lane.get("mean_score_delta")) <= 0:
+    if comparisons == 0 or wins == 0 or mean_delta <= 0:
         return "mixed_or_not_promoted"
     if routes < target_routes or comparisons < target_comparisons:
         return "promising_but_underpowered"
@@ -225,6 +258,9 @@ def build_lane_diagnostics(sweep: dict[str, Any], manifest: dict[str, Any]) -> l
         win_rate = wins / comparisons if comparisons else 0.0
         target_routes = as_int(target.get("target_routes"), 30)
         target_comparisons = as_int(target.get("target_comparisons"), 120)
+        estimated_rows = sweep_lane.get("estimated_rows")
+        if estimated_rows is None:
+            estimated_rows = manifest_lane.get("estimated_rows")
         diagnostics.append(
             {
                 "lane": lane if lane in LANE_TARGETS or lane == "time_series_model_routing" else f"unclassified_{len(diagnostics)}",
@@ -238,7 +274,7 @@ def build_lane_diagnostics(sweep: dict[str, Any], manifest: dict[str, Any]) -> l
                 "mean_score_delta": round(as_float(sweep_lane.get("mean_score_delta")), 6),
                 "best_score_delta": round(as_float(sweep_lane.get("best_score_delta")), 6),
                 "numeric_samples": as_int(sweep_lane.get("numeric_samples")),
-                "estimated_rows": as_int(sweep_lane.get("estimated_rows") or manifest_lane.get("estimated_rows")),
+                "estimated_rows": as_int(estimated_rows),
                 "mapped_rows": as_int(manifest_lane.get("mapped_rows")),
                 "ready_rows": as_int(manifest_lane.get("ready_rows")),
                 "systems": {},
@@ -411,6 +447,11 @@ def build_payload() -> dict[str, Any]:
     manifest = read_json(MANIFEST_JSON)
     live_domain = read_json(LIVE_DOMAIN_JSON)
     lane_diagnostics = build_lane_diagnostics(sweep, manifest)
+    summary = sweep.get("summary", {})
+    summary_comparisons, summary_wins = comparison_counts(summary)
+    reviewer_ready = live_domain.get("summary", {}).get("live_domain_reviewer_ready", False)
+    if type(reviewer_ready) is not bool:
+        raise ValueError("live-domain reviewer readiness must be a boolean")
     payload = {
         "schema": "champion_sample_expansion_and_economic_bridge_v1",
         "generated_utc": now_utc(),
@@ -421,12 +462,12 @@ def build_payload() -> dict[str, Any]:
             "live_domain_deployment_feed": str(LIVE_DOMAIN_JSON.relative_to(ROOT)),
         },
         "summary": {
-            "ready_rows": sweep.get("summary", {}).get("ready_rows", 0),
-            "source_count": sweep.get("summary", {}).get("source_count", 0),
-            "estimated_rows_replayed": sweep.get("summary", {}).get("estimated_rows_replayed", 0),
-            "numeric_samples_read": sweep.get("summary", {}).get("numeric_samples_read", 0),
-            "baseline_comparison_count": sweep.get("summary", {}).get("baseline_comparison_count", 0),
-            "candidate_win_count": sweep.get("summary", {}).get("candidate_win_count", 0),
+            "ready_rows": as_int(summary.get("ready_rows")),
+            "source_count": as_int(summary.get("source_count")),
+            "estimated_rows_replayed": as_int(summary.get("estimated_rows_replayed")),
+            "numeric_samples_read": as_int(summary.get("numeric_samples_read")),
+            "baseline_comparison_count": summary_comparisons,
+            "candidate_win_count": summary_wins,
             "wave_resonance_win_rate": next(
                 (row["win_rate"] for row in lane_diagnostics if row["lane"] == "wave_resonance_timing"),
                 0.0,
@@ -441,9 +482,7 @@ def build_payload() -> dict[str, Any]:
                 for row in lane_diagnostics
                 if row["status"] == "adapter_needed_before_claim"
             ],
-            "live_domain_reviewer_ready": bool(
-                live_domain.get("summary", {}).get("live_domain_reviewer_ready", False)
-            ),
+            "live_domain_reviewer_ready": reviewer_ready,
             "field_validation_claim_allowed": False,
             "real_dollar_savings_claim_allowed": False,
             "fixed_dollar_delta_sale_claim_allowed": False,
