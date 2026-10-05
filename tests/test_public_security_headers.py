@@ -73,6 +73,46 @@ server {
 
 
 class PublicSecurityHeaderTests(unittest.TestCase):
+    def test_live_response_rejects_old_policy_and_duplicate_headers(self) -> None:
+        current = "HTTP/2 200\r\n" + "\r\n".join(
+            f"{name.lower()}: {value}" for name, value in MODULE.HEADER_VALUES
+        ) + "\r\n\r\n"
+        MODULE.validate_response_headers(current)
+        origin = " https://lumencore-wonder-studio.robertashworth4444.chatgpt.site"
+        invalid = (
+            current.replace(origin, ""),
+            current.replace(origin, " https://untrusted.example"),
+            current + "Content-Security-Policy: default-src *\r\n",
+            current.replace("x-frame-options: DENY\r\n", ""),
+        )
+        for response in invalid:
+            with self.subTest(response=response):
+                with self.assertRaises(MODULE.SecurityHeaderRepairError):
+                    MODULE.validate_response_headers(response)
+        with tempfile.TemporaryDirectory() as tmp:
+            headers = Path(tmp) / "headers.txt"
+            headers.write_text(current, encoding="utf-8")
+            self.assertEqual(0, MODULE.main(["--verify-response-headers", str(headers)]))
+            headers.write_text(invalid[0], encoding="utf-8")
+            self.assertEqual(3, MODULE.main(["--verify-response-headers", str(headers)]))
+
+    def test_studio_origin_is_scoped_only_to_images_and_media(self) -> None:
+        historical = load_module(
+            ROOT / "code" / "ops" / "VERIFY_PUBLIC_SECURITY_HEADER_RECEIPT.py",
+            "historical_security_header_policy",
+        )
+        origin = "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site"
+        previous = historical.EXPECTED_POLICY["Content-Security-Policy"]
+        current = dict(MODULE.HEADER_VALUES)["Content-Security-Policy"]
+        expected = previous.replace(
+            "img-src 'self' data:;", f"img-src 'self' data: {origin};"
+        ).replace("media-src 'self';", f"media-src 'self' {origin};")
+        self.assertEqual(current, expected)
+        self.assertEqual(current.count(origin), 2)
+        for header, value in historical.EXPECTED_POLICY.items():
+            if header != "Content-Security-Policy":
+                self.assertEqual(dict(MODULE.HEADER_VALUES)[header], value)
+
     def test_repairs_all_https_servers_and_header_bearing_locations(self) -> None:
         result = MODULE.repair_config(PARTIAL)
         self.assertTrue(result.changed)
@@ -147,6 +187,7 @@ class PublicSecurityHeaderTests(unittest.TestCase):
         self.assertIn('"public ${route}"', text)
         self.assertIn("did not converge after", text)
         self.assertIn("X-Frame-Options=%q", text)
+        self.assertIn('python3 "$REPAIR_TOOL" --verify-response-headers "$headers"', text)
 
     def test_runner_verification_waits_for_public_convergence(self) -> None:
         text = DEPLOY_WORKFLOW.read_text(encoding="utf-8")
@@ -159,6 +200,7 @@ class PublicSecurityHeaderTests(unittest.TestCase):
             text,
         )
         self.assertIn('"$normalized"', text)
+        self.assertIn('python3 code/ops/repair_public_security_headers.py --verify-response-headers "$headers"', text)
         self.assertNotIn("nosniff\\r?$", text)
         self.assertIn("WAIT\\t%s\\tattempt=%s\\thttp=%s", text)
         self.assertIn("[[ \"$verified\" == true ]]", text)

@@ -143,6 +143,7 @@ verify_policy() {
     printf '  Permissions-Policy=%q\n' "$permissions" >&2
     return 1
   fi
+  python3 "$REPAIR_TOOL" --verify-response-headers "$headers" || return 1
   echo "OK: ${label} HTTP 200 with bounded public security policy"
 }
 

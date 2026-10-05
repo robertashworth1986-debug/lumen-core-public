@@ -48,7 +48,7 @@ def content_type_allowed(archive_name: str, content_type: str) -> bool:
     if Path(archive_name).suffix in {".js", ".mjs"}:
         # Module scripts require a JavaScript MIME type regardless of directory.
         return content_type in {"application/javascript", "text/javascript"}
-    if archive_name.startswith(("bounded-light/", "portfolio/", "rights/")):
+    if archive_name.startswith(("bounded-light/", "portfolio/", "rights/", "art/")):
         expected = {
             ".html": {"text/html"}, ".css": {"text/css"},
             ".json": {"application/json"}, ".svg": {"image/svg+xml"},
@@ -116,6 +116,7 @@ def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
         "cohort/index.html": "/cohort/",
         "portfolio/index.html": "/portfolio/",
         "rights/index.html": "/rights/",
+        "art/index.html": "/art/",
         "bounded-light/index.html": "/bounded-light/",
         "bounded-light/observatory/index.html": "/bounded-light/observatory/",
     }
