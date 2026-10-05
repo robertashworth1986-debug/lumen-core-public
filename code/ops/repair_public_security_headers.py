@@ -74,6 +74,22 @@ class SecurityHeaderRepairError(RuntimeError):
     """Raised when the Nginx policy cannot be repaired unambiguously."""
 
 
+def validate_response_headers(text: str) -> None:
+    """Reject stale, missing or duplicate security headers in a live response."""
+    expected = {name.lower(): value for name, value in HEADER_VALUES}
+    observed: dict[str, str] = {}
+    for line in text.splitlines():
+        name, separator, value = line.partition(":")
+        name = name.strip().lower()
+        if separator and name in expected:
+            if name in observed:
+                raise SecurityHeaderRepairError(f"duplicate response header: {name}")
+            observed[name] = value.strip()
+    for name, value in expected.items():
+        if observed.get(name) != value:
+            raise SecurityHeaderRepairError(f"response header is not current: {name}")
+
+
 @dataclass(frozen=True)
 class RepairResult:
     original: str
@@ -289,6 +305,11 @@ def _diff(original: str, repaired: str, path: Path) -> str:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "--verify-response-headers",
+        type=Path,
+        help="read-only exact policy check of a curl response-header file",
+    )
+    parser.add_argument(
         "--config",
         type=Path,
         default=Path("/etc/nginx/conf.d/lumatrader.conf"),
@@ -309,6 +330,21 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.verify_response_headers is not None:
+        if args.apply:
+            print("ERROR: response verification cannot apply configuration", file=sys.stderr)
+            return 2
+        try:
+            with args.verify_response_headers.open("rb") as handle:
+                raw = handle.read(65537)
+            if len(raw) > 65536:
+                raise SecurityHeaderRepairError("response headers exceed 64 KiB")
+            validate_response_headers(raw.decode("utf-8"))
+        except (OSError, UnicodeError, SecurityHeaderRepairError) as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 3
+        print("OK: response security headers match the current exact policy")
+        return 0
     config: Path = args.config
     if not config.is_file():
         print(f"ERROR: nginx config not found: {config}", file=sys.stderr)
