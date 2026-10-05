@@ -3,10 +3,19 @@
   "files": [
     {
       "path": "media/bounded-light-speed-teaser.mp4",
-      "bytes": 1800207,
-      "sha256": "83b7b15745390ab4d8b0c8b3e7f02c391610b79acdc7e14c9bab8ad210d5cd16",
-      "asset_url": "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/art/media/bounded-light-speed-teaser.mp4",
-      "included_in_repository_release": false
+      "bytes": 2377637,
+      "sha256": "3e46e4cad8ab268f9260a420d14f9296ac5fdcc4e81ab3dee3109aeb5f3c37a9",
+      "asset_url": "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/art/media/bounded-light-speed-teaser.mp4?v=cinematic-stereo-1",
+      "included_in_repository_release": false,
+      "audio": {
+        "edition": "cinematic-stereo-1",
+        "method": "Original procedural sound design; no external recordings or samples",
+        "sample_rate_hz": 48000,
+        "channels": 2,
+        "duration_seconds": 18,
+        "integrated_lufs": -16.45,
+        "true_peak_dbtp": -2.01
+      }
     },
     {
       "path": "media/ten-slide-preview.pdf",
