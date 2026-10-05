@@ -7,6 +7,47 @@
 
 ## One commercial sentence
 
+### October 5 fixed-material and high-activity diagnostic continuation
+
+Active outcome 2 now includes two diagnostic studies with protocols recorded locally
+before their single executions, addressing specific limits of the existing evidence. These are first-party
+synthetic or retrospective studies, not independent preregistration, fresh holdouts,
+physical validation or authorization to promote a family or deploy a candidate.
+
+The [fixed-volume geometry allocation study](GEOMETRY_TRANSPORT_SCREEN_2026-10-04.md#fixed-volume-cross-section-allocation-continuation)
+redistributed the same conductor volume with a 10%-of-uniform cross-section floor,
+fixed topology and five terminal-pair folds. All five paired held-out differences
+were positive within seven layouts; the serpentine chain lost in all five folds.
+Six layouts share terminal coordinates, while honeycomb and sunflower remain
+separate exploratory embeddings. These results do not rank unlike embeddings.
+Of 40 fits, 24 met the declared dual-gap tolerance and 16 exhausted the iteration
+budget. The 4,504 training solves used about 17.40 seconds, versus 0.046 seconds
+for 40 uniform-baseline evaluations: added design compute, not a speedup or energy
+saving. All allocations, losses, budgets and numerical residuals are retained.
+The historical 743-outage study results remain unchanged; their source binding is
+preserved at public commit `6b078afb13936e388c035f4442ffaee80027ac41`.
+
+The [high-activity interval diagnostic](../experiments/energy_multisource/stage6/high_activity_diagnostic_20261005/README.md)
+tested one fixed residual-calibration overlay on the already examined 2025 record.
+Only outcomes matured before each update under the stated, assumed 30-minute lag
+entered calibration. Ordinary-issue intervals were unchanged. Median high-activity
+coverage rose from 64.49% to 76.20%, but only one of 15 mandatory cells reached
+90%; 14 still failed. Median overall interval score fell 0.675% while interval
+width grew 3.289%; four cell-level score regressions remain explicit. Only 3,518
+of 5,754 high-issue rows had sufficient calibration support; the remaining rows
+used the unchanged baseline. These are dependent station/horizon rows, not
+independent events or verified historical publication availability. Eleven new
+software checks cover maturity, future-outcome isolation, fallback and identity.
+No second candidate or post-result threshold adjustment was executed.
+
+The registry validator now rejects disabled or missing promotion controls,
+invalid validation-fold budgets, malformed families and duplicate/non-finite JSON.
+This closes a software acceptance gap; the 26-family registry gains no performance
+promotion. Physical constraints, representative external validation, the 37
+unassigned prospective protocol fields and independent evaluator remain open.
+Phase guidance separates a pre-run rehearsal from a post-run independent-execution
+receipt and an external protocol digest; it does not fill fields or authorize a run.
+
 ### October 5 bounded test and experiment completion
 
 Active outcome 2 includes the founder-requested completion of existing reviewer
@@ -63,9 +104,15 @@ All 15 selected high-activity cells still fall below nominal 90% coverage; no
 fresh holdout, independent evaluator, electricity savings or geothermal benefit
 is established. The prospective protocol remains unfrozen and unstarted.
 
-The preceding main source suite passed 1,230 tests and 87 subtests, with eight
-legitimate skips and five warnings. This new source candidate requires its own
-maintained CI receipts. The October 5 15:35 UTC
+The completed [PR #242 source suite](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37340889569)
+passed 1,296 tests and 87 subtests, with eight legitimate clean-checkout/platform
+skips and no warnings reported. Separate exact-head jobs passed 27 native C tests
+and three Windows fixtures without skips. All ten applicable maintained workflows
+passed at `6cc84d78af4072700985b22a047b0c0dc9199b04`; merge
+`6b078afb13936e388c035f4442ffaee80027ac41` preserved that exact tested tree.
+The two subsequent diagnostic studies above retain their own protocol/source/result
+identities; their integrated source checks are evidenced by the continuation PR
+and exact-head handoff, not by relabeling the preceding suite. The October 5 15:35 UTC
 [exact live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37333941141)
 found 192 of 246 files matching, three mismatches and 51 HTTP 404 responses.
 `HOLD_PUBLIC_RELEASE_PROMOTION` remains. Source/test improvements do not replace

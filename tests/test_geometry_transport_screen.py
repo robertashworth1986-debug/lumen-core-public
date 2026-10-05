@@ -2,6 +2,8 @@ import math, unittest
 import numpy as np
 import importlib.util
 import json
+import copy
+from unittest.mock import patch
 import platform
 import sys
 import time
@@ -212,6 +214,92 @@ class TransportTests(unittest.TestCase):
             self.assertEqual(new['edges'],old['edges'])
             for key in ('mean_effective_conductance','mean_effective_resistance','mean_path_stretch'):
                 self.assertAlmostEqual(new['metrics'][key],old['metrics'][key],places=9)
+
+
+class MaterialAllocationTests(unittest.TestCase):
+    def setUp(self):
+        self.protocol = json.loads((_module_path.parents[2] / 'evidence/geometry_transport_screen/20261005/allocation_protocol.json').read_text())
+
+    def test_simplex_projection_exact_and_shift_invariant(self):
+        lower = np.array([.1, .2])
+        projected = _module.project_material_simplex([2, -1], lower)
+        np.testing.assert_allclose(projected, [.8, .2], atol=1e-14)
+        np.testing.assert_allclose(projected, _module.project_material_simplex([102, 99], lower), atol=1e-14)
+        with self.assertRaises(ValueError): _module.project_material_simplex([1, 2], [.5, .5])
+        with self.assertRaises(ValueError): _module.project_material_simplex([math.nan, 2], [.1, .1])
+
+    def test_uniform_material_reproduces_prior_no_fault_objective(self):
+        pairs = np.array([(a,b) for a in range(64) for b in range(a+1,64)])
+        for graph in build_graphs():
+            model = _module.allocation_model(graph['points'], graph['edges'])
+            score, gradient, residual = _module.conductance_objective(model, model['uniform_fractions'], pairs)
+            reference, _, _, _ = resistor_analysis(graph['points'], graph['edges'])
+            self.assertAlmostEqual(score, reference['mean_effective_conductance'], places=11)
+            self.assertLess(residual, 1e-10)
+            # Conductance is homogeneous of degree one in conductor material.
+            self.assertAlmostEqual(float(gradient@model['uniform_fractions']), score, places=11)
+
+    def test_circuit_gradient_matches_centered_simplex_differences(self):
+        model = _module.allocation_model([(0,0),(2,0),(.2,1)], [(0,1),(0,2),(1,2)])
+        q = np.array([.2,.3,.5]); pairs = np.array([[0,1],[1,2]])
+        _, gradient, _ = _module.conductance_objective(model,q,pairs)
+        for edge in (0,1):
+            perturb = np.zeros(3); perturb[edge]=1e-6; perturb[2]=-1e-6
+            above = _module.conductance_objective(model,q+perturb,pairs)[0]
+            below = _module.conductance_objective(model,q-perturb,pairs)[0]
+            self.assertAlmostEqual((above-below)/2e-6, gradient[edge]-gradient[2], places=7)
+
+    def test_classical_equal_area_series_solution_needs_no_update(self):
+        model = _module.allocation_model([(0,0),(1,0),(3,0)],[(0,1),(1,2)])
+        fit = _module.optimize_material(model,np.array([[0,2]]),self.protocol)
+        self.assertAlmostEqual(fit['training_score'],1/9,places=12)
+        self.assertEqual(fit['accepted_steps'],0)
+        self.assertEqual(fit['termination'],'declared_dual_gap_tolerance_reached')
+        np.testing.assert_allclose(fit['material_fractions'],[1/3,2/3],atol=1e-12)
+
+    def test_budget_exhaustion_is_not_reported_as_convergence(self):
+        model = _module.allocation_model([(0,0),(1,0),(.5,math.sqrt(3)/2)],[(0,1),(0,2),(1,2)])
+        protocol = copy.deepcopy(self.protocol); protocol['optimization_budget']['max_solver_calls']=1
+        fit = _module.optimize_material(model,np.array([[0,1]]),protocol)
+        self.assertEqual(fit['termination'],'solver_budget_exhausted')
+        self.assertEqual(fit['solver_calls'],1)
+        self.assertGreater(fit['dual_gap_upper_bound'],protocol['optimization_budget']['relative_dual_gap_tolerance'])
+
+    def test_training_calls_never_receive_held_out_pairs(self):
+        model = _module.allocation_model([(0,0),(2,0),(.2,1)],[(0,1),(0,2),(1,2)])
+        training = np.array([[0,1],[0,2]])
+        original = _module.conductance_objective
+        observed = []
+        def tracked(model,q,pairs,**kwargs):
+            observed.append(np.asarray(pairs).tolist())
+            return original(model,q,pairs,**kwargs)
+        with patch.object(_module,'conductance_objective',side_effect=tracked):
+            fit = _module.optimize_material(model,training,self.protocol)
+        self.assertTrue(observed)
+        self.assertTrue(all(pairs == training.tolist() for pairs in observed))
+        self.assertEqual(len(observed),fit['solver_calls'])
+        self.assertLessEqual(fit['solver_calls'],self.protocol['optimization_budget']['max_solver_calls'])
+        self.assertLessEqual(fit['accepted_steps'],self.protocol['optimization_budget']['max_iterations'])
+        self.assertAlmostEqual(fit['material_volume'],1,places=12)
+        self.assertGreaterEqual(fit['minimum_area_fraction_of_uniform'],.1-1e-12)
+        self.assertTrue(all(b >= a-1e-12 for a,b in zip(fit['training_trace'],fit['training_trace'][1:])))
+
+    def test_five_folds_cover_every_pair_exactly_once(self):
+        pairs, folds = _module.allocation_pair_folds(self.protocol)
+        self.assertEqual(len(pairs),2016)
+        self.assertEqual([len(fold) for fold in folds],[404,403,403,403,403])
+        self.assertEqual(set(np.concatenate(folds).tolist()),set(range(2016)))
+        for index,held_out in enumerate(folds):
+            training = np.concatenate([fold for j,fold in enumerate(folds) if j != index])
+            self.assertFalse(set(training) & set(held_out))
+
+    def test_invalid_objective_inputs_and_unsupported_protocol_rejected(self):
+        model = _module.allocation_model([(0,0),(1,0)],[(0,1)])
+        for q,pairs in [([0],[[0,1]]),([math.nan],[[0,1]]),([1],[[0,0]]),([1],[[0.,1.]]),([1],[[0,1],[1,0]])]:
+            with self.assertRaises(ValueError): _module.conductance_objective(model,q,pairs)
+        for group,key,value in [('physical_constraints','material_volume',2),('physical_constraints','minimum_cross_section_fraction_of_uniform',math.nan),('optimization_budget','max_iterations',True)]:
+            protocol=copy.deepcopy(self.protocol); protocol[group][key]=value
+            with self.assertRaises(ValueError): _module.validate_allocation_protocol(protocol)
 
 if __name__=='__main__':
     if len(sys.argv) == 3 and sys.argv[1] == '--benchmark-outages':

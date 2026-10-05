@@ -1,0 +1,66 @@
+{
+  "schema": "lumencore.fixed_volume_dc_allocation_protocol.v1",
+  "source_base_commit": "6b078afb13936e388c035f4442ffaee80027ac41",
+  "purpose": "Test the existing screen's uniform cross-section constraint: change material allocation on fixed topologies, not topology or physical assumptions.",
+  "active_outcome": "External reviewer can inspect a constrained optimization, retained failure and generalization boundary in the existing proof-to-pilot lane.",
+  "claim_level": "internal_synthetic_screening_only",
+  "promotion_gate_passed": false,
+  "graphs": [
+    "serpentine_chain",
+    "square_grid",
+    "triangulated_grid",
+    "minimum_spanning_tree",
+    "loop_augmented_tree",
+    "randomized_tree",
+    "honeycomb",
+    "sunflower_knn"
+  ],
+  "comparison_groups": "First six use identical terminals. Honeycomb and sunflower remain separate different-embedding exploratory cases; no pooled topology ranking.",
+  "primary_metric": "Arithmetic mean ideal DC effective conductance across held-out terminal pairs, larger is better, compared to original uniform-area policy in the same graph.",
+  "physical_constraints": {
+    "node_count": 64,
+    "diameter": 1.0,
+    "material_volume": 1.0,
+    "resistivity": 1.0,
+    "minimum_cross_section_fraction_of_uniform": 0.1,
+    "topology_and_coordinates_unchanged": true
+  },
+  "allocation_parameter": "q_e = A_e * length_e / V, sum q = 1; lower bound q_e >= 0.1 * length_e / total_length.",
+  "training": "Classical projected gradient ascent on mean effective conductance, exact numerical circuit gradients; Euclidean projection onto lower-bounded material simplex; start from original uniform cross-section.",
+  "optimization_budget": {
+    "max_iterations": 80,
+    "max_solver_calls": 1000,
+    "max_line_search_steps": 20,
+    "initial_step": 1.0,
+    "armijo_coefficient": 0.0001,
+    "relative_dual_gap_tolerance": 1e-06
+  },
+  "validation": {
+    "fold_count": 5,
+    "pair_shuffle_seed": 2026100502,
+    "split": "One deterministic shuffle of all 2016 unordered pairs; array_split into five held-out folds. Fit four folds; score fifth only after optimization returns. No allocation or hyperparameter selection uses held-out outcomes.",
+    "scope": "Pair-demand interpolation within already known synthetic graphs; old full-pair scenario exists. Not independent, prospective, temporal, physical or new-topology validation."
+  },
+  "baselines": [
+    "Original uniform cross-section with exactly the same volume",
+    "One preseeded random lower-bounded material allocation; not best-of-many"
+  ],
+  "random_allocation_seed": 2026100503,
+  "failure_rules": [
+    "Nonfinite score/gradient or invalid budget fails run.",
+    "Laplacian identity maximum residual must be <= 1e-8; positive connected eigenmode ratio > 1e-12.",
+    "Material budget error <=1e-12 and no area-floor violation >1e-12.",
+    "Line-search failure or budget exhaustion is reported, never recoded convergence."
+  ],
+  "acceptance": "Descriptive per-layout improvement only if all five held-out fold deltas exceed zero; this is not a statistical significance or championship promotion gate.",
+  "uncertainty": "Report all paired fold deltas, their range and negative/zero fold counts. Folds share training data and topology; no independent confidence interval or multiple-family significance claim.",
+  "compute_accounting": "Report solver calls, gradient calls, fit runtime, one held-out score runtime, uniform/random baseline score runtimes, dual gap and termination reason. Classical optimization costs extra compute.",
+  "stop_rule": "Exactly eight fixed layouts times five folds, one fixed algorithm/budget and one random control. Keep every outcome; no post-result hyperparameter, topology or fold changes.",
+  "limitations": [
+    "Ideal DC only; no time, frequency, noise, attenuation, heat or physical reliability.",
+    "No manufacturability, maximum radius, junction volume or overlap constraint; 10% area floor is a declared synthetic policy.",
+    "This allocates material with a classical numerical method; it does not invent a new geometry or establish superiority of a named family.",
+    "Earlier outage results used uniform areas and do not validate outages under the new allocations.",
+    "Registry statuses and historical receipts remain unchanged."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "frozen_utc": "2026-10-05T16:41:06.173632+00:00",
+  "source_history_commit": "2c06c8315c667dec6bed426b533024ecb8300f59",
+  "known_2025_outcomes_previously_consumed": true,
+  "new_recipe_not_yet_scored": true,
+  "new_tests_passed": 11,
+  "files": [
+    {
+      "file": "PROTOCOL.json",
+      "bytes": 4178,
+      "sha256": "5475e492267303cf502b52f6071ba9e5296deb219037264aeb769d4e09828e3a"
+    },
+    {
+      "file": "run_diagnostic.py",
+      "bytes": 12346,
+      "sha256": "20644b7d109bfcc9f48c596e629f0c5c30cb5575def4e097159b61be1ce006c7"
+    },
+    {
+      "file": "test_diagnostic.py",
+      "bytes": 3802,
+      "sha256": "e48e1d455c7a9508bcf9281a28653c39fb5e543dcdce4d265d886b44ef503fec"
+    },
+    {
+      "file": "TESTS.log",
+      "bytes": 1347,
+      "sha256": "d3cfa8631a4f225c78385e7c78fd3467fa30b2edf93b04082fb635b8f46dba7e"
+    }
+  ],
+  "boundary": "First-party prerecording before this one diagnostic run; not independent preregistration, fresh data or a prospective freeze."
+}

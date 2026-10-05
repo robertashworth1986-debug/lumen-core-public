@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 import subprocess
 from datetime import datetime, timezone
@@ -50,6 +51,17 @@ REQUIRED_FAMILY_IDS = {
 }
 PERFORMANCE_READY_STATUSES = {"implemented", "validated"}
 LEGACY_STATUSES = {"legacy_analogue_only", "legacy_transform_only"}
+KNOWN_STATUSES = PERFORMANCE_READY_STATUSES | LEGACY_STATUSES | {
+    "specification_only", "concept_only", "visualization_only", "diagnostic_specification"
+}
+REQUIRED_PROMOTION_CONTROLS = {
+    "versioned_definition", "preregistered_task_and_failure_criterion",
+    "budget_matched_baselines", "frozen_development_and_validation_scenarios",
+    "paired_uncertainty_interval", "multiple_comparison_control",
+    "runtime_and_resource_measurement", "sha256_manifest",
+    "negative_results_retained",
+    "independent_or_representative_validation_required_for_operational_claim",
+}
 
 
 def utc_now() -> datetime:
@@ -80,7 +92,26 @@ def source_commit(root: Path = ROOT) -> str | None:
 
 
 def load_registry(path: Path) -> dict[str, Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
+    def unique_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("duplicate JSON member in geometry registry")
+            result[key] = value
+        return result
+
+    def reject_nonfinite(value: str) -> None:
+        raise ValueError("non-finite JSON value in geometry registry")
+
+    def finite_float(value: str) -> float:
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise ValueError("non-finite JSON value in geometry registry")
+        return parsed
+
+    data = json.loads(path.read_text(encoding="utf-8"),
+                      object_pairs_hook=unique_members, parse_constant=reject_nonfinite,
+                      parse_float=finite_float)
     if not isinstance(data, dict):
         raise ValueError("registry root must be an object")
     return data
@@ -88,10 +119,16 @@ def load_registry(path: Path) -> dict[str, Any]:
 
 def validate_registry(registry: dict[str, Any]) -> list[str]:
     errors: list[str] = []
+    if not isinstance(registry, dict):
+        return ["registry root must be an object"]
     if registry.get("schema") != "geometry_championship_v1_registry":
         errors.append("unexpected schema")
     if registry.get("cross_lane_ranking_allowed") is not False:
         errors.append("cross-lane ranking must be disabled")
+    for field in ("evidence_boundary", "core_rule"):
+        value = registry.get(field)
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"{field} must be a non-empty string")
 
     lanes = registry.get("lanes")
     families = registry.get("families")
@@ -104,6 +141,13 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
         families = []
     if not isinstance(gate, dict) or not gate:
         errors.append("promotion_gate must be a non-empty object")
+    else:
+        for control in sorted(REQUIRED_PROMOTION_CONTROLS):
+            if gate.get(control) is not True:
+                errors.append(f"promotion control {control} must be true")
+        folds = gate.get("minimum_validation_folds")
+        if type(folds) is not int or folds < 5:
+            errors.append("minimum_validation_folds must be an integer of at least five")
 
     ids: list[str] = []
     for index, family in enumerate(families):
@@ -113,14 +157,19 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
         family_id = family.get("id")
         lane = family.get("lane")
         status = family.get("status")
+        label = family.get("label")
+        if not isinstance(label, str) or not label.strip():
+            errors.append(f"family {index} has no label")
         if not isinstance(family_id, str) or not family_id:
             errors.append(f"family {index} has no id")
         else:
             ids.append(family_id)
-        if lane not in lanes:
+        if not isinstance(lane, str) or lane not in lanes:
             errors.append(f"{family_id or index} references unknown lane {lane!r}")
-        if not isinstance(status, str) or not status:
-            errors.append(f"{family_id or index} has no status")
+        if not isinstance(status, str) or status not in KNOWN_STATUSES:
+            errors.append(f"{family_id or index} has unknown status")
+        if type(family.get("competitor", True)) is not bool:
+            errors.append(f"{family_id or index} competitor must be a boolean")
 
     if len(ids) != len(set(ids)):
         errors.append("family ids must be unique")
@@ -132,7 +181,8 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
         errors.append("unexpected families: " + ", ".join(extra))
 
     frobenius = next(
-        (family for family in families if family.get("id") == "frobenius_stability"),
+        (family for family in families
+         if isinstance(family, dict) and family.get("id") == "frobenius_stability"),
         None,
     )
     if frobenius and frobenius.get("competitor", True) is not False:
@@ -142,14 +192,20 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
         if not isinstance(lane, dict):
             errors.append(f"lane {lane_name} must be an object")
             continue
-        if not lane.get("baselines"):
-            errors.append(f"lane {lane_name} has no baselines")
-        if not lane.get("metrics"):
-            errors.append(f"lane {lane_name} has no metrics")
+        for key in ("baselines", "metrics"):
+            values = lane.get(key)
+            if (not isinstance(values, list) or not values
+                    or any(not isinstance(value, str) or not value.strip() for value in values)):
+                errors.append(f"lane {lane_name} {key} must be a non-empty string array")
+            elif len(values) != len(set(values)):
+                errors.append(f"lane {lane_name} {key} must not contain duplicates")
     return errors
 
 
 def build_readiness(registry: dict[str, Any]) -> dict[str, Any]:
+    errors = validate_registry(registry)
+    if errors:
+        raise ValueError("invalid geometry registry: " + "; ".join(errors))
     families = registry["families"]
     runnable = [
         family["id"]

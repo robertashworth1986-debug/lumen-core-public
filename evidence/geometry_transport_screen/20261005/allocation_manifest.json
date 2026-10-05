@@ -1,0 +1,74 @@
+{
+  "schema": "lumencore.geometry_transport_allocation_manifest.v1",
+  "source_base_commit": "6b078afb13936e388c035f4442ffaee80027ac41",
+  "claim_level": "internal_synthetic_screening_only",
+  "promotion_gate_passed": false,
+  "targeted_tests": {
+    "command": "python tests/test_geometry_transport_screen.py MaterialAllocationTests -v",
+    "passed": 8,
+    "failed": 0,
+    "old_outage_study_repeated": false
+  },
+  "study_validation": {
+    "fixed_layouts": 8,
+    "fits": 40,
+    "training_solver_calls": 4504,
+    "validation_solver_calls": 120,
+    "termination_counts": {
+      "iteration_budget_exhausted": 16,
+      "declared_dual_gap_tolerance_reached": 24
+    },
+    "max_volume_error": 1.3322676295501878e-15,
+    "max_laplacian_residual": 1.9248422300499612e-12,
+    "negative_folds_retained": 5,
+    "protocol_and_source_hashes_match": true,
+    "post_outcome_tuning": false
+  },
+  "historical_results_unchanged": [
+    {
+      "path": "evidence/geometry_transport_screen/20261004/results.json",
+      "sha256": "640509d22c7347826b5ac931a2135d60679fcca8981a648c5fa708352835910d"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261005/outage_results.json",
+      "sha256": "7173f5f43b4de742c7a8771057659636e9f2898dc72080d62b56e08aa1c8e9b0"
+    }
+  ],
+  "files": [
+    {
+      "path": "code/research/geometry_transport_screen.py",
+      "bytes": 30039,
+      "sha256": "7a81f615e6114bcc54f6d78950b4480b8ed0a81b80c28926ec2cce552c981c05"
+    },
+    {
+      "path": "tests/test_geometry_transport_screen.py",
+      "bytes": 18627,
+      "sha256": "31ff4764c84594f11cc6ec0da55c3f664d50fb95f450a4c6dc0a6e35b107d58b"
+    },
+    {
+      "path": "docs/GEOMETRY_TRANSPORT_SCREEN_2026-10-04.md",
+      "bytes": 18172,
+      "sha256": "9d6ec8c33e543efed3b5ba74e3d53a10c6e5e771c5586b03152f7bb1510962e4"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261005/allocation_protocol.json",
+      "bytes": 4309,
+      "sha256": "e65ab69806d88c7a4cad8d237d1b0ebbfb874f4a1eaa8fa9baaaa00b66442552"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261005/allocation_results.json",
+      "bytes": 392276,
+      "sha256": "54cd8ea6fcd0f30c3b66d6f1de8d09dfaaccbcbc1778cc8df56e0eee3486115b"
+    }
+  ],
+  "protocol_frozen_local_commit": "85f3429",
+  "executed_implementation_local_commit": "b81cc50f15641642b83da9c53b92834563a3723b",
+  "freeze_boundary": "First-party local recorded order, not independently timestamped preregistration or guaranteed public commit availability. Content SHA-256 identities bind portable artifacts.",
+  "prior_outage_manifest_historical_public_commit": "6b078afb13936e388c035f4442ffaee80027ac41",
+  "second_agent_numeric_review": {
+    "kind": "second_first_party_review_not_external_validation",
+    "fitted_held_out_scores_recomputed": 40,
+    "method": "independent direct grounded inverse",
+    "maximum_absolute_score_discrepancy": 1.04e-14
+  }
+}
