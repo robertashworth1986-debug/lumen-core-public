@@ -44,7 +44,7 @@ STATIC = """server {
         add_header X-Content-Type-Options "nosniff" always;
         add_header X-Frame-Options "DENY" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests" always;
+        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https://lumencore-wonder-studio.robertashworth4444.chatgpt.site; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self' https://lumencore-wonder-studio.robertashworth4444.chatgpt.site; frame-src 'none'; upgrade-insecure-requests" always;
         add_header Strict-Transport-Security "max-age=31536000" always;
         add_header Permissions-Policy "accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()" always;
     }

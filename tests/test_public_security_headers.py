@@ -73,6 +73,23 @@ server {
 
 
 class PublicSecurityHeaderTests(unittest.TestCase):
+    def test_studio_origin_is_scoped_only_to_images_and_media(self) -> None:
+        historical = load_module(
+            ROOT / "code" / "ops" / "VERIFY_PUBLIC_SECURITY_HEADER_RECEIPT.py",
+            "historical_security_header_policy",
+        )
+        origin = "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site"
+        previous = historical.EXPECTED_POLICY["Content-Security-Policy"]
+        current = dict(MODULE.HEADER_VALUES)["Content-Security-Policy"]
+        expected = previous.replace(
+            "img-src 'self' data:;", f"img-src 'self' data: {origin};"
+        ).replace("media-src 'self';", f"media-src 'self' {origin};")
+        self.assertEqual(current, expected)
+        self.assertEqual(current.count(origin), 2)
+        for header, value in historical.EXPECTED_POLICY.items():
+            if header != "Content-Security-Policy":
+                self.assertEqual(dict(MODULE.HEADER_VALUES)[header], value)
+
     def test_repairs_all_https_servers_and_header_bearing_locations(self) -> None:
         result = MODULE.repair_config(PARTIAL)
         self.assertTrue(result.changed)

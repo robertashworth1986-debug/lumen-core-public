@@ -251,6 +251,10 @@ readonly -a RELEASE_FILES=(
   "portfolio/review.html"
   "rights/index.html"
   "rights/artwork-register.json"
+  "art/index.html"
+  "art/art.css"
+  "art/art.js"
+  "art/media-manifest.json"
 )
 readonly -a RELEASE_DIRECTORIES=(
   "assets"
@@ -272,6 +276,7 @@ readonly -a RELEASE_DIRECTORIES=(
   "portfolio/assets"
   "portfolio/data"
   "rights"
+  "art"
 )
 readonly EXPECTED_FILE_COUNT="${#RELEASE_FILES[@]}"
 

@@ -7,6 +7,58 @@
 
 ## One commercial sentence
 
+### October 5 public art showcase and deployment boundary
+
+Active outcome 2 includes Robert's explicit request to make the existing artwork
+and presentation previews easier to share. The bounded `/art/` doorway presents
+19 concept artworks, a silent 18-second vertical film and a ten-layout slide
+preview. Native artwork detail remains 1672 × 941 pixels. Creator attribution,
+rights limits and technical-evidence boundaries remain unchanged. This public
+showcase does not publish an editable paid pack, private correspondence or owner
+archives, and does not promise viral reach or revenue.
+
+Four small source files join the exact release allowlist, now 246 files. Artwork
+and three public preview files retain absolute canonical Wonder Studio URLs;
+their external bytes are not part of the repository's exact-release guarantee.
+The media manifest records published preview hashes and identifies their external
+hosting. Social-card editing opens the Studio, while portfolio, rights and
+mathematical-observatory navigation remains local to the custom domain.
+
+The preceding main commit `605e028226f831fba422ab0ee3ccd1d0439c9881` passed its
+[full source suite](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37243004604)
+with 1,223 tests and 82 subtests passing, 8 tests skipped and 5 warnings. All 18
+repository-maintained PR #239 workflows passed; the separate optional AI review
+could not run because of account quota. These are first-party checks, not
+institutional certification or independent validation.
+
+The latest [exact live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37303581337)
+at October 5 11:32 UTC still found 192 of the prior 242 files matching, three
+mismatches and 47 HTTP 404 responses. `HOLD_PUBLIC_RELEASE_PROMOTION` remains.
+A later [health probe](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37311464748)
+passed 64 observations of 16 existing contracts; it did not check the new art,
+portfolio or rights routes. The 12:48 UTC
+[metrics capture](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37312141273)
+observed a reachable homepage and minimal gateway, but all four legacy feeds
+returned explicit HTTP 503 `operator_access_unconfigured` with unknown freshness.
+Their owner-approved producer, route, schema and disposition remain the separate
+[issue #234](https://github.com/robertashworth1986-debug/lumen-core-public/issues/234)
+contract gap. Reachability does not establish static-release parity or data recovery.
+
+The existing CSP allowed only same-origin image and video embeds, which would
+block the Studio-hosted gallery. This reviewed source candidate adds only the
+exact canonical Studio HTTPS origin to `img-src` and `media-src` in the config
+and its existing repair helpers. Every other CSP directive remains unchanged;
+no wildcard or script/connection permission is added. The historical August 9
+security-header receipt remains immutable. Applying the new policy requires the
+separate current-main security-header workflow and its explicit approval.
+
+No production mutation is part of this source pass. Both that security-header
+action and the existing exact-main static release, signed provenance/SBOM,
+production environment and full live-byte verification remain required. The available connector does not expose workflow
+dispatch or branch-protection writes; `main` has no enforced required contexts.
+No control is weakened to resolve those capability gaps. Estate scope and external
+validation remain OPEN; broader production promotion remains `HOLD`.
+
 ### October 4 current-main readiness and creator attribution
 
 Active outcome 2 includes the founder-requested **Bounded Light Speed** naming

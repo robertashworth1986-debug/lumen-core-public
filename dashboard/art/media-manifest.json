@@ -1,0 +1,28 @@
+{
+  "public_previews_only": true,
+  "files": [
+    {
+      "path": "media/bounded-light-speed-teaser.mp4",
+      "bytes": 1800207,
+      "sha256": "83b7b15745390ab4d8b0c8b3e7f02c391610b79acdc7e14c9bab8ad210d5cd16",
+      "asset_url": "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/art/media/bounded-light-speed-teaser.mp4",
+      "included_in_repository_release": false
+    },
+    {
+      "path": "media/ten-slide-preview.pdf",
+      "bytes": 15099764,
+      "sha256": "f1226f8398030044893ac98781f028493bd5b0e851ca52fc124bed5c4de71d65",
+      "asset_url": "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/art/media/ten-slide-preview.pdf",
+      "included_in_repository_release": false
+    },
+    {
+      "path": "media/ten-layouts.jpg",
+      "bytes": 371401,
+      "sha256": "b4908f901bb0df27aad999c74be190ffba5cbd70d44190f3c685e403930a2103",
+      "asset_url": "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/art/media/ten-layouts.jpg",
+      "included_in_repository_release": false
+    }
+  ],
+  "canonical_media_origin": "https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/art/",
+  "hosting": "Public preview media hosted by Wonder Studio; external to the repository release manifest."
+}

@@ -30,11 +30,11 @@ HEADER_VALUES = (
     (
         "Content-Security-Policy",
         "default-src 'self'; base-uri 'self'; object-src 'none'; "
-        "frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; "
+        "frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https://lumencore-wonder-studio.robertashworth4444.chatgpt.site; "
         "font-src 'self' data: https://fonts.gstatic.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; "
-        "worker-src 'self' blob:; media-src 'self'; frame-src 'none'; "
+        "worker-src 'self' blob:; media-src 'self' https://lumencore-wonder-studio.robertashworth4444.chatgpt.site; frame-src 'none'; "
         "upgrade-insecure-requests",
     ),
     ("Strict-Transport-Security", "max-age=31536000"),

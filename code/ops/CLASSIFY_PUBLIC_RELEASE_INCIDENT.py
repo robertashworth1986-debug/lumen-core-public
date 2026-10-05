@@ -139,6 +139,7 @@ def expected_live_url(archive_name: str, source_commit: str) -> str:
         "cohort/index.html": "/cohort/",
         "portfolio/index.html": "/portfolio/",
         "rights/index.html": "/rights/",
+        "art/index.html": "/art/",
         "bounded-light/index.html": "/bounded-light/",
         "bounded-light/observatory/index.html": "/bounded-light/observatory/",
     }
