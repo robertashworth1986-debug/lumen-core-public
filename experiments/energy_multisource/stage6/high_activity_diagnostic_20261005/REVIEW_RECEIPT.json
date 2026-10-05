@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "source_review": "PASS before the one execution",
+  "post_result_review": "PASS",
+  "review_scope": [
+    "Source/interval-column alignment and strict maturity boundary",
+    "Finite-rank quantile, support fallback, ordinary-bound identity",
+    "All15cells,12months,810baseline/candidate metric slices,counts and tradeoffs recomputed from saved arrays",
+    "Protocol/source/outputs match pre-execution and output manifests"
+  ],
+  "independent_external_validation": false,
+  "operator_controlled_agent_review": true,
+  "result_sha256": "dcfc2dd87a9626f0e278a7d3a8df50556a6003a083664e4862e008cc972e5079",
+  "candidate_regeneration_performed_by_reviewers": false,
+  "promotion_allowed": false
+}

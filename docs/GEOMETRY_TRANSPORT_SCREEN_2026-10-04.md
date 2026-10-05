@@ -142,3 +142,88 @@ October 4. The legacy result and browser data remain unchanged. The 26-family
 registry still has no performance-ready entries. Frequency-dependent signal
 transport, physical fixtures, multi-fold validation and independent engineering
 acceptance remain open.
+
+## Fixed-volume cross-section allocation continuation
+
+The next constraint question is whether redistributing the **same conductor
+volume** improves the existing mean-conductance objective on a fixed network.
+This tests the original uniform-thickness assumption; it adds no new geometry
+name, topology, product or physical performance claim.
+
+The [allocation protocol](../evidence/geometry_transport_screen/20261005/allocation_protocol.json)
+was frozen locally in commit `85f3429` before the study. The locally executed
+implementation `b81cc50f15641642b83da9c53b92834563a3723b` used a classical projected-gradient
+method, a minimum wire cross-section of 10% of the original uniform value,
+volume and resistivity of one, and unchanged coordinates and connections.
+Each fit had at most 80 iterations and 1,000 circuit solves. The algorithm,
+budgets, floor, partitions and thresholds were not adjusted after seeing results.
+These local commit identifiers record first-party execution order, not an
+independent timestamp or publicly retrievable preregistration. Full content
+hashes in the allocation manifest provide the portable source/protocol identity.
+
+Five deterministic folds partitioned the 2,016 terminal pairs. Each allocation
+used four folds for fitting; the remaining fold was scored once after fitting.
+These are withheld pair demands **within already known synthetic layouts**,
+not independent physical observations, previously unseen topologies or a
+prospective field test. Folds share training data and topology. The table gives
+the unweighted mean and range of five paired relative conductance differences
+against each layout's own original uniform-area policy, without a confidence
+interval or significance claim.
+
+| Same-terminal layout | Mean held-out change | Fold range | Nonpositive folds | Fits reaching tolerance |
+|---|---:|---:|---:|---:|
+| Serpentine chain | **−2.322%** | −5.365% to −0.302% | **5/5** | 0/5 |
+| Square grid | +1.019% | +0.689% to +1.646% | 0/5 | 5/5 |
+| Triangulated square grid | +16.104% | +15.304% to +16.950% | 0/5 | 5/5 |
+| Minimum spanning tree | +16.191% | +11.977% to +23.279% | 0/5 | 0/5 |
+| Loop-augmented tree | +1.547% | +0.810% to +1.943% | 0/5 | 5/5 |
+| Randomized tree | +15.741% | +9.808% to +21.732% | 0/5 | 0/5 |
+
+Different-terminal exploratory cases are separate: honeycomb improved +4.204%
+on average (range +0.661% to +6.992%, four of five fits reached tolerance), and
+sunflower improved +6.775% (+5.675% to +8.244%, five of five reached tolerance).
+Their values cannot establish a controlled advantage over grid embeddings.
+One preseeded random material allocation per layout supplies an additional null
+control; all its fold scores and actual material fractions are retained.
+
+The serpentine loss is a practical rejection result: improving the fitting
+objective did not improve its withheld demand pairs. The 16 tree/honeycomb fits
+that exhausted their iteration budget remain marked **not converged**. There
+were 24 fits reaching the declared dual-gap tolerance and no claim that every
+allocation is fully optimized. None of these results changes a registry status
+or passes the full geometry championship promotion gate.
+
+Optimization also has a cost. The 40 fits used **4,504 training circuit solves**
+and about **17.40 seconds** on this host. Scoring the 40 uniform baselines used
+40 solves and **0.046 seconds**; random and fitted validation scores used another
+40 solves each. This is added design compute, not a platform speedup or evidence
+of electricity saved. The maximum recorded Laplacian identity residual was
+`1.93e-12`, below the declared `1e-8` threshold. Numerical tests separately cover
+the analytical sensitivity against finite differences, exact series-circuit
+optima, material conservation, fold disjointness, training-only scoring and honest
+budget-exhaustion labels.
+
+The [full allocation result](../evidence/geometry_transport_screen/20261005/allocation_results.json)
+retains all 40 fits, material fractions, training traces, validation scores,
+negative differences, solver counts, durations, residuals, dual gaps and stopping
+reasons. The [allocation manifest](../evidence/geometry_transport_screen/20261005/allocation_manifest.json)
+binds the frozen protocol and actually executed source to that result. Previous
+uniform-area outage receipts remain immutable; they do not describe failure
+performance under these new allocations.
+The earlier outage manifest's source, test and report hashes are historical:
+all its bound files reconstruct exactly at public source
+`6b078afb13936e388c035f4442ffaee80027ac41`. They are not hashes of the later
+allocation implementation. An independent agent's grounded-inverse recomputation
+of all 40 fitted held-out scores agreed within `1.04e-14`; that is a second
+first-party numerical check, not an independent outside validation receipt.
+
+```bash
+python tests/test_geometry_transport_screen.py MaterialAllocationTests -v
+python code/research/geometry_transport_screen.py --allocation-protocol evidence/geometry_transport_screen/20261005/allocation_protocol.json --output /tmp/geometry-allocation.json
+```
+
+Reproduction is a rerun of this same finite synthetic study, not another
+independent experiment. No radius ceiling, conductor overlap, junction volume,
+thermal behavior, frequency response or manufacturing constraint is modeled.
+The next engineering gate still requires an owner-defined physical problem,
+appropriate constraints and independently accepted measurements.
