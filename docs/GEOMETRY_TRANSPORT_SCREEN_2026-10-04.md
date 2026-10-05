@@ -71,7 +71,74 @@ Choose one application and freeze its source/sink demands, operating conditions,
 Primary mathematical and engineering sources, their scope and access limitations are retained in [`geometry_extension_registry.json`](../evidence/geometry_transport_screen/20261004/geometry_extension_registry.json).
 
 
-The checked-in result is a dated first-party receipt. Its source hash matches
-`code/research/geometry_transport_screen.py`. The public release inventory
+The October 4 result is an immutable dated first-party receipt. Its source hash
+matches `code/research/geometry_transport_screen.py` at source commit
+`e7e16954f27308c19f308e2e78a74eee0edb3bb0`, before the continuation below. The public release inventory
 independently binds the browser copy of this data to the selected Git snapshot.
 No private correspondence, API data or user photographs are part of this run.
+
+## October 5 continuation: conductance after a broken wire
+
+This completes the prior screen's missing post-failure conductance stage in the
+same existing reviewer lane. It preserves every October 4 result, graph,
+coordinate, seed and primary objective. The
+[`outage_protocol.json`](../evidence/geometry_transport_screen/20261005/outage_protocol.json)
+defines this retrospective continuation; it is not an independent
+preregistration, a new holdout, or the full championship promotion gate.
+
+All **743 distinct single-edge outages** across the eight layouts were scored.
+Every surviving wire keeps its original cross-section and resistivity; removed
+material is lost. Every score retains all 2,016 original terminal pairs, with
+zero conductance for disconnected pairs. Equal weights across edge deletions
+describe this stress screen, not physical failure probabilities. Outage results
+are secondary metrics and cannot replace the original no-fault primary metric.
+
+| Identical-terminal model | Outages | Disconnecting outages | Before fault | Mean after one fault | Worst after one fault |
+|---|---:|---:|---:|---:|---:|
+| Serpentine chain | 63 | 63 | 0.184884 | 0.160192 | 0.151037 |
+| Square grid | 112 | 0 | 0.764307 | 0.750934 | 0.743609 |
+| Triangulated square grid | 161 | 0 | 0.660194 | 0.653952 | 0.649009 |
+| Minimum spanning tree | 63 | 63 | 0.255317 | 0.230626 | 0.171642 |
+| Loop-augmented tree | 96 | 0 | 0.709147 | 0.691456 | 0.675174 |
+| Randomized tree control | 63 | 63 | 0.197135 | 0.178529 | 0.143273 |
+
+All conductance values use the same normalized units as the original screen.
+Square-grid mean conductance retention was 98.250%; triangulated-grid retention
+was 99.055%, but its absolute post-fault conductance remained lower. The
+loop-augmented tree retained 97.505%, also below the square grid. These tradeoffs
+are retained, with no winning-family promotion.
+
+Different-terminal exploratory results remain separate: honeycomb had 77
+outages, 18 disconnecting, with conductance 1.256373 before, 1.205968 mean after,
+and 1.167786 worst after. Sunflower had 108 outages, none disconnecting, with
+0.523487 before, 0.513223 mean after, and 0.495442 worst after.
+
+The implementation reuses the unfaulted inverse through a rank-one update for
+connected deletions. Removing a bridge leaves effective resistance within each
+surviving component unchanged; cross-component conductance becomes zero. Tests
+compare **every outage** with an independent direct grounded component solve,
+alongside exact small circuits, fixed-material checks, scale laws and
+non-increasing conductance under wire deletion. Repeated timing passes reuse
+the same 743 scenarios; they are not additional independent experiments.
+
+The retained [`solver_comparison.json`](../evidence/geometry_transport_screen/20261005/solver_comparison.json)
+records every timing pass and the numerical agreement, while
+[`outage_results.json`](../evidence/geometry_transport_screen/20261005/outage_results.json)
+retains every deletion and the full original coordinates. The
+[`manifest.json`](../evidence/geometry_transport_screen/20261005/manifest.json)
+binds source, tests, protocol and results. Runtime comparisons are first-party
+diagnostics on one machine, not general hardware or physical efficiency claims.
+
+Reproduce the continuation and the independent comparison:
+
+```bash
+python code/research/geometry_transport_screen.py --edge-outages --output /tmp/geometry-outages.json
+python tests/test_geometry_transport_screen.py --benchmark-outages /tmp/geometry-outage-solver-comparison.json
+python -m unittest discover -s tests -p test_geometry_transport_screen.py -v
+```
+
+Reruns now record their actual UTC timestamp rather than incorrectly reusing
+October 4. The legacy result and browser data remain unchanged. The 26-family
+registry still has no performance-ready entries. Frequency-dependent signal
+transport, physical fixtures, multi-fold validation and independent engineering
+acceptance remain open.

@@ -1,0 +1,3 @@
+# Optional native C verification tools; no hardware or broker dependency.
+pytest==9.1.0
+ziglang==0.15.2

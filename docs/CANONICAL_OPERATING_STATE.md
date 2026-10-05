@@ -7,6 +7,70 @@
 
 ## One commercial sentence
 
+### October 5 bounded test and experiment completion
+
+Active outcome 2 includes the founder-requested completion of existing reviewer
+checks and reproducible experiments. This pass fixes identified source defects and
+closes finite test prerequisites; it does not finish every research family or
+establish institutional certification, independent validation or production readiness.
+
+- The [geometry transport continuation](GEOMETRY_TRANSPORT_SCREEN_2026-10-04.md)
+  evaluates all 743 distinct single-edge outages in the same eight fixed-budget
+  graphs. Optimized inverse updates agree with independent direct grounded solves
+  within 4.88498e-15 absolute error. Surviving weights stay fixed and disconnected
+  pair conductance is zero. A local median timing comparison was 0.077162 seconds
+  versus 0.375205 seconds for the new direct reference, about 4.86 times faster;
+  this is a host diagnostic, not physical signal efficiency or a platform speedup.
+  The 26-family championship, matched hardware and physical measurements remain open.
+- The existing economic-bridge producer now rejects non-finite values, invalid or
+  fractional counts, wins exceeding observations, and malformed benchmark flags.
+  Missing values cannot mask explicit invalid evidence. These repairs preserve
+  negative research outcomes, accepted-economics holds and fictional-funds boundaries;
+  they do not create trading returns, buyer savings or new observations.
+- The gateway uses the supported FastAPI lifespan, preserves the same six workers
+  and cooperatively cancels and awaits them at shutdown. Isolated lifecycle and
+  authentication tests preserve fail-closed behavior and pass with warnings treated
+  as errors. Cancellation is cooperative, not a time-bounded shutdown guarantee.
+- A separate native Windows CI job runs the three existing mocked PowerShell paper
+  runner fixtures using Python 3.11.9 and a hashed six-package test closure. It
+  rejects skipped or empty execution and does not connect to a broker. Linux
+  platform skips remain valid; native success requires the separate job receipt.
+- Native C verification now enforces Zig 0.15.2 for the primary build and names a
+  separate sanitizer compiler. A successful compile with sanitizer flags alone
+  previously produced an unjustified AddressSanitizer claim: a deliberate heap
+  overflow under the pinned Zig build exited successfully. The repaired producer
+  requires named AddressSanitizer and UndefinedBehaviorSanitizer detections on
+  deliberate faults, then a matching clean seven-vector result, before sealing
+  its receipt. A separate hash-locked CI job rejects skipped native execution.
+  This verifies host software instrumentation, not NIC/DPU hardware or expertise.
+
+The current-main frozen EIA capsule was actually executed at
+`e7e16954f27308c19f308e2e78a74eee0edb3bb0` on Ubuntu 24.04, glibc 2.39 and
+Python 3.11.9 with all 18 hash-locked packages. All three suites, 31 assertions
+and 28 fixtures passed. Four previously artifact-dependent checks then passed
+without skips against newly generated, dated offline outputs. These outputs are
+not recovered historical publication files. Capsule SHA-256 is
+`900a3b66891d21216bc876efccfa21f8e8703e2b57a784eb2437d318a24bb95b`;
+the frozen raw wave input remains
+`8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59`.
+The separately preserved research source
+`2c06c8315c667dec6bed426b533024ecb8300f59` passed 134 inherited research/custody
+tests and replayed 240 interval records, 90 comparisons and 465 arrays across
+187,987 dependent station/horizon targets. The numerical report exactly matches
+historical payload SHA-256
+`466c635a98721846e2981fd3ecfb71a5fbd093ae6c6ab46c44cd96d89e82e21f`.
+All 15 selected high-activity cells still fall below nominal 90% coverage; no
+fresh holdout, independent evaluator, electricity savings or geothermal benefit
+is established. The prospective protocol remains unfrozen and unstarted.
+
+The preceding main source suite passed 1,230 tests and 87 subtests, with eight
+legitimate skips and five warnings. This new source candidate requires its own
+maintained CI receipts. The October 5 15:35 UTC
+[exact live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37333941141)
+found 192 of 246 files matching, three mismatches and 51 HTTP 404 responses.
+`HOLD_PUBLIC_RELEASE_PROMOTION` remains. Source/test improvements do not replace
+separate exact-main deployment, signed provenance and live-byte verification.
+
 ### October 5 public art showcase and deployment boundary
 
 Active outcome 2 includes Robert's explicit request to make the existing artwork

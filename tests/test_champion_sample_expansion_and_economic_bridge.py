@@ -61,6 +61,95 @@ def test_large_counts_alone_do_not_promote_a_champion():
     assert module.status_for_lane("wave_resonance_timing", record, {}) == "internal_replay_review_required"
 
 
+@pytest.mark.parametrize("field,value", [
+    ("mean_score_delta", float("nan")), ("mean_score_delta", float("inf")),
+    ("mean_score_delta", "0.1"), ("mean_score_delta", True),
+    ("candidate_win_count", 601), ("candidate_win_count", -1),
+    ("baseline_comparison_count", True), ("routes_replayed", float("inf")),
+    ("routes_replayed", 150.9), ("routes_replayed", "150"),
+    ("routes_replayed", 2**53), ("routes_replayed", 0),
+])
+def test_invalid_evidence_cannot_be_classified_as_promising(field, value):
+    record = {"routes_replayed": 150, "baseline_comparison_count": 600,
+              "candidate_win_count": 600, "mean_score_delta": 0.1}
+    record[field] = value
+    with pytest.raises(ValueError):
+        module.status_for_lane("wave_resonance_timing", record, {})
+
+
+@pytest.mark.parametrize("text", [
+    '{"mean":NaN}', '{"mean":Infinity}', '{"mean":1e309}',
+    '{"candidate_win_count":0,"candidate_win_count":600}', '[]', '{invalid',
+])
+def test_malformed_inputs_are_not_silently_converted_to_missing_evidence(tmp_path, text):
+    source = tmp_path / "invalid.json"
+    source.write_text(text)
+    with pytest.raises(ValueError):
+        module.read_json(source)
+
+
+def test_duplicate_lanes_cannot_hide_a_negative_record():
+    rows = [{"lane": "wave_resonance_timing", "mean_score_delta": delta}
+            for delta in [-0.5, 0.5]]
+    with pytest.raises(ValueError, match="duplicate lane"):
+        module.build_lane_diagnostics({"lane_scoreboard": rows}, {})
+
+
+@pytest.mark.parametrize("source_name,source", [
+    ("LOCKED_SWEEP_JSON", {"summary": {"baseline_comparison_count": 600, "candidate_win_count": 601}}),
+    ("LOCKED_SWEEP_JSON", {"summary": {"numeric_samples_read": "600"}}),
+    ("LIVE_DOMAIN_JSON", {"summary": {"live_domain_reviewer_ready": "false"}}),
+])
+def test_invalid_summary_does_not_overwrite_existing_outputs(tmp_path, monkeypatch, source_name, source):
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    for name in ["LOCKED_SWEEP_JSON", "MANIFEST_JSON", "LIVE_DOMAIN_JSON"]:
+        path = tmp_path / (name + ".json")
+        path.write_text(json.dumps(source if name == source_name else {}))
+        monkeypatch.setattr(module, name, path)
+    for name in ["OUT_JSON", "DASHBOARD_JSON", "OUT_MD"]:
+        path = tmp_path / (name + ".out")
+        path.write_text("retained prior evidence")
+        monkeypatch.setattr(module, name, path)
+    with pytest.raises(ValueError):
+        module.main()
+    for name in ["OUT_JSON", "DASHBOARD_JSON", "OUT_MD"]:
+        assert getattr(module, name).read_text() == "retained prior evidence"
+
+
+def test_missing_input_remains_absent_and_signed_scores_remain_signed(tmp_path):
+    assert module.read_json(tmp_path / "absent.json") == {}
+    assert module.as_float(-0.25) == -0.25
+    assert module.as_int(2**53 - 1) == 2**53 - 1
+    with pytest.raises(ValueError):
+        module.stable_sha256({"mean_score_delta": float("nan")})
+
+
+@pytest.mark.parametrize("value", ["false", "true", 0, 1, None, [], {}])
+def test_manifest_readiness_requires_a_boolean(value):
+    with pytest.raises(ValueError, match="readiness must be a boolean"):
+        module.lane_manifest_summary([{"lane": "wave_resonance_timing", "ready_for_benchmark": value}])
+
+
+def test_manifest_readiness_preserves_missing_false_and_true():
+    rows = [{"lane": "wave_resonance_timing"},
+            {"lane": "wave_resonance_timing", "ready_for_benchmark": False},
+            {"lane": "wave_resonance_timing", "ready_for_benchmark": True}]
+    summary = module.lane_manifest_summary(rows)["wave_resonance_timing"]
+    assert summary["mapped_rows"] == 3
+    assert summary["ready_rows"] == 1
+
+
+def test_explicit_zero_estimate_does_not_fall_back_and_false_is_rejected():
+    lane = "wave_resonance_timing"
+    manifest = {"manifest_rows": [{"lane": lane, "estimated_rows": 100}]}
+    sweep = {"lane_scoreboard": [{"lane": lane, "estimated_rows": 0}]}
+    assert next(row for row in module.build_lane_diagnostics(sweep, manifest)
+                if row["lane"] == lane)["estimated_rows"] == 0
+    sweep["lane_scoreboard"][0]["estimated_rows"] = False
+    with pytest.raises(ValueError):
+        module.build_lane_diagnostics(sweep, manifest)
+
+
 def test_private_manifest_paths_and_comparison_bodies_are_excluded():
     private_path = "E:/PRIVATE_PATENT/client-record.pdf"
     manifest = {"manifest_rows": [{"lane": "PRIVATE_LANE", "source_path": private_path, "system": "PRIVATE_SYSTEM", "adapter_status": "PRIVATE_NOTES"}]}

@@ -66,7 +66,9 @@
     {
       "path": "code/luma_experience_gateway_legacy.py",
       "classification": "historical_preserved",
-      "expected_git_blob_sha": "d55b8187fc23d1e8b11fe5be4a09ccad91a5f20b"
+      "expected_git_blob_sha": "c3d2580d0dd43099e8dfd90267ce1c59b71df761",
+      "custody_note": "Rebound after reviewed FastAPI lifespan migration; the same six workers, order routes and guarded facade remain preserved, with cooperative cancellation cleanup.",
+      "reviewed_source_commit": "3148b9f963c0e7cb5ce43c04708e7c458d30b62c"
     },
     {
       "path": "code/auto_ticket_producer_legacy.py",

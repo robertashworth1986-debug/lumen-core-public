@@ -61,6 +61,119 @@ jobs:
           git cat-file -e "${BASE_SHA}^{commit}"
           git diff --check "${BASE_SHA}...HEAD"
 
+  windows-paper-runner:
+    name: Windows paper runner (mocked fixtures)
+    runs-on: windows-2025
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      PYTHONHASHSEED: '0'
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+    steps:
+      - name: Checkout reviewed source without retained credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Windows Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11.9'
+
+      - name: Create isolated hash-locked paper runner test environment
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $testVenv = Join-Path $env:RUNNER_TEMP 'lumencore-paper-runner-venv'
+          python -m venv $testVenv
+          if ($LASTEXITCODE -ne 0) { throw 'Test venv creation failed' }
+          $testPython = Join-Path $testVenv 'Scripts/python.exe'
+          & $testPython -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-windows-paper-runner-py311.lock
+          if ($LASTEXITCODE -ne 0) { throw 'Hash-locked test installation failed' }
+          & $testPython -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'Test dependency consistency failed' }
+          "PAPER_RUNNER_TEST_PYTHON=$testPython" >> $env:GITHUB_ENV
+
+      - name: Exercise existing mocked paper runner fixtures on Windows
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & $env:PAPER_RUNNER_TEST_PYTHON -c "import os,sys; assert os.name == 'nt'; assert sys.version_info[:3] == (3,11,9); assert sys.prefix != sys.base_prefix; print(sys.version)"
+          if ($LASTEXITCODE -ne 0) { throw 'Native test environment precondition failed' }
+          & powershell.exe -NoProfile -NonInteractive -Command 'if ($PSVersionTable.PSVersion.Major -ne 5) { throw "Windows PowerShell 5 is required" }; $PSVersionTable.PSVersion.ToString()'
+          if ($LASTEXITCODE -ne 0) { throw 'Windows PowerShell precondition failed' }
+          New-Item -ItemType Directory -Force out/institutional-readiness | Out-Null
+          & $env:PAPER_RUNNER_TEST_PYTHON -m pytest -q -rs tests/test_run_alpaca_paper_247.py --junitxml="out/institutional-readiness/windows-paper-runner-$env:GITHUB_SHA.xml"
+          if ($LASTEXITCODE -ne 0) { throw 'Native process paper runner tests failed' }
+          [xml]$receipt = Get-Content -Raw "out/institutional-readiness/windows-paper-runner-$env:GITHUB_SHA.xml"
+          $suite = $receipt.testsuites.testsuite
+          if ([int]$suite.tests -ne 3 -or [int]$suite.skipped -ne 0 -or [int]$suite.failures -ne 0 -or [int]$suite.errors -ne 0) { throw 'Mocked paper runner checks were empty, skipped, or failed' }
+
+      - name: Verify fixtures did not mutate reviewed source
+        run: |
+          $changes = @(git status --porcelain --untracked-files=all)
+          if ($LASTEXITCODE -ne 0 -or $changes.Count -ne 0) { throw 'Native tests changed reviewed source' }
+
+      - name: Upload commit-bound Windows paper runner receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: windows-paper-runner-${{ github.sha }}
+          path: out/institutional-readiness/windows-paper-runner-${{ github.sha }}.xml
+          if-no-files-found: warn
+          retention-days: 30
+
+  native-c-verification:
+    name: Native C sanitizer evidence (positive controls)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: '0'
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+      LUMA_NIC_SANITIZER_CC: /usr/bin/gcc
+    steps:
+      - name: Checkout reviewed source without retained credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up native verification Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11.9'
+
+      - name: Install hash-locked native test tools
+        run: |
+          python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: --requirement requirements-native-c-ubuntu-py311.lock
+          python -m pip check
+          test "$(python -m ziglang version)" = "0.15.2"
+          command -v gcc
+          gcc --version
+
+      - name: Run native vectors and sanitizer positive controls
+        run: |
+          mkdir -p out/institutional-readiness
+          python -m pytest -q -rs tests/test_nic_dpu_packet_pipeline.py --junitxml="out/institutional-readiness/native-c-${GITHUB_SHA}.xml"
+          python - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          suites = ET.parse(f"out/institutional-readiness/native-c-{os.environ['GITHUB_SHA']}.xml").getroot().findall("testsuite")
+          assert suites and sum(int(s.get("tests", "0")) for s in suites) >= 27
+          assert all(int(s.get(k, "0")) == 0 for s in suites for k in ("skipped", "failures", "errors"))
+          PY
+
+      - name: Verify tests did not mutate reviewed source
+        run: test -z "$(git status --porcelain --untracked-files=all)"
+
+      - name: Upload commit-bound native verification receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: native-c-verification-${{ github.sha }}
+          path: out/institutional-readiness/native-c-${{ github.sha }}.xml
+          if-no-files-found: warn
+          retention-days: 30
+
   full-repository-suite:
     name: Full repository suite (bounded first-party)
     runs-on: ubuntu-24.04

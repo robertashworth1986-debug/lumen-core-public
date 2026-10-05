@@ -1,0 +1,40 @@
+{
+  "schema": "lumencore.outage_solver_comparison.v1",
+  "generated_utc": "2026-10-05T16:12:03.905183+00:00",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "graph_count": 8,
+  "outage_count_per_pass": 743,
+  "repetitions": 3,
+  "max_absolute_mean_conductance_error": 4.884981308350689e-15,
+  "timing_passes": [
+    {
+      "optimized_seconds": 0.07716197099944111,
+      "direct_seconds": 0.3498334629985038,
+      "execution_order": [
+        "optimized",
+        "direct"
+      ]
+    },
+    {
+      "direct_seconds": 0.37744234800629783,
+      "optimized_seconds": 0.08063410400063731,
+      "execution_order": [
+        "direct",
+        "optimized"
+      ]
+    },
+    {
+      "optimized_seconds": 0.07621296700381208,
+      "direct_seconds": 0.3752052799973171,
+      "execution_order": [
+        "optimized",
+        "direct"
+      ]
+    }
+  ],
+  "median_optimized_seconds": 0.07716197099944111,
+  "median_direct_seconds": 0.3752052799973171,
+  "direct_to_optimized_median_runtime_ratio": 4.862567339033301,
+  "boundary": "First-party diagnostic on one machine; same finite circuits and baseline cost, graph construction excluded equally. No field or general hardware speed claim."
+}

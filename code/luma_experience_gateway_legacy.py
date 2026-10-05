@@ -15,6 +15,7 @@ import subprocess
 import sys
 import threading
 import time
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
@@ -1772,7 +1773,31 @@ class ConnectionManager:
             self.disconnect(ws)
 
 
-app = FastAPI(title="Luma Experience Gateway", version="2.0.0")
+@asynccontextmanager
+async def gateway_lifespan(app: FastAPI):
+    DASH.mkdir(parents=True, exist_ok=True)
+    tasks: list[asyncio.Task[None]] = []
+    try:
+        # Resolve the workers at startup, after the module has finished loading.
+        for worker in (
+            broadcaster,
+            spike_broadcaster,
+            _kraken_equity_sampler,
+            _profit_lock_watcher,
+            _autobuy_watcher,
+            _smart_scanner_watcher,
+        ):
+            tasks.append(asyncio.create_task(worker()))
+        yield
+    finally:
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+
+app = FastAPI(
+    title="Luma Experience Gateway", version="2.0.0", lifespan=gateway_lifespan
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -1839,11 +1864,6 @@ try:
     _grants_set_sink(_grants_event_sink)
 except Exception as _gs_err:  # pragma: no cover
     log.warning("grants websocket sink not wired: %s", _gs_err)
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    DASH.mkdir(parents=True, exist_ok=True)
 
 
 @app.get("/")
@@ -4110,16 +4130,6 @@ async def spike_broadcaster() -> None:
         except Exception:
             pass
         await asyncio.sleep(3.0)
-
-
-@app.on_event("startup")
-async def start_broadcaster() -> None:
-    asyncio.create_task(broadcaster())
-    asyncio.create_task(spike_broadcaster())
-    asyncio.create_task(_kraken_equity_sampler())
-    asyncio.create_task(_profit_lock_watcher())
-    asyncio.create_task(_autobuy_watcher())
-    asyncio.create_task(_smart_scanner_watcher())
 
 
 async def _kraken_equity_sampler() -> None:
