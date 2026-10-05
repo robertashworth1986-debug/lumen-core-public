@@ -11,11 +11,18 @@
 
 Active outcome 2 includes Robert's explicit request to make the existing artwork
 and presentation previews easier to share. The bounded `/art/` doorway presents
-19 concept artworks, a silent 18-second vertical film and a ten-layout slide
+19 concept artworks, an 18-second vertical film and a ten-layout slide
 preview. Native artwork detail remains 1672 × 941 pixels. Creator attribution,
 rights limits and technical-evidence boundaries remain unchanged. This public
 showcase does not publish an editable paid pack, private correspondence or owner
 archives, and does not promise viral reach or revenue.
+
+At Robert's request, the October 5 audio edition adds original procedural stereo
+sound effects to the existing 18-second film. The video bitstream is preserved;
+only the audio and media container changed. The public media manifest records the
+new hash, size and audio metadata, and versioned video URLs refresh cached playback.
+The 246-file release inventory is unchanged. Production deployment retains its
+existing separate gates. The full media remains externally hosted in Wonder Studio.
 
 Four small source files join the exact release allowlist, now 246 files. Artwork
 and three public preview files retain absolute canonical Wonder Studio URLs;
