@@ -7,6 +7,18 @@
 
 ## One commercial sentence
 
+### October 6 bounded Grant Factory draft correction
+
+Active outcome 2 includes a separate draft correction to the existing grant
+workflow. Generated narrative uses supplied project facts, marks missing facts,
+preserves synthetic/unknown evidence type, and introduces no standalone software
+price or deployment claim. Package checks and permitted state/kit updates retain
+consistent file manifests and immutable local approved snapshots. The fictional
+local rehearsal remains blocked for submission and does not establish customer
+isolation, funding, accepted economics, a customer, or a software release. The
+original source-to-export receipts remain unchanged. This correction is reviewable
+on `codex/grant-factory-evidence-custody`; main and live deployments are unchanged.
+
 ### October 5 fixed-material and high-activity diagnostic continuation
 
 Active outcome 2 now includes two diagnostic studies with protocols recorded locally
