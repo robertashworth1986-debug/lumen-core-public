@@ -20,6 +20,11 @@ hash-verifiable record a reviewer can inspect and replay.
 [**Run the verifier →**](QUICKSTART.md) ·
 [**Live website →**](https://lumen-core.ai/)
 
+**Technical reviewers:** start with the [review guide](docs/REVIEWER_START_HERE.md).
+It provides a code map, a dependency-free check, the full reproducible test setup,
+and the open decision gates. Record the commit you review. The live domain has
+documented release drift; use the repository as the source for this review.
+
 | Inspect the foundation | Open the evidence | Read the result correctly |
 |---|---|---|
 | **Proof Capsule v3** | [Executable verifier and adversarial tests](QUICKSTART.md) | Implemented first-party schema, custody, and claim-gate checks. |

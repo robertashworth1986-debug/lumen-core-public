@@ -1,0 +1,71 @@
+{
+  "schema": "lumencore.pdf_dependency_security_comparison.v1",
+  "recorded_utc": "2026-09-14T06:42:08.500339Z",
+  "baseline_commit": "c3bddd48768a23acdce727246291d48a62984ed8",
+  "baseline_pypdf": "6.15.0",
+  "candidate_pypdf": "6.17.0",
+  "audit_tool": "pip-audit==2.10.1",
+  "audit_command": "python -m pip_audit --no-deps --disable-pip -r <complete institutional lock> --format json --output <receipt>",
+  "audit_method": "Public advisory lookup for every name/version in the full 39-package lock. No package installation or uploaded document execution by the audit.",
+  "baseline_audit": {
+    "known_advisories": 3,
+    "affected_packages": 1,
+    "exit_code": 1
+  },
+  "candidate_audit": {
+    "known_advisories": 0,
+    "affected_packages": 0,
+    "exit_code": 0
+  },
+  "changed_locked_packages": [
+    "pypdf"
+  ],
+  "unchanged_locked_packages": 38,
+  "lock_target": "x86_64-unknown-linux-gnu, Python 3.11.9",
+  "local_test_environment": "Windows, Python 3.11.9, pytest 9.1.0. Direct institutional pins, not a replay of the Ubuntu binary closure.",
+  "baseline_regressions": {
+    "tests": "4",
+    "failures": "3",
+    "errors": "0",
+    "skipped": "0",
+    "time": "5.504",
+    "timestamp": "2026-09-14T01:33:33.147106-05:00"
+  },
+  "candidate_regressions": {
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.839",
+    "timestamp": "2026-09-14T01:33:12.551525-05:00"
+  },
+  "focused_suite": {
+    "tests": "89",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "4.650",
+    "timestamp": "2026-09-14T01:41:28.924516-05:00"
+  },
+  "test_scope": "Three tiny generated resource-guard regressions plus one ordinary text/outline/metadata round trip. Reduced outline/XForm limits, five-second isolated cycle process.",
+  "advisories": [
+    "GHSA-jp53-mhqp-8xcg",
+    "GHSA-23w6-3w8w-8484",
+    "GHSA-763m-79hh-57f2"
+  ],
+  "normalized_source_sha256": {
+    "requirements-institutional.txt": "bd849d24ae6a3bbcd7446845e8bcc582762cce6c5f6f17f7e42ca3db11487c25",
+    "requirements-institutional-ubuntu-py311.lock": "36ad19bef3e3d4bb20014db7fdb0018c06185eb5225d8d37eb3d8756bed0ebcf",
+    "tests/test_pdf_dependency_security.py": "37e0d4a39dc94cb6232ae6452aa500b00e13acc11fd51209092dcc822d53f6fc"
+  },
+  "audit_files_sha256": {
+    "baseline-pip-audit.json": "1e49476fdf7bafe5922735f6b40db082424d3113d15f91fe113350ba95eab2b0",
+    "candidate-pip-audit.json": "2d1d1f13a95ec41c614ea83468494efdf05eec84e48fd3a3c1518e57f2d33067"
+  },
+  "limits": [
+    "Time-bound known-advisory result only.",
+    "Not vulnerability freedom or PDF sandboxing.",
+    "No production change or default-branch alert closure.",
+    "Not independent security validation or customer acceptance."
+  ]
+}

@@ -455,12 +455,25 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
         with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "echarts"):
             MODULE.verify_dashboard_dependencies(package, lock)
 
-    def test_vulnerable_form_data_override_is_rejected(self) -> None:
-        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
-        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
-        package["overrides"]["form-data"] = "4.0.5"
-        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "form-data"):
-            MODULE.verify_dashboard_dependencies(package, lock)
+    def test_removed_dependency_chain_cannot_return_in_manifest_scopes(self) -> None:
+        for name in ("@tensorflow/tfjs", "argparse", "sprintf-js", "form-data"):
+            for scope in ("dependencies", "devDependencies", "optionalDependencies", "overrides"):
+                with self.subTest(name=name, scope=scope):
+                    package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+                    lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+                    package.setdefault(scope, {})[name] = "*"
+                    with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "removed.*reintroduced"):
+                        MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_removed_dependency_chain_cannot_return_through_nested_lock_entries(self) -> None:
+        for name in ("@tensorflow/tfjs", "argparse", "sprintf-js", "form-data"):
+            for prefix in ("", "node_modules/unreviewed-parent/"):
+                with self.subTest(name=name, prefix=prefix):
+                    package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+                    lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+                    lock["packages"][f"{prefix}node_modules/{name}"] = {"version": "1.0.0"}
+                    with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "removed.*lock.*reintroduced"):
+                        MODULE.verify_dashboard_dependencies(package, lock)
 
     def test_security_policy_must_retain_exception_expiry(self) -> None:
         text = (ROOT / "SECURITY.md").read_text(encoding="utf-8")

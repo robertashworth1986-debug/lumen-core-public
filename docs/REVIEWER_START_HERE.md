@@ -54,6 +54,24 @@ The [readiness dossier](INSTITUTIONAL_READINESS_DOSSIER.md) makes those gates
 specific. The machine-readable portfolio receipt records zero subscription-ready
 lanes; research breadth does not establish customers or deployed products.
 
+## A focused team review
+
+Start together with the five-minute check, then divide the inspection by question.
+The first pass can stay within these existing surfaces; the portfolio is context,
+not a requirement to inspect every historical experiment.
+
+| Track | Inspect first | Decision to return |
+|---|---|---|
+| Code and security | [Verifier](../code/proof_capsule_verifier.py), [adversarial tests](../tests/test_proof_capsule_verifier.py), [ProofLock threat model](../dashboard/build_week/prooflock_console/THREAT_MODEL.md), [dependency controls](REPOSITORY_SECURITY_ASSURANCE.md) | Can malformed, oversized or tampered evidence pass? Which trust assumptions need stronger controls? |
+| Reproducibility and forecasting | [Frozen executor handoff](CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md), [constraint comparisons](CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md), [strict identity verifier](../code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py) | Can the named computation be repeated, and do its failed gates support the stated HOLD decision? |
+| Systems and delivery | [Readiness dossier](INSTITUTIONAL_READINESS_DOSSIER.md), [release workflow](../.github/workflows/public-site-supply-chain.yml), [incident plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md), [buyer-owned scope](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md) | What is the smallest externally testable offer, and which controls must close before deployment? |
+
+Return findings with the **commit, environment, command, expected behavior,
+observed behavior, severity and proposed next gate**. Separate a reproduced
+defect from a question or design recommendation. Report security findings through
+the private route in [SECURITY.md](../SECURITY.md), without posting credentials
+or sensitive reproduction data in a public issue.
+
 ## Reviewing the full portfolio
 
 The [portfolio map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) covers trading,
@@ -126,9 +144,30 @@ separate prerequisites; Linux success does not imply those paths executed.
 The October 5 [main-source run](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37344423853)
 at `e5487b6d` recorded 1,321 passed tests, 8 skips and 166 subtests in the
 full-repository job. Those are dated first-party checks, not independent review.
-The existing [PDF dependency security PR #210](https://github.com/robertashworth1986-debug/lumen-core-public/pull/210)
-was still open on October 7; source-test success does not close that remediation.
-Review current checks and dependency status before deciding readiness.
+The [review-preparation PR #245](https://github.com/robertashworth1986-debug/lumen-core-public/pull/245)
+incorporates the existing PDF security repair from
+[PR #210](https://github.com/robertashworth1986-debug/lumen-core-public/pull/210):
+`pypdf==6.19.0`, the hash-locked distributions and six generated-fixture checks.
+It also removes the unused TensorFlow.js dependency chain responsible for the
+October 7 npm audit failure and updates urllib3 to 2.8.0 after a fresh Python
+audit found three transport advisories. Review the exact commit's checks and the
+[dated security record](REPOSITORY_SECURITY_ASSURANCE.md) before relying on
+these changes; a passing source suite is not a deployment receipt.
+
+## Open gates at the October 7 review
+
+| Gate | Recorded state | Evidence needed to close it |
+|---|---|---|
+| Independent evaluation | First-party checks exist; independent execution is pending. | A qualified evaluator's complete execution receipt and deviations. |
+| Live static release | October 7 audit: 192/246 files match, 3 differ, 51 are missing. | Authorized exact-main release, signed provenance and complete live-byte verification. |
+| Operational data | [Issue #234](https://github.com/robertashworth1986-debug/lumen-core-public/issues/234) retains four unavailable legacy feeds. | Owner-approved producer, route, schema and freshness contracts with end-to-end verification. |
+| Server recovery | The October 4 diagnosis identified paper-ledger ownership and gateway source/identity gaps; source preparation does not repair them. | Existing guarded [ledger repair](../.github/workflows/repair-paper-ticker-ledger.yml) and [gateway repair](../.github/workflows/repair-gateway-dependency-closure.yml), with runtime readback and rollback evidence. |
+| Repository assurance | Main-branch protection remains unenforced; the historical provider-key closure lacks a non-secret receipt. | Founder-approved branch enforcement with a recovery path, and provider rotation/revocation plus history reconciliation. |
+| Supplemental AI scan | The October 7 [AI review job](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37649823151) failed before analysis because account quota was exhausted. | A completed scan after account availability is restored; this is not a passing scan or a code finding. |
+
+These gates distinguish **ready for technical review** from approval to deploy,
+handle buyer data or make externally validated performance claims. CodeQL and
+the maintained test jobs have their own receipts and do not replace an incomplete scan.
 
 ## September 21 constraint evidence
 
