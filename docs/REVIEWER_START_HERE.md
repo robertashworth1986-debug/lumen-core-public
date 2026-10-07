@@ -9,19 +9,22 @@ Robert Ashworth · Founder / Systems Architect
 [Full evidence index](../EVIDENCE_INDEX.md) ·
 [Portfolio and maturity map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md)
 
-## October 5 review route
+## Technical review route
 
-1. Open the [portfolio doorway](https://lumen-core.ai/portfolio/) for the artwork,
-   candidate geometry catalog and bounded benchmark.
-2. Use the [portfolio map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) to follow
-   each engineering asset to its evidence and next gate.
-3. Review the [geometry protocol](GEOMETRY_EVALUATION_PROTOCOL_V1.md) before
-   treating any attractive shape as an efficiency result.
-4. Choose one authorized source, one incumbent baseline, one primary metric and
-   one decision owner for the next external evaluation.
+1. Record the exact Git commit under review and run the five-minute checks below.
+2. Inspect the verifier and its adversarial tests, then the existing assurance
+   crosswalk and production HOLD gates.
+3. Use the full-suite setup below for current source behavior. Use the separately
+   pinned executor handoff for the frozen scientific computation.
+4. Follow the [portfolio map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) to
+   each asset's implementation, evidence and next gate. Record reproducible
+   findings with the command, environment, expected result and observed result.
 
-The meeting is founder-reported for October 5, 2026. This page does not confirm
-attendance, time, endorsement, an executed audit or a commercial agreement.
+**Source and live delivery are separate checks.** The October 7, 2026
+[live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37614701203)
+of source `e5487b6d` matched 192 of 246 expected files, with 3 mismatches and
+51 missing files. Start from this GitHub checkout; a reachable website does not
+establish current source parity. This dated observation is not a deployment fix.
 
 ## The 90-second overview
 
@@ -88,6 +91,44 @@ These verify the declared registers, evidence paths, statuses, limitations,
 and workflow bindings. They do not establish independently assessed control
 operating effectiveness. The [ProofLock demonstration](https://lumen-core.ai/build_week/prooflock_console/)
 provides a visual companion to the evidence and decision gates.
+
+## Full current-source test suite
+
+Use Ubuntu 24.04 x86-64 and CPython 3.11.9, matching the existing
+[institutional workflow](../.github/workflows/institutional-readiness.yml).
+Use a normal user account: POSIX permission tests intentionally skip under root.
+Record `git rev-parse HEAD` with every result; a branch test is not a main-branch
+or live-release attestation.
+
+```bash
+git clone https://github.com/robertashworth1986-debug/lumen-core-public.git
+cd lumen-core-public
+git rev-parse HEAD
+git fetch origin 1c0eb51754beffac6f4df484914e35efc21c253f
+git cat-file -e '1c0eb51754beffac6f4df484914e35efc21c253f^{commit}'
+python3.11 -c 'import sys; assert sys.version_info[:3] == (3, 11, 9)'
+python3.11 -m venv .venv
+. .venv/bin/activate
+python code/ops/VERIFY_INSTITUTIONAL_DEPENDENCY_LOCK.py
+python -m pip install --require-hashes --only-binary=:all: -r requirements-institutional-ubuntu-py311.lock
+python -m pip check
+PYTHONHASHSEED=0 TZ=UTC OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
+  python -m pytest -q -rs --durations=20 --junitxml=out/institutional-readiness/reviewer-suite.xml
+```
+
+The explicit fetch supplies the historical author-package objects used by
+`test_codecheck_eia_mainline_integration.py`. A shallow or single-branch checkout
+can lack them even after deepening main. Do not weaken those checks or replace
+the pinned identity to make a run pass. Inspect all reported skips: generated
+publication fixtures, Windows process checks and the optional Zig compiler have
+separate prerequisites; Linux success does not imply those paths executed.
+
+The October 5 [main-source run](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37344423853)
+at `e5487b6d` recorded 1,321 passed tests, 8 skips and 166 subtests in the
+full-repository job. Those are dated first-party checks, not independent review.
+The existing [PDF dependency security PR #210](https://github.com/robertashworth1986-debug/lumen-core-public/pull/210)
+was still open on October 7; source-test success does not close that remediation.
+Review current checks and dependency status before deciding readiness.
 
 ## September 21 constraint evidence
 

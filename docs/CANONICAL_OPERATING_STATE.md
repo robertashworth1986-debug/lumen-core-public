@@ -1034,3 +1034,24 @@ The [proof-to-pilot page](https://lumen-core.ai/proof_to_pilot.html) includes th
 Three scoped emails were sent and verified through authoritative SENT readback: two cohort business invitations to choose one measurable workflow, and one ORNL partnership-routing follow-up with the two frozen EIA windows. One requested written tutorial was posted and read back in the existing EC member thread. Dollar examples were explicitly hypothetical staff-capacity arithmetic; no measured client savings were asserted. Exact recipients, messages and receipts remain in the existing private E-drive estate. No reply accepting a pilot, signed contract, license or cleared payment is established by these sends.
 
 The next commercial gate remains an owner, permissioned baseline, metric, prospective observation plan and agreed scope. Continue substantive responses through the existing threads. Maintain the cohort contribution as free, paper-only or nonclinical where applicable. Our strength is making everyone else stronger.
+
+## Technical reviewer preparation - 2026-10-07
+
+Founder-directed repository preparation advances outcome 2: one bounded external
+execution or owner-approved pilot. It updates the existing Proof Capsule verifier,
+adversarial tests, schema and reviewer entrypoint; it does not create another
+platform or change a frozen experiment. New regression cases reproduce malformed
+Unicode crashes, invalid API resource limits and reads beyond the remaining
+aggregate allowance. The verifier now rejects those inputs and bounds each read.
+The existing schema, receipt version, scientific comparisons and HOLD gates remain.
+The canonical technical-review packet is regenerated to bind the changed source
+and test bytes. Its generation time is refreshed; its separately dated live
+observations and historical receipts are preserved and explicitly distinguished.
+
+The reviewer page now leads with GitHub source, exact runtime and hash-locked
+setup, historical Git-object prerequisites, executable checks and reported skips.
+It distinguishes current-source tests from the frozen computation and identifies
+the October 7 live audit's 192/246 matches, 3 mismatches and 51 missing files.
+Live parity and the existing PDF dependency PR #210 remain separate open work.
+Review preparation and first-party tests do not establish independent validation,
+production authorization, certification, a paid engagement or buyer acceptance.

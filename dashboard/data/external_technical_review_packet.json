@@ -1,9 +1,9 @@
 {
   "schema": "lumencore.external_technical_review_packet.v1",
-  "generated_at_utc": "2026-08-12T05:14:44Z",
+  "generated_at_utc": "2026-10-07T16:07:35Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "source_config": "config/external_technical_review_packet_v1.json",
-  "source_config_sha256": "3e54119174134d4953b8d43e3322f48a7aefdfb46a6efbf6b600e3ab8f73e4e4",
+  "source_config_sha256": "7ded4a732621c5c87afb0f626e2188d78dd6f114569638e7cf7abbcade16d295",
   "template_config_sha256": "0cfbda7dfd68aff39eab6a07676b0b44b13fb4455a0530fb3b3663f05a19e148",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -31,7 +31,7 @@
     "reviewer_question_count": 7,
     "assurance_scenario_count": 6,
     "active_targeting_allowed": false,
-    "known_gap_count": 6,
+    "known_gap_count": 7,
     "duplicate_invite_blocked": true
   },
   "evidence_assets": [
@@ -47,8 +47,8 @@
     {
       "path": "docs/PROOF_CAPSULE_SCHEMA.md",
       "purpose": "Proof Capsule field, hash, and verification contract.",
-      "bytes": 8389,
-      "sha256": "a9a6aeafbcef4a7386070c069a9bc71b0a9891e16372c8df0beda81cbc09f973",
+      "bytes": 8981,
+      "sha256": "c291967c831818ee490a8d2bbe8aadb45610b7b4688f3f9847245d492b4b928a",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -65,8 +65,8 @@
     {
       "path": "code/proof_capsule_verifier.py",
       "purpose": "Local verifier used to inspect capsule integrity.",
-      "bytes": 37092,
-      "sha256": "1213f995ab87bb371452296e95f9213a64e5d5e3cb8b52d61979563c35997351",
+      "bytes": 37993,
+      "sha256": "ce6c24e5db0687b866e294afcbfcaf880a015e6c779d0a391109a2ec7d17df1f",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -298,8 +298,8 @@
         "expected_blue_control": "Strict parsing, allowlisted roles, path containment, and resource budgets fail closed.",
         "pass_condition": "Every adversarial fixture is rejected without converting malformed input into a passing capsule.",
         "boundary": "Parser rejection is software assurance, not field validation, authorship proof, or safety certification.",
-        "test_bytes": 19388,
-        "test_sha256": "aaa4c04dfb724ee524aa0fd6eaec8efc0911fb6ea22acb5ad6dcec3733272ce3",
+        "test_bytes": 24790,
+        "test_sha256": "565c6ef0d4ce064491e454ee7629b7dd22b2ea3312b8363415413a5c0f271726",
         "verification_command": "python -m pytest -q tests/test_proof_capsule_verifier.py"
       },
       {
@@ -376,6 +376,7 @@
     "No fit is found; record why and close the lane without implying endorsement."
   ],
   "known_gaps": [
+    "The October 7 packet refresh rebinds current source and test hashes only. It does not refresh the separately dated live-surface observations, confirm a new meeting outcome or create independent execution evidence. Historical computation and deployment receipts remain unchanged.",
     "Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and parity for gateway, runtime, and later repository commits remain unestablished.",
     "The earlier August 10 legacy-route observation is superseded for named static release 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 by its retained first-party deployment and audit receipt, which recorded all 43 allowlisted files including the eight noindex HOLD stubs as exact live-byte matches. That receipt is bounded to the named static release and does not establish external validation, runtime parity, sustained availability, or broader production authorization.",
     "The reproducibility receipts are first-party or operator-controlled, not independent external validation.",

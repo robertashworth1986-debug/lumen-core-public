@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.external_technical_review_packet_config.v1",
-  "generated_at_utc": "2026-08-12T05:14:44Z",
+  "generated_at_utc": "2026-10-07T16:07:35Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -291,6 +291,7 @@
     "No fit is found; record why and close the lane without implying endorsement."
   ],
   "known_gaps": [
+    "The October 7 packet refresh rebinds current source and test hashes only. It does not refresh the separately dated live-surface observations, confirm a new meeting outcome or create independent execution evidence. Historical computation and deployment receipts remain unchanged.",
     "Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and parity for gateway, runtime, and later repository commits remain unestablished.",
     "The earlier August 10 legacy-route observation is superseded for named static release 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 by its retained first-party deployment and audit receipt, which recorded all 43 allowlisted files including the eight noindex HOLD stubs as exact live-byte matches. That receipt is bounded to the named static release and does not establish external validation, runtime parity, sustained availability, or broader production authorization.",
     "The reproducibility receipts are first-party or operator-controlled, not independent external validation.",
