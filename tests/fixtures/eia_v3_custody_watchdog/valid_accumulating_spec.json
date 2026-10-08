@@ -1,0 +1,10 @@
+{
+  "schema": "eia_grid_hourly_hybrid_confirmation_public_custody_fixture_spec.v1",
+  "snapshot_kind": "synthetic_public_safe_contract_fixture",
+  "first_target_period_end_utc": "2026-08-02T12",
+  "prediction_panel_count": 3,
+  "settlement_panel_count": 2,
+  "seal_lead_seconds": 5400,
+  "generated_utc": "2026-08-02T14:15:00Z",
+  "as_of_utc": "2026-08-02T14:30:00Z"
+}
