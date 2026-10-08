@@ -3,11 +3,13 @@ from __future__ import annotations
 import copy
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -383,6 +385,112 @@ class ProofCapsuleVerifierTests(unittest.TestCase):
                 ROOT,
                 max_total_artifact_bytes=1,
             )
+
+    def test_byte_budgets_reject_non_integer_values_before_io(self) -> None:
+        for value in (True, False, 0, -1, 1.5, float("nan"), float("inf"), "8", None):
+            with self.subTest(value=value):
+                with patch.object(
+                    Path, "open", side_effect=AssertionError("unexpected read")
+                ):
+                    with self.assertRaisesRegex(
+                        MODULE.CapsuleError, "positive integer"
+                    ):
+                        MODULE.load_capsule_document(
+                            self.capsule_path, max_bytes=value
+                        )
+                    for key in ("max_artifact_bytes", "max_total_artifact_bytes"):
+                        with self.assertRaisesRegex(
+                            MODULE.CapsuleError, "positive integer"
+                        ):
+                            MODULE.validate_capsule(
+                                self.capsule, ROOT, **{key: value}
+                            )
+
+    def test_escaped_surrogate_title_returns_structured_cli_failure(self) -> None:
+        for surrogate in ("\ud800", "\udfff"):
+            with self.subTest(surrogate=repr(surrogate)), tempfile.TemporaryDirectory() as tmp:
+                mutated = copy.deepcopy(self.capsule)
+                mutated["title"] = "Malformed " + surrogate
+                path = Path(tmp) / "capsule.json"
+                path.write_text(json.dumps(mutated), encoding="utf-8")
+                with patch("sys.stderr", new_callable=io.StringIO) as errors:
+                    status = MODULE.main([str(path), "--root", str(ROOT)])
+                self.assertEqual(status, 1)
+                self.assertFalse(json.loads(errors.getvalue())["valid"])
+                self.assertIn("Unicode", json.loads(errors.getvalue())["error"])
+
+    def test_surrogate_manifest_path_fails_closed(self) -> None:
+        mutated = copy.deepcopy(self.capsule)
+        mutated["manifest"]["output_hashes"][0]["path"] = "bad-\ud800.txt"
+        self.assertFails(mutated)
+
+    def test_valid_non_bmp_unicode_remains_supported(self) -> None:
+        mutated = copy.deepcopy(self.capsule)
+        mutated["title"] = "Evidence \U0001f52c"
+        self.assertTrue(MODULE.validate_capsule(mutated, ROOT)["valid"])
+
+    def test_aggregate_budget_rejects_later_output_before_open(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            (root / "input.txt").write_bytes(b"abcd")
+            (root / "output.txt").write_bytes(b"efgh")
+            mutated = copy.deepcopy(self.capsule)
+            for label, name, data in (
+                ("input_hashes", "input.txt", b"abcd"),
+                ("output_hashes", "output.txt", b"efgh"),
+            ):
+                mutated["manifest"][label] = [
+                    {"path": name, "sha256": hashlib.sha256(data).hexdigest()}
+                ]
+            refresh_manifest_hash(mutated)
+            original_open = Path.open
+            opened = []
+
+            def observe_open(path, *args, **kwargs):
+                opened.append(path)
+                return original_open(path, *args, **kwargs)
+
+            with patch.object(Path, "open", observe_open):
+                with self.assertRaisesRegex(
+                    MODULE.CapsuleError, "aggregate maximum size"
+                ):
+                    MODULE.validate_capsule(
+                        mutated, root, max_total_artifact_bytes=6
+                    )
+            self.assertEqual(opened, [root / "input.txt"])
+            result = MODULE.validate_capsule(mutated, root, max_total_artifact_bytes=8)
+            self.assertEqual(result["verified_bytes"], 8)
+
+    def test_zero_byte_artifact_allowed_after_aggregate_budget_exhausted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "input.txt").write_bytes(b"x")
+            (root / "empty.txt").write_bytes(b"")
+            mutated = copy.deepcopy(self.capsule)
+            mutated["manifest"]["input_hashes"] = [
+                {"path": "input.txt", "sha256": hashlib.sha256(b"x").hexdigest()}
+            ]
+            mutated["manifest"]["output_hashes"] = [
+                {"path": "empty.txt", "sha256": hashlib.sha256(b"").hexdigest()}
+            ]
+            refresh_manifest_hash(mutated)
+            result = MODULE.validate_capsule(mutated, root, max_total_artifact_bytes=1)
+            self.assertEqual(result["verified_bytes"], 1)
+            self.assertEqual(result["verified_hash_records"], 2)
+
+    def test_growing_artifact_read_is_bounded_by_one_detection_byte(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "growing.txt"
+            path.write_bytes(b"x")
+            stream = io.BytesIO(b"x" * 100)
+            # Model growth after fstat while keeping the real descriptor identity.
+            with path.open("rb") as real_handle, patch.object(Path, "open") as mocked_open:
+                handle = mocked_open.return_value.__enter__.return_value
+                handle.fileno.return_value = real_handle.fileno()
+                handle.read.side_effect = stream.read
+                with self.assertRaises(MODULE.CapsuleError):
+                    MODULE._sha256(path, max_bytes=4)
+                self.assertEqual(stream.tell(), 5)
 
     def test_duplicate_json_key_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

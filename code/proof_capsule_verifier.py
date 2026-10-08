@@ -255,6 +255,7 @@ def load_capsule_document(
 ) -> LoadedCapsule:
     """Load one stable regular file and bind its exact bytes to a digest."""
 
+    _require_positive_byte_budget(max_bytes, "max_bytes")
     try:
         path_before = path.lstat()
         if not stat.S_ISREG(path_before.st_mode):
@@ -353,6 +354,10 @@ def _require_mapping(parent: dict[str, Any], key: str) -> dict[str, Any]:
 
 
 def _validate_text(value: str, context: str) -> str:
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError as exc:
+        raise CapsuleError(f"{context} contains invalid Unicode") from exc
     if value != value.strip():
         raise CapsuleError(f"{context} must not contain surrounding whitespace")
     if len(value) > MAX_TEXT_CHARACTERS:
@@ -524,13 +529,28 @@ def _safe_path(root: Path, raw_path: str) -> tuple[str, Path]:
     return canonical, candidate
 
 
-def _sha256(path: Path, *, max_bytes: int) -> tuple[str, int, tuple[int, int]]:
+def _require_positive_byte_budget(value: int, name: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise CapsuleError(f"{name} must be a positive integer")
+
+
+def _sha256(
+    path: Path,
+    *,
+    max_bytes: int,
+    limit_error: str | None = None,
+) -> tuple[str, int, tuple[int, int]]:
+    size_error = limit_error or (
+        f"manifest file exceeds maximum size of {max_bytes} bytes: {path}"
+    )
     try:
         path_before = path.lstat()
         if not stat.S_ISREG(path_before.st_mode):
             raise CapsuleError(
                 f"manifest target is not a regular file: {path}"
             )
+        if path_before.st_size > max_bytes:
+            raise CapsuleError(size_error)
         with path.open("rb") as handle:
             opened_before = os.fstat(handle.fileno())
             if not stat.S_ISREG(opened_before.st_mode):
@@ -538,9 +558,7 @@ def _sha256(path: Path, *, max_bytes: int) -> tuple[str, int, tuple[int, int]]:
                     f"manifest target is not a regular file: {path}"
                 )
             if opened_before.st_size > max_bytes:
-                raise CapsuleError(
-                    f"manifest file exceeds maximum size of {max_bytes} bytes: {path}"
-                )
+                raise CapsuleError(size_error)
             if _stat_signature(path_before) != _stat_signature(opened_before):
                 raise CapsuleError(
                     f"manifest file changed before hashing: {path}"
@@ -548,12 +566,14 @@ def _sha256(path: Path, *, max_bytes: int) -> tuple[str, int, tuple[int, int]]:
 
             digest = hashlib.sha256()
             total = 0
-            for block in iter(lambda: handle.read(1024 * 1024), b""):
+            while True:
+                # One extra byte detects growth without reading an oversized chunk.
+                block = handle.read(min(1024 * 1024, max_bytes - total + 1))
+                if not block:
+                    break
                 total += len(block)
                 if total > max_bytes:
-                    raise CapsuleError(
-                        f"manifest file exceeds maximum size of {max_bytes} bytes: {path}"
-                    )
+                    raise CapsuleError(size_error)
                 digest.update(block)
             opened_after = os.fstat(handle.fileno())
         path_after = path.lstat()
@@ -612,9 +632,19 @@ def _validate_hash_records(
         seen_targets.add(path)
         if not path.exists():
             raise CapsuleError(f"manifest file does not exist: {canonical}")
+        remaining_bytes = (
+            max_total_artifact_bytes - previously_verified_bytes - verified_bytes
+        )
+        aggregate_error = (
+            "manifest artifacts exceed the aggregate maximum size of "
+            f"{max_total_artifact_bytes} bytes"
+        )
         actual, byte_count, file_id = _sha256(
             path,
-            max_bytes=max_artifact_bytes,
+            max_bytes=min(max_artifact_bytes, remaining_bytes),
+            limit_error=(
+                aggregate_error if remaining_bytes < max_artifact_bytes else None
+            ),
         )
         if file_id in seen_file_ids:
             raise CapsuleError(
@@ -627,10 +657,7 @@ def _validate_hash_records(
             )
         next_total = previously_verified_bytes + verified_bytes + byte_count
         if next_total > max_total_artifact_bytes:
-            raise CapsuleError(
-                "manifest artifacts exceed the aggregate maximum size of "
-                f"{max_total_artifact_bytes} bytes"
-            )
+            raise CapsuleError(aggregate_error)
         verified_bytes += byte_count
         verified_records.append({"path": canonical, "sha256": actual})
     return verified_records, verified_bytes
@@ -645,10 +672,8 @@ def validate_capsule(
     capsule_file_sha256: str | None = None,
     capsule_file_bytes: int | None = None,
 ) -> dict[str, Any]:
-    if max_artifact_bytes < 1:
-        raise CapsuleError("max_artifact_bytes must be positive")
-    if max_total_artifact_bytes < 1:
-        raise CapsuleError("max_total_artifact_bytes must be positive")
+    _require_positive_byte_budget(max_artifact_bytes, "max_artifact_bytes")
+    _require_positive_byte_budget(max_total_artifact_bytes, "max_total_artifact_bytes")
     if (capsule_file_sha256 is None) != (capsule_file_bytes is None):
         raise CapsuleError(
             "capsule_file_sha256 and capsule_file_bytes must be provided together"

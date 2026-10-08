@@ -9,19 +9,22 @@ Robert Ashworth · Founder / Systems Architect
 [Full evidence index](../EVIDENCE_INDEX.md) ·
 [Portfolio and maturity map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md)
 
-## October 5 review route
+## Technical review route
 
-1. Open the [portfolio doorway](https://lumen-core.ai/portfolio/) for the artwork,
-   candidate geometry catalog and bounded benchmark.
-2. Use the [portfolio map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) to follow
-   each engineering asset to its evidence and next gate.
-3. Review the [geometry protocol](GEOMETRY_EVALUATION_PROTOCOL_V1.md) before
-   treating any attractive shape as an efficiency result.
-4. Choose one authorized source, one incumbent baseline, one primary metric and
-   one decision owner for the next external evaluation.
+1. Record the exact Git commit under review and run the five-minute checks below.
+2. Inspect the verifier and its adversarial tests, then the existing assurance
+   crosswalk and production HOLD gates.
+3. Use the full-suite setup below for current source behavior. Use the separately
+   pinned executor handoff for the frozen scientific computation.
+4. Follow the [portfolio map](PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) to
+   each asset's implementation, evidence and next gate. Record reproducible
+   findings with the command, environment, expected result and observed result.
 
-The meeting is founder-reported for October 5, 2026. This page does not confirm
-attendance, time, endorsement, an executed audit or a commercial agreement.
+**Source and live delivery are separate checks.** The October 7, 2026
+[live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37614701203)
+of source `e5487b6d` matched 192 of 246 expected files, with 3 mismatches and
+51 missing files. Start from this GitHub checkout; a reachable website does not
+establish current source parity. This dated observation is not a deployment fix.
 
 ## The 90-second overview
 
@@ -50,6 +53,24 @@ customer revenue, field savings, and certification remain open milestones.
 The [readiness dossier](INSTITUTIONAL_READINESS_DOSSIER.md) makes those gates
 specific. The machine-readable portfolio receipt records zero subscription-ready
 lanes; research breadth does not establish customers or deployed products.
+
+## A focused team review
+
+Start together with the five-minute check, then divide the inspection by question.
+The first pass can stay within these existing surfaces; the portfolio is context,
+not a requirement to inspect every historical experiment.
+
+| Track | Inspect first | Decision to return |
+|---|---|---|
+| Code and security | [Verifier](../code/proof_capsule_verifier.py), [adversarial tests](../tests/test_proof_capsule_verifier.py), [ProofLock threat model](../dashboard/build_week/prooflock_console/THREAT_MODEL.md), [dependency controls](REPOSITORY_SECURITY_ASSURANCE.md) | Can malformed, oversized or tampered evidence pass? Which trust assumptions need stronger controls? |
+| Reproducibility and forecasting | [Frozen executor handoff](CODECHECK_INDEPENDENT_EXECUTOR_HANDOFF_2026-07-21.md), [constraint comparisons](CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md), [strict identity verifier](../code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py) | Can the named computation be repeated, and do its failed gates support the stated HOLD decision? |
+| Systems and delivery | [Readiness dossier](INSTITUTIONAL_READINESS_DOSSIER.md), [release workflow](../.github/workflows/public-site-supply-chain.yml), [incident plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md), [buyer-owned scope](LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md) | What is the smallest externally testable offer, and which controls must close before deployment? |
+
+Return findings with the **commit, environment, command, expected behavior,
+observed behavior, severity and proposed next gate**. Separate a reproduced
+defect from a question or design recommendation. Report security findings through
+the private route in [SECURITY.md](../SECURITY.md), without posting credentials
+or sensitive reproduction data in a public issue.
 
 ## Reviewing the full portfolio
 
@@ -88,6 +109,65 @@ These verify the declared registers, evidence paths, statuses, limitations,
 and workflow bindings. They do not establish independently assessed control
 operating effectiveness. The [ProofLock demonstration](https://lumen-core.ai/build_week/prooflock_console/)
 provides a visual companion to the evidence and decision gates.
+
+## Full current-source test suite
+
+Use Ubuntu 24.04 x86-64 and CPython 3.11.9, matching the existing
+[institutional workflow](../.github/workflows/institutional-readiness.yml).
+Use a normal user account: POSIX permission tests intentionally skip under root.
+Record `git rev-parse HEAD` with every result; a branch test is not a main-branch
+or live-release attestation.
+
+```bash
+git clone https://github.com/robertashworth1986-debug/lumen-core-public.git
+cd lumen-core-public
+git rev-parse HEAD
+git fetch origin 1c0eb51754beffac6f4df484914e35efc21c253f
+git cat-file -e '1c0eb51754beffac6f4df484914e35efc21c253f^{commit}'
+python3.11 -c 'import sys; assert sys.version_info[:3] == (3, 11, 9)'
+python3.11 -m venv .venv
+. .venv/bin/activate
+python code/ops/VERIFY_INSTITUTIONAL_DEPENDENCY_LOCK.py
+python -m pip install --require-hashes --only-binary=:all: -r requirements-institutional-ubuntu-py311.lock
+python -m pip check
+PYTHONHASHSEED=0 TZ=UTC OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 \
+  python -m pytest -q -rs --durations=20 --junitxml=out/institutional-readiness/reviewer-suite.xml
+```
+
+The explicit fetch supplies the historical author-package objects used by
+`test_codecheck_eia_mainline_integration.py`. A shallow or single-branch checkout
+can lack them even after deepening main. Do not weaken those checks or replace
+the pinned identity to make a run pass. Inspect all reported skips: generated
+publication fixtures, Windows process checks and the optional Zig compiler have
+separate prerequisites; Linux success does not imply those paths executed.
+
+The October 5 [main-source run](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37344423853)
+at `e5487b6d` recorded 1,321 passed tests, 8 skips and 166 subtests in the
+full-repository job. Those are dated first-party checks, not independent review.
+The [review-preparation PR #245](https://github.com/robertashworth1986-debug/lumen-core-public/pull/245)
+incorporates the existing PDF security repair from
+[PR #210](https://github.com/robertashworth1986-debug/lumen-core-public/pull/210):
+`pypdf==6.19.0`, the hash-locked distributions and six generated-fixture checks.
+It also removes the unused TensorFlow.js dependency chain responsible for the
+October 7 npm audit failure and updates urllib3 to 2.8.0 after a fresh Python
+audit found three transport advisories. Review the exact commit's checks and the
+[dated security record](REPOSITORY_SECURITY_ASSURANCE.md) before relying on
+these changes; a passing source suite is not a deployment receipt.
+
+## Open gates at the October 7 review
+
+| Gate | Recorded state | Evidence needed to close it |
+|---|---|---|
+| Independent evaluation | First-party checks exist; independent execution is pending. | A qualified evaluator's complete execution receipt and deviations. |
+| Live static release | October 7 audit: 192/246 files match, 3 differ, 51 are missing. | Authorized exact-main release, signed provenance and complete live-byte verification. |
+| Operational data | [Issue #234](https://github.com/robertashworth1986-debug/lumen-core-public/issues/234) retains four unavailable legacy feeds. | Owner-approved producer, route, schema and freshness contracts with end-to-end verification. |
+| Server recovery | The October 4 diagnosis identified paper-ledger ownership and gateway source/identity gaps; source preparation does not repair them. | Existing guarded [ledger repair](../.github/workflows/repair-paper-ticker-ledger.yml) and [gateway repair](../.github/workflows/repair-gateway-dependency-closure.yml), with runtime readback and rollback evidence. |
+| Repository assurance | Main-branch protection remains unenforced; the historical provider-key closure lacks a non-secret receipt. | Founder-approved branch enforcement with a recovery path, and provider rotation/revocation plus history reconciliation. |
+| Supplemental AI scan | The October 7 [AI review job](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37649823151) failed before analysis because account quota was exhausted. | A completed scan after account availability is restored; this is not a passing scan or a code finding. |
+
+These gates distinguish **ready for technical review** from approval to deploy,
+handle buyer data or make externally validated performance claims. CodeQL and
+the maintained test jobs have their own receipts and do not replace an incomplete scan.
 
 ## September 21 constraint evidence
 

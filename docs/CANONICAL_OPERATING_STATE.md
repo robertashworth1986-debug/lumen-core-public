@@ -1,11 +1,50 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-08-12 UTC
+**State date:** 2026-10-07 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
 ## One commercial sentence
+
+### October 7 technical reviewer preparation
+
+Founder-directed repository preparation advances outcome 2: one bounded external
+execution or owner-approved pilot. It updates the existing Proof Capsule verifier,
+adversarial tests, schema and reviewer entrypoint; it does not create another
+platform or change a frozen experiment. New regression cases reproduce malformed
+Unicode crashes, invalid API resource limits and reads beyond the remaining
+aggregate allowance. The verifier now rejects those inputs and bounds each read.
+The existing schema, receipt version, scientific comparisons and HOLD gates remain.
+The canonical technical-review packet is regenerated to bind the changed source
+and test bytes. Its generation time is refreshed; its separately dated live
+observations and historical receipts are preserved and explicitly distinguished.
+
+The reviewer page now leads with GitHub source, exact runtime and hash-locked
+setup, historical Git-object prerequisites, executable checks and reported skips.
+It distinguishes current-source tests from the frozen computation and identifies
+the October 7 live audit's 192/246 matches, 3 mismatches and 51 missing files.
+The continuation incorporates the existing PDF dependency PR #210 rather than
+creating a second repair: pypdf 6.19.0, verified distribution hashes and six
+bounded resource/compatibility fixtures. It removes unused TensorFlow.js and
+the argparse/sprintf-js/form-data closure responsible for the fresh npm audit
+failure. Strict installation, peer/provenance validation and the audit threshold
+remain enforced; regression checks reject root or nested reintroduction.
+The local 10-package candidate graph reports zero known npm vulnerabilities.
+Fresh auditing of the PDF candidate also found three urllib3 2.7.0 advisories.
+The same 39-package institutional lock now uses the upstream fixed 2.8.0
+release with both distribution hashes verified; its subsequent audit reports
+zero known advisories. The existing dependency-security evidence lane retains
+the dated comparison and outputs. Frozen research dependencies are unchanged.
+
+The canonical reviewer guide supplies three inspection tracks, reproducible
+finding fields and explicit open gates. No private reviewer identity is added.
+The supplementary GitHub AI review is unavailable because account quota is
+exhausted; this does not replace successful CodeQL/test receipts with a clean
+AI-scan claim. Live parity, unavailable legacy feeds, guarded server recovery,
+branch enforcement, provider-key closure and external evaluation remain open.
+Review preparation and first-party tests do not establish independent validation,
+production authorization, certification, a paid engagement or buyer acceptance.
 
 ### October 5 fixed-material and high-activity diagnostic continuation
 
