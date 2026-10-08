@@ -1,0 +1,18 @@
+{
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "research_checkpoint": "a369e1ce658faf89d67e26ed36c85d3d69cccf41",
+  "issue": 214,
+  "review_pr": 215,
+  "artifacts": [
+    {"artifact_id":9947920836,"run_id":33901820634,"file":"utah-forge-gdr1683.zip","sha256":"d27e25495e0a7a6eac31e54442e0a9f39fe2e4566dcad8e85a725547654b9545","bytes":33343013},
+    {"artifact_id":9948597218,"run_id":33903657157,"file":"energy-multisource-wedge.zip","sha256":"b229d3303dd96f27b743525a6b09a03669a055864b1ae6575ad12e0190010aa1","bytes":33679526},
+    {"artifact_id":9948734448,"run_id":33904028641,"file":"geothermal-deep-sources.zip","sha256":"d2313ee619fc12aadbee2472511318019ccecc34a16544e13144b8092b387c3c","bytes":40650430},
+    {"artifact_id":9948914159,"run_id":33904479723,"file":"geothermal-deep-wedge.zip","sha256":"8727aaf20914ca321b1a4e3a246417d484db978892c82ea516d19438d590e89f","bytes":13662047},
+    {"artifact_id":9965191841,"run_id":33952199259,"file":"energy-next-stage-ci.zip","sha256":"dd995b13f8a16e29a58103d39542284010d02638bec16b2f49c9e13943c4cb5f","bytes":40616882},
+    {"artifact_id":9965277493,"run_id":33952488937,"file":"energy-drift-abstention-ci.zip","sha256":"aa9063c5eab114d22c2998f2fdece93c518f41e859b879d5f09860317772de76","bytes":33347102},
+    {"artifact_id":9970027256,"run_id":33967956418,"file":"energy-stage3-history.zip","sha256":"ae6d24e849043fc0175c63fafce20a78a7852711bb85e87de266eabaf2efd4dc","bytes":6237118},
+    {"artifact_id":9970144275,"run_id":33968332369,"file":"energy-stage3-replay.zip","sha256":"c419656e4b351ba65f039a098bc9cf0fb1ff793149c1f346e0e3faba90d6e368","bytes":15240},
+    {"artifact_id":9970692612,"run_id":33970218198,"file":"energy-stage4-ci.zip","sha256":"a0c693328a3a614ee7646731b81497f7d5f4b33b5338c9fab0595797d1017a2d","bytes":20736097}
+  ],
+  "historical_corrections": "Stage 3 corrections supersede earlier geothermal performance and zero-selected-loss claims. Preserve original artifacts for audit, not as current claim authority."
+}

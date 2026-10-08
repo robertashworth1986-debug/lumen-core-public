@@ -1,0 +1,170 @@
+{
+  "generated_utc": "2026-09-05T07:27:00Z",
+  "branch": "exp/energy-multisource-breadth",
+  "claim_boundary": "Offline retrospective screening only. No live control, setpoint, safety limit, site recommendation, reserve estimate, bankability conclusion, or external validation is produced.",
+  "reproducible_runs": {
+    "next_stage_robustness": {
+      "run_id": 33952199259,
+      "head_sha": "224eb64d5c5686a52ef13c5a25626ebf3ab1a203",
+      "artifact": "energy-next-stage-224eb64d5c5686a52ef13c5a25626ebf3ab1a203",
+      "artifact_sha256": "dd995b13f8a16e29a58103d39542284010d02638bec16b2f49c9e13943c4cb5f",
+      "status": "PASS"
+    },
+    "causal_drift_abstention": {
+      "run_id": 33952488937,
+      "head_sha": "8d0d7370f418549ecf5421d417f6cd5f81084993",
+      "artifact": "energy-drift-abstention-8d0d7370f418549ecf5421d417f6cd5f81084993",
+      "artifact_sha256": "aa9063c5eab114d22c2998f2fdece93c518f41e859b879d5f09860317772de76",
+      "status": "PASS"
+    }
+  },
+  "findings": {
+    "forge1683_walk_forward": {
+      "rows": 71851,
+      "mean_rolling_improvement_pct": {
+        "10_min": 3.529343027761704,
+        "30_min": 2.4592840325375196,
+        "60_min": 3.3014965782142136
+      },
+      "negative_folds_each_horizon": 1,
+      "interpretation": "The earlier single holdout 8-12% flow result is not stable across all chronological regimes. Simple smoothing remains useful in some regimes but must not be promoted as universal superiority."
+    },
+    "forge1683_sensor_robustness": {
+      "random_missing_30pct_mean_improvement_pct": {
+        "10_min": 4.68293081878516,
+        "30_min": 9.579643903293404,
+        "60_min": 8.65841125367179
+      },
+      "long_block_missing_120_samples_mean_improvement_pct": {
+        "10_min": 4.737262792932643,
+        "30_min": 8.886683426263664,
+        "60_min": 7.870542710566532
+      },
+      "gaussian_noise_2pct_std_mean_improvement_pct": {
+        "10_min": 5.443683208372812,
+        "30_min": 9.818217903407206,
+        "60_min": 8.781831857816002
+      },
+      "interpretation": "The simple flow smoother is comparatively robust to synthetic missingness and noise, especially at 30-60 minute horizons, under the tested forward-fill corruption protocol."
+    },
+    "forge1683_distribution_drift": {
+      "recovery_proxy_block1_median": 0.5934565167595632,
+      "recovery_proxy_block5_median": 0.8888415067519545,
+      "recovery_proxy_block1_vs_block5_ks": 0.981708648172321,
+      "production_flow_block1_median": 237.58,
+      "production_flow_block5_median": 374.21,
+      "production_temperature_block1_median": 312.22,
+      "production_temperature_block5_median": 363.99,
+      "interpretation": "The circulation record is strongly nonstationary. Static thresholds and fixed model assumptions can become invalid as the operating regime evolves."
+    },
+    "forge1683_causal_drift_abstention": {
+      "pre_drift_vs_next_block_gain_spearman": {
+        "10_min": -0.41958041958041964,
+        "30_min": -0.3706293706293707,
+        "60_min": -0.3356643356643357
+      },
+      "always_rolling_mean_improvement_pct": {
+        "10_min": 3.113685238571163,
+        "30_min": 1.6000659446714074,
+        "60_min": 3.2855256047818564
+      },
+      "drift_abstention_mean_improvement_pct_all_blocks": {
+        "10_min": 3.2459603561051753,
+        "30_min": 2.0629338568211164,
+        "60_min": 3.4604617238815423
+      },
+      "drift_abstention_mean_improvement_pct_post_warmup": {
+        "10_min": 4.868940534157763,
+        "30_min": 3.0944007852316746,
+        "60_min": 5.190692585822314
+      },
+      "negative_selected_blocks_post_warmup": {
+        "10_min": 1,
+        "30_min": 0,
+        "60_min": 0
+      },
+      "interpretation": "A causal drift-triggered fallback modestly improves mean performance and eliminates selected negative blocks after warm-up at 30 and 60 minutes in this historical record. The 10-minute rule still fails once and remains a hold lane. This is a model-selection experiment, not an operating-control rule."
+    },
+    "forge1149_state_forecasting_negative": {
+      "state_ridge_improvement_pct_vs_persistence": {
+        "60_sec": -363.60189592533237,
+        "180_sec": -446.9201753161303,
+        "360_sec": -424.8553343138473
+      },
+      "interpretation": "The tested state-aware Ridge model is decisively worse than persistence for short-horizon pressure forecasting. Historical path-dependence remains a diagnostic hypothesis only."
+    },
+    "noaa_ndbc_wave": {
+      "station_46237_simple_rolling_improvement_pct": {
+        "1_hour": 8.397019929732611,
+        "3_hour": 7.452542155617446,
+        "6_hour": 7.844968701813936
+      },
+      "station_46237_rich_feature_best_improvement_pct": 2.608987851193559,
+      "station_46237_missing_10pct_mean_improvement_pct": {
+        "1_hour": 7.173248921359845,
+        "3_hour": 6.66148581976197,
+        "6_hour": 6.978348944000287
+      },
+      "station_46237_missing_30pct_mean_improvement_pct": {
+        "1_hour": 4.773603716661412,
+        "3_hour": 4.678297674123838,
+        "6_hour": 5.897480660029761
+      },
+      "best_cross_station_improvement_pct": 1.2477266510036755,
+      "interpretation": "The wave edge remains local and simple. Rich local features and cross-station models did not clear the 5% promotion threshold. Mild missingness preserves much of the 46237 local-smoothing edge; severe missingness degrades it."
+    },
+    "usgs_geothermal_evidence_reconciliation": {
+      "sites_with_at_least_5_estimators": 1255,
+      "synthetic_dropout_20pct_mae_degC": {
+        "median": 6.594442231075695,
+        "mean": 19.267021627774614,
+        "trimmed_mean": 13.479894687915007
+      },
+      "synthetic_dropout_40pct_mae_degC": {
+        "median": 13.060653386454183,
+        "mean": 22.49200112881806,
+        "trimmed_mean": 18.860760823373173
+      },
+      "synthetic_dropout_60pct_mae_degC": {
+        "median": 20.460621513944222,
+        "mean": 26.13488797192183,
+        "trimmed_mean": 25.07796733067729
+      },
+      "interpretation": "Relative to the full-data per-site median consensus reference, median reconciliation is substantially more stable under synthetic estimator dropout than mean or trimmed-mean reconciliation. The consensus reference is not physical ground truth."
+    },
+    "usgs_resource_uncertainty_frontier": {
+      "systems": 977,
+      "lambda_0": {
+        "portfolio_mean_score": 3.650472640991211,
+        "portfolio_p10": 3.4520723819732666,
+        "mean_individual_score_sd": 1.5773141384124756
+      },
+      "lambda_0_25": {
+        "portfolio_mean_score": 3.6091597080230713,
+        "portfolio_p10": 3.4144785404205322,
+        "mean_individual_score_sd": 1.5188065767288208,
+        "mean_individual_p10": 1.6154166460037231
+      },
+      "lambda_1": {
+        "portfolio_mean_score": 3.228823184967041,
+        "portfolio_p10": 3.0458388328552246,
+        "mean_individual_score_sd": 1.3396203517913818
+      },
+      "interpretation": "Penalizing uncertainty reduces dispersion but also sacrifices expected score. The result is a measurable risk-return frontier, not a universal best ranking or a site recommendation."
+    }
+  },
+  "priority_wedges": [
+    "drift-aware fail-closed forecasting and model-validity monitoring for geothermal operations data",
+    "sensor-quality and missing-data resilience validation for geothermal analytics",
+    "robust reconciliation of conflicting geothermal resource estimates under incomplete evidence",
+    "uncertainty-aware resource portfolio/ranking analytics with explicit risk-return tradeoffs",
+    "local short-horizon wave-resource forecasting where station-specific evidence clears a frozen baseline"
+  ],
+  "hold_or_negative_lanes": [
+    "universal geothermal flow forecasting superiority",
+    "short-horizon FORGE1149 state-aware pressure forecasting with the tested Ridge model",
+    "rich-feature wave forecasting as tested",
+    "cross-buoy wave forecasting as tested",
+    "10-minute geothermal drift-abstention as a fully fail-closed lane"
+  ]
+}
