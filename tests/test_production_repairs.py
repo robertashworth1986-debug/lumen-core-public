@@ -73,6 +73,7 @@ class ProductionRepairTests(unittest.TestCase):
                 ),
                 patch.object(grant_factory, "update_queue", return_value={}),
             ):
+                grant_factory.create_bundle_manifest(run)
                 state = grant_factory.approve("nsf_sbir_phase_i")
                 self.assertEqual(state["state"], "approved")
                 snapshot = approved / "nsf_sbir_phase_i" / run.name
@@ -135,6 +136,8 @@ class ProductionRepairTests(unittest.TestCase):
             }
             for name, content in required.items():
                 (run_dir / name).write_text(content, encoding="utf-8")
+            (run_dir / "manifest.sha256.json").unlink()
+            grant_factory.create_bundle_manifest(run_dir)
             preflight = build_preflight("test_grant", run_dir, None)
             self.assertFalse(preflight["ready"])
             self.assertTrue(
@@ -165,6 +168,8 @@ class ProductionRepairTests(unittest.TestCase):
             }
             for name, content in required.items():
                 (run_dir / name).write_text(content, encoding="utf-8")
+            (run_dir / "manifest.sha256.json").unlink()
+            grant_factory.create_bundle_manifest(run_dir)
             preflight = build_preflight(
                 "test_grant",
                 run_dir,

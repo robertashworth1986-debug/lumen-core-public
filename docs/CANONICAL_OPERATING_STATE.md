@@ -7,6 +7,36 @@
 
 ## One commercial sentence
 
+### October 8 founder-authorized consolidation and report repair
+
+Active outcome 2: one external validation or paid-pilot conversion. This branch
+integrates the complete histories of PRs #244, #232 and #222, resolving additive
+operating-state conflicts while preserving later mainline fixes. It corrects
+three newly supplied legacy report scripts in the existing research lane and
+updates the existing portfolio map rather than adding a separate product packet.
+
+The grant correction retains supplied facts, unknowns, immutable approved
+snapshots and byte-consistent exports. Denominator diagnostics partition missing
+inputs without double-counting overlapping exclusions. Revenue qualification now
+requires explicit comparison and handling facts, rejects non-text placeholders,
+excludes unknown/unbounded evidence nodes, and binds SOW prefills to the exact
+qualified input and opportunity identity. Prefills remain drafts; no customer,
+contract, revenue, submission or deployment is created.
+
+Report regression tests cover nonfinite/malformed data, timestamp alignment,
+undefined spectra, absent comparison versions, worse candidate loss, failed
+writes and overwritten outputs. Rendering fixtures are explicitly synthetic.
+The raw HyperCore histories are still unavailable; screenshot interpretation is
+not a numerical rerun. Unsupported historical KPI claims are excluded from the
+private business-plan revision. Public source contains no private reviewer names,
+correspondence, contact records or original investor dossiers.
+
+The existing PR consolidation map records the entire 26-PR open-queue triage.
+Unintegrated conflicts, stale branches and failing dependency checks remain open;
+no branch history is deleted. Production and external-validation HOLD gates remain.
+Fresh test and merge receipts belong to this continuation's exact Git subject.
+
+
 ### October 7 technical reviewer preparation
 
 Founder-directed repository preparation advances outcome 2: one bounded external
@@ -45,6 +75,17 @@ AI-scan claim. Live parity, unavailable legacy feeds, guarded server recovery,
 branch enforcement, provider-key closure and external evaluation remain open.
 Review preparation and first-party tests do not establish independent validation,
 production authorization, certification, a paid engagement or buyer acceptance.
+### October 6 bounded Grant Factory draft correction
+
+Active outcome 2 includes a separate draft correction to the existing grant
+workflow. Generated narrative uses supplied project facts, marks missing facts,
+preserves synthetic/unknown evidence type, and introduces no standalone software
+price or deployment claim. Package checks and permitted state/kit updates retain
+consistent file manifests and immutable local approved snapshots. The fictional
+local rehearsal remains blocked for submission and does not establish customer
+isolation, funding, accepted economics, a customer, or a software release. The
+original source-to-export receipts remain unchanged. This correction is reviewable
+on `codex/grant-factory-evidence-custody`; main and live deployments are unchanged.
 
 ### October 5 fixed-material and high-activity diagnostic continuation
 
@@ -466,6 +507,20 @@ validation occurred in this repair pass. Existing frozen EIA evidence remains
 unchanged and on HOLD. The next operating gate remains a permissioned,
 timestamped source snapshot followed by the accepted comparison protocol and
 human review; code repair alone does not prove continuous operation or savings.
+### September 24 sector coverage diagnostic
+
+Active outcome 2 now includes a source-level extension of the existing offline
+denominator audit for grid, marine and geothermal research. Each scheduled
+target excluded from a comparison is attributed to its complete missing-input
+pattern; overlapping marginal counts are explicitly separated from exclusive
+lost-target totals. This makes the next source-repair work more precise without
+changing forecasts, thresholds, frozen results or research-only decisions.
+The [existing assurance note](DENOMINATOR_AND_PAPER_ASSURANCE_2026-09-11.md)
+records 81 passing focused local tests and both intact EIA packet identities.
+No complete-suite CI pass, rescored historical packet, improved coverage,
+independent validation, deployment or external action is established by this
+source change. Buyer-owned scope, chronology and prospective capture remain
+the next validation gates.
 
 ### September 21 live-release audit hardening
 
@@ -598,6 +653,21 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 **Next allowed action:** Return to the no-duplicate hold. Attend the recurring Member Representative Committee and selected Work Group meetings, review public/non-proprietary materials, and share bounded thoughts during those calls when useful. Keep IP and publicity actions separately agreement-gated; do not send another logo correction, onboarding acknowledgment, or contribution-path follow-up unless EPRI/OPAI asks.
 
 ### 2. One external validation or paid-pilot conversion
+
+**September 28 Revenue Engine import repair:** The existing PR #222 test
+modules now load the three revenue scripts by exact repository path, following
+the existing test convention. This removes their collision with Python's
+standard-library `code` module without making the source directory a package,
+changing the revenue behavior, or altering frozen evidence. The original
+collection error was reproduced before the correction. On local Python
+3.12.14 with pytest 9.1.0, all seven existing revenue tests passed with the
+standard-library `code` module already loaded; its module identity remained
+unchanged. Repository-wide collection reached 826 tests, including all seven
+revenue tests, but remained blocked by 11 unrelated import errors for missing
+local NumPy, pandas, Requests, FastAPI and PyYAML dependencies. This is a
+bounded local repair, not a full-suite pass. The hash-locked Python 3.11.9 CI
+suite remains the authoritative merge gate. No deployment, external action,
+buyer acceptance, revenue or validation is established.
 
 **Reviewer doorway:** PR #66 was merged on July 23 at `aed61134407426114148e3201cd357099d155864`. It is the canonical human-and-machine evidence-navigation layer. PR #74 is the current merged CODECHECK/reviewer package. Route a qualified non-author evaluator through those existing surfaces; do not create another platform or validation package.
 

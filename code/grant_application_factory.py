@@ -46,6 +46,11 @@ CLI:
 from __future__ import annotations
 
 import argparse
+import math
+import stat
+import tempfile
+import threading
+from contextlib import contextmanager
 from collections import Counter
 import csv
 from functools import lru_cache
@@ -60,7 +65,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 from application_context_resolver import load_application_profile
@@ -1462,20 +1467,20 @@ def format_spotlight_lines(spotlights: list[dict[str, Any]], limit: int = 4) -> 
         model = item.get("model_performance") or {}
         pieces: list[str] = []
         max_abs_z = anomaly.get("max_abs_z")
-        if isinstance(max_abs_z, (int, float)):
+        if _reported_number(max_abs_z) != "unavailable":
             pieces.append(f"max |z| {max_abs_z:.2f}")
         n_3sigma = anomaly.get("n_anomalies_3sigma")
-        if isinstance(n_3sigma, int) and n_3sigma > 0:
+        if isinstance(n_3sigma, int) and not isinstance(n_3sigma, bool) and n_3sigma > 0:
             pieces.append(f"{n_3sigma} x >=3sigma anomalies")
         n_breaks = regime.get("n_breaks_total")
-        if isinstance(n_breaks, int) and n_breaks > 0:
+        if isinstance(n_breaks, int) and not isinstance(n_breaks, bool) and n_breaks > 0:
             pieces.append(f"{n_breaks} regime breaks")
         if regime.get("recent_break"):
             pieces.append("recent break in current window")
         rel = model.get("router_rel_vs_oracle")
-        if isinstance(rel, (int, float)):
+        if _reported_number(rel) != "unavailable":
             pieces.append(f"router/oracle RMSE {rel:.2f}")
-        detail = "; ".join(pieces) if pieces else "strong cross-layer evidence signal"
+        detail = "; ".join(pieces) if pieces else "no verified dataset-level result is available"
         lines.append(f"- {dataset} ({domain}): {detail}.")
     return lines
 
@@ -1589,254 +1594,39 @@ def score_eligibility(program: dict, profile: dict, evidence: dict) -> dict:
 # ----------------------------------------------------------------------------
 # Renderers — produce real, paste-ready text per section
 # ----------------------------------------------------------------------------
-def render_project_summary(
-    program: dict,
-    profile: dict,
-    ev: dict,
-    spotlights: list[dict[str, Any]] | None = None,
-) -> str:
-    L = ev["layers"]
-    ben = L["benchmark"]
-    rt = L["meta_router"]
-    cal = L["ci_calibration"]
-    breadth = L.get("measured_breadth", {})
-    n = ben.get("n_datasets") or "—"
-    rt_rate = rt.get("win_rate")
-    rt_pct = f"{rt_rate*100:.1f}%" if isinstance(rt_rate, (int, float)) else "—"
-    c80 = cal.get("mean_cov80")
-    c95 = cal.get("mean_cov95")
-    c80s = f"{c80*100:.1f}%" if isinstance(c80, (int, float)) else "—"
-    c95s = f"{c95*100:.1f}%" if isinstance(c95, (int, float)) else "—"
-    registry = L.get("active_registry", {}) if isinstance(L.get("active_registry"), dict) else {}
-    source_meta = program.get("source_metadata") if isinstance(program.get("source_metadata"), dict) else {}
-    spotlight_lines = format_spotlight_lines(spotlights or [], limit=4)
-    opp_context_lines: list[str] = []
-    if source_meta:
-        opp_num = source_meta.get("opp_num")
-        if opp_num:
-            opp_context_lines.append(f"- Live-discovered opportunity number: **{opp_num}**")
-        days = source_meta.get("days_to_close")
-        if isinstance(days, int):
-            opp_context_lines.append(f"- Time-to-close: **{days} days**")
-        applicant_types = source_meta.get("applicant_types")
-        if isinstance(applicant_types, list) and applicant_types:
-            opp_context_lines.append(f"- Applicant types listed by agency: {', '.join(map(str, applicant_types[:6]))}")
-        instruments = source_meta.get("funding_instruments")
-        if isinstance(instruments, list) and instruments:
-            opp_context_lines.append(f"- Funding instruments: {', '.join(map(str, instruments[:4]))}")
-        alns = source_meta.get("alns")
-        if isinstance(alns, list) and alns:
-            opp_context_lines.append(f"- ALN references: {', '.join(map(str, alns[:6]))}")
-
-    sector_line = ""
-    active_sectors = registry.get("active_sectors") if isinstance(registry.get("active_sectors"), list) else []
-    active_sources = registry.get("active_sources") if isinstance(registry.get("active_sources"), list) else []
-    if active_sectors or active_sources:
-        sector_line = (
-            f"- **Enabled source registry:** {len(active_sectors)} sectors / {len(active_sources)} "
-            f"credentialed or public-data sources; "
-            f"{registry.get('measured_source_count', 0)} have measured local artifacts and "
-            f"{registry.get('credential_only_source_count', 0)} are credential-only. "
-            f"sector list = {', '.join(map(str, active_sectors[:8]))}.\n"
-        )
-
-    spotlight_block = ""
-    if spotlight_lines:
-        spotlight_block = (
-            "## Program-specific evidence spotlights\n"
-            "The following datasets are selected from the frozen benchmark based on this program's domain and live opportunity context:\n"
-            + "\n".join(spotlight_lines)
-            + "\n\n"
-        )
-
-    opp_block = ""
-    if opp_context_lines:
-        opp_block = "## Opportunity extraction context\n" + "\n".join(opp_context_lines) + "\n\n"
-
+def render_project_summary(program: dict, profile: dict, ev: dict,
+                           spotlights: list[dict[str, Any]] | None = None) -> str:
+    company = profile.get("company") or {}
+    person = profile.get("pi") or {}
     return (
-        f"# Project Summary\n\n"
-        f"**Program:** {program['agency']} — {program['program']}  \n"
-        f"**Topic:** {program['topic_area']}  \n"
-        f"**Applicant:** {profile['company']['legal_name']} "
-        f"(d/b/a {profile['company']['dba']})  \n"
-        f"**PI:** {profile['pi']['name']}, {profile['pi']['title']}\n\n"
-        f"## Innovation\n"
-        f"LumenCore™ ships a production, evidence-chained time-series forecasting "
-        f"stack that solves the hardest problem in operational forecasting: "
-        f"**no single model family wins everywhere**. We fix this with a "
-        f"per-dataset family meta-router that selects the right model for each "
-        f"series, plus six independent evidence layers — all SHA-256 verifiable, "
-        f"all reproducible from one frozen benchmark.\n\n"
-        f"## Headline results (frozen run `{ev['run_utc']}`)\n"
-        f"- **{n} frozen benchmark series** evaluated head-to-head across 9 "
-        f"models in 5 families.\n"
-        f"- **Measured data breadth:** {breadth.get('artifacts_measured', 0):,} physical/archive "
-        f"artifacts measured, {breadth.get('parse_ok_count', 0):,} parsed successfully, "
-        f"covering {breadth.get('rows_total', 0):,} rows. This catalog is broader than, "
-        f"and is not represented as identical to, the frozen benchmark or live feeds.\n"
-        f"- **Meta-router evaluation:** {rt.get('wins')}/{rt.get('n')} "
-        f"series-level wins ({rt_pct}); median rel-RMSE vs oracle = "
-        f"{rt.get('median_rel_rmse_vs_oracle')}.\n"
-        f"- **Calibrated uncertainty:** 80% bands cover {c80s} empirically; 95% "
-        f"bands cover {c95s} (target 80% / 95%).\n"
-        f"- **Anomaly scanner:** {L['anomaly_scanner'].get('n_with_2sigma')}/"
-        f"{L['anomaly_scanner'].get('n_datasets')} datasets flagged ≥2σ in the "
-        f"holdout window — early-warning candidates.\n"
-        f"- **Regime-shift detector:** {L['regime_shift'].get('n_with_break')}/"
-        f"{L['regime_shift'].get('n_datasets')} datasets carry mean-shift breaks "
-        f"(CUSUM δ=0.5, h=5); {L['regime_shift'].get('n_recent')} broke in the "
-        f"most recent 12 steps.\n\n"
-        + sector_line
-        + "\n"
-        + opp_block
-        + spotlight_block
-        +
-        f"## Public benefit\n"
-        f"Open evidence surface at https://lumen-core.ai/evidence/. Every claim in "
-        f"this proposal chains to a SHA-256 manifest in the published bundle. "
-        f"Independent reviewers can re-run and reproduce within hours.\n"
+        f"# Project Summary — DRAFT FOR HUMAN REVIEW\n\n"
+        f"**Program:** {program.get('agency')} — {program.get('program')}\n"
+        f"**Topic:** {program.get('topic_area')}\n"
+        f"**Applicant:** {company.get('legal_name') or 'TO_BE_FILLED: company.legal_name'}\n"
+        f"**PI:** {person.get('name') or 'TO_BE_FILLED: pi.name'}\n\n"
+        f"## Supplied project purpose\n{_project_fact(profile, 'summary')}\n\n"
+        f"## Evidence status\n{_evidence_note(ev)}\n"
     )
 
-
-def render_technical_volume(
-    program: dict,
-    profile: dict,
-    ev: dict,
-    spotlights: list[dict[str, Any]] | None = None,
-) -> str:
-    L = ev["layers"]
-    rg = L["regime_shift"]
-    bl = L["stacking_blender"]
-    weights = bl.get("avg_blend_weights") or {}
-    weights_lines = "\n".join(
-        f"  - {k}: avg weight {v:.3f}" for k, v in
-        sorted((weights or {}).items(), key=lambda kv: -float(kv[1] or 0))
-    )
-    spotlight_lines = format_spotlight_lines(spotlights or [], limit=6)
-    spotlight_section = ""
-    if spotlight_lines:
-        spotlight_section = (
-            "## 2B. Program-targeted dataset findings\n"
-            "These dataset-level findings were selected to align with the current opportunity's sector and agency framing:\n"
-            + "\n".join(spotlight_lines)
-            + "\n\n"
-        )
-
+def render_technical_volume(program: dict, profile: dict, ev: dict,
+                            spotlights: list[dict[str, Any]] | None = None) -> str:
     return (
-        f"# Technical Volume\n\n"
-        f"## 1. Problem statement\n"
-        f"Operational forecasting in critical infrastructure (electricity, "
-        f"financial, supply chain) suffers three coupled failures:\n"
-        f"1. **Model brittleness** — every estimator has datasets where it loses "
-        f"badly; users pick one and live with the worst case.\n"
-        f"2. **Uncertainty theatre** — point forecasts ship with bands that are "
-        f"either wildly miscalibrated or never reported at all.\n"
-        f"3. **Silent regime shifts** — when the data-generating process changes, "
-        f"models keep predicting yesterday's world.\n\n"
-        f"## 2. Approach (seven verifiable layers)\n\n"
-        f"**Layer 1 — Master benchmark.** {L['benchmark'].get('n_datasets')} "
-        f"frozen benchmark series × 9 models × 5 families: baseline, harmonic, neural, "
-        f"tree, classical. Walk-forward 80/20 split per dataset. RMSE per "
-        f"(dataset, model). Frozen output: SHA-256 chain in "
-        f"`out/master_universe_v2/<UTC>/manifest.sha256.json`.\n\n"
-        f"**Layer 2 — Meta-router.** A 16-feature random-forest classifier "
-        f"learns which family wins on each series. Features include trend "
-        f"slope, harmonic-12 strength, seasonality FFT energy, autocorr at "
-        f"k=1..12, hurst exponent, std-of-diffs. Result: "
-        f"{L['meta_router'].get('wins')}/{L['meta_router'].get('n')} wins, "
-        f"median rel-RMSE vs oracle = {L['meta_router'].get('median_rel_rmse_vs_oracle')}.\n\n"
-        f"**Layer 3 — Hybrid stacker.** Eight strategies head-to-head, "
-        f"including two novel hybrids: SARIMA + harmonic-residual ("
-        f"beats v2-oracle on {L['hybrid_stacker'].get('j_beats_v2_oracle')} "
-        f"datasets) and Linear+harmonic-residual (beats on "
-        f"{L['hybrid_stacker'].get('k_beats_v2_oracle')}).\n\n"
-        f"**Layer 4 — CI calibration.** σ·√h residual-bootstrap bands. "
-        f"Empirical coverage: 80% target → "
-        f"{L['ci_calibration'].get('mean_cov80')*100:.1f}% actual; "
-        f"95% target → {L['ci_calibration'].get('mean_cov95')*100:.1f}% actual.\n\n"
-        f"**Layer 5 — NNLS stacking blender.** Convex non-negative least-squares "
-        f"weights over five family champions, fit on a holdout slice of training. "
-        f"Average blend weights:\n{weights_lines}\n\n"
-        f"**Layer 6 — Anomaly scanner.** Router-picked champion forecasts every "
-        f"series; |z| against σ·√h bands flags points >2σ as anomalies. "
-        f"{L['anomaly_scanner'].get('n_with_2sigma')}/"
-        f"{L['anomaly_scanner'].get('n_datasets')} datasets flagged.\n\n"
-        f"**Layer 7 — Regime-shift detector.** Two-sided CUSUM "
-        f"(δ={(rg.get('params') or {}).get('cusum_delta')}, "
-        f"h={(rg.get('params') or {}).get('cusum_h')}) on rolling-standardized "
-        f"series, plus variance-ratio test. Found "
-        f"{rg.get('n_with_break')}/{rg.get('n_datasets')} datasets with "
-        f"mean-shift breaks; {rg.get('n_recent')} in the last 12 steps.\n\n"
-        + spotlight_section
-        +
-        f"## 3. Why this is novel\n"
-        + "\n".join(f"- {d}" for d in profile.get("differentiators", [])) + "\n\n"
-        f"## 4. Phase {('II' if 'phase_ii' in program['id'] else 'I')} milestones\n"
-        f"- M1 (month 1): Deduplicate the measured artifact catalog and promote "
-        f"at least 1,500 distinct, quality-controlled series into the benchmark.\n"
-        f"- M2 (month 2): Retrain router on expanded universe; target "
-        f"≥55% per-dataset wins.\n"
-        f"- M3 (month 3): Ship live REST + WebSocket API for forecast "
-        f"streaming; SLA <200ms p95 cold latency.\n"
-        f"- M4 (month 4): Pilot integration with one DOE partner laboratory "
-        f"and one private-sector pilot (energy or critical-infrastructure SCADA).\n"
-        f"- M5 (month 5): Reproducibility audit by an independent reviewer "
-        f"using only the SHA-256 evidence chain.\n"
-        f"- M6 (month 6): Phase I final report + Phase II proposal package.\n\n"
-        f"## 5. Anticipated results\n"
-        f"- ≥55% per-dataset family-selection wins on a 1,500-set universe.\n"
-        f"- Empirical 80% / 95% band coverage within ±2pp of nominal.\n"
-        f"- ≥30% reduction in surprise-event misses (anomaly + regime breaks "
-        f"detected before manual operator detection in pilot SCADA logs).\n"
-        f"- All deliverables published with SHA-256 manifests at "
-        f"https://lumen-core.ai/evidence/.\n"
+        "# Technical Volume — DRAFT FOR HUMAN REVIEW\n\n"
+        f"## Supplied methods\n{_project_fact(profile, 'methods')}\n\n"
+        f"## Supplied evaluation and failure plan\n{_project_fact(profile, 'validation_plan')}\n\n"
+        f"## Evidence limitations\n{_evidence_note(ev)}\n\n"
+        "The applicant must confirm source rights, comparator, metric, holdout and acceptance rules. "
+        "No partner, benchmark win, physical benefit or operational deployment is inferred.\n"
     )
-
 
 def render_commercialization(program: dict, profile: dict, ev: dict) -> str:
-    verified_letters = [
-        str(letter).strip()
-        for letter in profile.get("team_letters_of_support", [])
-        if str(letter).strip()
-        and not str(letter).strip().upper().startswith("TO_BE_FILLED")
-    ]
-    letters_text = (
-        "\n".join(f"- {letter}" for letter in verified_letters)
-        if verified_letters
-        else "- No third-party letter is claimed in this draft; add only executed letters permitted by the solicitation."
-    )
     return (
-        f"# Commercialization Plan\n\n"
-        f"## Market\n"
-        f"Three primary verticals, all underserved by current "
-        f"forecast-as-a-service offerings:\n"
-        f"1. **Energy operations** (utilities, ISO/RTOs, distributed energy "
-        f"resource aggregators): forecast load, generation, frequency, "
-        f"and detect regime breaks before they propagate.\n"
-        f"2. **Financial / commodities desks**: meta-routed forecasts on macro "
-        f"and rates series with calibrated bands suitable for risk attribution.\n"
-        f"3. **Federal / public-good infrastructure**: federal data partners "
-        f"(FRED, EIA, BLS, NOAA) consume pre-validated forecasts with audit "
-        f"trail.\n\n"
-        f"## Business model\n"
-        f"- **Tier 1 — Public evidence (free):** lumen-core.ai/evidence/ — "
-        f"acquisition channel and reproducibility proof.\n"
-        f"- **Tier 2 — API ($999–$9,999/mo):** rate-limited REST + streaming "
-        f"forecasts with SLA, on the deployed FastAPI gateway.\n"
-        f"- **Tier 3 — Enterprise pilots ($50–250k/yr):** managed deployment "
-        f"with sector-specific model fine-tuning and on-prem option.\n"
-        f"- **Tier 4 — Government deliverables:** Phase I → Phase II → "
-        f"production contracts.\n\n"
-        f"## Competitive positioning\n"
-        + "\n".join(f"- {d}" for d in profile.get("differentiators", [])) + "\n\n"
-        f"## Letters of support (commitments)\n"
-        + letters_text + "\n\n"
-        f"## Path to follow-on funding\n"
-        f"Phase I → Phase II ({program.get('ceiling_usd')}) → enterprise pilots "
-        f"→ Series Seed (LumenCore as standalone product company). "
-        f"IP status: {profile.get('ip_status')}\n"
+        "# Commercialization Plan — DRAFT FOR HUMAN REVIEW\n\n"
+        f"## Supplied commercial assumptions\n{_project_fact(profile, 'commercial_plan')}\n\n"
+        "No subscription price, booked revenue, customer commitment, funding outcome or "
+        "market acceptance is established by this generated draft. The applicant must "
+        "confirm any supplied commercial assumption against its current approved scope.\n"
     )
-
 
 def render_budget(program: dict, profile: dict) -> dict:
     """Generate a default budget that fits the program ceiling."""
@@ -1882,75 +1672,39 @@ def render_budget(program: dict, profile: dict) -> dict:
 
 
 def render_cover_letter(program: dict, profile: dict, ev: dict) -> str:
-    today = datetime.now().date().isoformat()
+    company = profile.get("company") or {}
+    person = profile.get("pi") or {}
     return (
-        f"{today}\n\n"
-        f"To: {program['agency']} — {program['program']} Selection Committee\n"
-        f"Re: SBIR / Topic — {program.get('topic_area')}\n\n"
-        f"Dear Selection Committee,\n\n"
-        f"{profile['company']['legal_name']} respectfully submits this proposal "
-        f"under {program['program']}. Our LumenCore™ stack is a production, "
-        f"evidence-chained forecasting platform with seven independent, "
-        f"SHA-256-verifiable measurement layers — built on "
-        f"{ev['layers']['benchmark'].get('n_datasets')} frozen benchmark series and "
-        f"validated end-to-end before this submission was assembled.\n\n"
-        f"Every quantitative claim in the attached package resolves to a "
-        f"public manifest entry at https://lumen-core.ai/evidence/runs/"
-        f"{ev['run_utc']}/. Reviewers can independently rebuild any number, "
-        f"chart, or model output from the published artifacts.\n\n"
-        f"PI: {profile['pi']['name']}, {profile['pi']['title']} "
-        f"({profile['pi'].get('employed_pct')}% time commitment).\n\n"
-        f"Sincerely,\n\n"
-        f"{profile['pi']['name']}\n"
-        f"{profile['pi']['title']}, {profile['company']['legal_name']}\n"
-        f"{profile['company'].get('email')} · {profile['company'].get('phone')}\n"
+        "# Cover Letter — DRAFT FOR HUMAN REVIEW\n\n"
+        f"To: {program.get('agency')} — {program.get('program')}\n\n"
+        f"Applicant: {company.get('legal_name') or 'TO_BE_FILLED: company.legal_name'}\n"
+        f"Reviewer: {person.get('name') or 'TO_BE_FILLED: pi.name'}\n\n"
+        f"Proposed purpose: {_project_fact(profile, 'summary')}\n\n"
+        "This is a draft for factual and solicitation-specific review. It has not been "
+        "submitted and does not certify eligibility or technical performance.\n\n"
+        f"{_evidence_note(ev)}\n"
     )
-
 
 def render_application_md(program: dict, profile: dict, ev: dict, budget: dict) -> str:
-    spotlights = build_program_spotlights(program, ev["run_utc"], max_items=6)
     parts = [
-        f"# {program['agency']} — {program['program']}",
-        f"## Topic: {program['topic_area']}",
-        f"_Frozen evidence run: `{ev['run_utc']}`_\n",
-        "---\n",
-        render_project_summary(program, profile, ev, spotlights=spotlights),
-        "\n---\n",
-        render_technical_volume(program, profile, ev, spotlights=spotlights),
-        "\n---\n",
+        f"# {program.get('agency')} — {program.get('program')} — DRAFT FOR HUMAN REVIEW",
+        render_project_summary(program, profile, ev),
+        render_technical_volume(program, profile, ev),
         render_commercialization(program, profile, ev),
-        "\n---\n",
-        "# Budget Summary\n",
-        f"- **Ceiling:** ${budget['ceiling_usd']:,}",
-        f"- **Duration:** {budget['duration_months']} months",
-        f"- **Total requested:** ${budget['total']:,}\n",
-        "| Category | Amount (USD) |",
-        "|---|---:|",
+        "# Budget planning assumptions",
+        f"Total proposed planning amount: {budget.get('total')}. "
+        "This amount is not approved pricing, an allowable-cost certification or an award.",
     ]
-    for cat, amt in budget["categories"].items():
-        parts.append(f"| {cat.replace('_', ' ').title()} | ${amt:,} |")
-    parts.append("\n## Budget notes\n" + "\n".join(f"- {n}" for n in budget["notes"]))
-    parts.append("\n---\n")
-    parts.append("# Key Personnel\n")
-    parts.append(f"**{profile['pi']['name']}** — {profile['pi']['title']}\n")
-    parts.append(profile['pi']['bio_short'])
-    parts.append("\n---\n# Facilities & Compute\n")
-    parts.append(
-        "Local development: Windows 11 with Python 3.14 venv; reproducible "
-        "joblib-parallel pipelines on commodity hardware. Production: "
-        "Caddy-fronted FastAPI gateway on Oracle Cloud VPS at "
-        "https://lumen-core.ai. All evidence served read-only from a "
-        "static SHA-256-manifested tree."
-    )
-    parts.append("\n---\n# Evidence chain (SHA-256 verifiable)\n")
-    parts.append(
-        f"Public bundle: https://lumen-core.ai/evidence/runs/{ev['run_utc']}/  \n"
-        f"Layer manifests:"
-    )
-    for layer in ["router", "stacker", "blender", "calibration",
-                  "anomalies", "regime"]:
-        parts.append(f"- {layer}/manifest.sha256.json")
-    return "\n".join(parts) + "\n"
+    if program.get("ceiling_usd") is None:
+        parts.append("TO_BE_FILLED: verified opportunity ceiling")
+    if program.get("duration_months") is None:
+        parts.append("TO_BE_FILLED: project duration")
+    parts.extend(f"- {key}: {value}" for key, value in budget.get("categories", {}).items())
+    parts.extend(budget.get("notes", []))
+    parts.extend(["# Supplied facilities", _project_fact(profile, "facilities"),
+                  "# Final review", "Resolve all missing facts and verify the current solicitation, "
+                  "entity/portal authority and evidence before any human-approved submission."])
+    return "\n\n".join(parts) + "\n"
 
 
 def _is_nsf_sbir(program: dict[str, Any]) -> bool:
@@ -1974,50 +1728,223 @@ def _is_nsf_sbir(program: dict[str, Any]) -> bool:
 
 
 def render_nsf_project_pitch(program: dict, profile: dict, ev: dict) -> str:
-    benchmark = ev["layers"]["benchmark"]
-    breadth = ev["layers"].get("measured_breadth", {})
     return (
-        f"# NSF Project Pitch - {profile['company']['dba']}\n\n"
-        f"## 1. Technology innovation\n"
-        f"LumenCore is an evidence-chained forecasting and decision platform that "
-        f"tests multiple model families per time series, routes each series to the "
-        f"best-performing family, calibrates uncertainty empirically, and detects "
-        f"anomalies and regime changes. The technical risk is whether model-family "
-        f"selection and uncertainty calibration can remain reliable across sectors "
-        f"without hiding weak cases behind a single aggregate score.\n\n"
-        f"## 2. Technical objectives and challenges\n"
-        f"Phase I will: (1) deduplicate and quality-rank the measured data catalog; "
-        f"(2) expand the current frozen benchmark of "
-        f"{benchmark.get('n_datasets')} evaluated series; (3) run leakage-resistant "
-        f"walk-forward validation and calibration; (4) quantify failure modes by "
-        f"sector and regime; and (5) expose signed evidence artifacts through a "
-        f"reviewable API. The local catalog currently measures "
-        f"{breadth.get('artifacts_measured', 0):,} artifacts and "
-        f"{breadth.get('rows_total', 0):,} rows, but those counts are not claimed "
-        f"as distinct live feeds or benchmarked series.\n\n"
-        f"## 3. Market opportunity\n"
-        f"Initial customers are operators that need auditable forecasts rather than "
-        f"opaque point predictions: energy and infrastructure teams, regulated data "
-        f"operations, and enterprise risk groups. The commercialization test is a "
-        f"paid pilot in which LumenCore is measured against the customer's incumbent "
-        f"forecast and alert workflow on accuracy, calibration, latency, and operator "
-        f"time saved.\n\n"
-        f"## 4. Company and team\n"
-        f"{profile['company']['legal_name']} is a U.S.-owned small business led by "
-        f"{profile['pi']['name']}, {profile['pi']['title']}. The current system includes "
-        f"data ingestion, multi-family forecasting, uncertainty calibration, anomaly "
-        f"detection, signed evidence manifests, and deployed API surfaces. Phase I "
-        f"funding would convert the research stack into a repeatable, independently "
-        f"validated product with documented security and deployment controls.\n\n"
-        f"## Submission status\n"
-        f"This file is a draft for the NSF Project Pitch gate. It does not claim an "
-        f"NSF invitation or authorization to submit a full proposal.\n"
+        "# Project Pitch — DRAFT FOR HUMAN REVIEW\n\n"
+        + render_project_summary(program, profile, ev) + "\n"
+        + render_technical_volume(program, profile, ev) + "\n"
+        + render_commercialization(program, profile, ev) + "\n"
+        + "A pitch is not an invitation to submit a full proposal. Confirm the current "
+          "portal requirements and retain human review and submission authority.\n"
     )
 
+class BundleIntegrityError(ValueError):
+    """The current bundle cannot be trusted within its checksum scope."""
 
-# ----------------------------------------------------------------------------
-# Bundle writer
-# ----------------------------------------------------------------------------
+
+_BUNDLE_LOCKS: dict[str, threading.RLock] = {}
+_BUNDLE_LOCKS_GUARD = threading.Lock()
+
+
+@contextmanager
+def bundle_lock(run_dir: Path):
+    """Serialize cooperating bundle operations within this one process."""
+    key = str(run_dir.resolve())
+    with _BUNDLE_LOCKS_GUARD:
+        lock = _BUNDLE_LOCKS.setdefault(key, threading.RLock())
+    with lock:
+        yield
+
+
+def _bundle_files(run_dir: Path) -> dict[str, bytes]:
+    files = {}
+    for path in sorted(run_dir.iterdir()):
+        if path.name == "manifest.sha256.json":
+            continue
+        info = path.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise BundleIntegrityError("bundle contains a non-regular or aliased entry")
+        content = path.read_bytes()
+        after = path.lstat()
+        if (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns) != (
+            after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns
+        ):
+            raise BundleIntegrityError("bundle changed during verification")
+        files[path.name] = content
+    return files
+
+
+def _manifest_json(raw: str) -> dict:
+    def unique(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise BundleIntegrityError("duplicate manifest field")
+            result[key] = value
+        return result
+    try:
+        def reject_constant(value):
+            raise BundleIntegrityError("nonfinite manifest field")
+        result = json.loads(raw, object_pairs_hook=unique, parse_constant=reject_constant)
+    except (ValueError, TypeError) as exc:
+        raise BundleIntegrityError("bundle manifest is invalid") from exc
+    if not isinstance(result, dict):
+        raise BundleIntegrityError("bundle manifest is invalid")
+    return result
+
+
+def _verified_bundle_files(run_dir: Path) -> dict[str, bytes]:
+    """Return the exact checked bytes; hashes establish custody, not truth."""
+    with bundle_lock(run_dir):
+        if run_dir.is_symlink() or run_dir.parent.is_symlink():
+            raise BundleIntegrityError("bundle directory is aliased")
+        manifest_path = run_dir / "manifest.sha256.json"
+        try:
+            info = manifest_path.lstat()
+        except OSError as exc:
+            raise BundleIntegrityError("bundle manifest is unavailable") from exc
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise BundleIntegrityError("bundle manifest is missing or aliased")
+        manifest = _manifest_json(manifest_path.read_text(encoding="utf-8"))
+        records = manifest.get("files")
+        if manifest.get("program_id") != run_dir.parent.name:
+            raise BundleIntegrityError("bundle program binding mismatch")
+        if not isinstance(records, dict) or not records:
+            raise BundleIntegrityError("bundle manifest has no file records")
+        files = _bundle_files(run_dir)
+        if set(records) != set(files):
+            raise BundleIntegrityError("bundle manifest file coverage mismatch")
+        for name, record in records.items():
+            if (not isinstance(name, str) or Path(name).name != name
+                    or name in {".", "..", "manifest.sha256.json"}
+                    or "/" in name or "\\" in name
+                    or not isinstance(record, dict)):
+                raise BundleIntegrityError("bundle manifest record is invalid")
+            size = record.get("size_bytes")
+            sha = record.get("sha256")
+            if (isinstance(size, bool) or not isinstance(size, int) or size < 0
+                    or not isinstance(sha, str)
+                    or re.fullmatch(r"[0-9a-f]{64}", sha) is None):
+                raise BundleIntegrityError("bundle manifest hash or size is invalid")
+            if len(files[name]) != size or hashlib.sha256(files[name]).hexdigest() != sha:
+                raise BundleIntegrityError("bundle artifact checksum mismatch")
+        # Return manifest bytes too so exporters do not re-read mutable paths.
+        files["manifest.sha256.json"] = manifest_path.read_bytes()
+        if _manifest_json(files["manifest.sha256.json"].decode("utf-8")) != manifest:
+            raise BundleIntegrityError("bundle manifest changed during verification")
+        return files
+
+
+def verified_bundle_files(run_dir: Path) -> dict[str, bytes]:
+    """Fail closed on inaccessible, invalid or mismatched current artifacts."""
+    try:
+        return _verified_bundle_files(run_dir)
+    except (OSError, UnicodeError) as exc:
+        raise BundleIntegrityError("bundle could not be verified") from exc
+
+
+def _write_bundle_manifest(run_dir: Path, files: dict[str, bytes], metadata: dict) -> dict:
+    manifest = {
+        "program_id": metadata["program_id"],
+        "generated_utc": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
+        "evidence_run_utc": metadata.get("evidence_run_utc"),
+        "files": {name: {"size_bytes": len(content),
+                         "sha256": hashlib.sha256(content).hexdigest()}
+                  for name, content in sorted(files.items())
+                  if name != "manifest.sha256.json"},
+    }
+    path = run_dir / "manifest.sha256.json"
+    tmp = path.with_name(".manifest.sha256.json.tmp")
+    tmp.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    os.replace(tmp, path)
+    return manifest
+
+
+def create_bundle_manifest(run_dir: Path) -> dict:
+    """Seal a newly generated, not-yet-manifested bundle."""
+    with bundle_lock(run_dir):
+        if (run_dir / "manifest.sha256.json").exists():
+            raise BundleIntegrityError("refusing to replace an existing seal")
+        app = _manifest_json((run_dir / "application.json").read_text(encoding="utf-8"))
+        return _write_bundle_manifest(run_dir, _bundle_files(run_dir), {
+            "program_id": run_dir.parent.name,
+            "evidence_run_utc": app.get("evidence_run_utc"),
+        })
+
+
+def refresh_bundle_manifest(run_dir: Path, previous_files: dict[str, bytes],
+                            allowed_changes: set[str]) -> dict:
+    """Reseal permitted writes; never silently accept other content changes."""
+    with bundle_lock(run_dir):
+        manifest_path = run_dir / "manifest.sha256.json"
+        info = manifest_path.lstat()
+        if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
+                or manifest_path.read_bytes() != previous_files["manifest.sha256.json"]):
+            raise BundleIntegrityError("manifest changed before permitted refresh")
+        files = _bundle_files(run_dir)
+        previous = {k: v for k, v in previous_files.items()
+                    if k != "manifest.sha256.json"}
+        for name in set(files) | set(previous):
+            if name not in allowed_changes and files.get(name) != previous.get(name):
+                raise BundleIntegrityError("unpermitted bundle mutation")
+        old = _manifest_json(previous_files["manifest.sha256.json"].decode("utf-8"))
+        return _write_bundle_manifest(run_dir, files, old)
+
+
+def _reported_number(value: Any) -> str:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return "unavailable"
+    return format(value, ".12g") if math.isfinite(value) else "unavailable"
+
+
+def _public_evidence_url(ev: dict) -> str | None:
+    publication = ev.get("publication")
+    if not isinstance(publication, dict) or publication.get("verified") is not True:
+        return None
+    url = publication.get("url")
+    if not isinstance(url, str) or any(char.isspace() for char in url):
+        return None
+    try:
+        parsed = urlsplit(url)
+        if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+            return None
+        if parsed.port not in (None, 443):
+            return None
+    except ValueError:
+        return None
+    return url
+
+
+def _project_fact(profile: dict, key: str) -> str:
+    project = profile.get("project")
+    value = project.get(key) if isinstance(project, dict) else None
+    return value.strip() if isinstance(value, str) and value.strip() else f"TO_BE_FILLED: project.{key}"
+
+
+def _evidence_note(ev: dict) -> str:
+    kind = ev.get("evidence_type") or "not established"
+    if ev.get("demo_notice"):
+        kind = "synthetic / fictional demonstration only"
+    lines = [
+        f"Supplied evidence type: {kind}.",
+        f"Supplied evidence run: {ev.get('run_utc') or 'TO_BE_FILLED: evidence.run_utc'}.",
+        "The following values are supplied metadata, not independently verified results.",
+    ]
+    layers = ev.get("layers") if isinstance(ev.get("layers"), dict) else {}
+    for name, field in [("benchmark", "n_datasets"), ("meta_router", "wins"),
+                        ("meta_router", "n"), ("ci_calibration", "mean_cov80"),
+                        ("ci_calibration", "mean_cov95")]:
+        layer = layers.get(name)
+        value = layer.get(field) if isinstance(layer, dict) else None
+        lines.append(f"- {name}.{field}: {_reported_number(value)}")
+    url = _public_evidence_url(ev)
+    lines.append(f"Verified publication locator supplied: {url}" if url else
+                 "Public evidence publication is not verified; inspect local records.")
+    lines.append("Checksums establish artifact identity within their scope, not scientific validity, independent validation, production readiness or release authority.")
+    return "\n".join(lines)
+
+
+
+
 def _sha256(p: Path) -> str:
     h = hashlib.sha256()
     with open(p, "rb") as f:
@@ -2031,7 +1958,23 @@ def write_bundle(program: dict, profile: dict, ev: dict,
     program_id = str(program.get("id") or "")
     program_dir = _bounded_direct_child(GRANTS, program_id, label="program id")
     out_dir = _bounded_direct_child(program_dir, utc, label="run UTC")
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if program_dir.exists() and any(r.is_dir() and r.name >= out_dir.name for r in program_dir.iterdir()):
+        from datetime import timedelta
+        candidate_time = datetime.now(timezone.utc)
+        for existing in program_dir.iterdir():
+            if existing.is_dir() and re.fullmatch(r"[0-9]{8}T[0-9]{6}Z", existing.name):
+                try:
+                    existing_time = datetime.strptime(existing.name, "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
+                except ValueError:
+                    continue
+                candidate_time = max(candidate_time, existing_time + timedelta(seconds=1))
+        while True:
+            package_utc = candidate_time.strftime("%Y%m%dT%H%M%SZ")
+            out_dir = _bounded_direct_child(program_dir, package_utc, label="run UTC")
+            if not out_dir.exists():
+                break
+            candidate_time += timedelta(seconds=1)
+    out_dir.mkdir(parents=True, exist_ok=False)
 
     budget = render_budget(program, profile)
     spotlights = build_program_spotlights(program, ev["run_utc"], max_items=6)
@@ -2061,6 +2004,8 @@ def write_bundle(program: dict, profile: dict, ev: dict,
         "program": program["program"],
         "topic_area": program["topic_area"],
         "evidence_run_utc": ev["run_utc"],
+        "evidence_type": "synthetic_fixture" if ev.get("demo_notice") else (ev.get("evidence_type") or "not established"),
+        "demo_notice": ev.get("demo_notice"),
         "applicant": profile["company"],
         "pi": profile["pi"],
         "eligibility": elig,
@@ -2102,7 +2047,9 @@ def write_bundle(program: dict, profile: dict, ev: dict,
     (out_dir / "evidence_manifest.json").write_text(
         json.dumps({
             "run_utc": ev["run_utc"],
-            "public_url": f"https://lumen-core.ai/evidence/runs/{ev['run_utc']}/",
+            "evidence_type": "synthetic_fixture" if ev.get("demo_notice") else (ev.get("evidence_type") or "not established"),
+            "demo_notice": ev.get("demo_notice"),
+            "public_url": _public_evidence_url(ev),
             "local_path": str((ROOT / "dashboard" / "evidence" / "runs" /
                                ev["run_utc"]).resolve()),
             "layers": list(ev["layers"].keys()),
@@ -2113,18 +2060,7 @@ def write_bundle(program: dict, profile: dict, ev: dict,
             },
         }, indent=2), encoding="utf-8")
 
-    # SHA-256 manifest of this bundle
-    files = [p for p in out_dir.iterdir() if p.is_file()
-             and p.name != "manifest.sha256.json"]
-    manifest = {
-        "program_id": program_id,
-        "generated_utc": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
-        "evidence_run_utc": ev["run_utc"],
-        "files": {p.name: {"size_bytes": p.stat().st_size,
-                           "sha256": _sha256(p)} for p in files},
-    }
-    (out_dir / "manifest.sha256.json").write_text(
-        json.dumps(manifest, indent=2), encoding="utf-8")
+    create_bundle_manifest(out_dir)
     return out_dir
 
 
@@ -2222,62 +2158,67 @@ def approve(program_id: str) -> dict:
     prog_dir = _named_direct_child(GRANTS, program_id)
     if prog_dir is None:
         raise SystemExit(f"no draft for {program_id}")
-    program_id = prog_dir.name
-    runs = sorted([p for p in prog_dir.iterdir() if p.is_dir()])
+    runs = sorted(p for p in prog_dir.iterdir() if p.is_dir())
     if not runs:
         raise SystemExit(f"no runs in {prog_dir}")
     latest = runs[-1]
-    app = _read_or_none(latest / "application.json") or {}
-    catalog_payload = _read_or_none(DATA / "grant_catalog.json") or {}
-    catalog_program = next(
-        (
-            row
-            for row in catalog_payload.get("programs", [])
-            if isinstance(row, dict) and row.get("id") == program_id
-        ),
-        {},
-    )
-    window_input = dict(app)
-    for key in (
-        "deadline_typical",
-        "current_state",
-        "url",
-        "source_verified_utc",
-        "source_verification_url",
-    ):
-        if catalog_program.get(key) is not None:
-            window_input[key] = catalog_program.get(key)
-    window = _program_window_assessment(window_input)
-    if not window.get("actionable"):
-        raise SystemExit(
-            f"refusing approval for non-actionable opportunity {program_id}: "
-            f"{window.get('status')} ({window.get('reason')})"
-        )
-    APPROVED_DIR.mkdir(parents=True, exist_ok=True)
-    approved_program_dir = _bounded_direct_child(
-        APPROVED_DIR, program_id, label="program id"
-    )
-    dest = _bounded_direct_child(approved_program_dir, latest.name, label="run UTC")
-    if dest.exists():
-        raise SystemExit(
-            f"approved snapshot already exists for {program_id}/{latest.name}; "
-            "refusing to overwrite immutable evidence"
-        )
+    with bundle_lock(latest):
+        app = _read_or_none(latest / "application.json") or {}
+        catalog = _read_or_none(DATA / "grant_catalog.json") or {}
+        entry = next((row for row in catalog.get("programs", [])
+                      if isinstance(row, dict) and row.get("id") == program_id), {})
+        window_input = dict(app)
+        for key in ("deadline_typical", "current_state", "url",
+                    "source_verified_utc", "source_verification_url"):
+            if entry.get(key) is not None:
+                window_input[key] = entry[key]
+        window = _program_window_assessment(window_input)
+        if not window.get("actionable"):
+            raise SystemExit(f"refusing approval for non-actionable opportunity {program_id}")
+        APPROVED_DIR.mkdir(parents=True, exist_ok=True)
+        approved_dir = _bounded_direct_child(APPROVED_DIR, program_id, label="program id")
+        approved_dir.mkdir(parents=True, exist_ok=True)
+        dest = _bounded_direct_child(approved_dir, latest.name, label="run UTC")
+        if dest.exists():
+            raise SystemExit("approved snapshot already exists; refusing to overwrite immutable evidence")
+        previous = verified_bundle_files(latest)
+        state = _manifest_json(previous["approval_state.json"].decode("utf-8"))
+        if state.get("state") != "draft":
+            raise SystemExit("approval requires a fresh draft state")
+        state["state"] = "approved"
+        state["approved_utc"] = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        # Kit refers to a particular state; regenerate it after this transition.
+        try:
+            (latest / "approval_state.json").write_text(json.dumps(state, indent=2), encoding="utf-8")
+            refresh_bundle_manifest(latest, previous, {"approval_state.json"})
+            if "submission_packet.json" in previous or "SUBMIT_HOWTO.md" in previous:
+                from grant_submission_kit import build_preflight, write_submission_kit
+                pf = build_preflight(program_id, latest, entry)
+                write_submission_kit(program_id, latest, pf)
+            approved_bytes = verified_bundle_files(latest)
+            stage = Path(tempfile.mkdtemp(prefix=".snapshot-", dir=approved_dir))
+            try:
+                for name, content in approved_bytes.items():
+                    (stage / name).write_bytes(content)
+                verified_bundle_files(stage)
+                os.rename(stage, dest)
+            except BaseException:
+                shutil.rmtree(stage, ignore_errors=True)
+                raise
+        except BaseException:
+            for path in latest.iterdir():
+                if path.is_file() and path.name not in previous:
+                    path.unlink()
+            for name, content in previous.items():
+                (latest / name).write_bytes(content)
+            raise
+        update_queue()
+        print(f"[approve] {program_id} -> {dest}")
+        return state
 
-    state_p = latest / "approval_state.json"
-    state = json.loads(state_p.read_text(encoding="utf-8"))
-    state["state"] = "approved"
-    state["approved_utc"] = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    state_p.write_text(json.dumps(state, indent=2), encoding="utf-8")
-    shutil.copytree(latest, dest)
-    update_queue()
-    print(f"[approve] {program_id} -> {dest}")
-    return state
 
 
-# ----------------------------------------------------------------------------
-# CLI
-# ----------------------------------------------------------------------------
+
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--grant", help="generate only this grant_id")
@@ -2285,9 +2226,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--list", action="store_true",
                     help="print queue summary")
     ap.add_argument("--force", action="store_true",
-                    help="rebuild bundles even if state==approved (preserves "
-                         "the approved state and approved_utc; refuses to "
-                         "touch already-submitted grants)")
+                    help="create a fresh draft needing reapproval if approved; "
+                         "refuse already-submitted grants")
     args = ap.parse_args(argv)
 
     if args.approve:
@@ -2334,11 +2274,11 @@ def main(argv: list[str]) -> int:
         # preserved verbatim under out/grants/_approved/<id>/<utc>/.
         program_id = str(p.get("id") or "")
         prog_dir = _bounded_direct_child(GRANTS, program_id, label="program id")
-        preserved_state: dict | None = None
         if prog_dir.exists():
             runs = sorted([r for r in prog_dir.iterdir() if r.is_dir()])
             if runs:
-                latest_state = _read_or_none(runs[-1] / "approval_state.json") or {}
+                verified = verified_bundle_files(runs[-1])
+                latest_state = _manifest_json(verified["approval_state.json"].decode("utf-8"))
                 cur = latest_state.get("state")
                 if cur == "submitted":
                     # Never overwrite a submitted package — hard lock.
@@ -2350,8 +2290,8 @@ def main(argv: list[str]) -> int:
                     n_locked += 1
                     continue
                 if cur == "approved" and args.force:
-                    preserved_state = latest_state
-                    print(f"[force] {p['id']:<32} state=approved — rebuilding with new profile")
+                    verified_bundle_files(runs[-1])
+                    print(f"[force] {p['id']:<32} creating a new draft requiring reapproval")
         elig = score_eligibility(p, profile, ev)
         if not elig["eligible"]:
             print(
@@ -2360,11 +2300,6 @@ def main(argv: list[str]) -> int:
             )
             continue
         out_dir = write_bundle(p, profile, ev, elig, utc)
-        # If this was an approved grant rebuilt with --force, restore the
-        # approval state so the submission queue stays consistent.
-        if preserved_state is not None:
-            (out_dir / "approval_state.json").write_text(
-                json.dumps(preserved_state, indent=2), encoding="utf-8")
         print(f"[draft] {p['id']:<32} score={elig['score']} -> {out_dir}")
         n_done += 1
 

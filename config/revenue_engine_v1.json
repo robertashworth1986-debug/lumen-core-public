@@ -1,0 +1,24 @@
+{
+  "schema": "lumencore_revenue_engine_v1",
+  "version": "1.0.0",
+  "status": "internal_qualification_only",
+  "canonical_product": "Proof-to-pilot AI infrastructure validation architecture",
+  "objective": "Convert one qualified buyer-owned decision into the existing bounded validation sprint without creating a parallel product.",
+  "pipeline": ["discover", "qualify", "evidence_map", "scope", "founder_approval", "contract", "execute", "proof_capsule", "decision", "commercial_record"],
+  "fit_outcomes": ["scope_candidate", "needs_facts", "needs_separate_controls", "no_fit"],
+  "commercial_tiers_source": "config/bounded_validation_sprint_v1.json",
+  "evidence_source": "config/evidence_graph_v1.json",
+  "claim_boundary_source": "docs/CLAIM_BOUNDARY_REGISTER.md",
+  "outreach_control_source": "config/outreach_registry_v1.json",
+  "controls": {
+    "auto_send": false,
+    "auto_submit": false,
+    "auto_sign": false,
+    "auto_spend": false,
+    "auto_production_change": false,
+    "auto_claim_promotion": false,
+    "founder_approval_required_for_external_action": true,
+    "unknown_facts_are_never_inferred": true,
+    "buyer_data_required_before_performance_claim": true
+  }
+}
