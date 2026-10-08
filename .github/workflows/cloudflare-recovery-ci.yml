@@ -1,0 +1,103 @@
+name: Cloudflare static recovery preview CI
+
+on:
+  push:
+    paths:
+      - "cloudflare-recovery/**"
+      - "code/deploy/package_public_site_release.py"
+      - ".github/workflows/cloudflare-recovery-ci.yml"
+  pull_request:
+    paths:
+      - "cloudflare-recovery/**"
+      - "code/deploy/package_public_site_release.py"
+      - ".github/workflows/cloudflare-recovery-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-recovery-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.8.0"
+          cache: npm
+          cache-dependency-path: cloudflare-recovery/package-lock.json
+
+      - name: Install pinned Worker dependencies
+        working-directory: cloudflare-recovery
+        run: npm ci --no-audit --no-fund
+
+      - name: Reconstruct and validate the governed static release
+        working-directory: cloudflare-recovery
+        run: npm run check
+
+      - name: Exercise routes in the local Workers runtime
+        working-directory: cloudflare-recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run dev -- \
+            --ip 127.0.0.1 \
+            --port 8787 \
+            --inspector-ip 127.0.0.1 \
+            --inspector-port 9229 \
+            --show-interactive-dev-session=false \
+            --latest=false \
+            > /tmp/lumencore-cloudflare-recovery.log 2>&1 &
+          worker_pid=$!
+          trap 'kill "$worker_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 80); do
+            if curl --fail --silent --show-error http://127.0.0.1:8787/ > /dev/null 2>&1; then
+              break
+            fi
+            if ! kill -0 "$worker_pid" 2>/dev/null; then
+              sed -n '1,240p' /tmp/lumencore-cloudflare-recovery.log
+              exit 1
+            fi
+            sleep 0.25
+          done
+
+          [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/)" == "200" ]]
+          [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/evidence/)" == "200" ]]
+          [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/build_week/prooflock_console/)" == "200" ]]
+          [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/not-found-test)" == "404" ]]
+          [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/api/public/status)" == "503" ]]
+          [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/health)" == "503" ]]
+          [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/ws-preview-test)" == "503" ]]
+          [[ "$(curl --silent --request POST --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8787/proof_to_pilot.html)" == "405" ]]
+
+          hold_body="$(curl --silent --show-error http://127.0.0.1:8787/api/public/status)"
+          [[ "$hold_body" == *'"status":"hold"'* ]]
+          [[ "$hold_body" == *'"source_release":"1ce7c35975a4011fa844e8b39ccbc950c8c0f398"'* ]]
+
+          headers="$(curl --silent --show-error --head http://127.0.0.1:8787/)"
+          for header in \
+            content-security-policy \
+            permissions-policy \
+            referrer-policy \
+            strict-transport-security \
+            x-content-type-options \
+            x-frame-options \
+            x-robots-tag; do
+            grep --ignore-case --quiet "^${header}:" <<< "$headers"
+          done
+
+          asset_headers="$(curl --silent --show-error --head http://127.0.0.1:8787/assets/lumencore.css)"
+          grep --ignore-case --quiet '^strict-transport-security:' <<< "$asset_headers"
+          grep --ignore-case --quiet '^x-content-type-options:' <<< "$asset_headers"
