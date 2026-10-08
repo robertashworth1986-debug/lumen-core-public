@@ -1,6 +1,6 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-10-06T23:10:00Z",
+  "generated_at_utc": "2026-10-08T12:53:16.622725Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "aa4b951bf0b7095bf92012a7ee2e02e02f14aedacbc66dc643fef86064b6f85d",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -94,9 +94,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
-            "bytes": 16361,
-            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [
@@ -160,9 +160,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
-            "bytes": 16361,
-            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [],
@@ -457,9 +457,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
-            "bytes": 16361,
-            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [],
@@ -675,9 +675,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
-            "bytes": 16361,
-            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [
@@ -867,9 +867,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
-            "bytes": 16361,
-            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [
@@ -960,9 +960,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "0ace17b15f5832f2a61d68653c17e3a2061f858c",
-            "bytes": 16361,
-            "sha256": "541e93f2d1634f279c41faba394043783161c5c7a3426c326ef4653c79a87dc7"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [
@@ -1000,6 +1000,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "950d65875d067faaf7245aed34dd2db9f53968152bf581986768706d2332e471"
+    "payload_sha256": "0746ee1a194dc58bfc7588fad94ee3db5372bdb4023b8db8523cd6965e9dd265"
   }
 }
