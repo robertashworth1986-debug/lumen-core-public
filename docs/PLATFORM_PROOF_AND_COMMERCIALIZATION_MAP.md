@@ -150,3 +150,57 @@ Institutional and public-sector trust requires scoped assurance and buyer
 acceptance. The [assurance crosswalk](INSTITUTIONAL_ASSURANCE_CROSSWALK.md) maps
 first-party controls and remaining gates; it is not certification, government
 approval, award selection or an external audit.
+
+
+## October 8 source and screenshot reconciliation
+
+This continuation advances active outcome 2, a bounded external review or paid
+pilot. The supplied historical investor KPIs (revenue, 45% ROI and 2,000+ users)
+have no supporting commercial records in the reviewed packet and are excluded
+from current traction claims. Original files remain historical sources.
+
+The supplied Omega chart contains V7 only despite its V6/V7/V8 comparison title.
+Its falling C curve cannot support improving coherence without reconciling C's
+formula and direction. A triangulated single trajectory is not an independently
+sampled response surface. Raw V6/V7/V8 histories, generating source, environments,
+seeds and matched conditions remain missing; no historical result was rerun.
+
+Three uploaded scripts have no exact-path canonical implementation in this repo.
+The corrected implementations below supersede them for future reporting:
+
+- `code/research/flowform_investor.py`: explicit labeled history inputs, finite
+  numeric validation, strictly increasing steps, separate metric axes, only
+  loaded versions in titles, and 3D trajectory plots without surface claims.
+- `code/research/run_quantum_overlay.py`: requires supplied candidate and baseline
+  CSVs with identical, uniformly spaced times. It removes the fresh random
+  baseline and unconditional improvement text. Entropy and peak-power fraction
+  are spectral descriptors, not coherence or a Lyapunov exponent. Zero detrended
+  power produces null spectral metrics. Causal comparability stays unverified.
+- `code/research/geom3d_extended.py`: completes the truncated program, requires a
+  named CSV or explicit illustrations-only mode, and labels the helix as geometry,
+  with no magnetic-field or hardware claim.
+
+Each successful report retains the exact consumed inputs, generating source and
+SHA-256 manifest. Existing report directories are never overwritten; failure
+before completion leaves no published report. These are local report producers,
+not a hosted isolation guarantee or performance-validation engine.
+
+Example invocations (replace paths with authorized research inputs):
+
+```bash
+python code/research/flowform_investor.py --run V7=/path/to/history.json --output /new/report/hypercore
+python code/research/run_quantum_overlay.py --candidate /path/to/candidate.csv --baseline /path/to/baseline.csv --evidence-type synthetic --time-unit seconds --output /new/report/overlay
+python code/research/geom3d_extended.py --illustrations-only --output /new/report/geometry
+```
+
+Use the existing institutional Python/NumPy/SciPy lock for numeric checks.
+Rendering additionally needs Matplotlib; it is an optional local reporting
+library, outside the institutional dependency lock. Smoke rendering used the
+available Matplotlib runtime and synthetic fixtures, not recovered original data.
+
+The wider screenshot review also found an EchoLock score derived from CPU/memory,
+not a measurement of physical coherence; a tournament completion banner after a
+missing-file exception; and an obsolete minute-frequency alias. Those photographed
+runtime sources are not recovered here. Trading candidate selection and missing
+inputs require the separate causal-evaluation continuation, not a claim of a fresh
+holdout or a repaired live runtime. Source fixes do not imply deployment.

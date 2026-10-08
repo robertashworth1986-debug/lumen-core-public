@@ -24,6 +24,27 @@ California median5 at three days: 555 common targets; MAE is 21.3593% better tha
 
 The three measured families are energy-related. Marine wave activity is not electrical production; FORGE source timezone and EIA as-published chronology remain unresolved. Six inherited other-sector contracts still have zero measured rows. No financial, emissions, uptime or plant-efficiency conversion is permitted.
 
+## September 24 coverage diagnostic continuation
+
+The existing offline forecast audit now reports the missing inputs for each
+excluded scheduled target. Marginal counts identify unavailable truth, candidate,
+persistence and seasonal values; mutually exclusive patterns reconcile exactly
+to scheduled targets minus common pairs. Marginal counts can overlap and must
+not be summed. Slice-excluded targets do not contribute. Empty and entirely
+missing slices retain their exclusion report and research-only decision.
+
+This supports active outcome 2 by making data-repair priorities inspectable for
+the existing grid, marine and geothermal research. It does not identify the
+cause of missing data or establish as-of publication times. Original scores,
+models, thresholds and frozen receipts remain unchanged. No historical packet
+was rescored for this extension and no coverage improvement is claimed.
+
+Local Python 3.12 validation passed 81 tests across the denominator/paper audit
+and strict EIA verifier suites, including five new missingness cases. Both EIA
+packet identity checks also passed (original: six inputs/four outputs; later:
+nine inputs/two outputs). This is focused local validation, not full repository
+CI or independent reproduction.
+
 ## Paper accounting
 
 `code/ops/audit_paper_accounting.py` checks a narrow, single-USD, long-only, fully funded in-memory paper ledger. It rejects live mode, unknown fields, duplicate IDs, invalid UTC chronology, unsupported events, shorts, unfunded fills, nondecimal amounts, cash mismatches and missing/stale/future marks. External deposits/withdrawals are not profit; declared fees are included.

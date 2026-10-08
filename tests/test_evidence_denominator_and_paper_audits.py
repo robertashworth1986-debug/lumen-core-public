@@ -41,6 +41,39 @@ def test_losing_stronger_baseline_blocks_screen():
     assert not r["all_baseline_descriptive_screen"]
 
 
+def test_exclusions_partition_overlapping_gaps_and_respect_slice():
+    nan = np.nan
+    result = forecast.audit_cell(
+        [1, nan, 1, 1, nan, nan], [1, nan, 1, 1, 1, nan],
+        {"persistence": [1, 1, nan, 1, 1, nan],
+         "seasonal": [1, 1, nan, nan, 1, nan]},
+        [True, True, True, True, True, False])
+    gaps = result["coverage_exclusions"]
+    assert gaps["excluded_scheduled_targets"] == 4
+    assert gaps["missing_by_input_over_scheduled"] == {
+        "truth": 2, "candidate": 1, "persistence": 1, "seasonal": 2}
+    assert {tuple(row["missing_inputs"]): row["scheduled_targets"]
+            for row in gaps["exclusive_missing_patterns"]} == {
+        ("truth", "candidate"): 1, ("persistence", "seasonal"): 1,
+        ("seasonal",): 1, ("truth",): 1}
+    assert sum(row["scheduled_targets"] for row in gaps["exclusive_missing_patterns"]) + result["common_pairs"] == result["scheduled_targets"]
+    assert result["decision"] == "RESEARCH_ONLY_NO_PROMOTION"
+
+
+@pytest.mark.parametrize("values,mask,excluded", [
+    ([1., 2.], [True, True], 0),
+    ([np.nan, np.nan], [True, True], 2),
+    ([np.nan], [False], 0),
+    ([], np.array([], bool), 0),
+])
+def test_exclusions_remain_visible_with_no_pairs_or_no_gaps(values, mask, excluded):
+    result = forecast.audit_cell(values, values,
+        {name: values for name in forecast.REQUIRED_BASELINES}, mask)
+    gaps = result["coverage_exclusions"]
+    assert gaps["excluded_scheduled_targets"] == excluded
+    assert sum(row["scheduled_targets"] for row in gaps["exclusive_missing_patterns"]) == excluded
+
+
 def test_reference_equivalence_is_visible_not_two_independent_baselines():
     y = np.zeros(200); c = np.ones(200)
     r = forecast.audit_cell(y, c, {k: c * 2 for k in forecast.REQUIRED_BASELINES}, np.ones(200, bool))
