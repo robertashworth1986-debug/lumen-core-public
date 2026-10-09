@@ -1,0 +1,17 @@
+{
+  "claim_boundary": "This verifies exact-release SBOM construction and attestation workflow policy. It does not prove that a signed main-branch attestation exists until that workflow runs successfully, and it does not establish a SLSA level, certification, external validation, security, or live-domain parity.",
+  "inventoried_release_file_count": 246,
+  "inventory_coverage_ratio": 1.0,
+  "production_decision": "HOLD_UNTIL_EXPLICIT_DEPLOYMENT_AND_EXACT_LIVE_VERIFICATION",
+  "release_file_count": 246,
+  "release_manifest_sha256": "94b327a6ae103663a2747b7e7880a08328782d5fdb6457ea5f35c2f45ecde18d",
+  "release_subject_sha256": "3a10704a9c8f152aa728c0de47e47a9a8d1963f6e1df7d710fe0b20feafb2a87",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "sbom_sha256": "6762a34d8ed1a4f8f25e3c138360fecde383c9c8c8c11c253bad028ed486d8e8",
+  "schema": "lumencore.public_site_supply_chain_verification.v1",
+  "signed_attestation_scope": "MAIN_BRANCH_GITHUB_HOSTED_WORKFLOW_ONLY",
+  "source_commit": "1fba9f0213ae79c1739fc6f7bca8266e94752b72",
+  "supply_chain_receipt_sha256": "1e268359d2336ee57b544fdb07bbcc4ca6980d93e926d73328fdb091f00e97fc",
+  "valid": true,
+  "verification_sha256": "96125edab244f28b60b991916e2d69b6735612b29503d6385b9d4535552f9f17"
+}

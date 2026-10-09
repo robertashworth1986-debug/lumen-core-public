@@ -7,6 +7,33 @@
 
 ## One commercial sentence
 
+### October 9 public-release reconciliation
+
+Active outcome 2: one external validation or paid-pilot conversion.
+The full read-only release audit at `2026-10-09T07:44:33.321519Z` compared current intended
+source `1fba9f0213ae79c1739fc6f7bca8266e94752b72` with the public domain:
+192 of 246 files matched, three mismatched, and 51 returned HTTP 404.
+The three older files and 51 later additions reconcile exactly to the latest
+successful guarded deployment, September 23 source
+`dfc45fe2a05102c835dafe05d9b847cd04566086`. Independent nonce requests retained
+the same failures. Origin filesystem and cache configuration remain uninspected.
+
+The [observation records](../evidence/public-site-deployments/observations/20261009T073306Z/) retain the canonical
+full-manifest audit, incident classification, nonce diagnostic and historical
+comparison separately. The [incident plan](INCIDENT_RESPONSE_AND_CONTINUITY_PLAN.md)
+records the exact guarded next steps and the separate HTTP-failure rollback gap.
+The outdated fixed 43-file audit wording now follows the selected source manifest.
+
+Immutable packaging/inventory verification passed; the reconstructed archive
+matches current-source CI-signed provenance and SBOM receipts. These are release
+preparation, not authorization or deployment. Zero production files were repaired.
+Exact-source release approval, workflow dispatch access, complete post-release
+live verification and the separate Studio-media security-header action remain
+outstanding. No production or DNS/email mutation occurred. Public-release and
+broader production HOLD remain, as do external-validation and buyer-acceptance gates.
+Existing rollback and prior-observation PRs remain separate; no repair branch was
+silently merged and no historical deployment receipt was replaced.
+
 ### October 8 founder-authorized consolidation and report repair
 
 Active outcome 2: one external validation or paid-pilot conversion. This branch

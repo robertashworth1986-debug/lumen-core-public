@@ -1,0 +1,823 @@
+{
+  "scope": "Independent nonce GETs for the 54 October 7 failing paths; public endpoint only, not an origin filesystem audit.",
+  "started_at_utc": "2026-10-09T07:33:06.465517+00:00",
+  "completed_at_utc": "2026-10-09T07:33:59.471033+00:00",
+  "results": [
+    {
+      "archive_name": "operator_home.html",
+      "url": "https://lumen-core.ai/?audit_nonce=1791531186465503145",
+      "http_status": 200,
+      "bytes": 33735,
+      "sha256": "98cd41dfc0bfdd496da56e78219ac6705803639b2460ce9238aba20899411818",
+      "final_url": "https://lumen-core.ai/?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:11 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "33735",
+        "Last-Modified": "Wed, 23 Sep 2026 19:06:23 GMT",
+        "ETag": "\"6ab4232f-83c7\"",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "robots.txt",
+      "url": "https://lumen-core.ai/robots.txt?audit_nonce=1791531186465503145",
+      "http_status": 200,
+      "bytes": 630,
+      "sha256": "68564a5ddc2b475d865e3705bd306ebbb714ade88305c278af89956c031f59d0",
+      "final_url": "https://lumen-core.ai/robots.txt?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:11 GMT",
+        "Content-Type": "text/plain",
+        "Content-Length": "630",
+        "Last-Modified": "Wed, 23 Sep 2026 19:06:23 GMT",
+        "ETag": "\"6ab4232f-276\"",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "sitemap.xml",
+      "url": "https://lumen-core.ai/sitemap.xml?audit_nonce=1791531186465503145",
+      "http_status": 200,
+      "bytes": 8986,
+      "sha256": "5d633c220f00fa2f7219cd088e5f4fd4f10d0c9e13847f61842136ff7b99c980",
+      "final_url": "https://lumen-core.ai/sitemap.xml?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:11 GMT",
+        "Content-Type": "text/xml",
+        "Content-Length": "8986",
+        "Last-Modified": "Wed, 23 Sep 2026 19:06:23 GMT",
+        "ETag": "\"6ab4232f-231a\"",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/assets/01_bridge_of_light.webp",
+      "url": "https://lumen-core.ai/bounded-light/assets/01_bridge_of_light.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/assets/01_bridge_of_light.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:11 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/assets/02_light_boundary.webp",
+      "url": "https://lumen-core.ai/bounded-light/assets/02_light_boundary.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/assets/02_light_boundary.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:15 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/assets/03_toroidal_observatory.webp",
+      "url": "https://lumen-core.ai/bounded-light/assets/03_toroidal_observatory.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/assets/03_toroidal_observatory.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:15 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/assets/04_echo_cathedral.webp",
+      "url": "https://lumen-core.ai/bounded-light/assets/04_echo_cathedral.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/assets/04_echo_cathedral.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:15 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/assets/05_phase_garden.webp",
+      "url": "https://lumen-core.ai/bounded-light/assets/05_phase_garden.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/assets/05_phase_garden.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:15 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/assets/06_hemilink.webp",
+      "url": "https://lumen-core.ai/bounded-light/assets/06_hemilink.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/assets/06_hemilink.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:19 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/index.html",
+      "url": "https://lumen-core.ai/bounded-light/?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:19 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/lab.js",
+      "url": "https://lumen-core.ai/bounded-light/lab.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/lab.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:19 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/math.js",
+      "url": "https://lumen-core.ai/bounded-light/math.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/math.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:19 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/provenance.json",
+      "url": "https://lumen-core.ai/bounded-light/provenance.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/provenance.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:23 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/style.css",
+      "url": "https://lumen-core.ai/bounded-light/style.css?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/style.css?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:23 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/assets/07_calabi_bloom.webp",
+      "url": "https://lumen-core.ai/bounded-light/observatory/assets/07_calabi_bloom.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/assets/07_calabi_bloom.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:23 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/assets/08_gyroid_sanctum.webp",
+      "url": "https://lumen-core.ai/bounded-light/observatory/assets/08_gyroid_sanctum.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/assets/08_gyroid_sanctum.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:23 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/assets/09_hopf_atlas.webp",
+      "url": "https://lumen-core.ai/bounded-light/observatory/assets/09_hopf_atlas.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/assets/09_hopf_atlas.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/geometry.mjs",
+      "url": "https://lumen-core.ai/bounded-light/observatory/geometry.mjs?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/geometry.mjs?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/geometry.worker.js",
+      "url": "https://lumen-core.ai/bounded-light/observatory/geometry.worker.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/geometry.worker.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/index.html",
+      "url": "https://lumen-core.ai/bounded-light/observatory/?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:27 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/observatory.css",
+      "url": "https://lumen-core.ai/bounded-light/observatory/observatory.css?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/observatory.css?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/observatory.js",
+      "url": "https://lumen-core.ai/bounded-light/observatory/observatory.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/observatory.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/provenance.json",
+      "url": "https://lumen-core.ai/bounded-light/observatory/provenance.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/provenance.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/renderer.js",
+      "url": "https://lumen-core.ai/bounded-light/observatory/renderer.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/renderer.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:31 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "bounded-light/observatory/state.js",
+      "url": "https://lumen-core.ai/bounded-light/observatory/state.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/bounded-light/observatory/state.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:34 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/Public_Portfolio_Review_Brief_2026-10-04.pdf",
+      "url": "https://lumen-core.ai/portfolio/Public_Portfolio_Review_Brief_2026-10-04.pdf?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/Public_Portfolio_Review_Brief_2026-10-04.pdf?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:34 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/brachistochrone.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/brachistochrone.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/brachistochrone.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:34 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/cube.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/cube.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/cube.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:34 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/dodecahedron.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/dodecahedron.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/dodecahedron.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:37 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/hopf-atlas.webp",
+      "url": "https://lumen-core.ai/portfolio/assets/hopf-atlas.webp?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/hopf-atlas.webp?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:37 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/icosahedron.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/icosahedron.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/icosahedron.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:37 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/murray-branching.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/murray-branching.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/murray-branching.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:37 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/octahedron.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/octahedron.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/octahedron.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:40 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/phyllotaxis.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/phyllotaxis.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/phyllotaxis.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:40 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/tetrahedron.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/tetrahedron.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/tetrahedron.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:40 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/assets/transport-study.svg",
+      "url": "https://lumen-core.ai/portfolio/assets/transport-study.svg?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/assets/transport-study.svg?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:40 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/data/grants-summary.json",
+      "url": "https://lumen-core.ai/portfolio/data/grants-summary.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/data/grants-summary.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:44 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/data/math-sources.md",
+      "url": "https://lumen-core.ai/portfolio/data/math-sources.md?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/data/math-sources.md?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:44 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/data/portfolio.json",
+      "url": "https://lumen-core.ai/portfolio/data/portfolio.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/data/portfolio.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:44 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/data/registry.json",
+      "url": "https://lumen-core.ai/portfolio/data/registry.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/data/registry.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:44 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/data/review-status.json",
+      "url": "https://lumen-core.ai/portfolio/data/review-status.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/data/review-status.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:47 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/data/transport.json",
+      "url": "https://lumen-core.ai/portfolio/data/transport.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/data/transport.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:47 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/index.html",
+      "url": "https://lumen-core.ai/portfolio/?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:47 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/math-models.mjs",
+      "url": "https://lumen-core.ai/portfolio/math-models.mjs?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/math-models.mjs?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:47 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/portfolio-model.mjs",
+      "url": "https://lumen-core.ai/portfolio/portfolio-model.mjs?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/portfolio-model.mjs?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:50 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/portfolio.css",
+      "url": "https://lumen-core.ai/portfolio/portfolio.css?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/portfolio.css?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:50 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/portfolio.js",
+      "url": "https://lumen-core.ai/portfolio/portfolio.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/portfolio.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:50 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "portfolio/review.html",
+      "url": "https://lumen-core.ai/portfolio/review.html?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/portfolio/review.html?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:50 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "rights/index.html",
+      "url": "https://lumen-core.ai/rights/?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/rights/?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:55 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "rights/artwork-register.json",
+      "url": "https://lumen-core.ai/rights/artwork-register.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/rights/artwork-register.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:55 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "art/index.html",
+      "url": "https://lumen-core.ai/art/?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/art/?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:55 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "art/art.css",
+      "url": "https://lumen-core.ai/art/art.css?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/art/art.css?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:55 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "art/art.js",
+      "url": "https://lumen-core.ai/art/art.js?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/art/art.js?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:59 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    },
+    {
+      "archive_name": "art/media-manifest.json",
+      "url": "https://lumen-core.ai/art/media-manifest.json?audit_nonce=1791531186465503145",
+      "http_status": 404,
+      "bytes": 22,
+      "sha256": "37ec4665a8102d115ffd1ac20dae94c98b4dac64b0c1a68228aa2a531caeb35d",
+      "final_url": "https://lumen-core.ai/art/media-manifest.json?audit_nonce=1791531186465503145",
+      "headers": {
+        "Server": "nginx/1.20.1",
+        "Date": "Fri, 09 Oct 2026 07:33:59 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "22",
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'; worker-src 'self' blob:; media-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+      }
+    }
+  ]
+}
