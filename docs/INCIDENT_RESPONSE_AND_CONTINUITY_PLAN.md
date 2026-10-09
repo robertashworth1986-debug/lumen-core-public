@@ -20,6 +20,54 @@ not hidden as a successful deployment. Repository evidence remains canonical
 until a human-authorized exact-snapshot deployment produces a successful
 current-commit live receipt.
 
+### October 9, 2026 read-only release reconciliation
+
+Active outcome 2: one external validation or paid-pilot conversion.
+The intended source examined was `1fba9f0213ae79c1739fc6f7bca8266e94752b72`.
+The unchanged repository verifier completed its full 246-file public HTTP audit
+at **2026-10-09T07:44:33.321519Z**: **192 matched, 3 mismatched, and 51 returned HTTP 404**.
+The [raw observation](../evidence/public-site-deployments/observations/20261009T073306Z/live-verification.json)
+and [classification](../evidence/public-site-deployments/observations/20261009T073306Z/classification.json)
+retain `release_verified: false` and `HOLD_PUBLIC_RELEASE_PROMOTION`.
+This is a first-party read-only observation, not an independent assessment or
+a deployment receipt. No production discrepancy was corrected in this pass.
+
+Separate nonce requests completed at 07:33:59 UTC. All 51 later additions
+returned HTTP 404; the three changed existing paths—`operator_home.html`,
+`robots.txt`, and `sitemap.xml`—returned hashes matching September 23 source
+`dfc45fe2a05102c835dafe05d9b847cd04566086`. The missing additions are 22
+Bounded Light files, 23 portfolio files, two rights files, and four art files.
+They are in the current allowlist, not intentional current-release exclusions.
+The [reconciliation](../evidence/public-site-deployments/observations/20261009T073306Z/reconciliation.json)
+enumerates every affected path. Each receipt preserves its own observation time;
+the observation directory is anchored to the nonce diagnostic's start time.
+
+The latest successful guarded deployment found was
+[run 35907010582](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/35907010582),
+which verified all 195 files on September 23. Comparison with intended source
+accounts exactly for the 51 added files and three changed files. The 246 release
+file paths and hashes are unchanged between October 7 audit source `e5487b6d`
+and the October 9 comparison subject. The
+[October 8 audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37770785899)
+also recorded 192 matches, three mismatches, and 51 errors.
+This is consistent with the older deployment remaining served. Public requests
+do not inspect the origin filesystem or prove every intermediary cache was bypassed.
+
+Local immutable packaging and inventory verification passed for all 246 files.
+The reconstructed archive SHA-256 is
+`3a10704a9c8f152aa728c0de47e47a9a8d1963f6e1df7d710fe0b20feafb2a87`.
+Retained signed provenance and SBOM verification from
+[run 37780663244](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37780663244)
+bind that same archive, source, main ref, signing workflow, GitHub OIDC issuer,
+and hosted runner. Those CI receipts were inspected; fresh local cryptographic
+verification was not executed because the GitHub CLI was unavailable.
+
+No production files, DNS/email records, Nginx settings, runtime services, or
+existing reviewer materials were changed. Exact static-release approval remains
+absent, the connected GitHub tools expose no workflow dispatch operation, and no
+server deployment session was used. These access and authorization limits prevent
+repair in this pass. Public-release promotion and broader production remain HOLD.
+
 ## Authority and roles
 
 | Role | Responsibility | Authority boundary |
@@ -49,7 +97,7 @@ incident. Those conditions require human investigation and classification.
 The read-only `Audit exact public-site snapshot` workflow runs on relevant main
 changes, daily, and on manual dispatch. It:
 
-1. packages the 43 allowlisted files from immutable Git blobs;
+1. packages the exact allowlisted files from immutable Git blobs for the audited source commit;
 2. binds the commit, Git object IDs, sizes, hashes, archive hash, and target;
 3. downloads every canonical live URL without using credentials;
 4. checks HTTP status, allowed MIME type, bytes, and SHA-256;
@@ -94,6 +142,28 @@ private runtime prerequisites, negative-access checks, and retained receipts.
 Static deployment does not authorize gateway repair, and gateway repair does
 not authorize static deployment.
 
+For the October 9 subject, current-main signed provenance and SBOM verification
+are available, but do not authorize deployment. The owner must review the exact
+main SHA, select `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` in
+`deploy-public-site-release.yml`, retain the production-environment gate, and
+obtain complete live-byte/MIME verification. If main advances, repin and verify
+the new signed subject before any release; this observation is not its approval.
+
+The current apply script restores captured files after an apply failure. Public
+HTTP verification is a later, separate workflow step: its failure does not invoke
+automatic restoration. Preserve the new timestamped backup and require reviewed
+recovery if that gate fails. Existing [PR #208](https://github.com/robertashworth1986-debug/lumen-core-public/pull/208)
+proposes same-attempt compensation; it is not current-main behavior and was not
+integrated by this observation. The September 23 rollback path is historical
+evidence, not a substitute for a fresh pre-release backup.
+
+The art gallery's external Wonder Studio media requires the separate current-main
+`repair-public-security-headers.yml` action and `APPLY_PUBLIC_SECURITY_HEADERS`
+approval. The observed policy permits same-origin media and lacks the exact
+Studio origin. The static release leaves Nginx, DNS/email and runtime data alone.
+External Studio bytes are intentionally outside the 246-file release guarantee;
+static parity does not prove that gallery media renders successfully.
+
 ## Continuity and recovery planning targets
 
 These are non-contractual, unvalidated planning targets—not achieved service
@@ -130,7 +200,7 @@ not evidence of a completed live restoration, backup recovery, customer
 notification, disaster-recovery exercise, or independent audit.
 
 A future live exercise must record authorization time, start time, affected
-commit, rollback capture, restoration time, all 43 route results, deviations,
+commit, rollback capture, restoration time, every route result required by the selected release manifest, deviations,
 communications decisions, unresolved gates, and incident-closure authority.
 
 ## Machine commands

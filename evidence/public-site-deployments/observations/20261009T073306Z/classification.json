@@ -1,0 +1,348 @@
+{
+  "affected": [
+    {
+      "archive_name": "art/art.css",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "art/art.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "art/index.html",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "art/media-manifest.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/assets/01_bridge_of_light.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/assets/02_light_boundary.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/assets/03_toroidal_observatory.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/assets/04_echo_cathedral.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/assets/05_phase_garden.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/assets/06_hemilink.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/index.html",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/lab.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/math.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/assets/07_calabi_bloom.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/assets/08_gyroid_sanctum.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/assets/09_hopf_atlas.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/geometry.mjs",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/geometry.worker.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/index.html",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/observatory.css",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/observatory.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/provenance.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/renderer.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/observatory/state.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/provenance.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "bounded-light/style.css",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "operator_home.html",
+      "critical": true,
+      "status": "MISMATCH"
+    },
+    {
+      "archive_name": "portfolio/Public_Portfolio_Review_Brief_2026-10-04.pdf",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/brachistochrone.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/cube.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/dodecahedron.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/hopf-atlas.webp",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/icosahedron.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/murray-branching.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/octahedron.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/phyllotaxis.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/tetrahedron.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/assets/transport-study.svg",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/data/grants-summary.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/data/math-sources.md",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/data/portfolio.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/data/registry.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/data/review-status.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/data/transport.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/index.html",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/math-models.mjs",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/portfolio-model.mjs",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/portfolio.css",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/portfolio.js",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "portfolio/review.html",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "rights/artwork-register.json",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "rights/index.html",
+      "critical": false,
+      "status": "ERROR"
+    },
+    {
+      "archive_name": "robots.txt",
+      "critical": false,
+      "status": "MISMATCH"
+    },
+    {
+      "archive_name": "sitemap.xml",
+      "critical": false,
+      "status": "MISMATCH"
+    }
+  ],
+  "affected_file_count": 54,
+  "affected_ratio": 0.219512,
+  "automatic_actions_performed": [
+    "machine_classification",
+    "incident_receipt_generation"
+  ],
+  "base_url": "https://lumen-core.ai",
+  "claim_boundaries": [
+    "not_a_tested_live_incident_response_program",
+    "not_a_business_continuity_certification",
+    "not_a_disaster_recovery_certification",
+    "not_an_enterprise_sla",
+    "not_a_security_audit_or_penetration_test",
+    "not_proof_of_customer_notification_or_regulatory_compliance",
+    "not_authority_to_deploy_repair_rotate_notify_delete_trade_or_close"
+  ],
+  "classified_at_utc": "2026-10-09T07:44:33.321519Z",
+  "containment_sequence": [
+    "preserve the immutable release package, manifest, live audit, and incident receipt",
+    "treat the checked-out repository commit as canonical and the drifting live surface as unverified",
+    "hold public-release promotion and do not cite mismatched live bytes as current evidence",
+    "separate static release drift from gateway, secret, DNS, buyer-data, and legal incident lanes",
+    "escalate any suspected SEV-1 condition for human classification without inferring it from a public HTTP audit"
+  ],
+  "critical_affected": [
+    "operator_home.html"
+  ],
+  "decision": "HOLD_PUBLIC_RELEASE_PROMOTION",
+  "error_count": 51,
+  "expected_file_count": 246,
+  "external_notification_performed": false,
+  "human_authorization_required": [
+    "deploy an exact public-site snapshot",
+    "repair or restart the public gateway",
+    "install, rotate, or revoke a credential or secret",
+    "change DNS, firewall, TLS, reverse-proxy, or hosting configuration",
+    "notify a customer, regulator, insurer, partner, or the public",
+    "delete or disclose data or evidence",
+    "accept legal terms or make a certification or attestation",
+    "place a trade or enable production execution",
+    "close an incident after a live production change"
+  ],
+  "incident_closure_authorized": false,
+  "incident_fingerprint_sha256": "c88dc9269eb67c1f76165eb345838950a9ef5bb9eac0dce39928291e9ba1209a",
+  "incident_state": "ACTIVE_PUBLIC_RELEASE_INTEGRITY_INCIDENT",
+  "live_audit_canonical_sha256": "c473bc1969a755ba58ece9c659de34787c5ad807f32e45898d887542b8c0248a",
+  "manifest_canonical_sha256": "bcb398a6834021e4cbf6616a915300ca45cd550631127f8266495e852f36597f",
+  "matched_file_count": 192,
+  "mismatch_count": 3,
+  "planning_targets": {
+    "buyer_data_rto_rpo": "not established; must be negotiated in the signed buyer scope",
+    "classification_target": "same audit workflow run",
+    "contract_status": "non_contractual_unvalidated_planning_targets",
+    "public_audit_cadence_hours": 24,
+    "public_static_restore_target_hours_after_valid_human_authorization": 4,
+    "release_byte_rpo": "zero for immutable Git-tracked allowlisted release bytes"
+  },
+  "policy_canonical_sha256": "8047dd8ccaed37f496639647ed6258c5afe539010814e7630b65c0c2b08c093a",
+  "production_mutation_performed": false,
+  "receipt_schema": "lumencore.public_release_incident.v1",
+  "receipt_sha256": "6f6b0ddd36be8cd03de6af3b7a3422671d81a8ceb82913203961ee1611d9843d",
+  "recovery_sequence": [
+    "review the exact commit, manifest, affected surfaces, and rollback boundary",
+    "obtain the literal exact-snapshot deployment approval before mutating public files",
+    "obtain the separate gateway-repair approval before changing gateway dependencies or runtime secrets",
+    "apply only the allowlisted release with rollback capture",
+    "rerun the full-manifest exact-byte and MIME audit against the deployed commit",
+    "verify critical routes and retain deployment, rollback, and live-audit receipts",
+    "close only after the current commit reports release_verified true and any separate incident lane is resolved"
+  ],
+  "release_verified": false,
+  "severity": "SEV-2",
+  "source_commit": "1fba9f0213ae79c1739fc6f7bca8266e94752b72",
+  "valid": true
+}
