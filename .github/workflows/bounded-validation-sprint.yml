@@ -6,8 +6,11 @@ on:
       - "config/bounded_validation_sprint_v1.json"
       - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_OFFER.md"
       - "docs/LUMENCORE_BOUNDED_VALIDATION_SPRINT_SOW_TEMPLATE.md"
+      - "docs/LUMENCORE_BUYER_OWNED_VALIDATION_INTAKE.md"
       - "code/ops/validate_bounded_validation_sprint.py"
+      - "code/ops/run_buyer_owned_shadow_replay.py"
       - "tests/test_bounded_validation_sprint.py"
+      - "tests/test_buyer_owned_shadow_replay.py"
       - ".github/workflows/bounded-validation-sprint.yml"
   workflow_dispatch:
 
@@ -37,14 +40,15 @@ jobs:
         run: |
           python -m py_compile \
             code/ops/validate_bounded_validation_sprint.py \
-            tests/test_bounded_validation_sprint.py
+            code/ops/run_buyer_owned_shadow_replay.py \
+            tests/test_bounded_validation_sprint.py \
+            tests/test_buyer_owned_shadow_replay.py
 
-      - name: Run focused commercial-boundary tests
+      - name: Run focused commercial-boundary and shadow-replay tests
         run: |
-          python -m unittest discover \
-            -s tests \
-            -p "test_bounded_validation_sprint.py" \
-            -v
+          python -m unittest -v \
+            tests.test_bounded_validation_sprint \
+            tests.test_buyer_owned_shadow_replay
 
       - name: Validate offer, pricing, scope, IP, and claim boundaries
         run: |

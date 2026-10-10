@@ -30,7 +30,9 @@
       "held-out window or frozen seeds",
       "failure and incomplete-run rules",
       "allowed public claims",
-      "decision owner"
+      "decision owner",
+      "execution boundary and human approval owner",
+      "economic denominator, eligibility, realization, cost, and non-overlap group"
     ],
     "required_deliverables": [
       "signed evaluation contract or authorized purchase instrument",
@@ -42,13 +44,50 @@
       "SHA-256 input/output manifest",
       "offline verification instructions",
       "buyer-readable Proof Capsule",
-      "one bounded go/no-go decision briefing"
+      "one bounded go/no-go decision briefing",
+      "read-only shadow comparison receipt",
+      "non-overlapping economic conversion ledger"
     ],
     "claim_boundary": [
       "No guaranteed outcome, savings, ROI, certification, deployment, agency endorsement, award, or production authorization.",
       "Internal or buyer-authorized replay is not field validation unless the qualified data owner approves the protocol and the resulting claim in writing.",
-      "Visualizations and dashboards project verifier state; they cannot strengthen the evidence result."
-    ]
+      "Visualizations and dashboards project verifier state; they cannot strengthen the evidence result.",
+      "No dollar value conversion is allowed until the technical gate passes and buyer-owned denominator, eligibility, realization, cost, and non-overlap inputs are complete.",
+      "System, market, asset, transaction, or spend scale is not a savings denominator by itself."
+    ],
+    "execution_boundary": {
+      "mode": "read_only_shadow",
+      "production_write_access": false,
+      "actuation_allowed": false,
+      "production_credentials_allowed": false,
+      "recommendations_require_human_approval": true,
+      "matched_conditions_required": true,
+      "incumbent_fallback_required": true,
+      "comparison_arms": [
+        "incumbent",
+        "candidate",
+        "alternative_optional"
+      ]
+    },
+    "economic_conversion_gate": {
+      "status": "disabled_until_complete",
+      "required_inputs": [
+        "buyer-owned addressable cost denominator",
+        "denominator currency, unit, and time window",
+        "eligible share",
+        "measured technical delta",
+        "realization factor",
+        "implementation and run costs",
+        "non-overlap group"
+      ],
+      "eligible_share_min": 0,
+      "eligible_share_max": 1,
+      "realization_factor_min": 0,
+      "realization_factor_max": 1,
+      "implementation_and_run_costs_required": true,
+      "non_overlap_ledger_required": true,
+      "public_value_claims_allowed": false
+    }
   },
   "tiers": [
     {
