@@ -7,6 +7,28 @@
 
 ## One commercial sentence
 
+### October 9 Wonder Studio creative-services publication
+
+Robert explicitly requested publication of the upgraded Wonder Studio and
+its business-design offer on GitHub. This scoped founder instruction extends
+the existing art and presentation showcase with a supplementary creative
+offer; the primary engineering validation offer and its HOLD gates remain.
+
+The public Studio's version 15 was published from source
+`c2b04f10ad1f555d1ed15d17eda66397949c94ec`. It adds a brand preview,
+three fictional business demonstrations, interactive projected 3D motion,
+two ten-second H.264 loops and a private custom-inquiry receipt with email
+fallback. The release reported 51 passing Node checks and a successful build;
+full browser visual QA was unavailable. These are first-party implementation
+checks, not client results or third-party validation.
+
+The README and existing visual-asset boundary now link to these public
+experiences. This documentation change contains no private Studio source,
+customer inquiries, scientific result changes or infrastructure deployment.
+The separately hosted Studio release does not resolve the custom domain's
+recorded release drift. Existing research, rights and production gates remain.
+Price, scope, schedule and rights require agreement for each paid commission.
+
 ### October 8 founder-authorized consolidation and report repair
 
 Active outcome 2: one external validation or paid-pilot conversion. This branch

@@ -68,6 +68,27 @@ strategy-attributed net profit. Virtual tests do not establish hardware or human
 performance. Museum installations remain a possible application, not a verified
 customer deployment.
 
+## Wonder Studio — make your business visible
+
+[**Make it your brand →**](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/brand/) ·
+[See three business examples](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/examples/) ·
+[Explore motion](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/motion/) ·
+[Discuss custom work](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/services/)
+
+Wonder Studio is LumenCore's creative-services offering for presentations,
+advertising screens, campaign graphics and one-page marketing websites.
+Try your own logo, colors and message across four PNG formats, save a reusable
+brand kit, or explore flowing projected 3D geometry and downloadable motion loops.
+
+Custom work starts with a short brief: **Slide Polish**, **Story & Deck**, or
+**Business Launch Kit**. Scope, price and timing are agreed before work begins.
+The café, founder-pitch and product-launch examples are fictional design
+demonstrations. Created by Robert Ashworth using AI tools.
+
+The Studio is separately hosted. Its artwork and motion illustrate creative
+direction; they do not establish physical, forecasting or savings results.
+See the [creative-work boundary](docs/CONCEPTUAL_RND_AND_VISUAL_ASSET_BOUNDARY.md#wonder-studio-creative-services).
+
 ## Commercial entry offer
 
 The sole primary paid entry point is the **Buyer-Owned Baseline Validation
