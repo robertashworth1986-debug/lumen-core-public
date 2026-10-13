@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
+import threading
 from pathlib import Path
 
 import pytest
@@ -31,6 +32,7 @@ def gateway_workers(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     tasks = []
     dashboard = tmp_path / "dashboard"
     monkeypatch.setattr(legacy, "DASH", dashboard)
+    monkeypatch.setattr(legacy, "_GATEWAY_LOCK", tmp_path / "run" / "gateway.lock")
 
     def worker(name):
         async def run():
@@ -117,5 +119,68 @@ def test_lifespan_startup_failure_does_not_start_workers(gateway_workers):
             async with app.router.lifespan_context(app):
                 pytest.fail("startup must not succeed")
         assert started == stopped == tasks == []
+
+    asyncio.run(exercise())
+
+
+def test_lifespan_rejects_overlapping_startup_before_replacing_workers(gateway_workers):
+    import luma_experience_gateway_legacy as legacy
+
+    app, _, started, _, tasks = gateway_workers
+
+    async def exercise():
+        async with app.router.lifespan_context(app):
+            await asyncio.sleep(0)
+            first_queue = legacy._GATEWAY_BLOCKING_QUEUE
+            with pytest.raises(legacy.GatewayAlreadyRunning):
+                async with app.router.lifespan_context(app):
+                    pytest.fail("overlapping startup must be refused")
+            assert legacy._GATEWAY_BLOCKING_QUEUE is first_queue
+            assert len(started) == len(WORKERS)
+            assert all(not task.done() for task in tasks)
+
+    asyncio.run(exercise())
+
+
+def test_shutdown_keeps_lifetime_lock_until_running_thread_finishes(gateway_workers, monkeypatch):
+    import luma_experience_gateway_legacy as legacy
+
+    app, _, _, _, _ = gateway_workers
+    started, release = threading.Event(), threading.Event()
+
+    def transaction():
+        started.set()
+        assert release.wait(2)
+
+    async def worker():
+        await legacy._run_gateway_blocking(transaction)
+        await asyncio.Event().wait()
+
+    monkeypatch.setattr(legacy, "_profit_lock_watcher", worker)
+
+    async def exercise():
+        async def serve():
+            async with app.router.lifespan_context(app):
+                await asyncio.Event().wait()
+
+        owner = asyncio.create_task(serve())
+        second_lock = legacy.GatewayLifetimeLock(legacy._GATEWAY_LOCK)
+        try:
+            assert await asyncio.to_thread(started.wait, 2)
+            owner.cancel()
+            await asyncio.sleep(0.02)
+            assert not owner.done()
+            owner.cancel()  # A second cancellation must not abandon the thread.
+            await asyncio.sleep(0.02)
+            assert not owner.done()
+            with pytest.raises(legacy.GatewayAlreadyRunning):
+                second_lock.acquire()
+        finally:
+            release.set()
+            await asyncio.gather(owner, return_exceptions=True)
+        assert owner.cancelled()
+        second_lock.acquire()
+        second_lock.release()
+        assert legacy._GATEWAY_BLOCKING_QUEUE is None
 
     asyncio.run(exercise())

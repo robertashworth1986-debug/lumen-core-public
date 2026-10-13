@@ -518,12 +518,19 @@ def _canonical_manifest_path(raw_path: str) -> str:
 def _safe_path(root: Path, raw_path: str) -> tuple[str, Path]:
     canonical = _canonical_manifest_path(raw_path)
     candidate_unresolved = root / Path(*PurePosixPath(canonical).parts)
-    cursor = root
-    for part in PurePosixPath(canonical).parts:
-        cursor = cursor / part
-        if cursor.is_symlink():
-            raise CapsuleError(f"manifest path must not traverse a symlink: {raw_path}")
-    candidate = candidate_unresolved.resolve()
+    try:
+        cursor = root
+        for part in PurePosixPath(canonical).parts:
+            cursor = cursor / part
+            if cursor.is_symlink():
+                raise CapsuleError(
+                    f"manifest path must not traverse a symlink: {raw_path}"
+                )
+        candidate = candidate_unresolved.resolve()
+    except CapsuleError:
+        raise
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise CapsuleError(f"cannot resolve manifest path {raw_path}: {exc}") from exc
     if candidate != root and root not in candidate.parents:
         raise CapsuleError(f"manifest path escapes root: {raw_path}")
     return canonical, candidate
@@ -630,7 +637,13 @@ def _validate_hash_records(
                 f"multiple manifest paths resolve to the same file: {canonical}"
             )
         seen_targets.add(path)
-        if not path.exists():
+        try:
+            exists = path.exists()
+        except OSError as exc:
+            raise CapsuleError(
+                f"cannot inspect manifest file {canonical}: {exc}"
+            ) from exc
+        if not exists:
             raise CapsuleError(f"manifest file does not exist: {canonical}")
         remaining_bytes = (
             max_total_artifact_bytes - previously_verified_bytes - verified_bytes
@@ -691,9 +704,12 @@ def validate_capsule(
 
     try:
         root_resolved = root.resolve(strict=True)
-    except OSError as exc:
+        root_is_dir = root_resolved.is_dir()
+    except CapsuleError:
+        raise
+    except (OSError, RuntimeError, ValueError) as exc:
         raise CapsuleError(f"cannot resolve repository root: {exc}") from exc
-    if not root_resolved.is_dir():
+    if not root_is_dir:
         raise CapsuleError("repository root must be a directory")
 
     _require_exact_fields(capsule, TOP_LEVEL_FIELDS, "top-level")

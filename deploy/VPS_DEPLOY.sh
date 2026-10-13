@@ -415,11 +415,14 @@ server {
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
-    location /proof/ {
-        alias /opt/lumencore/out/;
-        autoindex on;
-        autoindex_exact_size off;
-        autoindex_localtime on;
+    # Workspace output is private. Public evidence uses the reviewed static
+    # release; never bypass gateway authentication with a filesystem alias.
+    location = /proof {
+        return 404;
+    }
+
+    location ^~ /proof/ {
+        return 404;
     }
 
     location /evidence/ {
@@ -531,7 +534,7 @@ echo " Services:"
 echo "   lamascout-api    → https://lumen-core.ai/api/scout/"
 echo "   dashboard        → https://lumen-core.ai/dashboard/"
 echo "   intel api        → https://lumen-core.ai/intel/"
-echo "   proof artifacts  → https://lumen-core.ai/proof/"
+echo "   private outputs  → https://lumen-core.ai/out/ (operator token required)"
 echo "   investor app     → https://${APP_DOMAIN}/"
 echo "   research app     → https://${RESEARCH_DOMAIN}/"
 echo ""

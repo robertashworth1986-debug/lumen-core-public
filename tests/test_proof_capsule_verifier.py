@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import errno
 import hashlib
 import importlib.util
 import io
@@ -51,6 +52,20 @@ class ProofCapsuleVerifierTests(unittest.TestCase):
     def assertFails(self, capsule: dict) -> None:  # noqa: N802
         with self.assertRaises(MODULE.CapsuleError):
             MODULE.validate_capsule(capsule, ROOT)
+
+    def assert_cli_failure(
+        self, capsule_path: Path, root: Path, expected_error: str
+    ) -> None:
+        with patch("sys.stdout", new_callable=io.StringIO) as output, patch(
+            "sys.stderr", new_callable=io.StringIO
+        ) as errors:
+            status = MODULE.main([str(capsule_path), "--root", str(root)])
+        self.assertEqual(status, 1)
+        self.assertEqual(output.getvalue(), "")
+        result = json.loads(errors.getvalue())
+        self.assertEqual(set(result), {"valid", "error"})
+        self.assertFalse(result["valid"])
+        self.assertIn(expected_error, result["error"])
 
     def test_public_capsule_verifies(self) -> None:
         result = MODULE.validate_capsule(
@@ -195,6 +210,64 @@ class ProofCapsuleVerifierTests(unittest.TestCase):
             refresh_manifest_hash(mutated)
             with self.assertRaisesRegex(MODULE.CapsuleError, "symlink"):
                 MODULE.validate_capsule(mutated, root)
+
+    def test_overlong_manifest_paths_return_structured_cli_failure(self) -> None:
+        paths = {
+            "component": "x" * 300 + ".txt",
+            "total": "/".join(["x" * 100] * 500),
+        }
+        for label, raw_path in paths.items():
+            with self.subTest(kind=label), tempfile.TemporaryDirectory() as tmp:
+                mutated = copy.deepcopy(self.capsule)
+                mutated["manifest"]["output_hashes"][0]["path"] = raw_path
+                refresh_manifest_hash(mutated)
+                self.assertFails(mutated)
+                capsule_path = Path(tmp) / "capsule.json"
+                capsule_path.write_text(json.dumps(mutated), encoding="utf-8")
+                self.assert_cli_failure(capsule_path, ROOT, "manifest")
+
+    def test_path_resolution_errors_return_structured_cli_failure(self) -> None:
+        artifact = ROOT / self.capsule["manifest"]["output_hashes"][0]["path"]
+        original_resolve = Path.resolve
+        for target, context in (
+            (ROOT, "cannot resolve repository root"),
+            (artifact, "cannot resolve manifest path"),
+        ):
+            for error in (
+                OSError(errno.ENAMETOOLONG, "path is too long"),
+                RuntimeError("symlink loop"),
+                ValueError("stat: path too long for Windows"),
+            ):
+                with self.subTest(target=target, error=type(error).__name__):
+                    def fail_resolve(path, *args, **kwargs):
+                        if path == target:
+                            raise error
+                        return original_resolve(path, *args, **kwargs)
+
+                    with patch.object(Path, "resolve", fail_resolve), patch.object(
+                        MODULE, "_sha256", side_effect=AssertionError("unexpected hash")
+                    ):
+                        self.assert_cli_failure(self.capsule_path, ROOT, context)
+
+    def test_path_inspection_errors_return_structured_cli_failure(self) -> None:
+        artifact = ROOT / self.capsule["manifest"]["output_hashes"][0]["path"]
+        for method, target, context in (
+            ("is_symlink", artifact, "cannot resolve manifest path"),
+            ("exists", artifact, "cannot inspect manifest file"),
+            ("is_dir", ROOT, "cannot resolve repository root"),
+        ):
+            with self.subTest(method=method):
+                original = getattr(Path, method)
+
+                def fail_inspection(path, *args, **kwargs):
+                    if path == target:
+                        raise PermissionError(errno.EACCES, "permission denied")
+                    return original(path, *args, **kwargs)
+
+                with patch.object(Path, method, fail_inspection), patch.object(
+                    MODULE, "_sha256", side_effect=AssertionError("unexpected hash")
+                ):
+                    self.assert_cli_failure(self.capsule_path, ROOT, context)
 
     def test_invalid_manifest_hash_format_fails_closed(self) -> None:
         mutated = copy.deepcopy(self.capsule)

@@ -1,0 +1,29 @@
+{
+  "accepted": [
+    {"id":"integral_float","raw":"{\"measurement\":1.0}"},
+    {"id":"exponent_boundary","raw":"{\"measurement\":[1e-7,1e-6,1e-5,1.5e-4]}"},
+    {"id":"signed_zero","raw":"{\"measurement\":[-0.0,0.0,-0,0]}"},
+    {"id":"safe_integer_limits","raw":"{\"measurement\":[9007199254740991,-9007199254740991]}"},
+    {"id":"small_binary64","raw":"{\"measurement\":[5e-324,2.2250738585072014e-308,1e-100]}"},
+    {"id":"unicode_key_order","raw":"{\"measurement\":{\"Ｚ\":\"fullwidth\",\"😀\":\"astral\",\"a\":\"ASCII\"}}"},
+    {"id":"unicode_prefix_order","raw":"{\"😀a\":1,\"😀\":2,\"é\":3,\"é\":4}"},
+    {"id":"escapes","raw":"{\"text\":\"quote\\\" slash/ backslash\\\\ \\b\\t\\n\\f\\r\\u0000\\u001f\\u007f é 😀\"}"},
+    {"id":"nested_json_types","raw":"{\"n\":null,\"b\":[true,false],\"o\":{},\"a\":[],\"v\":{\"number\":0.125}}"}
+  ],
+  "rejected": [
+    {"id":"unsafe_integer_original","raw":"{\"measurement\":9007199254740992}"},
+    {"id":"unsafe_integer_alias","raw":"{\"measurement\":9007199254740993}"},
+    {"id":"unsafe_integral_float","raw":"{\"measurement\":9007199254740993.0}"},
+    {"id":"unsafe_exponent","raw":"{\"measurement\":1e20}"},
+    {"id":"overflow","raw":"{\"measurement\":1e400}"},
+    {"id":"nan","raw":"{\"measurement\":NaN}"},
+    {"id":"infinity","raw":"{\"measurement\":Infinity}"},
+    {"id":"lone_high_surrogate","raw":"{\"text\":\"\\ud800\"}"},
+    {"id":"lone_low_surrogate_key","raw":"{\"\\udc00\":1}"},
+    {"id":"duplicate_top_level","raw":"{\"decision\":\"PROMOTE\",\"decision\":\"HOLD\"}"},
+    {"id":"duplicate_escaped_nested","raw":"{\"outer\":{\"a\":1,\"\\u0061\":2}}"},
+    {"id":"duplicate_in_array","raw":"[{\"claim\":1,\"claim\":2}]"},
+    {"id":"trailing_comma","raw":"{\"a\":1,}"},
+    {"id":"trailing_content","raw":"{}{}"}
+  ]
+}

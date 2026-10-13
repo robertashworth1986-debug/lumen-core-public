@@ -87,7 +87,13 @@ def test_audit_uses_tracked_repository_evidence(module, inputs):
     by_id = {engine["id"]: engine for engine in payload["engines"]}
 
     assert by_id["lumengov_grant_factory"]["observed_maturity"] == "tested_implementation"
-    assert by_id["lumen_infrastructure_sentinel"]["observed_maturity"] == "runnable_component"
+    assert by_id["lumen_infrastructure_sentinel"]["observed_maturity"] == "tested_implementation"
+    assert by_id["lumen_infrastructure_sentinel"]["inventory_label"] == "Tracked source, entrypoint and test files present"
+    registry, _, _ = inputs
+    sentinel = next(engine for engine in registry["engines"] if engine["id"] == "lumen_infrastructure_sentinel")
+    assert sentinel["evidence"]["entrypoint"] == ["code/forecast_evaluation_v2.py"]
+    assert "does not implement outage detection" in sentinel["scoping_use"]
+    assert "cannot close this gate" in sentinel["acceptance_gate"]
     assert by_id["echoform_identity_engine"]["observed_maturity"] == "concept_only"
     assert by_id["smart_city_node_engine"]["observed_maturity"] == "concept_only"
     assert by_id["luma_xr_command_room"]["missing_paths"] == []
@@ -103,6 +109,48 @@ def test_audit_uses_tracked_repository_evidence(module, inputs):
     assert tracked_records
     assert all(len(record["git_blob_sha"]) == 40 for record in tracked_records)
     assert all(len(record["sha256"]) == 64 for record in tracked_records)
+
+
+def test_public_inventory_labels_never_convert_file_presence_to_execution(module, inputs):
+    payload = build(module, inputs)
+    for row in [payload, payload["summary"], *payload["engines"]]:
+        assert row["scope"] == "tracked_file_presence_only"
+        assert row["execution_verified_by_this_audit"] is False
+        assert row["customer_acceptance_verified_by_this_audit"] is False
+    for engine in payload["engines"]:
+        assert engine["inventory_label"] == module.INVENTORY_LABELS[engine["observed_maturity"]]
+        assert "file" in engine["inventory_label"].lower()
+    markdown = module.render_markdown(payload)
+    assert "Tracked-file inventory" in markdown
+    assert "does not execute the listed engines or tests" in markdown
+    assert "Execution verified by this audit: `false`" in markdown
+    assert "Customer acceptance verified by this audit: `false`" in markdown
+    assert "Repository maturity" not in markdown
+    assert "Priority-lane maturity" not in markdown
+
+
+def test_invalid_but_present_source_entrypoint_and_test_remain_inventory_only(module, inputs, monkeypatch, tmp_path):
+    registry, _, _ = inputs
+    engine = copy.deepcopy(registry["engines"][0])
+    engine["evidence"] = {kind: [] for kind in module.EVIDENCE_CLASSES}
+    tracked = {}
+    bytes_that_must_not_execute = b"raise RuntimeError('inventory must never execute this file')\n"
+    for kind, relative in [("source", "code/inventory_source.py"),
+                           ("entrypoint", "code/inventory_entrypoint.py"),
+                           ("test", "tests/test_inventory_only.py")]:
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(bytes_that_must_not_execute)
+        engine["evidence"][kind] = [relative]
+        tracked[relative] = "a" * 40
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(module, "git_blob_bytes", lambda _: bytes_that_must_not_execute)
+    row = module.audit_engine(engine, tracked)
+    assert row["observed_maturity"] == "tested_implementation", "preserve the compatibility enum"
+    assert row["inventory_label"] == "Tracked source, entrypoint and test files present"
+    assert row["execution_verified_by_this_audit"] is False
+    assert row["customer_acceptance_verified_by_this_audit"] is False
+    assert row["scope"] == "tracked_file_presence_only"
 
 
 def test_public_payload_excludes_private_drive_and_branch_inventory(module, inputs):

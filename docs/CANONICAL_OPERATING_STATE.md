@@ -1,11 +1,63 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-10-07 UTC
+**State date:** 2026-10-13 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
 ## One commercial sentence
+
+### October 13 reviewer-readiness and trading repairs
+
+Founder-authorized current-source repairs advance outcome 2: one bounded external
+evaluation or paid scope. The scope includes forecasting/evidence acceptance,
+ProofLock identities, gateway serving controls and the existing trading research
+lane. It does not authorize live orders, autonomous control, paid reviewer terms
+or a scientific performance promotion.
+
+Receipt acceptance now reconciles the original five frozen-input assertions and
+26 suite assertions against the immutable protocol, including failed promotion
+facts and the later packet's referenced environment identity. Frozen scientific
+runners, inputs, outputs and dated receipts remain unchanged. The executable v2
+forecast doorway instead reviews supplied forecasts under a separately pinned
+protocol, requires complete calendar/as-of comparisons and preserves dependent
+and adverse results in HUMAN_REVIEW_HOLD. Its included fixture is synthetic.
+
+ProofLock adds explicitly versioned binary64/scalar Unicode serialization and
+real JavaScript/Python parity checks. The historical portable v1 example retains
+its bytes; nonportable v1 inputs reject. Private output routes are protected by
+the operator boundary; nginx source no longer aliases the full output directory
+as a public proof surface. Malformed filesystem paths reject without an uncaught
+traceback. These source repairs do not establish their live deployment.
+
+Gateway work is serialized through a bounded executor and protected by an owned
+native lifetime lock. A separately locked minimal reviewer serving profile has
+no legacy worker/provider graph and retains HOLD components. Full legacy provider
+closure, cross-process producer ownership and server readback remain separate
+open gates. Linux/Windows CI covers the native lifetime-lock boundary.
+
+Trading repairs remove future-wide volatility normalization and same-period
+signal accounting, retain large losses and initial-capital drawdown, reject
+nonfinite risk inputs, cap sizing to declared risk and cash after entry costs,
+and give the append-only ledger a stable projection/replay contract. Synthetic
+fixtures do not establish trading alpha, realized balances or prospective
+after-cost paper performance. Historical ledger bytes remain available and
+require broker reconciliation before any economic restatement.
+
+The existing portfolio audit now identifies its maturity labels as tracked-file
+inventory only, with execution and customer acceptance explicitly unverified.
+The priority lane points to the bounded offline forecast reviewer; historical
+market-screening components remain identified as such. An infrastructure failure
+detector and buyer-specific false-alert acceptance gate are not implemented by
+that reviewer. The existing technical-review packet is regenerated with current
+source/test identities while separately dated live observations remain dated.
+
+The reviewer guide supplies focused trading, evidence and runtime commands plus
+the full hash-locked Python 3.11.9 reproduction route. Actual source/PR/CI/release
+receipts belong to the exact reviewed commit. Source merge, signed static build,
+live static deployment and runtime installation are separate evidence states.
+Independent evaluation, accepted buyer baseline, field benefit, revenue,
+certification and valuation remain open; passing software tests do not close them.
 
 ### October 9 Wonder Studio creative-services publication
 
