@@ -155,8 +155,8 @@
     {
       "path": "tests/test_execution_accounting_regressions.py",
       "purpose": "Synthetic trading causality, risk sizing and append-only ledger regressions.",
-      "bytes": 13910,
-      "sha256": "3f97a424e49c949fbdd2067a99d1f01e76a03219fb37e595d88cd0f2ebc88896",
+      "bytes": 18631,
+      "sha256": "d3dcb240cbce10c1e5a8a807efe97488283704ce31e1058546975e3bc6387eb5",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null

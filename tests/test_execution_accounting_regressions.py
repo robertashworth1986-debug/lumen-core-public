@@ -1,8 +1,11 @@
 """Offline fixtures for causal scoring, bounded risk and append-only records."""
 import csv
+import io
 import hashlib
 import json
 import math
+import os
+import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -18,7 +21,7 @@ from execution import rolling_capital_engine, rolling_capital_engine_multi
 from execution.risk_kernel import RiskKernel, RiskState
 from execution.sizing_engine import SizingEngine, SizeInput
 from execution.liquidity_guard import LiquidityGuard, LiquiditySnapshot
-from execution.trade_ledger import TradeLedger, LEDGER_SCHEMA_VERSION
+from execution.trade_ledger import TradeLedger, LEDGER_SCHEMA_VERSION, CSV_FIELDS
 from backtest_walkforward_engine import BacktestEngine
 
 
@@ -51,6 +54,12 @@ def test_invalid_or_crossed_book_cannot_supply_liquidity(changes):
     assert not decision.pass_trade and decision.max_notional_usd == 0 and decision.score == 0
 
 
+def test_finite_large_quotes_do_not_hide_spread_by_overflowing_the_midpoint():
+    decision=LiquidityGuard().assess(LiquiditySnapshot(1e308,1.1e308,10,10,1,5))
+    assert 'wide_spread' in decision.reasons
+    assert math.isfinite(decision.score) and math.isfinite(decision.max_notional_usd)
+
+
 def sizing_input(**changes):
     return replace(SizeInput(10000, 100, 90, .01, 1, 0, urgency='ultra_aggressive', dislocation_score=1), **changes)
 
@@ -63,6 +72,11 @@ def test_size_multipliers_never_expand_declared_risk_or_remaining_heat():
     remaining = engine.size(sizing_input(portfolio_heat=.0199))
     assert remaining.risk_usd <= 10000 * (.02 - .0199)
     assert engine.size(sizing_input(portfolio_heat=.02)).qty == 0
+
+
+def test_sizing_floor_never_overrides_a_lower_declared_maximum():
+    engine=SizingEngine(max_risk_pct=.0001,max_risk_pct_floor=.0005)
+    assert 0 < engine.size(sizing_input()).risk_usd <= 10000*.0001
 
 
 def test_size_cash_reserve_includes_entry_fee_and_slippage():
@@ -132,6 +146,22 @@ def test_rolling_wrappers_use_one_canonical_scoring_implementation():
     assert rolling_capital_engine_multi.build_families is capital.build_families
     assert rolling_capital_engine.stats is capital.stats
     assert rolling_capital_engine_multi.build_strategy_returns is capital.build_strategy_returns
+
+
+@pytest.mark.parametrize('name',['rolling_capital_engine.py','rolling_capital_engine_multi.py'])
+def test_rolling_module_can_be_loaded_by_file_without_import_paths_or_side_effects(name,tmp_path,monkeypatch):
+    path=Path(__file__).resolve().parents[1]/'code'/'execution'/name
+    script='''import importlib.util,sys
+spec=importlib.util.spec_from_file_location("isolated_rolling_path_load",sys.argv[1])
+module=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+print(module.stats([-.1])["final_nav"])
+'''
+    env={key:value for key,value in os.environ.items() if key not in {'PYTHONPATH','PYTHONHOME'}}
+    result=subprocess.run([sys.executable,'-I','-W','error','-c',script,str(path)],cwd=tmp_path,env=env,capture_output=True,text=True,check=False)
+    assert result.returncode==0,result.stderr
+    assert float(result.stdout.strip())==pytest.approx(.9)
+    assert not (tmp_path/'C:').exists()
 
 
 class LastMoveStrategy:
@@ -251,6 +281,67 @@ def test_ledger_nonfinite_or_tampered_records_fail_without_appending(tmp_path):
     with pytest.raises(ValueError,match='invalid trade ledger'):
         book.append({'symbol':'TOY','pnl':2})
     assert Path(book.jsonl_path).read_bytes()==previous
+
+
+def test_verified_final_jsonl_record_without_newline_remains_appendable(tmp_path):
+    book=ledger(tmp_path)
+    first={'event_id':'one','symbol':'TOY','pnl':1}
+    digest=book.append(first)
+    original=Path(book.jsonl_path).read_bytes().rstrip(b'\r\n')
+    Path(book.jsonl_path).write_bytes(original)
+    assert book.append(first)==digest  # Retry itself leaves the verified prefix intact.
+    assert Path(book.jsonl_path).read_bytes()==original
+    book.append({'event_id':'two','symbol':'TOY','pnl':-2})
+    assert Path(book.jsonl_path).read_bytes().startswith(original+b'\n')
+    assert len(book.read_records())==2
+
+
+def test_truncated_jsonl_tail_is_rejected_without_mutating_source_or_projection(tmp_path):
+    book=ledger(tmp_path);book.append({'symbol':'TOY','pnl':1})
+    Path(book.jsonl_path).write_bytes(Path(book.jsonl_path).read_bytes()+b'{"event_id":')
+    source=Path(book.jsonl_path).read_bytes();projection=Path(book.csv_path).read_bytes()
+    with pytest.raises(ValueError,match='invalid trade ledger'):
+        book.append({'symbol':'TOY','pnl':2})
+    assert Path(book.jsonl_path).read_bytes()==source and Path(book.csv_path).read_bytes()==projection
+
+
+def test_partial_csv_row_with_a_hash_is_not_treated_as_complete(tmp_path):
+    book=ledger(tmp_path);payload={'event_id':'one','symbol':'TOY','pnl':1};digest=book.append(payload)
+    record=book.read_records()[0]
+    stream=io.StringIO(newline='');writer=csv.DictWriter(stream,fieldnames=CSV_FIELDS)
+    writer.writeheader();writer.writerow({**{key:record.get(key,'') for key in CSV_FIELDS},'record_json':''})
+    partial=stream.getvalue().rstrip('\r\n').encode()
+    Path(book.csv_path).write_bytes(partial)
+    source=Path(book.jsonl_path).read_bytes()
+    assert book.append(payload)==digest
+    assert Path(book.jsonl_path).read_bytes()==source
+    assert Path(book.csv_path).read_bytes().startswith(partial+b'\n')
+    with open(book.csv_path,newline='') as fp:
+        rows=list(csv.DictReader(fp))
+    assert rows[-1]['record_hash']==digest and json.loads(rows[-1]['record_json'])==record
+    size=Path(book.csv_path).stat().st_size
+    assert book.append(payload)==digest and Path(book.csv_path).stat().st_size==size
+
+
+def test_unclosed_csv_quotes_are_held_for_explicit_projection_reconstruction(tmp_path):
+    book=ledger(tmp_path);payload={'symbol':'TOY','pnl':1};book.append(payload)
+    data=Path(book.csv_path).read_bytes();header=data.splitlines(keepends=True)[0]
+    partial=header+b'"unterminated'
+    Path(book.csv_path).write_bytes(partial)
+    source=Path(book.jsonl_path).read_bytes()
+    with pytest.raises(ValueError,match='malformed quoted'):
+        book.append(payload)
+    assert Path(book.csv_path).read_bytes()==partial and Path(book.jsonl_path).read_bytes()==source
+
+
+def test_nested_numeric_json_keys_are_rejected_before_any_ledger_write(tmp_path):
+    book=ledger(tmp_path)
+    with pytest.raises(ValueError,match='every depth'):
+        book.append({'event_id':'a','by_day':{2:1,10:2}})
+    with pytest.raises(ValueError,match='every depth'):
+        book.append({'event_id':'b','observations':[{'bad':{1:True}}]})
+    assert not Path(book.csv_path).exists() and not Path(book.jsonl_path).exists()
+    assert not Path(book.jsonl_path+'.lock').exists()
 
 
 def test_legacy_misaligned_csv_can_be_read_from_jsonl_and_recovered_append_only(tmp_path):

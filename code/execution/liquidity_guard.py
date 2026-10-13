@@ -35,7 +35,11 @@ class LiquidityGuard:
             valid = False
         if not valid:
             return LiquidityDecision(False, 0.0, 0.0, ["invalid_liquidity_snapshot"])
-        mid = (snap.bid + snap.ask) / 2
+        # Halve before adding: two individually finite large quotes can make
+        # (bid + ask) overflow and falsely report a zero spread.
+        mid = (snap.bid / 2) + (snap.ask / 2)
+        if not math.isfinite(mid) or mid <= 0:
+            return LiquidityDecision(False, 0.0, 0.0, ["invalid_liquidity_snapshot"])
         spread_bps = ((snap.ask - snap.bid) / max(mid, 1e-9)) * 10000
         score = 1.0
 

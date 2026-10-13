@@ -100,8 +100,9 @@ class SizingEngine:
         if stop_dist <= 1e-9 or equity <= 0:
             return SizeDecision(qty=0.0, notional_usd=0.0, risk_usd=0.0, leverage_hint=1.0)
 
-        # Base risk budget with hard floor/ceiling to avoid runaway sizing.
-        risk_pct = min(max(self.max_risk_pct, self.max_risk_pct_floor), self.max_risk_pct_ceiling)
+        # The configured maximum remains a hard cap even below the suggested
+        # sizing floor; a floor must not silently increase authorized risk.
+        risk_pct = min(self.max_risk_pct, self.max_risk_pct_ceiling)
         risk_usd = equity * risk_pct
 
         # heat haircut

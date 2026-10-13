@@ -29,7 +29,7 @@ One calendar invitation already exists and is accepted. Do not send another repl
 | `evidence/public-site-deployments/1ce7c35975a4011fa844e8b39ccbc950c8c0f398/deployment-receipt.json` | Retained first-party deployment, rollback, 43-of-43 exact live-byte, and read-only audit receipt for the named static release only. | `FILE_PRESENT` | `d70224cc048de288540f1b04bb75ca5cef3ec01756ef9e965e559269f2ae1930` |
 | `docs/REVIEWER_START_HERE.md` | Current-source reproduction route, dated repair scope and remaining gates. | `FILE_PRESENT` | `6404f23e86f889b43e2bcaef9e0146552d31852d26457b5c4dffb6942598fbfd` |
 | `docs/FORECAST_EVALUATION_V2_REVIEW.md` | Versioned calendar-keyed review of precomputed forecasts; synthetic fixture remains HOLD. | `FILE_PRESENT` | `98b30bac2fcb67cbde04c4b13e64f7faaa503ec8fd01727841e102806902a5fd` |
-| `tests/test_execution_accounting_regressions.py` | Synthetic trading causality, risk sizing and append-only ledger regressions. | `FILE_PRESENT` | `3f97a424e49c949fbdd2067a99d1f01e76a03219fb37e595d88cd0f2ebc88896` |
+| `tests/test_execution_accounting_regressions.py` | Synthetic trading causality, risk sizing and append-only ledger regressions. | `FILE_PRESENT` | `d3dcb240cbce10c1e5a8a807efe97488283704ce31e1058546975e3bc6387eb5` |
 | `tests/test_prooflock_canonicalization_parity.py` | Actual JavaScript/Python receipt serialization parity and strict raw-input checks. | `FILE_PRESENT` | `3b6acfb15c2df4443897668737f8653f34a8bad1caaae1f8828f022de125d903` |
 
 The receipt statuses above are bounded first-party or operator-controlled evidence. Their own claim boundaries remain controlling.

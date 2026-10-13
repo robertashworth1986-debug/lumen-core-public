@@ -8,8 +8,17 @@ import json
 import time
 try:
     from .capital_engine_core import build_families, stats, build_strategy_returns, safe_series
-except ImportError:  # Direct execution from this directory.
-    from capital_engine_core import build_families, stats, build_strategy_returns, safe_series
+except ImportError:  # Script/path-based loading without changing global import paths.
+    import importlib.util
+    _core_spec = importlib.util.spec_from_file_location(
+        "_lumencore_capital_engine_core", Path(__file__).with_name("capital_engine_core.py")
+    )
+    _core = importlib.util.module_from_spec(_core_spec)
+    _core_spec.loader.exec_module(_core)
+    build_families = _core.build_families
+    stats = _core.stats
+    build_strategy_returns = _core.build_strategy_returns
+    safe_series = _core.safe_series
 
 OUT = Path(r"C:/LumaTrader/rolling_capital")
 

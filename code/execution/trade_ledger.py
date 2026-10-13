@@ -25,7 +25,29 @@ _METADATA = {"ledger_schema_version", "logged_utc", "event_payload_sha256", "rec
 
 
 def _canonical(row):
+    _validate_text_keys(row)
     return json.dumps(row, sort_keys=True, allow_nan=False)
+
+
+def _validate_text_keys(value):
+    """JSON coerces numeric object keys, which would invalidate later hashes."""
+    if isinstance(value, dict):
+        if any(not isinstance(key, str) for key in value):
+            raise ValueError("trade ledger JSON object keys must be text at every depth")
+        for item in value.values():
+            _validate_text_keys(item)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _validate_text_keys(item)
+
+
+def _needs_line_terminator(path):
+    path = Path(path)
+    if not path.exists() or path.stat().st_size == 0:
+        return False
+    with path.open("rb") as stream:
+        stream.seek(-1, os.SEEK_END)
+        return stream.read(1) != b"\n"
 
 
 def _payload_hash(row):
@@ -93,16 +115,41 @@ class TradeLedger:
                 records.append(row)
         return records
 
-    def _csv_projection(self):
+    def _csv_projection(self, records):
         path = Path(self.csv_path)
         if not path.exists() or path.stat().st_size == 0:
             return list(CSV_FIELDS), set(), True
         with path.open("r", newline="", encoding="utf-8") as stream:
-            reader = csv.DictReader(stream)
+            reader = csv.DictReader(stream, strict=True)
             header = reader.fieldnames
             if not header or len(set(header)) != len(header) or "record_hash" not in header:
                 raise ValueError("existing CSV requires a unique header with record_hash")
-            hashes = {row.get("record_hash") for row in reader if row.get("record_hash")}
+            known_records = {record["record_hash"]: record for record in records}
+            hashes = set()
+            try:
+                for row in reader:
+                    record_hash = row.get("record_hash")
+                    expected = known_records.get(record_hash)
+                    if expected is None or None in row:
+                        continue
+                    # A hash cell can precede the interrupted part of a CSV
+                    # write. Accept only an entire canonical projection.
+                    matches = True
+                    for key in header:
+                        if key == "record_json":
+                            try:
+                                matches = _canonical(json.loads(row.get(key) or "")) == _canonical(expected)
+                            except (ValueError, TypeError):
+                                matches = False
+                        else:
+                            value = expected.get(key, "")
+                            matches = row.get(key) == ("" if value is None else str(value))
+                        if not matches:
+                            break
+                    if matches:
+                        hashes.add(record_hash)
+            except csv.Error as exc:
+                raise ValueError("existing CSV has malformed quoted fields; preserve it and reconstruct a separate projection from JSONL") from exc
         return header, hashes, False
 
     def _append_csv(self, record, header, write_header):
@@ -111,7 +158,10 @@ class TradeLedger:
         if "record_json" in header:
             projected["record_json"] = _canonical(record)
         Path(self.csv_path).parent.mkdir(parents=True, exist_ok=True)
+        needs_terminator = _needs_line_terminator(self.csv_path)
         with open(self.csv_path, "a", newline="", encoding="utf-8") as stream:
+            if needs_terminator:
+                stream.write("\n")
             writer = csv.DictWriter(stream, fieldnames=header)
             if write_header:
                 writer.writeheader()
@@ -128,7 +178,7 @@ class TradeLedger:
         payload_digest = _payload_hash(payload)  # Reject NaN/Infinity before any write.
         with self._lock():
             records = self.read_records()
-            header, projected_hashes, write_header = self._csv_projection()
+            header, projected_hashes, write_header = self._csv_projection(records)
             event_id = payload.get("event_id")
             existing = None
             for record in records:
@@ -152,7 +202,12 @@ class TradeLedger:
             digest = hashlib.sha256(_canonical(record).encode("utf-8")).hexdigest()
             record["record_hash"] = digest
             Path(self.jsonl_path).parent.mkdir(parents=True, exist_ok=True)
+            needs_terminator = _needs_line_terminator(self.jsonl_path)
             with open(self.jsonl_path, "a", encoding="utf-8") as stream:
+                # read_records() already verified every existing source object.
+                # Adding its missing terminator preserves the original prefix.
+                if needs_terminator:
+                    stream.write("\n")
                 stream.write(_canonical(record) + "\n")
                 stream.flush()
                 os.fsync(stream.fileno())
