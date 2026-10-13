@@ -42,7 +42,8 @@ jobs:
         with:
           python-version: '3.11.9'
       - name: Install hash-locked test tools
-        run: python -m pip install --require-hashes --only-binary=:all: -r requirements-windows-paper-runner-py311.lock
+        run: |
+          python -m pip install --require-hashes --only-binary=:all: -r requirements-windows-paper-runner-py311.lock
       - name: Exercise actual POSIX or Windows lock implementation
         run: python -m pytest -q -rs tests/test_gateway_lifetime_lock.py --junitxml=out/gateway-runtime/native-lock.xml
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
