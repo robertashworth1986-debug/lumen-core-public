@@ -236,6 +236,7 @@ class ProofCapsuleVerifierTests(unittest.TestCase):
             for error in (
                 OSError(errno.ENAMETOOLONG, "path is too long"),
                 RuntimeError("symlink loop"),
+                ValueError("stat: path too long for Windows"),
             ):
                 with self.subTest(target=target, error=type(error).__name__):
                     def fail_resolve(path, *args, **kwargs):

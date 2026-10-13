@@ -19,7 +19,7 @@ One calendar invitation already exists and is accepted. Do not send another repl
 | `QUICKSTART.md` | Five-minute public reproduction entry point. | `FILE_PRESENT` | `25c607878d731a5c36cba4866d352e318e5c4f4c11b5a64279942b35ca7f12db` |
 | `docs/PROOF_CAPSULE_SCHEMA.md` | Proof Capsule field, hash, and verification contract. | `FILE_PRESENT` | `c291967c831818ee490a8d2bbe8aadb45610b7b4688f3f9847245d492b4b928a` |
 | `examples/proof_capsule/dice_eia_public_capsule.json` | Concrete bounded public-data capsule example. | `FILE_PRESENT` | `8376af18ca354d25b34cdd08d15a0df1d814fc5a0915f981b06318ca2e9bf250` |
-| `code/proof_capsule_verifier.py` | Local verifier used to inspect capsule integrity. | `FILE_PRESENT` | `ad22f500338b083f1f9787bfecae2964dc2493b5935cf72f2fcf9c5b01910655` |
+| `code/proof_capsule_verifier.py` | Local verifier used to inspect capsule integrity. | `FILE_PRESENT` | `49e263e5e577870cf2362ff7c389c935f6daa968177834c5d015758c66c98be8` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json` | Bounded first-party reproducibility receipt. | `BOUNDED_REPRODUCIBILITY_PASS` | `3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json` | Recorded first-party reviewer runtime receipt. | `AUTHORITATIVE_RUNTIME_PASS` | `6908148d421a10f9592c7a9a5ccd4283cd66f3147b33b6381e27ddae9577ab8c` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json` | Operator-controlled container rebuild receipt. | `OPERATOR_CONTAINER_REBUILD_PASS` | `188d62b4b36d1dc417801d630782632a542de64312ce77e796a1517282c8a916` |

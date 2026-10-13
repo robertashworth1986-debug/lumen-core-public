@@ -527,7 +527,9 @@ def _safe_path(root: Path, raw_path: str) -> tuple[str, Path]:
                     f"manifest path must not traverse a symlink: {raw_path}"
                 )
         candidate = candidate_unresolved.resolve()
-    except (OSError, RuntimeError) as exc:
+    except CapsuleError:
+        raise
+    except (OSError, RuntimeError, ValueError) as exc:
         raise CapsuleError(f"cannot resolve manifest path {raw_path}: {exc}") from exc
     if candidate != root and root not in candidate.parents:
         raise CapsuleError(f"manifest path escapes root: {raw_path}")
@@ -703,7 +705,9 @@ def validate_capsule(
     try:
         root_resolved = root.resolve(strict=True)
         root_is_dir = root_resolved.is_dir()
-    except (OSError, RuntimeError) as exc:
+    except CapsuleError:
+        raise
+    except (OSError, RuntimeError, ValueError) as exc:
         raise CapsuleError(f"cannot resolve repository root: {exc}") from exc
     if not root_is_dir:
         raise CapsuleError("repository root must be a directory")
