@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import atexit
 import asyncio
 import copy
 import csv
@@ -12,15 +11,18 @@ import os
 import random
 import re
 import subprocess
+import stat
 import sys
 import threading
 import time
 from contextlib import asynccontextmanager
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone, timedelta
+from functools import wraps
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -98,21 +100,220 @@ ROOT = _resolve_stack_root()
 CODE = ROOT / "code"
 DASH = _resolve_dashboard_dir(ROOT)
 
-# ── Singleton lock — prevent duplicate gateway processes ─────────────────────
+# The PID remains a diagnostic record. A persistent OS-lock file owns exclusion;
+# neither file is deleted on shutdown, which avoids replacement-owner races.
 _GATEWAY_LOCK = ROOT / "run" / "luma_experience_gateway.lock"
-_GATEWAY_LOCK.parent.mkdir(parents=True, exist_ok=True)
-if _GATEWAY_LOCK.exists():
-    try:
-        _existing_pid = int(_GATEWAY_LOCK.read_text().strip())
-        if _existing_pid != os.getpid():
-            os.kill(_existing_pid, 0)  # raises OSError if the process is gone
-            print(f"[singleton] luma_experience_gateway already running as PID {_existing_pid} — exiting.", flush=True)
-            raise SystemExit(0)
-    except (ValueError, OSError, SystemError):
-        pass  # stale lock
-_GATEWAY_LOCK.write_text(str(os.getpid()))
-atexit.register(lambda: _GATEWAY_LOCK.unlink(missing_ok=True))
-# ─────────────────────────────────────────────────────────────────────────────
+
+
+class GatewayAlreadyRunning(RuntimeError):
+    """Another process owns the gateway lifetime lock."""
+
+
+class GatewayLifetimeLock:
+    """Non-blocking POSIX/Windows lock acquired only during explicit startup.
+
+    The guard inode is persistent: unlinking an advisory-lock file would allow
+    a second process to lock a different inode. The separate integer PID file
+    preserves the existing diagnostic format and is never removed by cleanup.
+    """
+
+    def __init__(self, pid_path: Path) -> None:
+        self.pid_path = pid_path
+        self.guard_path = pid_path.with_name(pid_path.name + ".guard")
+        self._fd: int | None = None
+
+    @staticmethod
+    def _prior_pid_is_running(pid: int) -> bool:
+        if os.name == "nt":
+            # os.kill(pid, 0) is not a portable Windows liveness probe.
+            import ctypes
+            from ctypes import wintypes
+
+            kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+            kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+            kernel.OpenProcess.restype = wintypes.HANDLE
+            kernel.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+            kernel.GetExitCodeProcess.restype = wintypes.BOOL
+            kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+            kernel.CloseHandle.restype = wintypes.BOOL
+            handle = kernel.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION
+            if not handle:
+                error = ctypes.get_last_error()
+                if error == 87:  # ERROR_INVALID_PARAMETER: no such PID.
+                    return False
+                if error == 5:  # Access denied cannot rule out a live owner.
+                    return True
+                raise OSError(error, "cannot inspect prior gateway PID")
+            try:
+                code = wintypes.DWORD()
+                if not kernel.GetExitCodeProcess(handle, ctypes.byref(code)):
+                    raise OSError(ctypes.get_last_error(), "cannot inspect prior gateway PID")
+                return code.value == 259  # STILL_ACTIVE
+            finally:
+                kernel.CloseHandle(handle)
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
+        return True
+
+    def acquire(self) -> None:
+        if self._fd is not None:
+            raise RuntimeError("gateway lifetime lock already acquired")
+        self.pid_path.parent.mkdir(parents=True, exist_ok=True)
+        if self.guard_path.is_symlink() or self.pid_path.is_symlink():
+            raise RuntimeError("gateway lock paths must not be symbolic links")
+        if self.pid_path.exists() and not self.pid_path.is_file():
+            raise RuntimeError("gateway PID record must be a regular file")
+        flags = os.O_CREAT | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0)
+        fd = os.open(self.guard_path, flags, 0o600)
+        try:
+            if not stat.S_ISREG(os.fstat(fd).st_mode):
+                raise RuntimeError("gateway guard must be a regular file")
+            os.set_inheritable(fd, False)
+            if os.name == "nt":
+                import msvcrt
+
+                # Windows byte-range locking also works beyond EOF.
+                os.lseek(fd, 0, os.SEEK_SET)
+                msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+            elif os.name == "posix":
+                import fcntl
+
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            else:
+                raise RuntimeError("gateway lifetime locking requires POSIX or Windows")
+        except OSError as exc:
+            os.close(fd)
+            raise GatewayAlreadyRunning("gateway lifetime lock unavailable") from exc
+        except BaseException:
+            os.close(fd)
+            raise
+        self._fd = fd
+        try:
+            # Do not coexist with a pre-upgrade gateway that only wrote a PID.
+            try:
+                prior_pid = int(self.pid_path.read_text(encoding="ascii").strip())
+            except (OSError, ValueError, UnicodeError):
+                prior_pid = 0
+            if prior_pid > 0 and prior_pid != os.getpid():
+                if self._prior_pid_is_running(prior_pid):
+                    raise GatewayAlreadyRunning("prior gateway PID is still running")
+            pid_flags = os.O_CREAT | os.O_WRONLY | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0)
+            pid_fd = os.open(self.pid_path, pid_flags, 0o600)
+            with os.fdopen(pid_fd, "w", encoding="ascii") as stream:
+                stream.write(str(os.getpid()))
+        except BaseException:
+            self.release()
+            raise
+
+    def release(self) -> None:
+        fd, self._fd = self._fd, None
+        if fd is None:
+            return
+        try:
+            if os.name == "nt":
+                import msvcrt
+
+                os.lseek(fd, 0, os.SEEK_SET)
+                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(fd, fcntl.LOCK_UN)
+        finally:
+            os.close(fd)
+
+
+_GATEWAY_STATE_LOCK = threading.RLock()
+_GATEWAY_BLOCKING_QUEUE = None
+
+
+def _serialized_gateway_state(function):
+    """Serialize complete in-process state transactions, including sync routes."""
+    @wraps(function)
+    def guarded(*args, **kwargs):
+        with _GATEWAY_STATE_LOCK:
+            return function(*args, **kwargs)
+
+    return guarded
+
+
+class GatewayBlockingQueue:
+    """Bounded queue with one owned thread; canceled queued work is discarded.
+
+    A running synchronous call cannot be force-killed safely. Shutdown waits
+    for it before releasing the process lock; existing transport timeouts remain.
+    This is in-process serialization, not coordination with external producers.
+    """
+
+    def __init__(self, max_pending: int = 16) -> None:
+        if isinstance(max_pending, bool) or not isinstance(max_pending, int) or max_pending < 1:
+            raise ValueError("max_pending must be a positive integer")
+        self._queue = asyncio.Queue(maxsize=max_pending)
+        self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="luma-gateway")
+        self._closed = False
+        self._consumer = asyncio.create_task(self._consume())
+
+    async def run(self, function, *args, **kwargs):
+        if self._closed:
+            raise HTTPException(status_code=503, detail="gateway worker unavailable")
+        future = asyncio.get_running_loop().create_future()
+        try:
+            self._queue.put_nowait((future, function, args, kwargs))
+        except asyncio.QueueFull as exc:
+            raise HTTPException(status_code=503, detail="gateway worker busy") from exc
+        return await future
+
+    async def _consume(self) -> None:
+        loop = asyncio.get_running_loop()
+        while True:
+            item = await self._queue.get()
+            if item is None:
+                self._queue.task_done()
+                return
+            future, function, args, kwargs = item
+            try:
+                if future.cancelled():
+                    continue
+                result = await loop.run_in_executor(
+                    self._executor,
+                    lambda: _serialized_gateway_state(function)(*args, **kwargs),
+                )
+                if not future.done():
+                    future.set_result(result)
+            except Exception as exc:
+                if not future.done():
+                    future.set_exception(exc)
+            finally:
+                self._queue.task_done()
+
+    async def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
+        # Refuse queued callbacks; preserve any already-running transaction.
+        while True:
+            try:
+                item = self._queue.get_nowait()
+            except asyncio.QueueEmpty:
+                break
+            if item is not None:
+                future = item[0]
+                if not future.done():
+                    future.set_exception(HTTPException(status_code=503, detail="gateway worker stopping"))
+            self._queue.task_done()
+        self._queue.put_nowait(None)
+        await self._consumer
+        await asyncio.to_thread(self._executor.shutdown, wait=True, cancel_futures=True)
+
+
+async def _run_gateway_blocking(function, *args, **kwargs):
+    if _GATEWAY_BLOCKING_QUEUE is None:
+        raise HTTPException(status_code=503, detail="gateway worker unavailable")
+    return await _GATEWAY_BLOCKING_QUEUE.run(function, *args, **kwargs)
 
 OUT = ROOT / "out"
 EXEC_OUT = OUT / "execution"
@@ -1775,9 +1976,15 @@ class ConnectionManager:
 
 @asynccontextmanager
 async def gateway_lifespan(app: FastAPI):
-    DASH.mkdir(parents=True, exist_ok=True)
+    global _GATEWAY_BLOCKING_QUEUE
+    lifetime_lock = GatewayLifetimeLock(_GATEWAY_LOCK)
+    lifetime_lock.acquire()
+    blocking_queue = None
     tasks: list[asyncio.Task[None]] = []
     try:
+        DASH.mkdir(parents=True, exist_ok=True)
+        blocking_queue = GatewayBlockingQueue()
+        _GATEWAY_BLOCKING_QUEUE = blocking_queue
         # Resolve the workers at startup, after the module has finished loading.
         for worker in (
             broadcaster,
@@ -1790,9 +1997,30 @@ async def gateway_lifespan(app: FastAPI):
             tasks.append(asyncio.create_task(worker()))
         yield
     finally:
-        for task in tasks:
-            task.cancel()
-        await asyncio.gather(*tasks, return_exceptions=True)
+        try:
+            async def finish_shutdown():
+                for task in tasks:
+                    task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
+                if blocking_queue is not None:
+                    await blocking_queue.close()
+
+            # Repeated cancellation must not release the lifetime lock while
+            # an already-running thread can still write a state transaction.
+            cleanup = asyncio.create_task(finish_shutdown())
+            interrupted = False
+            while not cleanup.done():
+                try:
+                    await asyncio.shield(cleanup)
+                except asyncio.CancelledError:
+                    interrupted = True
+            cleanup.result()
+            if interrupted:
+                raise asyncio.CancelledError
+        finally:
+            if _GATEWAY_BLOCKING_QUEUE is blocking_queue:
+                _GATEWAY_BLOCKING_QUEUE = None
+            lifetime_lock.release()
 
 
 app = FastAPI(
@@ -1809,39 +2037,53 @@ app.add_middleware(
 if _PROMETHEUS_AVAILABLE:
     _PrometheusInstrumentator().instrument(app).expose(app, endpoint="/metrics")
 
+# Mounting means the router imported, not that its data/model/provider works.
+# The authenticated operator health route exposes these scoped HOLD states.
+GATEWAY_OPTIONAL_COMPONENTS: dict[str, dict[str, str]] = {}
+
 # LinkedIn auth router (no-ops gracefully when LINKEDIN_CLIENT_ID is missing)
 try:
     from linkedin_router import router as _linkedin_router  # type: ignore
     app.include_router(_linkedin_router)
+    GATEWAY_OPTIONAL_COMPONENTS["linkedin"] = {"state": "HOLD", "import_status": "mounted", "operational_validation": "not_established"}
 except Exception as _li_err:  # pragma: no cover
+    GATEWAY_OPTIONAL_COMPONENTS["linkedin"] = {"state": "HOLD", "import_status": "unavailable", "operational_validation": "not_established"}
     log.warning("linkedin_router not mounted: %s", _li_err)
 
 # Forecast API (innovation #3) — serves router-chosen forecasts with CI bands
 try:
     from forecast_api import router as _forecast_router  # type: ignore
     app.include_router(_forecast_router)
+    GATEWAY_OPTIONAL_COMPONENTS["forecast"] = {"state": "HOLD", "import_status": "mounted", "operational_validation": "not_established"}
 except Exception as _fc_err:  # pragma: no cover
+    GATEWAY_OPTIONAL_COMPONENTS["forecast"] = {"state": "HOLD", "import_status": "unavailable", "operational_validation": "not_established"}
     log.warning("forecast_api not mounted: %s", _fc_err)
 
 # Grants API (innovation #15) — grant application factory
 try:
     from grants_api import router as _grants_router  # type: ignore
     app.include_router(_grants_router)
+    GATEWAY_OPTIONAL_COMPONENTS["grants"] = {"state": "HOLD", "import_status": "mounted", "operational_validation": "not_established"}
 except Exception as _gr_err:  # pragma: no cover
+    GATEWAY_OPTIONAL_COMPONENTS["grants"] = {"state": "HOLD", "import_status": "unavailable", "operational_validation": "not_established"}
     log.warning("grants_api not mounted: %s", _gr_err)
 
 # Opportunities API — federal grant/contract harvester + filler bot
 try:
     from opportunities_api import router as _opps_router  # type: ignore
     app.include_router(_opps_router)
+    GATEWAY_OPTIONAL_COMPONENTS["opportunities"] = {"state": "HOLD", "import_status": "mounted", "operational_validation": "not_established"}
 except Exception as _op_err:  # pragma: no cover
+    GATEWAY_OPTIONAL_COMPONENTS["opportunities"] = {"state": "HOLD", "import_status": "unavailable", "operational_validation": "not_established"}
     log.warning("opportunities_api not mounted: %s", _op_err)
 
 # Autonomous Agent Manifest — unified human-in-the-loop approval queue
 try:
     from autonomous_agent_manifest import router as _agents_router  # type: ignore
     app.include_router(_agents_router)
+    GATEWAY_OPTIONAL_COMPONENTS["agents"] = {"state": "HOLD", "import_status": "mounted", "operational_validation": "not_established"}
 except Exception as _ag_err:  # pragma: no cover
+    GATEWAY_OPTIONAL_COMPONENTS["agents"] = {"state": "HOLD", "import_status": "unavailable", "operational_validation": "not_established"}
     log.warning("autonomous_agent_manifest not mounted: %s", _ag_err)
 
 manager = ConnectionManager()
@@ -4074,7 +4316,7 @@ async def ws_live_legacy(websocket: WebSocket) -> None:
 async def broadcaster() -> None:
     while True:
         try:
-            payload = {"type": "snapshot", "data": build_snapshot()}
+            payload = {"type": "snapshot", "data": await _run_gateway_blocking(build_snapshot)}
             await manager.broadcast(payload)
         except Exception:
             pass
@@ -4142,7 +4384,7 @@ async def _kraken_equity_sampler() -> None:
     while True:
         snap_ok = False
         try:
-            snap = await asyncio.to_thread(_build_kraken_equity_snapshot)
+            snap = await _run_gateway_blocking(_build_kraken_equity_snapshot)
             snap_ok = bool(snap and snap.get("ok"))
         except Exception:
             pass
@@ -5455,6 +5697,7 @@ def _kraken_add_order(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 @app.get("/api/master/approval-queue")
+@_serialized_gateway_state
 def master_approval_queue() -> dict[str, Any]:
     """Live approval queue with per-ticket guard evaluation. Auto-stales >24h tickets."""
     flags = _load_control_flags()
@@ -5515,6 +5758,7 @@ class ApprovalDecideRequest(BaseModel):
 
 
 @app.post("/api/master/approval/decide")
+@_serialized_gateway_state
 def master_approval_decide(req: ApprovalDecideRequest) -> dict[str, Any]:
     """
     Approve or reject a pending ticket.
@@ -5713,6 +5957,7 @@ def master_approval_decide(req: ApprovalDecideRequest) -> dict[str, Any]:
 # AUTO-TICKET PRODUCER bridge — one-click "Scan & Refill" from dashboard
 # ───────────────────────────────────────────────────────────────────────
 @app.post("/api/master/approval/scan-refill")
+@_serialized_gateway_state
 def master_scan_refill(req: dict | None = None) -> dict[str, Any]:
     """Emit fresh PENDING tickets from the latest spike-hunter cache.
 
@@ -6530,6 +6775,7 @@ def _build_kraken_equity_snapshot() -> dict[str, Any]:
 
 
 @app.get("/api/kraken/balance")
+@_serialized_gateway_state
 def api_kraken_balance(force: int = 0):
     now = time.time()
     cached = _KRAKEN_BAL_CACHE.get("data")
@@ -6910,6 +7156,11 @@ async def api_sells_config_set(request: Request) -> dict[str, Any]:
     body = await request.json()
     if not isinstance(body, dict):
         return {"ok": False, "error": "body must be object"}
+    return await _run_gateway_blocking(_patch_profit_lock_config, body)
+
+
+@_serialized_gateway_state
+def _patch_profit_lock_config(body: dict[str, Any]) -> dict[str, Any]:
     cfg = _load_profit_lock_cfg()
     # Whitelist update
     for k in PROFIT_LOCK_DEFAULT.keys():
@@ -6920,6 +7171,7 @@ async def api_sells_config_set(request: Request) -> dict[str, Any]:
 
 
 @app.get("/api/sells/candidates")
+@_serialized_gateway_state
 def api_sells_candidates() -> dict[str, Any]:
     """Preview profit-lock decisions for every open lot. No tickets created."""
     cfg = _load_profit_lock_cfg()
@@ -6973,6 +7225,11 @@ async def api_sells_lock_in(request: Request) -> dict[str, Any]:
         body = await request.json()
     except Exception:
         body = {}
+    return await _run_gateway_blocking(_sells_lock_in, body)
+
+
+@_serialized_gateway_state
+def _sells_lock_in(body: dict[str, Any]) -> dict[str, Any]:
     target_txid = str(body.get("txid") or "").strip()
     do_all = bool(body.get("all"))
     force = bool(body.get("force"))   # bypass cooldown / action gate (manual click)
@@ -7071,87 +7328,101 @@ _PROFIT_LOCK_STATE: dict[str, Any] = {
 
 
 @app.get("/api/sells/watcher/status")
+@_serialized_gateway_state
 def api_sells_watcher_status() -> dict[str, Any]:
     s = dict(_PROFIT_LOCK_STATE)
     s["config"] = _load_profit_lock_cfg()
     return s
 
 
+@_serialized_gateway_state
+def _profit_lock_tick() -> int:
+    """Run the existing scan and ticket transaction in the serialized worker."""
+    interval = 30
+    try:
+        cfg = _load_profit_lock_cfg()
+        interval = max(1, int(cfg.get("scan_interval_s") or 30))
+        if not bool(cfg.get("enabled")):
+            _PROFIT_LOCK_STATE["last_scan_utc"] = now_utc()
+            _PROFIT_LOCK_STATE["last_scan_actionable"] = 0
+            return interval
+        # Scan
+        preview = api_sells_candidates()
+        actionable = int(preview.get("actionable_count") or 0)
+        _PROFIT_LOCK_STATE["last_scan_utc"] = now_utc()
+        _PROFIT_LOCK_STATE["last_scan_actionable"] = actionable
+        if actionable > 0:
+            # Re-use the lock_in path for {'all': true}
+            upnl = api_kraken_unrealized()
+            peaks = _load_peaks()
+            queue = _load_approval_queue()
+            balance_snap = api_kraken_balance(force=0)
+            cooldown = int(cfg.get("ticket_cooldown_s") or 600)
+            recent_by_src: dict[str, float] = {}
+            for t in queue:
+                if str(t.get("side", "")).lower() != "sell":
+                    continue
+                state = str(t.get("approval_state") or "").upper()
+                if state in ("CANCELLED", "EXPIRED"):
+                    continue
+                src = str(t.get("source_txid") or "")
+                if not src:
+                    continue
+                try:
+                    dt = datetime.fromisoformat(str(t.get("timestamp", "")).replace("Z", "+00:00"))
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    age_s = (datetime.now(timezone.utc) - dt).total_seconds()
+                except Exception:
+                    age_s = 1e9
+                recent_by_src[src] = min(recent_by_src.get(src, 1e9), age_s)
+            created = 0
+            for lot in upnl.get("lots") or []:
+                tx = str(lot.get("txid") or "")
+                decision = _evaluate_lot_exit(lot, cfg, peaks.get(tx, {}))
+                if decision.get("action") not in ("lock_in", "trail_stop", "hard_stop"):
+                    continue
+                if recent_by_src.get(tx, 1e9) < cooldown:
+                    continue
+
+                sell_check = _sell_balance_precheck(
+                    str(lot.get("pair") or ""),
+                    lot.get("qty"),
+                    balance_snapshot=balance_snap,
+                )
+                if not bool(sell_check.get("ok", True)):
+                    continue
+
+                queue.append(_build_sell_ticket(lot, decision, note_prefix="profit_lock_auto"))
+                created += 1
+                _PROFIT_LOCK_STATE["last_decision"] = {
+                    "ts": now_utc(),
+                    "txid": tx,
+                    "pair": lot.get("pair"),
+                    "tier": decision.get("tier"),
+                    "reason": decision.get("reason"),
+                }
+            if created:
+                _save_approval_queue(queue)
+                _PROFIT_LOCK_STATE["tickets_created_total"] = int(_PROFIT_LOCK_STATE.get("tickets_created_total") or 0) + created
+    except Exception as exc:
+        _PROFIT_LOCK_STATE["last_error"] = _record_internal_failure(
+            "profit_lock_watcher_failed", exc
+        )
+    return interval
+
+
 async def _profit_lock_watcher() -> None:
     _PROFIT_LOCK_STATE["started_utc"] = now_utc()
     while True:
         try:
-            cfg = _load_profit_lock_cfg()
-            interval = int(cfg.get("scan_interval_s") or 30)
-            if not bool(cfg.get("enabled")):
-                _PROFIT_LOCK_STATE["last_scan_utc"] = now_utc()
-                _PROFIT_LOCK_STATE["last_scan_actionable"] = 0
-                await asyncio.sleep(interval)
-                continue
-            # Scan
-            preview = api_sells_candidates()
-            actionable = int(preview.get("actionable_count") or 0)
-            _PROFIT_LOCK_STATE["last_scan_utc"] = now_utc()
-            _PROFIT_LOCK_STATE["last_scan_actionable"] = actionable
-            if actionable > 0:
-                # Re-use the lock_in path for {'all': true}
-                upnl = api_kraken_unrealized()
-                peaks = _load_peaks()
-                queue = _load_approval_queue()
-                balance_snap = api_kraken_balance(force=0)
-                cooldown = int(cfg.get("ticket_cooldown_s") or 600)
-                recent_by_src: dict[str, float] = {}
-                for t in queue:
-                    if str(t.get("side", "")).lower() != "sell":
-                        continue
-                    state = str(t.get("approval_state") or "").upper()
-                    if state in ("CANCELLED", "EXPIRED"):
-                        continue
-                    src = str(t.get("source_txid") or "")
-                    if not src:
-                        continue
-                    try:
-                        dt = datetime.fromisoformat(str(t.get("timestamp", "")).replace("Z", "+00:00"))
-                        if dt.tzinfo is None:
-                            dt = dt.replace(tzinfo=timezone.utc)
-                        age_s = (datetime.now(timezone.utc) - dt).total_seconds()
-                    except Exception:
-                        age_s = 1e9
-                    recent_by_src[src] = min(recent_by_src.get(src, 1e9), age_s)
-                created = 0
-                for lot in upnl.get("lots") or []:
-                    tx = str(lot.get("txid") or "")
-                    decision = _evaluate_lot_exit(lot, cfg, peaks.get(tx, {}))
-                    if decision.get("action") not in ("lock_in", "trail_stop", "hard_stop"):
-                        continue
-                    if recent_by_src.get(tx, 1e9) < cooldown:
-                        continue
-
-                    sell_check = _sell_balance_precheck(
-                        str(lot.get("pair") or ""),
-                        lot.get("qty"),
-                        balance_snapshot=balance_snap,
-                    )
-                    if not bool(sell_check.get("ok", True)):
-                        continue
-
-                    queue.append(_build_sell_ticket(lot, decision, note_prefix="profit_lock_auto"))
-                    created += 1
-                    _PROFIT_LOCK_STATE["last_decision"] = {
-                        "ts": now_utc(),
-                        "txid": tx,
-                        "pair": lot.get("pair"),
-                        "tier": decision.get("tier"),
-                        "reason": decision.get("reason"),
-                    }
-                if created:
-                    _save_approval_queue(queue)
-                    _PROFIT_LOCK_STATE["tickets_created_total"] = int(_PROFIT_LOCK_STATE.get("tickets_created_total") or 0) + created
+            interval = await _run_gateway_blocking(_profit_lock_tick)
         except Exception as exc:
+            interval = 30
             _PROFIT_LOCK_STATE["last_error"] = _record_internal_failure(
                 "profit_lock_watcher_failed", exc
             )
-        await asyncio.sleep(int((_load_profit_lock_cfg().get("scan_interval_s") or 30)))
+        await asyncio.sleep(interval)
 
 
 # =============================================================================
@@ -7726,6 +7997,7 @@ def _start_alpha_scan(cfg: dict[str, Any], reason: str) -> dict[str, Any]:
         }
 
 
+@_serialized_gateway_state
 def _smart_scanner_tick(force: bool = False, run_spike: bool = True, run_alpha: bool = True) -> dict[str, Any]:
     cfg = _load_smart_scanner_cfg()
     _poll_alpha_scan_process()
@@ -7790,6 +8062,11 @@ async def api_smart_scanner_set_config(req: Request) -> dict[str, Any]:
     body = await req.json()
     if not isinstance(body, dict):
         return {"ok": False, "error": "expected JSON object"}
+    return await _run_gateway_blocking(_patch_smart_scanner_config, body)
+
+
+@_serialized_gateway_state
+def _patch_smart_scanner_config(body: dict[str, Any]) -> dict[str, Any]:
     cfg = _load_smart_scanner_cfg()
     for key in SMART_SCANNER_DEFAULT.keys():
         if key in body:
@@ -7811,11 +8088,14 @@ async def api_smart_scanner_run(req: Request) -> dict[str, Any]:
     return {
         "ok": True,
         "ts": now_utc(),
-        "result": _smart_scanner_tick(force=force, run_spike=run_spike, run_alpha=run_alpha),
+        "result": await _run_gateway_blocking(
+            _smart_scanner_tick, force=force, run_spike=run_spike, run_alpha=run_alpha
+        ),
     }
 
 
 @app.get("/api/scanner/smart/status")
+@_serialized_gateway_state
 def api_smart_scanner_status() -> dict[str, Any]:
     _poll_alpha_scan_process()
     cfg = _load_smart_scanner_cfg()
@@ -7844,7 +8124,9 @@ async def _smart_scanner_watcher() -> None:
     while True:
         sleep_s = 30
         try:
-            tick = _smart_scanner_tick(force=False, run_spike=True, run_alpha=True)
+            tick = await _run_gateway_blocking(
+                _smart_scanner_tick, force=False, run_spike=True, run_alpha=True
+            )
             sleep_s = max(10, int(tick.get("effective_interval_s") or 30))
         except Exception as exc:
             _SMART_SCANNER_STATE["last_error"] = _record_internal_failure(
@@ -7897,6 +8179,7 @@ def _check_circuit_breaker(cfg: dict[str, Any]) -> dict[str, Any]:
         }
 
 
+@_serialized_gateway_state
 def _autobuy_scan_once(force: bool = False) -> dict[str, Any]:
     """Single auto-buy pass. Honors caps, dedupes, respects loss cooldown.
 
@@ -8036,6 +8319,11 @@ async def api_autobuy_set_config(req: Request) -> dict[str, Any]:
     body = await req.json()
     if not isinstance(body, dict):
         return {"ok": False, "error": "expected JSON object"}
+    return await _run_gateway_blocking(_patch_autobuy_config, body)
+
+
+@_serialized_gateway_state
+def _patch_autobuy_config(body: dict[str, Any]) -> dict[str, Any]:
     cfg = _load_autobuy_cfg()
     for k in AUTOBUY_DEFAULT.keys():
         if k in body:
@@ -8052,10 +8340,11 @@ async def api_autobuy_run(req: Request) -> dict[str, Any]:
         body = await req.json()
     except Exception:
         body = {}
-    return _autobuy_scan_once(force=bool(body.get("force", False)))
+    return await _run_gateway_blocking(_autobuy_scan_once, force=bool(body.get("force", False)))
 
 
 @app.get("/api/buys/autobuy/status")
+@_serialized_gateway_state
 def api_autobuy_status() -> dict[str, Any]:
     cfg = _load_autobuy_cfg()
     # Compute "best available edge" snapshot vs. thresholds — tells the user
@@ -8121,28 +8410,40 @@ def api_autobuy_status() -> dict[str, Any]:
     }
 
 
+@_serialized_gateway_state
+def _autobuy_tick() -> int:
+    """Keep the enabled flag and existing transaction together in one worker."""
+    try:
+        cfg = _load_autobuy_cfg()
+        interval = max(20, int(cfg.get("scan_interval_s") or 60))
+        if bool(cfg.get("enabled", False)):
+            try:
+                _autobuy_scan_once(force=False)
+            except Exception as exc:
+                _AUTOBUY_STATE["last_decision"] = {
+                    "ts": now_utc(),
+                    "error": _record_internal_failure("autobuy_watcher_failed", exc),
+                }
+        else:
+            _AUTOBUY_STATE["last_scan_utc"] = now_utc()
+            _AUTOBUY_STATE["last_scan_eligible"] = 0
+    except Exception:
+        interval = 60
+    return interval
+
+
 async def _autobuy_watcher() -> None:
     _AUTOBUY_STATE["started_utc"] = now_utc()
     await asyncio.sleep(8.0)  # let other watchers settle first
     while True:
         try:
-            cfg = _load_autobuy_cfg()
-            interval = max(20, int(cfg.get("scan_interval_s") or 60))
-            if bool(cfg.get("enabled", False)):
-                try:
-                    _autobuy_scan_once(force=False)
-                except Exception as exc:
-                    _AUTOBUY_STATE["last_decision"] = {
-                        "ts": now_utc(),
-                        "error": _record_internal_failure(
-                            "autobuy_watcher_failed", exc
-                        ),
-                    }
-            else:
-                _AUTOBUY_STATE["last_scan_utc"] = now_utc()
-                _AUTOBUY_STATE["last_scan_eligible"] = 0
-        except Exception:
+            interval = await _run_gateway_blocking(_autobuy_tick)
+        except Exception as exc:
             interval = 60
+            _AUTOBUY_STATE["last_decision"] = {
+                "ts": now_utc(),
+                "error": _record_internal_failure("autobuy_watcher_failed", exc),
+            }
         await asyncio.sleep(interval)
 
 

@@ -4,7 +4,9 @@ import argparse
 import copy
 import hashlib
 import json
+import math
 import re
+import struct
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -28,14 +30,132 @@ VERIFIER_DERIVED_GATE_IDS = {"artifact_hashes", "lineage_manifest"}
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 SAFE_ARTIFACT_PATTERN = re.compile(r"^assets/[A-Za-z0-9._/-]+$")
 SCHEME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+RECEIPT_SCHEMA = "lumencore.prooflock_receipt.v1"
+RECEIPT_SCHEMA_V2 = "lumencore.prooflock_receipt.v2"
+CANONICALIZATION_V1 = "lumencore.prooflock_c14n.legacy.v1"
+CANONICALIZATION_V2 = "lumencore.prooflock_c14n.binary64.v2"
+MAX_SAFE_INTEGER = 2**53 - 1
+MAX_JSON_TEXT = 2_000_000
+MAX_DEPTH = 100
 
 
-def canonical_json(payload: Any) -> str:
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+def serialization_profile(receipt: Any) -> str:
+    schema = receipt.get("schema") if isinstance(receipt, dict) else None
+    profile = CANONICALIZATION_V2 if schema == RECEIPT_SCHEMA_V2 else CANONICALIZATION_V1
+    if isinstance(receipt, dict):
+        if "canonicalization" in receipt and receipt["canonicalization"] != profile:
+            raise ValueError("unsupported canonicalization profile")
+        if schema == RECEIPT_SCHEMA_V2 and receipt.get("canonicalization") != profile:
+            raise ValueError("v2 receipts require an explicit canonicalization profile")
+    return profile
 
 
-def stable_hash(payload: Any) -> str:
-    return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+def scalar_string(value: str) -> str:
+    if any(0xD800 <= ord(character) <= 0xDFFF for character in value):
+        raise ValueError("unpaired Unicode surrogate is prohibited")
+    return value
+
+
+def canonical_json(payload: Any, profile: str | None = None) -> str:
+    """V1's restricted legacy JSON or V2's explicitly tagged binary64 text."""
+    profile = profile or serialization_profile(payload)
+    if profile not in {CANONICALIZATION_V1, CANONICALIZATION_V2}:
+        raise ValueError("unsupported canonicalization profile")
+
+    def encode(value: Any, depth: int) -> str:
+        if depth > MAX_DEPTH:
+            raise ValueError("canonical payload exceeds the nesting limit")
+        if value is None:
+            return "null"
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, str):
+            scalar_string(value)
+            if profile == CANONICALIZATION_V1 and "\x7f" in value:
+                raise ValueError("v1 does not support DEL characters; use an explicit v2 receipt")
+            return json.dumps(value, ensure_ascii=True, separators=(",", ":"))
+        if isinstance(value, (int, float)):
+            if isinstance(value, int):
+                if abs(value) > MAX_SAFE_INTEGER:
+                    raise ValueError("nonfinite or unsafe integer number is prohibited")
+            elif not math.isfinite(value) or (value.is_integer() and abs(value) > MAX_SAFE_INTEGER):
+                raise ValueError("nonfinite or unsafe integer number is prohibited")
+            if profile == CANONICALIZATION_V1:
+                if not isinstance(value, int):
+                    raise ValueError("v1 supports safe integer numbers only; use an explicit v2 receipt")
+                return str(value)
+            number = float(value)
+            return "N" + struct.pack(">d", 0.0 if number == 0 else number).hex() + ";"
+        if isinstance(value, list):
+            return "[" + ",".join(encode(item, depth + 1) for item in value) + "]"
+        if isinstance(value, dict):
+            for key in value:
+                if not isinstance(key, str):
+                    raise ValueError("JSON object keys must be strings")
+                scalar_string(key)
+                if profile == CANONICALIZATION_V1 and any(ord(c) > 0x7E for c in key):
+                    raise ValueError("v1 requires ASCII object keys; use an explicit v2 receipt")
+            return "{" + ",".join(
+                json.dumps(key, ensure_ascii=True) + ":" + encode(value[key], depth + 1)
+                for key in sorted(value)
+            ) + "}"
+        raise ValueError("canonical payload must contain only JSON data types")
+
+    return encode(payload, 0)
+
+
+def strict_json_loads(text: str, profile: str | None = None) -> Any:
+    if not isinstance(text, str) or len(text) > MAX_JSON_TEXT:
+        raise ValueError("JSON input exceeds the text limit")
+    try:
+        if len(text.encode("utf-8")) > MAX_JSON_TEXT:
+            raise ValueError("JSON input exceeds the text limit")
+    except UnicodeEncodeError as exc:
+        raise ValueError("unpaired Unicode surrogate is prohibited") from exc
+    numeric_tokens: list[str] = []
+
+    def number(token: str) -> int | float:
+        numeric_tokens.append(token)
+        if re.fullmatch(r"-?(?:0|[1-9][0-9]*)", token):
+            value = int(token)
+            if abs(value) > MAX_SAFE_INTEGER:
+                raise ValueError("nonfinite or unsafe integer number is prohibited")
+            return value
+        value = float(token)
+        if not math.isfinite(value) or (value.is_integer() and abs(value) > MAX_SAFE_INTEGER):
+            raise ValueError("nonfinite or unsafe integer number is prohibited")
+        return value
+
+    def object_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        output: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in output:
+                raise ValueError(f"duplicate decoded JSON key: {key}")
+            output[key] = value
+        return output
+
+    def invalid_constant(token: str) -> None:
+        raise ValueError(f"nonfinite JSON number is prohibited: {token}")
+
+    try:
+        parsed = json.loads(text, parse_int=number, parse_float=number,
+                            parse_constant=invalid_constant, object_pairs_hook=object_pairs)
+    except RecursionError as exc:
+        raise ValueError("JSON input exceeds the nesting limit") from exc
+    schema = parsed.get("schema") if isinstance(parsed, dict) else None
+    profile = profile or (CANONICALIZATION_V1 if schema == RECEIPT_SCHEMA else
+                          CANONICALIZATION_V2 if schema == RECEIPT_SCHEMA_V2 else None)
+    if profile == CANONICALIZATION_V1 and any(
+        not re.fullmatch(r"-?(?:0|[1-9][0-9]*)", token) or token == "-0"
+        for token in numeric_tokens
+    ):
+        raise ValueError("v1 raw JSON supports safe integer lexemes only; use an explicit v2 receipt")
+    canonical_json(parsed, profile or CANONICALIZATION_V2)
+    return parsed
+
+
+def stable_hash(payload: Any, profile: str | None = None) -> str:
+    return hashlib.sha256(canonical_json(payload, profile).encode("utf-8")).hexdigest()
 
 
 def receipt_payload(receipt: dict[str, Any]) -> dict[str, Any]:
@@ -138,14 +258,20 @@ def verify_receipt(receipt: Any, root: Path = ROOT) -> dict[str, Any]:
     if not receipt_is_object:
         integrity_errors.append("receipt must be an object")
 
-    if safe_receipt.get("schema") != "lumencore.prooflock_receipt.v1":
+    if safe_receipt.get("schema") not in {RECEIPT_SCHEMA, RECEIPT_SCHEMA_V2}:
         integrity_errors.append("unsupported or missing receipt schema")
     if not str(safe_receipt.get("claim_boundary") or "").strip():
         integrity_errors.append("claim_boundary is required")
 
     expected_receipt_hash = str(safe_receipt.get("receipt_sha256") or "").lower()
-    computed_receipt_hash = stable_hash(receipt_payload(safe_receipt))
-    receipt_hash_matches = expected_receipt_hash == computed_receipt_hash
+    computed_receipt_hash = ""
+    profile = ""
+    try:
+        profile = serialization_profile(safe_receipt)
+        computed_receipt_hash = stable_hash(receipt_payload(safe_receipt), profile)
+    except (ValueError, TypeError, RecursionError) as exc:
+        integrity_errors.append(f"unsupported canonical receipt payload: {exc}")
+    receipt_hash_matches = bool(computed_receipt_hash) and expected_receipt_hash == computed_receipt_hash
     if not receipt_hash_matches:
         integrity_errors.append("receipt_sha256 does not match the canonical receipt payload")
 
@@ -202,8 +328,8 @@ def verify_receipt(receipt: Any, root: Path = ROOT) -> dict[str, Any]:
             "predecessor_protocol_manifest",
         }:
             try:
-                parsed_manifest = json.loads(target.read_text(encoding="utf-8"))
-            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                parsed_manifest = strict_json_loads(target.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, ValueError):
                 parsed_manifest = None
             if isinstance(parsed_manifest, dict):
                 manifest_payloads[result["role"]] = parsed_manifest
@@ -326,6 +452,7 @@ def verify_receipt(receipt: Any, root: Path = ROOT) -> dict[str, Any]:
     errors = [*integrity_errors, *policy_errors]
     return {
         "schema": "lumencore.prooflock_verification_report.v1",
+        "serialization_profile": profile,
         "verified_utc": datetime.now(timezone.utc).isoformat(),
         "receipt_id": safe_receipt.get("receipt_id"),
         "integrity_valid": integrity_valid,
@@ -358,7 +485,9 @@ def verify_receipt(receipt: Any, root: Path = ROOT) -> dict[str, Any]:
 
 
 def write_receipt_hash(path: Path) -> dict[str, Any]:
-    receipt = json.loads(path.read_text(encoding="utf-8"))
+    receipt = strict_json_loads(path.read_text(encoding="utf-8"))
+    if not isinstance(receipt, dict):
+        raise ValueError("receipt must be an object")
     receipt["receipt_sha256"] = stable_hash(receipt_payload(receipt))
     path.write_text(json.dumps(receipt, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
     return receipt
@@ -367,12 +496,16 @@ def write_receipt_hash(path: Path) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Verify a ProofLock receipt and its repository artifacts.")
     parser.add_argument("receipt", nargs="?", type=Path, default=DEFAULT_RECEIPT)
-    parser.add_argument("--write-hash", action="store_true", help="Recompute receipt_sha256 before verification.")
+    parser.add_argument("--write-hash", action="store_true", help="Explicitly recompute receipt_sha256 in the declared schema; no v1 migration or ambiguous-number resealing.")
     args = parser.parse_args()
 
     path = args.receipt.resolve()
-    receipt = write_receipt_hash(path) if args.write_hash else json.loads(path.read_text(encoding="utf-8"))
-    report = verify_receipt(receipt)
+    try:
+        receipt = write_receipt_hash(path) if args.write_hash else strict_json_loads(path.read_text(encoding="utf-8"))
+        report = verify_receipt(receipt)
+    except (OSError, ValueError, TypeError, RecursionError) as exc:
+        report = {"schema": "lumencore.prooflock_verification_report.v1", "integrity_valid": False,
+                  "policy_valid": False, "promotion_allowed": False, "errors": [str(exc)]}
     print(json.dumps(report, indent=2, ensure_ascii=True))
     return 0 if report["integrity_valid"] and report["policy_valid"] else 1
 

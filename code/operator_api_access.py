@@ -2,8 +2,8 @@
 
 The legacy gateway contains both reviewer-safe and operator-sensitive routes.
 This middleware keeps that distinction explicit: minimal liveness routes are
-public, while every other API route, runtime-introspection surface, and live
-WebSocket requires a runtime operator token.
+public, while every other API route, runtime-introspection surface, workspace
+output route, and live WebSocket requires a runtime operator token.
 """
 
 from __future__ import annotations
@@ -40,6 +40,9 @@ PROTECTED_OPERATOR_HTTP_ROOTS = frozenset(
         "/docs",
         "/metrics",
         "/openapi.json",
+        "/out",
+        "/proof",
+        "/INSTITUTIONAL_STACK_V2/out",
         "/redoc",
     }
 )

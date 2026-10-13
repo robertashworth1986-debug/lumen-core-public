@@ -286,6 +286,13 @@ and [exact archived source rows](../evidence/reproducibility/eia_daily_20260713_
 retain every comparator and modeled authority. The frozen numerical environment
 is the same one recorded for the preceding replay. Verify without model fitting:
 
+Standalone later-packet verification also requires the preceding replay's
+manifest at its reviewed digest and the exact `environment.json` identity
+recorded there. This binds the historical environment reference without changing
+either archived manifest. The frozen later runner records a reference rather
+than a fresh environment observation; a new run still needs its own observed
+runtime receipt before its environment can be reconciled.
+
 ```bash
 python code/ops/VERIFY_EIA_CONSTRAINT_REVIEW.py --packet later
 ```
@@ -294,6 +301,20 @@ The next useful constraint is now explicit: secure a scope-matched, time-stamped
 buyer baseline and complete forecast-history capture, then test this unchanged
 candidate prospectively under the buyer's error and cost policy. More repeated
 runs of these archives cannot fill those evidence gaps.
+
+The [versioned offline evaluation review](FORECAST_EVALUATION_V2_REVIEW.md)
+provides an executable path for the next accepted comparison. It retains calendar
+dates and declared availability, requires identical complete identity sets for
+every strategy and reports descriptive differences with `HUMAN_REVIEW_HOLD`.
+Its included protocol and CSV files are synthetic regression fixtures, not a
+buyer acceptance or a new EIA result.
+
+The frozen v1 evaluator remains historical evidence: its older history arrays
+compress missing dates, and its authority-month sign-test p-values do not resolve
+temporal or cross-authority dependence. The newer review path uses actual
+seven-calendar-day pairs and supplies no independence-based p-value or automatic
+promotion. It does not rescore the archives or establish corrected scientific
+superiority, actual publication timing, candidate feature causality or savings.
 
 ## Claim Boundary
 

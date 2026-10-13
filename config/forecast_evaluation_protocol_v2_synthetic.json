@@ -1,0 +1,45 @@
+{
+  "schema": "forecast_evaluation_protocol.v2",
+  "protocol_id": "SYNTHETIC_DAILY_FORECAST_REVIEW_20261013",
+  "evidence_type": "synthetic",
+  "owner_acceptance_reference": "Fictional fixture owner acceptance for software regression only",
+  "locked_at_utc": "2026-10-13T12:00:00Z",
+  "grain": "entity_calendar_day",
+  "time_zone": "UTC",
+  "unit": "megawatthours",
+  "entities": [
+    "FIXTURE_A",
+    "FIXTURE_B"
+  ],
+  "window": {
+    "start": "2026-10-14",
+    "end": "2026-10-16"
+  },
+  "candidate_strategy": "candidate_v2",
+  "baseline_strategies": [
+    "incumbent_fixture",
+    "algorithmic_fixture"
+  ],
+  "scope_match_declared": true,
+  "baseline_scope_reference": "Fictional shared daily-demand scope; no utility baseline or owner adoption",
+  "issue_rule": {
+    "day_offset": 0,
+    "time_utc": "04:00:00"
+  },
+  "history_contract": {
+    "lag_offsets_days": [
+      1,
+      7,
+      14
+    ],
+    "season_days": 7,
+    "lookback_days": 730,
+    "minimum_seasonal_pairs": 7
+  },
+  "metrics": [
+    "mae_mwh",
+    "mean_seasonal_mase_7"
+  ],
+  "inference": "descriptive_only_no_independence_claim",
+  "promotion": "HUMAN_REVIEW_HOLD"
+}

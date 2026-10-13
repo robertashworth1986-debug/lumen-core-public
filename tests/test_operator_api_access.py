@@ -3,7 +3,9 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
@@ -105,6 +107,10 @@ class OperatorApiAccessTests(unittest.TestCase):
             "/api/grants",
             "/api/snapshot",
             "/api/operator/health",
+            "/out",
+            "/out/execution/live_executor_heartbeat.json",
+            "/proof/execution/live_executor_heartbeat.json",
+            "/INSTITUTIONAL_STACK_V2/out/execution/live_executor_heartbeat.json",
             "/metrics",
             "/metrics/",
             "/openapi.json",
@@ -364,6 +370,80 @@ class OperatorApiAccessTests(unittest.TestCase):
         install_operator_api_access(app)
         self.assertEqual(len(app.middleware), 1)
         self.assertIs(app.middleware[0][0][0], OperatorApiAccessMiddleware)
+
+
+@unittest.skipIf(httpx is None, "httpx is required for the static-output probe")
+class StaticOutputAccessIntegrationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_output_mounts_require_operator_access_before_serving_bytes(self) -> None:
+        from starlette.applications import Starlette
+        from starlette.routing import Mount
+        from starlette.staticfiles import StaticFiles
+
+        assert httpx is not None
+        marker = b'{"fixture":"synthetic-private-output"}'
+        token = "synthetic-output-operator-token-0000"
+        prefixes = ("/out", "/proof", "/INSTITUTIONAL_STACK_V2/out")
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            (output / "execution").mkdir()
+            (output / "execution" / "fixture.json").write_bytes(marker)
+            inner = Starlette(
+                routes=[
+                    Mount(prefix, app=StaticFiles(directory=str(output)))
+                    for prefix in prefixes
+                ]
+            )
+            for tokens, denied_status in (((), 503), ((token,), 401)):
+                app = OperatorApiAccessMiddleware(inner, token_provider=lambda: tokens)
+                async with httpx.AsyncClient(
+                    transport=httpx.ASGITransport(app=app),
+                    base_url="http://synthetic-output-test",
+                ) as client:
+                    for prefix in prefixes:
+                        path = f"{prefix}/execution/fixture.json"
+                        with self.subTest(prefix=prefix, tokens_configured=bool(tokens)):
+                            missing = await client.get(path)
+                            invalid = await client.get(
+                                path, headers={"Authorization": "Bearer invalid"}
+                            )
+                            head = await client.head(path)
+                            self.assertEqual(missing.status_code, denied_status)
+                            self.assertEqual(invalid.status_code, denied_status)
+                            self.assertEqual(head.status_code, denied_status)
+                            self.assertNotIn(marker, missing.content)
+                            self.assertNotIn(marker, invalid.content)
+                            if tokens:
+                                allowed = await client.get(
+                                    path, headers={"Authorization": f"Bearer {token}"}
+                                )
+                                self.assertEqual(allowed.status_code, 200)
+                                self.assertEqual(allowed.content, marker)
+                    encoded = await client.get("/out%2Fexecution%2Ffixture.json")
+                    self.assertEqual(encoded.status_code, denied_status)
+                    for path in (PUBLIC_HEALTH_PATH, PUBLIC_STATUS_PATH):
+                        public = await client.get(path)
+                        self.assertEqual(public.status_code, 200)
+                        self.assertEqual(public.json()["public_surface"], "minimal")
+
+
+class DeploymentOutputBoundaryTests(unittest.TestCase):
+    def test_proxy_sources_cannot_serve_workspace_output_from_public_alias(self) -> None:
+        for relative in (
+            "deploy/VPS_DEPLOY.sh",
+            "code/deploy/nginx/lumatrader.conf",
+        ):
+            with self.subTest(path=relative):
+                source = (ROOT / relative).read_text(encoding="utf-8")
+                self.assertIsNone(
+                    re.search(r"\b(?:alias|root)\s+/opt/lumencore/out(?:/|;)", source)
+                )
+                for location in (r"= /proof", r"\^~ /proof/"):
+                    block = re.search(
+                        rf"location {location}\s*\{{([^}}]*)\}}", source
+                    )
+                    self.assertIsNotNone(block)
+                    assert block is not None
+                    self.assertRegex(block.group(1), r"\breturn\s+404\s*;")
 
 
 @unittest.skipIf(httpx is None, "httpx is required for the real gateway probe")

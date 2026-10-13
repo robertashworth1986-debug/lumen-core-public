@@ -8,6 +8,7 @@ Kraken AddOrder boundary.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -19,7 +20,6 @@ for _path in (_CODE_DIR, _EXECUTION_DIR):
     if str(_path) not in sys.path:
         sys.path.insert(0, str(_path))
 
-import luma_experience_gateway_legacy as _legacy
 from execution.order_safety_gate import (
     ADD_ORDER_PATH,
     ORDER_POLICY,
@@ -29,7 +29,17 @@ from operator_api_access import install_operator_api_access
 
 
 ORDER_SAFETY_POLICY = ORDER_POLICY
-_ORIGINAL_KRAKEN_ADD_ORDER = _legacy._kraken_add_order
+_SERVING_PROFILE = os.getenv("LUMA_GATEWAY_SERVING_PROFILE", "operator").strip().lower()
+if _SERVING_PROFILE not in {"operator", "minimal"}:
+    raise ValueError("LUMA_GATEWAY_SERVING_PROFILE must be operator or minimal")
+_legacy = None
+_ORIGINAL_KRAKEN_ADD_ORDER = None
+if _SERVING_PROFILE == "operator":
+    import luma_experience_gateway_legacy as _legacy
+
+    _ORIGINAL_KRAKEN_ADD_ORDER = getattr(
+        _legacy._kraken_add_order, "_lumencore_original_adapter", _legacy._kraken_add_order
+    )
 
 
 def _kraken_add_order(payload: dict[str, Any]) -> dict[str, Any]:
@@ -41,16 +51,34 @@ def _kraken_add_order(payload: dict[str, Any]) -> dict[str, Any]:
             "error": ["ELUMEN:Order safety gate blocked live AddOrder"],
             "order_safety": decision.as_dict(),
         }
+    if _ORIGINAL_KRAKEN_ADD_ORDER is None:
+        return {"error": ["ELUMEN:Minimal reviewer profile has no order adapter"]}
     return _ORIGINAL_KRAKEN_ADD_ORDER(payload)
 
 
-# Approval route functions retain the legacy module as their globals mapping,
-# so patch that mapping before exposing the public FastAPI app.
-_legacy._kraken_add_order = _kraken_add_order
+if _legacy is not None:
+    # Approval routes retain the legacy module as their globals mapping.
+    # Keep repeated facade imports/reloads from wrapping this function itself.
+    _kraken_add_order._lumencore_original_adapter = _ORIGINAL_KRAKEN_ADD_ORDER
+    _legacy._kraken_add_order = _kraken_add_order
+    from luma_experience_gateway_legacy import *  # noqa: E402,F401,F403
 
-from luma_experience_gateway_legacy import *  # noqa: E402,F401,F403
+    app = _legacy.app
+else:
+    from fastapi import FastAPI, HTTPException
 
-app = _legacy.app
+    # Explicit review-only profile: no legacy imports, worker tasks, files,
+    # providers, trading adapters or optional operator-feature graph.
+    app = FastAPI(title="Luma Gateway Minimal Reviewer Profile", version="1.0.0")
+
+    @app.get("/")
+    def minimal_profile():
+        return {"profile": "minimal", "operational_readiness": "HOLD"}
+
+    @app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
+    def unavailable_operator_component(path: str):
+        raise HTTPException(status_code=503, detail="operator components remain HOLD in minimal reviewer profile")
+
 if hasattr(app, "add_middleware"):
     install_operator_api_access(app)
 
@@ -58,7 +86,14 @@ if hasattr(app, "add_middleware"):
 def _operator_health() -> dict[str, Any]:
     """Retain detailed legacy health behind the operator API boundary."""
 
-    return _legacy.health()
+    if _legacy is None:
+        return {
+            "profile": "minimal",
+            "operational_readiness": "HOLD",
+            "optional_components": "not_loaded",
+            "background_workers": "not_started",
+        }
+    return {**_legacy.health(), "optional_components": dict(_legacy.GATEWAY_OPTIONAL_COMPONENTS)}
 
 
 if hasattr(app, "add_api_route") and not any(
@@ -81,8 +116,8 @@ def main() -> int:
 
     uvicorn.run(
         app,
-        host="0.0.0.0",
-        port=8787,
+        host=os.getenv("LUMA_GATEWAY_HOST", "127.0.0.1" if _SERVING_PROFILE == "minimal" else "0.0.0.0"),
+        port=int(os.getenv("LUMA_GATEWAY_PORT", "8787")),
         reload=False,
         log_level="info",
     )

@@ -42,6 +42,7 @@ PACKETS = {
             "evidence/reproducibility/eia_daily_20260713_20260908_selected.json.gz",
         }),
         "outputs": frozenset({"benchmark.json", "predictions.csv.gz"}),
+        "environment_reference": "../eia_constraint_review_20260921/environment.json",
     },
 }
 
@@ -88,6 +89,28 @@ def file_digest(path: Path) -> str:
     return h.hexdigest()
 
 
+def verify_referenced_environment(root: Path, reference: str) -> dict:
+    """Bind the historical reference without rewriting either frozen manifest."""
+    original = PACKETS["original"]
+    directory = original["directory"]
+    path = contained_file(root, directory + "/manifest.json")
+    if path.stat().st_size > MAX_MANIFEST_BYTES:
+        raise ValueError("referenced manifest exceeds size limit")
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != original["manifest_sha256"]:
+        raise ValueError("referenced environment manifest differs from reviewed pin")
+    manifest = json.loads(raw, object_pairs_hook=reject_duplicate_keys, parse_constant=reject_nonfinite)
+    if not isinstance(manifest, dict) or manifest.get("schema") != original["schema"]:
+        raise ValueError("unexpected referenced manifest schema")
+    record = manifest.get("outputs", {}).get("environment.json")
+    if not isinstance(record, dict) or set(record) != {"sha256", "bytes"} or not isinstance(record["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", record["sha256"]) or type(record["bytes"]) is not int or not 0 <= record["bytes"] <= MAX_ARTIFACT_BYTES:
+        raise ValueError("invalid referenced environment identity")
+    environment = contained_file(root, directory + "/environment.json")
+    if environment.stat().st_size != record["bytes"] or file_digest(environment) != record["sha256"]:
+        raise ValueError("referenced environment hash or size mismatch")
+    return {"verified": True, "reference": reference, "manifest_sha256": original["manifest_sha256"], **record}
+
+
 def verify_packet(packet: str, repo_root: Path = ROOT) -> dict:
     if packet not in PACKETS:
         raise ValueError("unsupported replay packet")
@@ -117,6 +140,11 @@ def verify_packet(packet: str, repo_root: Path = ROOT) -> dict:
     manifest_sha256 = hashlib.sha256(raw).hexdigest()
     if manifest_sha256 != contract["manifest_sha256"]:
         raise ValueError("manifest differs from reviewed repository pin")
+    referenced_environment = None
+    if "environment_reference" in contract:
+        if manifest.get("environment_reference") != contract["environment_reference"]:
+            raise ValueError("unexpected environment reference")
+        referenced_environment = verify_referenced_environment(root, contract["environment_reference"])
     for category, base in (("inputs", root), ("outputs", output)):
         for relative, record in manifest[category].items():
             path = contained_file(base, relative)
@@ -126,6 +154,7 @@ def verify_packet(packet: str, repo_root: Path = ROOT) -> dict:
         "verified": True, "packet": packet, "schema": contract["schema"],
         "input_count": len(manifest["inputs"]), "output_count": len(manifest["outputs"]),
         "manifest_sha256": manifest_sha256,
+        "referenced_environment": referenced_environment,
         "boundary": "Reviewed first-party artifact identities only; no external validation, scientific correctness, promotion or savings claim.",
     }
 

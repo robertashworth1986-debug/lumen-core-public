@@ -56,6 +56,59 @@ lanes; research breadth does not establish customers or deployed products.
 
 ## A focused team review
 
+### October 13 repair review, including trading
+
+The current-source repair pass adds a versioned forecast reviewer, receipt
+reconciliation, cross-runtime ProofLock serialization, private-output access
+controls, bounded gateway work and paper-trading accounting checks. Record the
+exact checkout before running them. Frozen v1 scientific code and results remain
+historical evidence; these repairs do not silently restate their results.
+
+After installing the full-suite environment below, start with:
+
+```bash
+python -m pytest -q tests/test_execution_accounting_regressions.py tests/test_order_safety_gate.py tests/test_order_safety_alpaca_paper_boundary.py
+python -m pytest -q tests/test_forecast_evaluation_v2.py tests/test_codecheck_independent_execution_receipt.py tests/test_eia_constraint_strict_verifier.py
+python -m pytest -q tests/test_prooflock_canonicalization_parity.py tests/test_operator_api_access.py tests/test_gateway_runtime_concurrency.py tests/test_gateway_lifetime_lock.py
+```
+
+The trading fixtures check future-data isolation, delayed signals, after-cost
+accounting, first-loss drawdown, finite risk inputs, capped sizing and append-only
+ledger recovery. They contact no broker and place no orders. They do not establish
+profitability, prospective paper performance or reconciled historical balances.
+The ledger retains historical bytes; a corrected projection is not a broker
+reconciliation or a corrected historical profit claim.
+
+Run the separately pinned synthetic forecast command in
+[Forecast evaluation v2](FORECAST_EVALUATION_V2_REVIEW.md). Its deliberately
+adverse comparison remains visible and the report always returns
+`HUMAN_REVIEW_HOLD`. Complete input identities and calendar/as-of timing are
+software checks; supplied feature causality, publication history, data rights,
+accepted baseline and independence still require human review.
+
+ProofLock's new v2 serialization is explicitly versioned and uses tagged binary64
+numbers and scalar Unicode key ordering; it is not JCS. Historical portable v1
+sample bytes remain unchanged. Ambiguous v1 numbers or strings reject rather
+than receiving a new silent identity. See the
+[compatibility contract](../dashboard/build_week/prooflock_console/CANONICALIZATION.md).
+
+For a separate clean serving smoke, use CPython 3.11.9 and a fresh environment:
+
+```bash
+python3.11 -m venv .venv-gateway-minimal
+. .venv-gateway-minimal/bin/activate
+python -m pip install --require-hashes --only-binary=:all: -r requirements-gateway-minimal-ubuntu-py311.lock
+python code/ops/VERIFY_GATEWAY_MINIMAL_RUNTIME.py --smoke
+```
+
+This smoke uses ephemeral loopback HTTP and the explicit minimal reviewer
+profile. It starts no legacy providers, market workers or control loops; its
+forecast/operator components remain HOLD. It does not establish the full legacy
+gateway dependency closure, shared producer coordination or live server parity.
+Use the separate [runtime CI](../.github/workflows/gateway-runtime-ci.yml) for
+native Linux/Windows lifetime-lock checks. Current-source tests and a static
+release build do not enact nginx or gateway changes on a server.
+
 Start together with the five-minute check, then divide the inspection by question.
 The first pass can stay within these existing surfaces; the portfolio is context,
 not a requirement to inspect every historical experiment.
@@ -141,8 +194,8 @@ the pinned identity to make a run pass. Inspect all reported skips: generated
 publication fixtures, Windows process checks and the optional Zig compiler have
 separate prerequisites; Linux success does not imply those paths executed.
 
-The October 5 [main-source run](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37344423853)
-at `e5487b6d` recorded 1,321 passed tests, 8 skips and 166 subtests in the
+The October 10 [main-source run](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/38011625758)
+at `c8bfc2f9` recorded 1,466 passed tests, 8 skips and 201 subtests in the
 full-repository job. Those are dated first-party checks, not independent review.
 The [review-preparation PR #245](https://github.com/robertashworth1986-debug/lumen-core-public/pull/245)
 incorporates the existing PDF security repair from

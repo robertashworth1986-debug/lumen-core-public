@@ -1,6 +1,10 @@
-# LumenCore Engine Portfolio Audit
+# LumenCore Engine Portfolio — Tracked-File Inventory
 
-Generated at: `2026-10-08T12:53:16.622725Z`
+Generated at: `2026-10-13T18:35:44.430155Z`
+
+**Audit scope:** `tracked_file_presence_only`
+This audit checks configured tracked-file presence and hashes Git blobs. It does not execute the listed engines or tests, evaluate their results, or verify customer acceptance.
+The retained `observed_maturity` JSON enums are compatibility identifiers for file-presence combinations, not evidence of tested or runnable behavior.
 
 ## Reviewer decision
 
@@ -17,12 +21,14 @@ ProofLock is the evidence layer for the buyer-owned baseline validation sprint.
 The buyer supplies authorized data, accepts the incumbent baseline, and locks the metric and threshold before execution.
 LumenCore returns replay receipts, negative results, hashes, an offline verifier, and a buyer-readable Proof Capsule.
 
-## Current commercial truth
+## Current inventory and commercial boundaries
 
 - Portfolio lanes audited: `15`
 - Primary offers: `1`
-- Priority-lane maturity: `runnable_component`
-- Priority lane eligible for buyer scoping: `true`
+- Priority-lane inventory: Tracked source, entrypoint and test files present
+- Priority lane has configured files for a scoping review: `true`
+- Execution verified by this audit: `false`
+- Customer acceptance verified by this audit: `false`
 - Subscription-ready products: `0`
 - Missing configured evidence paths: `0`
 - Untracked configured evidence paths: `0`
@@ -34,32 +40,32 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 ## Portfolio lanes
 
-| Lane | Role | Repository maturity | Evidence classes | Buyer-safe scoping use |
+| Lane | Role | Tracked-file inventory | Configured file classes present | Buyer-safe scoping use |
 |---|---|---|---:|---|
-| Lumen Infrastructure Sentinel | `priority_validation_lane` | `runnable_component` | 5/6 | Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence. |
-| EchoForm Identity Engine | `concept_lane` | `concept_only` | 1/6 | Reproduce the bounded memory/consent/provenance prototype and retain the failed upstream identity challenge before any broader identity claim. |
-| Smart City Node Engine | `concept_lane` | `concept_only` | 1/6 | Requirements and simulation-scoping workshop only. |
-| CrowdFund Radar | `research_lane` | `component_only` | 1/6 | Compare a pre-registered campaign ranking with a simple popularity baseline. |
-| Cyber Forensics Assist | `research_lane` | `component_only` | 3/6 | Measure chronology completeness and reviewer agreement without modifying source evidence. |
-| Energy Harmonization Engine | `research_lane` | `runnable_component` | 3/6 | Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision. |
-| FlowForm Hardware Engine | `research_lane` | `runnable_component` | 3/6 | Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan. |
-| Kraken Sentinel / LumaSniper | `research_lane` | `tested_implementation` | 5/6 | Review read-only telemetry and paper-ledger controls under a frozen protocol. |
-| Luma XR Command Room | `research_lane` | `runnable_component` | 4/6 | Test declared monitoring tasks using non-sensitive sample telemetry. |
-| LumaScout | `research_lane` | `runnable_component` | 4/6 | Compare a pre-registered shortlist with a transparent popularity baseline. |
-| LumaTrader | `research_lane` | `tested_implementation` | 6/6 | Compare a frozen paper or replay protocol with a declared baseline after costs and abstention rules. |
-| Sports Harmonic Edge | `research_lane` | `runnable_component` | 3/6 | Compare historical and prospective research scoring with simple declared market baselines. |
-| World Model Engine | `research_lane` | `runnable_component` | 3/6 | Model one buyer-owned decision using a declared source set, baseline, and uncertainty register. |
-| LumaCore Orchestrator | `workflow_module` | `runnable_component` | 5/6 | Compare a declared governed workflow with the buyer's existing process while preserving approvals and abstentions. |
-| LumenGov Grant Factory | `workflow_module` | `tested_implementation` | 6/6 | Measure preparation latency and conformance defects against the buyer's existing human-controlled workflow. |
+| Lumen Infrastructure Sentinel | `priority_validation_lane` | Tracked source, entrypoint and test files present | 6/6 | Review one authorized dataset and an owner-accepted precomputed forecast baseline under a separately locked protocol. The included v2 run is synthetic and does not implement outage detection. |
+| EchoForm Identity Engine | `concept_lane` | No tracked source file in the configured evidence | 1/6 | Reproduce the bounded memory/consent/provenance prototype and retain the failed upstream identity challenge before any broader identity claim. |
+| Smart City Node Engine | `concept_lane` | No tracked source file in the configured evidence | 1/6 | Requirements and simulation-scoping workshop only. |
+| CrowdFund Radar | `research_lane` | Tracked source files present | 1/6 | Compare a pre-registered campaign ranking with a simple popularity baseline. |
+| Cyber Forensics Assist | `research_lane` | Tracked source files present | 3/6 | Measure chronology completeness and reviewer agreement without modifying source evidence. |
+| Energy Harmonization Engine | `research_lane` | Tracked source and entrypoint files present | 3/6 | Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision. |
+| FlowForm Hardware Engine | `research_lane` | Tracked source and entrypoint files present | 3/6 | Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan. |
+| Kraken Sentinel / LumaSniper | `research_lane` | Tracked source, entrypoint and test files present | 5/6 | Review read-only telemetry and paper-ledger controls under a frozen protocol. |
+| Luma XR Command Room | `research_lane` | Tracked source and entrypoint files present | 4/6 | Test declared monitoring tasks using non-sensitive sample telemetry. |
+| LumaScout | `research_lane` | Tracked source and entrypoint files present | 4/6 | Compare a pre-registered shortlist with a transparent popularity baseline. |
+| LumaTrader | `research_lane` | Tracked source, entrypoint and test files present | 6/6 | Compare a frozen paper or replay protocol with a declared baseline after costs and abstention rules. |
+| Sports Harmonic Edge | `research_lane` | Tracked source and entrypoint files present | 3/6 | Compare historical and prospective research scoring with simple declared market baselines. |
+| World Model Engine | `research_lane` | Tracked source and entrypoint files present | 3/6 | Model one buyer-owned decision using a declared source set, baseline, and uncertainty register. |
+| LumaCore Orchestrator | `workflow_module` | Tracked source and entrypoint files present | 5/6 | Compare a declared governed workflow with the buyer's existing process while preserving approvals and abstentions. |
+| LumenGov Grant Factory | `workflow_module` | Tracked source, entrypoint and test files present | 6/6 | Measure preparation latency and conformance defects against the buyer's existing human-controlled workflow. |
 
 ## Lane gates
 
 ### Lumen Infrastructure Sentinel
 
-- Safe description: Infrastructure baseline, drift, anomaly, and evidence-packet tooling.
+- Safe description: Infrastructure evidence-readiness and offline forecast-comparison tooling; historical market-screening components remain separately identified.
 - Buyer profile: Data-center, utility, hospital IT, telecom, and managed-service operators with an authorized historical or replay dataset.
-- Acceptance gate: Detect declared injected or historical failure modes at an agreed false-alert rate on buyer-authorized data.
-- Claim boundary: No outage prevention, realized savings, field validation, safety control, or production deployment claim.
+- Acceptance gate: Before an infrastructure-failure claim, implement and independently review the declared failure detector and agreed false-alert rate on buyer-authorized data. The offline forecast reviewer cannot close this gate.
+- Claim boundary: Synthetic local comparisons only. No implemented infrastructure-failure detector, outage prevention, realized savings, field validation, safety control, or production deployment claim.
 - Missing configured paths: 0
 
 ### EchoForm Identity Engine
@@ -178,7 +184,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 - Strategic packet SHA-256: `358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7`
 - Evidence graph SHA-256: `cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05`
-- Portfolio payload SHA-256: `0746ee1a194dc58bfc7588fad94ee3db5372bdb4023b8db8523cd6965e9dd265`
+- Portfolio payload SHA-256: `ced7e4cbfcb65f1915bfd1d0f3a22775184778f119bdcb88c348077039f263e3`
 - Public contact: <https://lumen-core.ai/proof_to_pilot.html>
 
 ## Boundaries

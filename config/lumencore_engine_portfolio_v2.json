@@ -23,22 +23,26 @@
       "id": "lumen_infrastructure_sentinel",
       "name": "Lumen Infrastructure Sentinel",
       "lane": "priority_validation_lane",
-      "safe_description": "Infrastructure baseline, drift, anomaly, and evidence-packet tooling.",
+      "safe_description": "Infrastructure evidence-readiness and offline forecast-comparison tooling; historical market-screening components remain separately identified.",
       "buyer_profile": "Data-center, utility, hospital IT, telecom, and managed-service operators with an authorized historical or replay dataset.",
-      "scoping_use": "Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence.",
-      "acceptance_gate": "Detect declared injected or historical failure modes at an agreed false-alert rate on buyer-authorized data.",
-      "claim_boundary": "No outage prevention, realized savings, field validation, safety control, or production deployment claim.",
+      "scoping_use": "Review one authorized dataset and an owner-accepted precomputed forecast baseline under a separately locked protocol. The included v2 run is synthetic and does not implement outage detection.",
+      "acceptance_gate": "Before an infrastructure-failure claim, implement and independently review the declared failure detector and agreed false-alert rate on buyer-authorized data. The offline forecast reviewer cannot close this gate.",
+      "claim_boundary": "Synthetic local comparisons only. No implemented infrastructure-failure detector, outage prevention, realized savings, field validation, safety control, or production deployment claim.",
       "evidence": {
         "source": [
           "code/institutional_harmonic_infrastructure.py",
-          "code/execution/infra_constraint_monitor.py"
+          "code/execution/infra_constraint_monitor.py",
+          "code/forecast_evaluation_v2.py"
         ],
         "entrypoint": [
-          "code/institutional_harmonic_infrastructure.py"
+          "code/forecast_evaluation_v2.py"
         ],
-        "test": [],
+        "test": [
+          "tests/test_forecast_evaluation_v2.py"
+        ],
         "documentation": [
-          "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md"
+          "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+          "docs/FORECAST_EVALUATION_V2_REVIEW.md"
         ],
         "artifact": [
           "institutional_harmonic_infrastructure_proof.json"
