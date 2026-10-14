@@ -44,6 +44,11 @@ output path for another review. Without `--json-out`, it returns JSON on stdout.
   Seasonal MASE uses the mean absolute difference over available pairs exactly
   seven calendar days apart. Insufficient support or a zero scale fails; no
   undeclared denominator floor is applied.
+- Timestamps use `YYYY-MM-DDTHH:MM:SS[.ffffff]Z` with at most six fractional
+  digits. Excess precision rejects instead of rounding a late publication into
+  the accepted issue cutoff. Seasonal scale reads only the declared lookback
+  calendar dates, at most 730 history lookups per target, preserving gaps and
+  publication availability without scanning the full history for every target.
 - Descriptive error summaries preserve every required comparison, adverse
   results and dependent observations. They do not interpret repeated rows as
   independent trials or supply a significance-based promotion decision.

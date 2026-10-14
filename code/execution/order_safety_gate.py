@@ -8,6 +8,24 @@ from typing import Any, Mapping
 
 ADD_ORDER_PATH = "/0/private/AddOrder"
 ORDER_POLICY = "validate_only_fail_closed"
+# This boundary is intentionally closed to new private endpoints. Checking only
+# AddOrder let batch, edit/amend and normalized path variants reach the signed
+# transport. Reads required by account/reconciliation tooling remain available;
+# all private mutations except exact validate-only AddOrder fail before I/O.
+READ_ONLY_PRIVATE_PATHS = frozenset({
+    "/0/private/Balance",
+    "/0/private/BalanceEx",
+    "/0/private/TradeBalance",
+    "/0/private/OpenOrders",
+    "/0/private/ClosedOrders",
+    "/0/private/QueryOrders",
+    "/0/private/TradesHistory",
+    "/0/private/QueryTrades",
+    "/0/private/OpenPositions",
+    "/0/private/Ledgers",
+    "/0/private/QueryLedgers",
+    "/0/private/TradeVolume",
+})
 
 
 class OrderSafetyError(RuntimeError):
@@ -53,17 +71,17 @@ def evaluate_order_request(
     safe_payload: Mapping[str, Any] = payload if isinstance(payload, Mapping) else {}
     payload_sha256 = _payload_hash(safe_payload)
 
-    if url_path != ADD_ORDER_PATH:
+    if isinstance(url_path, str) and url_path in READ_ONLY_PRIVATE_PATHS:
         return OrderSafetyDecision(
             allowed=True,
             policy=ORDER_POLICY,
             mode="non_order_private_call",
-            reason="request is not an AddOrder submission",
+            reason="request is an explicitly allowed read-only private call",
             url_path=str(url_path),
             payload_sha256=payload_sha256,
         )
 
-    if _is_validate_only(safe_payload.get("validate")):
+    if url_path == ADD_ORDER_PATH and _is_validate_only(safe_payload.get("validate")):
         return OrderSafetyDecision(
             allowed=True,
             policy=ORDER_POLICY,
@@ -76,8 +94,17 @@ def evaluate_order_request(
     return OrderSafetyDecision(
         allowed=False,
         policy=ORDER_POLICY,
-        mode="blocked_live_order",
-        reason="AddOrder is blocked unless validate is explicitly true",
+        mode=(
+            "blocked_live_order"
+            if url_path == ADD_ORDER_PATH
+            else "blocked_private_side_effect"
+        ),
+        reason=(
+            "AddOrder is blocked unless validate is explicitly true"
+            if url_path == ADD_ORDER_PATH
+            else "private endpoint is not on the read-only allowlist; "
+            "mutations and unknown routes are blocked"
+        ),
         url_path=str(url_path),
         payload_sha256=payload_sha256,
     )

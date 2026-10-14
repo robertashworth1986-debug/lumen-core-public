@@ -282,12 +282,39 @@ def test_as_of_timestamps_cannot_omit_utc_timezone(module, inputs, column, inval
         evaluate(module, inputs)
 
 
-def test_forecast_published_after_issue_cannot_enter_score(module, inputs):
+@pytest.mark.parametrize("late_time", ["04:00:01", "04:00:00.000001"])
+def test_forecast_published_after_issue_cannot_enter_score(module, inputs, late_time):
     fields, rows = read_rows(inputs["predictions"])
-    rows[0]["prediction_available_at_utc"] = rows[0]["issued_at_utc"].replace("04:00:00", "04:00:01")
+    rows[0]["prediction_available_at_utc"] = rows[0]["issued_at_utc"].replace("04:00:00", late_time)
     write_rows(inputs["predictions"], fields, rows)
     with pytest.raises(ValueError):
         evaluate(module, inputs)
+
+
+@pytest.mark.parametrize("timestamp_source", ["issued_at_utc", "prediction_available_at_utc", "actual_available_at_utc", "history", "protocol"])
+def test_submicrosecond_timestamps_cannot_be_silently_rounded(module, inputs, timestamp_source):
+    if timestamp_source == "protocol":
+        protocol = json.loads(inputs["protocol"].read_text(encoding="utf-8"))
+        change_protocol(inputs, "locked_at_utc", protocol["locked_at_utc"][:-1] + ".0000009Z")
+    else:
+        input_name = "history" if timestamp_source == "history" else "predictions"
+        column = "actual_available_at_utc" if input_name == "history" else timestamp_source
+        fields, rows = read_rows(inputs[input_name])
+        rows[0][column] = rows[0][column][:-1] + ".0000009Z"
+        write_rows(inputs[input_name], fields, rows)
+    with pytest.raises(ValueError, match="at most six fractional digits"):
+        evaluate(module, inputs)
+
+
+@pytest.mark.parametrize("timestamp", ["20261014T040000Z", "2026-10-14 04:00:00Z", "2026-W42-3T04:00:00Z"])
+def test_timestamp_aliases_cannot_replace_declared_calendar_utc_format(module, timestamp):
+    with pytest.raises(ValueError):
+        module._utc(timestamp)
+
+
+@pytest.mark.parametrize(("fraction", "microseconds"), [("", 0), (".1", 100000), (".000001", 1), (".123456", 123456)])
+def test_supported_timestamp_precision_is_preserved_exactly(module, fraction, microseconds):
+    assert module._utc(f"2026-10-14T04:00:00{fraction}Z") == datetime(2026, 10, 14, 4, microsecond=microseconds, tzinfo=timezone.utc)
 
 
 def test_forecasts_and_history_available_exactly_at_issue_are_allowed(module, inputs):
@@ -415,6 +442,40 @@ def test_calendar_scale_filters_by_availability_before_counting_pairs(module):
         module.calendar_seasonal_scale(history, "A", date(2026, 1, 17), issued, 730, 8)
 
 
+@pytest.mark.parametrize("lookback_days", [28, 730])
+def test_seasonal_scale_read_budget_depends_on_calendar_window_not_archive_size(module, lookback_days):
+    class CountedHistory(dict):
+        reads = 0
+
+        def get(self, key, default=None):
+            self.reads += 1
+            return super().get(key, default)
+
+        def items(self):
+            for item in super().items():
+                self.reads += 1
+                yield item
+
+    history = CountedHistory()
+    first = date(2020, 1, 1)
+    for entity in range(100):
+        for offset in range(1000):
+            day = first + timedelta(days=offset)
+            history[(f"E{entity}", day)] = module.Observation(
+                float(offset * offset + entity),
+                datetime.combine(day + timedelta(days=1), datetime.min.time(), timezone.utc),
+            )
+    result = module.calendar_seasonal_scale(
+        history, "E0", first + timedelta(days=1000),
+        datetime(2023, 1, 1, tzinfo=timezone.utc), lookback_days, 7,
+    )
+    # For y[n]=n^2, the paired absolute difference is 14*n-49. All
+    # eligible pairs run from n=1000-lookback+7 through n=999.
+    expected_scale = 14 * ((1000 - lookback_days + 7 + 999) / 2) - 49
+    assert result == {"scale_mwh": expected_scale, "pair_count": lookback_days - 7}
+    assert history.reads <= lookback_days
+
+
 def test_constant_history_cannot_create_an_undeclared_mase_scale_floor(module):
     history = irregular_history(module)
     history = {
@@ -469,6 +530,40 @@ def test_cli_does_not_emit_review_artifact_for_wrong_protocol(tmp_path):
         capture_output=True, text=True, check=False,
     )
     assert result.returncode != 0
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("input_name", ["history", "predictions"])
+@pytest.mark.parametrize("field_location", ["header", "data"])
+def test_oversized_csv_fields_return_structured_rejection(module, inputs, tmp_path, input_name, field_location):
+    fields, rows = read_rows(inputs[input_name])
+    oversized = "A" * (csv.field_size_limit() + 1)
+    if field_location == "header":
+        previous = fields[0]
+        fields[0] = oversized
+        for row in rows:
+            row[oversized] = row.pop(previous)
+    else:
+        rows[0][fields[0]] = oversized
+    write_rows(inputs[input_name], fields, rows)
+    assert inputs[input_name].stat().st_size < module.MAX_FILE_BYTES
+    with pytest.raises(ValueError, match="CSV parser rejected"):
+        evaluate(module, inputs)
+    output = tmp_path / "rejected_review.json"
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--protocol", str(inputs["protocol"]),
+         "--protocol-sha256", digest(inputs["protocol"]),
+         "--predictions", str(inputs["predictions"]),
+         "--history", str(inputs["history"]), "--json-out", str(output)],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 1
+    assert result.stdout == ""
+    rejection = json.loads(result.stderr)
+    assert rejection["status"] == "HUMAN_REVIEW_HOLD"
+    assert rejection["input_rejected"] is True
+    assert rejection["promotion_gate_passed"] is False
+    assert rejection["production_authorized"] is False
     assert not output.exists()
 
 

@@ -4,7 +4,7 @@
   "execution_verified_by_this_audit": false,
   "customer_acceptance_verified_by_this_audit": false,
   "observed_maturity_contract": "Legacy compatibility enum derived only from configured tracked-file presence; it does not establish execution, test results, operational readiness or customer acceptance.",
-  "generated_at_utc": "2026-10-13T18:35:44.430155Z",
+  "generated_at_utc": "2026-10-14T06:25:33.815944Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "1d6930af5d20338210f82b8f6fbf368474d3f793a15de8009a7a5cfabb01c705",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -93,9 +93,9 @@
             "path": "code/forecast_evaluation_v2.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "f3df52dcde5a049ee0c1e13cef832a4c0b65e765",
-            "bytes": 18173,
-            "sha256": "8720c20089e9b50e4e9dde0bfb794c50e12772b9f2de66b3a9f931fc03af1bd4"
+            "git_blob_sha": "4ab6dd4190d25aae124409d3f532d0441bf9198e",
+            "bytes": 18499,
+            "sha256": "be6db9104cc2928b86bc9ad7de8118eefbef48c55127d6c9e4bb632a4f8bc39d"
           }
         ],
         "entrypoint": [
@@ -103,9 +103,9 @@
             "path": "code/forecast_evaluation_v2.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "f3df52dcde5a049ee0c1e13cef832a4c0b65e765",
-            "bytes": 18173,
-            "sha256": "8720c20089e9b50e4e9dde0bfb794c50e12772b9f2de66b3a9f931fc03af1bd4"
+            "git_blob_sha": "4ab6dd4190d25aae124409d3f532d0441bf9198e",
+            "bytes": 18499,
+            "sha256": "be6db9104cc2928b86bc9ad7de8118eefbef48c55127d6c9e4bb632a4f8bc39d"
           }
         ],
         "test": [
@@ -113,9 +113,9 @@
             "path": "tests/test_forecast_evaluation_v2.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "f96ea9b5495da54bf4885b1dd1536d5c0b3a5192",
-            "bytes": 20625,
-            "sha256": "8ec38fe5226f41e8d1c7068ab7ab491f4bb914081b5390127a2e847de794c304"
+            "git_blob_sha": "c076fb6c3f8febed04029a0b51e63410927f64da",
+            "bytes": 25106,
+            "sha256": "c589aee975b7a1bc5b02b4b8c55daa7ca848ca0fa1cb0cae3b308189438b3b0a"
           }
         ],
         "documentation": [
@@ -131,9 +131,9 @@
             "path": "docs/FORECAST_EVALUATION_V2_REVIEW.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "6e7979b7873cd509fd8a644521749591c8893aef",
-            "bytes": 3986,
-            "sha256": "98b30bac2fcb67cbde04c4b13e64f7faaa503ec8fd01727841e102806902a5fd"
+            "git_blob_sha": "8b4c64c2f28a00a908f2b6ab7c91103372bd9083",
+            "bytes": 4376,
+            "sha256": "a3c2a0e1602c0af062e6355b8abe5e6370277f5ac372286a19967c1e1ba66c4d"
           }
         ],
         "artifact": [
@@ -484,9 +484,9 @@
             "path": "code/kraken_execution.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1c704111b73f224101828658640ccb8f44dbe12d",
-            "bytes": 4780,
-            "sha256": "985860a84269c29a1a81ff906d53fb9c4f76d529964b464cd4c88646aa483b10"
+            "git_blob_sha": "0aaf19380724fc8acc9de8f2b42645e7693bc646",
+            "bytes": 4795,
+            "sha256": "bc0fc48d338a2e2c6b4ed640964045228af9979621b1b140a2b9de6a949360a4"
           },
           {
             "path": "code/kraken_swing_hunter.py",
@@ -512,9 +512,9 @@
             "path": "tests/test_order_safety_gate.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "dc2197adea3d0699e387a4e9217e078fa98dd8ab",
-            "bytes": 6043,
-            "sha256": "657e2f7ed8e5e6b766c48d52376a178446740f0d320c4c6b7d7b8f8d4b6fd658"
+            "git_blob_sha": "012d0efd0abd328934b192563a43433f061a73f5",
+            "bytes": 7650,
+            "sha256": "29eeb6393d5ee29b07025bb8cc3257a61acd96d98d23a1aeb9406fbbe9d5ab2a"
           }
         ],
         "documentation": [
@@ -742,9 +742,9 @@
             "path": "tests/test_order_safety_alpaca_paper_boundary.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "b53d76597e0096ba197e3663394eeeab5805eb5a",
-            "bytes": 5107,
-            "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759"
+            "git_blob_sha": "45b0cefc9aeb262ec8125c40d34c9befa3d58c83",
+            "bytes": 7377,
+            "sha256": "9fc28549279515195fe1686635ec225d1c8058683fb77e965bd7b4dfd5132e2a"
           }
         ],
         "documentation": [
@@ -1093,6 +1093,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "ced7e4cbfcb65f1915bfd1d0f3a22775184778f119bdcb88c348077039f263e3"
+    "payload_sha256": "19d36a89bf1b9d9c7710ee94433a75b3524ec7f41d6f32fb22ca442f6743bb62"
   }
 }

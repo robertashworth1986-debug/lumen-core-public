@@ -2,9 +2,9 @@
 
 The historical implementation is preserved byte-for-byte in
 ``kraken_execution_legacy.py`` for auditability. This facade is the public
-import surface. It blocks every Kraken AddOrder request unless the payload is
-explicitly validate-only and replaces the legacy validate-only helper with a
-side-effect-bounded implementation.
+import surface. It allows only explicitly listed read-only private calls and
+exact validate-only AddOrder requests, and replaces the legacy validate-only
+helper with a side-effect-bounded implementation.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ def _private_post(
 
 
 # Legacy functions resolve globals in the legacy module. Rebinding its private
-# transport makes the gate central for every caller that reaches AddOrder.
+# transport applies the same closed endpoint policy to every private caller.
 _legacy._private_post = _private_post
 
 

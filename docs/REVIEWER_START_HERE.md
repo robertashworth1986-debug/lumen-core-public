@@ -56,6 +56,85 @@ lanes; research breadth does not establish customers or deployed products.
 
 ## A focused team review
 
+### October 14 follow-up: code review and launch decision
+
+This continuation advances active outcome 2 using the existing reviewer path.
+An outside code review should return a written assessment of code quality,
+security, scalability, reusable components and the work required for a bounded
+launch. Record the agreed scope, effort and cost ceiling separately before paid
+work begins. A proposed review, an AI-assisted scan or a passing first-party
+test run does not establish completed independent evaluation. A human reviewer
+should identify the commands they executed and own their written conclusions.
+
+Start with one reproduction, then inspect the controls below. Return each
+blocker with severity, file/line, expected and observed behavior, remediation
+and a bounded effort estimate. Separate repairable components from any component
+that needs replacement; state the assumptions behind a rebuild estimate.
+
+| Review question | Current-source focus | Remaining acceptance gate |
+|---|---|---|
+| Can an order bypass the intended boundary? | Kraken permits enumerated read-only private calls and explicitly validated `AddOrder`; batch, amend, edit and unknown private calls reject before transport. Alpaca does not automatically retry a mutation after an ambiguous transport failure. | Broker reconciliation, idempotent intent/recovery design and prospective after-cost paper evaluation. No live order authority follows from these repairs. |
+| Do malformed inputs fail predictably? | Forecast CSV parser failures use the structured rejection path. Non-ASCII operator tokens reject through HTTP/WebSocket authorization. | An outside reviewer must test the actual deployed boundary separately. Local tests are not a penetration test. |
+| Can the serving path support a buyer workload? | Inspect the bounded gateway executor and lifetime lock, then forecast calendar/history scans, input budgets and ledger ownership. | Define input size, arrival rate, latency, queue limits, cancellation and resource budgets before a controlled load test. No institutional throughput claim is established. |
+| What is the smallest deliverable a buyer can accept? | One authorized data package, accepted baseline, locked metric, explicit limitations and a reviewer-readable decision record. | Named technical and budget owners, handling agreement, accepted scope and required payment; tests and referrals do not establish revenue. |
+
+After installing the full-suite environment below, reproduce the changed boundaries:
+
+```bash
+python -m pytest -q tests/test_order_safety_gate.py tests/test_order_safety_facades.py tests/test_order_safety_alpaca_paper_boundary.py
+python -m pytest -q tests/test_forecast_evaluation_v2.py tests/test_operator_api_access.py
+```
+
+The follow-on repair also tests mounted/proxy-root API authorization, rejects
+timestamp precision that would be silently truncated, bounds seasonal-history
+lookups to the declared calendar window, restores missing verified ledger CSV
+rows before another event, and rejects market simple returns below -100%.
+These are software correctness controls; they do not establish fill quality,
+strategy returns, outside validation or broker reconciliation.
+
+The existing local dashboard refresh now accepts the current registry/config
+wrappers, requires explicit source enablement and keeps all assumed dollar
+rates labeled `MODELED`. Reported file counts do not become verified live rows.
+Paper configuration and historical records do not establish current operation.
+The browser bridge distinguishes a poll attempt from a source observation,
+labels accepted values as reported, and suppresses malformed or old reports.
+Its five-minute report-display cutoff is not a source-data freshness guarantee.
+The refresh singleton also preserves a live or unknown owner's old lock instead
+of evicting it after six hours. This remains a process-PID lock, not the gateway's
+separately tested native lifetime lock or multi-producer ownership proof.
+
+```bash
+python -m pytest -q tests/test_execution_accounting_regressions.py tests/test_dashboard_metric_provenance.py tests/test_live_registry_bridge.py tests/test_gov_snapshot_guard.py
+```
+
+### Read the early rolling dashboards as historical research
+
+The [estate scope review](LUMENCORE_ESTATE_SCOPE_REVIEW_2026-10-04.md) locates the
+earlier Mission Control, Quant Lab, trading sweeps and simulation outputs. Their
+existence is useful implementation history; a rolling display, Monte Carlo run
+or frozen hash does not by itself demonstrate a profitable decision.
+
+In particular, [the infrastructure loop builder](../code/infra_live_loop_builder.py)
+contains fixed row counts, improvement percentages and assumed hourly loss
+rates; it does not fetch those rows or measure an achieved improvement. The
+[constraint detector](../code/execution/institutional_constraint_detector.py)
+simulates provider failures and labels one minus modeled impact an optimization
+gain. Neither output is a measured saving or cash receipt. Do not execute the
+historical builder as a review shortcut: it has top-level filesystem writes.
+The [historical harmonic tournament](../code/institutional_harmonic_suite.py)
+also retains same-period signal accounting, clipped returns and test-dependent
+selection. October 13 accounting repairs in other engines do not repair or
+retroactively validate this historical tournament.
+
+Continuous source capture can support new hypotheses. To test one, use a
+timestamped authorized source, an accepted baseline, a frozen candidate and
+evaluation rule, then prospective shadow measurement and human review. Trading
+must retain fees, spread, slippage, fill/exit failures, drawdowns and account
+reconciliation. Infrastructure value needs a buyer-owned action and measured
+cost/benefit after operating overhead. Neither path guarantees a positive result.
+The [public metrics contract](PUBLIC_METRICS_CONTRACT.md) still records four
+unresolved legacy feed contracts; gateway liveness is not live-data freshness.
+
 ### October 13 repair review, including trading
 
 The current-source repair pass adds a versioned forecast reviewer, receipt

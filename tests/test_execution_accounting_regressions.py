@@ -129,6 +129,24 @@ def test_scoring_rejects_index_mismatch_nonfinite_returns_and_negative_costs():
         capital.build_strategy_returns([1, 1], [0, .1], cost_bps=-1)
 
 
+@pytest.mark.parametrize('signal', [[-1, -1], [1, 1], [0, 0]])
+@pytest.mark.parametrize('loss', [-1.0000000001, -1.5])
+def test_impossible_underlying_loss_cannot_be_converted_into_short_profit(signal, loss):
+    with pytest.raises(ValueError, match='-100%'):
+        capital.build_strategy_returns(signal, [0, loss], cost_bps=0)
+
+
+@pytest.mark.parametrize('loss', [-1.0, -.5])
+@pytest.mark.parametrize('direction', [-1, 1])
+def test_scoring_retains_valid_total_and_large_underlying_losses(loss, direction):
+    net, position, turnover = capital.build_strategy_returns([direction, direction], [0, loss], cost_bps=0)
+    assert net.tolist() == pytest.approx([0, direction * loss])
+    assert position.tolist() == [0, direction]
+    assert turnover.tolist() == [0, 1]
+    assert np.isfinite(net.to_numpy()).all()
+    assert capital.stats(net)['final_nav'] == pytest.approx(1 + direction * loss)
+
+
 def test_drawdown_includes_starting_capital_even_in_short_windows():
     metrics = capital.stats([-.1, 0, .01])
     assert metrics['final_nav'] == pytest.approx(.909)
@@ -251,6 +269,66 @@ def test_ledger_failed_csv_projection_is_recovered_without_a_second_source_event
         assert len(list(csv.DictReader(stream))) == 1
 
 
+def test_new_event_recovers_prior_interrupted_projection_before_appending(tmp_path):
+    book = ledger(tmp_path)
+    first = {'event_id': 'first', 'symbol': 'TOY', 'status': 'OPEN', 'qty': 1}
+    with patch.object(book, '_append_csv', side_effect=OSError('fixture projection failure')):
+        with pytest.raises(OSError):
+            book.append(first)
+    original_source = Path(book.jsonl_path).read_bytes()
+
+    book.append({'event_id': 'second', 'symbol': 'TOY', 'status': 'CLOSED', 'qty': 1})
+
+    assert Path(book.jsonl_path).read_bytes().startswith(original_source)
+    records = book.read_records()
+    with open(book.csv_path, newline='') as stream:
+        projected = [json.loads(row['record_json']) for row in csv.DictReader(stream)]
+    assert [record['event_id'] for record in records] == ['first', 'second']
+    assert projected == records
+
+
+def test_deleted_projection_is_recovered_in_full_when_a_new_event_arrives(tmp_path):
+    book = ledger(tmp_path)
+    for event_id in ('first', 'second'):
+        book.append({'event_id': event_id, 'symbol': 'TOY', 'qty': 1})
+    original_source = Path(book.jsonl_path).read_bytes()
+    Path(book.csv_path).unlink()
+
+    book.append({'event_id': 'third', 'symbol': 'TOY', 'qty': 2})
+
+    assert Path(book.jsonl_path).read_bytes().startswith(original_source)
+    records = book.read_records()
+    with open(book.csv_path, newline='') as stream:
+        projected = [json.loads(row['record_json']) for row in csv.DictReader(stream)]
+    assert projected == records and len(records) == 3
+
+
+def test_failed_prior_projection_recovery_does_not_commit_a_new_source_event(tmp_path):
+    book = ledger(tmp_path)
+    book.append({'event_id': 'first', 'symbol': 'TOY', 'qty': 1})
+    original_source = Path(book.jsonl_path).read_bytes()
+    Path(book.csv_path).unlink()
+
+    with patch.object(book, '_append_csv', side_effect=OSError('fixture recovery failure')):
+        with pytest.raises(OSError):
+            book.append({'event_id': 'second', 'symbol': 'TOY', 'qty': 2})
+
+    assert Path(book.jsonl_path).read_bytes() == original_source
+
+
+def test_event_conflict_never_repairs_projection_or_changes_source(tmp_path):
+    book = ledger(tmp_path)
+    book.append({'event_id': 'first', 'symbol': 'TOY', 'qty': 1})
+    original_source = Path(book.jsonl_path).read_bytes()
+    Path(book.csv_path).unlink()
+
+    with pytest.raises(ValueError, match='different payload'):
+        book.append({'event_id': 'first', 'symbol': 'TOY', 'qty': 2})
+
+    assert Path(book.jsonl_path).read_bytes() == original_source
+    assert not Path(book.csv_path).exists()
+
+
 def test_ledger_preserves_legacy_bytes_and_appends_by_the_existing_header(tmp_path):
     book = ledger(tmp_path)
     historical = {'timestamp':'t0','symbol':'TOY','status':'OPEN','logged_utc':'2026-01-01T00:00:00+00:00','ledger_schema_version':'1.1.0'}
@@ -321,6 +399,25 @@ def test_partial_csv_row_with_a_hash_is_not_treated_as_complete(tmp_path):
     assert rows[-1]['record_hash']==digest and json.loads(rows[-1]['record_json'])==record
     size=Path(book.csv_path).stat().st_size
     assert book.append(payload)==digest and Path(book.csv_path).stat().st_size==size
+
+
+def test_new_event_recovers_partial_projection_without_rewriting_its_prefix(tmp_path):
+    book = ledger(tmp_path)
+    book.append({'event_id': 'first', 'symbol': 'TOY', 'pnl': -1})
+    record = book.read_records()[0]
+    stream = io.StringIO(newline='')
+    writer = csv.DictWriter(stream, fieldnames=CSV_FIELDS)
+    writer.writeheader()
+    writer.writerow({**{key: record.get(key, '') for key in CSV_FIELDS}, 'record_json': ''})
+    partial = stream.getvalue().rstrip('\r\n').encode()
+    Path(book.csv_path).write_bytes(partial)
+
+    book.append({'event_id': 'second', 'symbol': 'TOY', 'pnl': 2})
+
+    assert Path(book.csv_path).read_bytes().startswith(partial + b'\n')
+    with open(book.csv_path, newline='') as fp:
+        rows = list(csv.DictReader(fp))
+    assert [json.loads(row['record_json']) for row in rows[-2:]] == book.read_records()
 
 
 def test_unclosed_csv_quotes_are_held_for_explicit_projection_reconstruction(tmp_path):

@@ -1,6 +1,6 @@
 # LumenCore Engine Portfolio — Tracked-File Inventory
 
-Generated at: `2026-10-13T18:35:44.430155Z`
+Generated at: `2026-10-14T06:25:33.815944Z`
 
 **Audit scope:** `tracked_file_presence_only`
 This audit checks configured tracked-file presence and hashes Git blobs. It does not execute the listed engines or tests, evaluate their results, or verify customer acceptance.
@@ -184,7 +184,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 - Strategic packet SHA-256: `358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7`
 - Evidence graph SHA-256: `cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05`
-- Portfolio payload SHA-256: `ced7e4cbfcb65f1915bfd1d0f3a22775184778f119bdcb88c348077039f263e3`
+- Portfolio payload SHA-256: `19d36a89bf1b9d9c7710ee94433a75b3524ec7f41d6f32fb22ca442f6743bb62`
 - Public contact: <https://lumen-core.ai/proof_to_pilot.html>
 
 ## Boundaries
