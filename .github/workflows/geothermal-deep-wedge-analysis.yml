@@ -1,0 +1,123 @@
+name: Geothermal Deep Wedge Analysis
+
+on:
+  push:
+    branches:
+      - "exp/energy-multisource-breadth"
+    paths:
+      - "experiments/energy_multisource/run_geothermal_deep_wedge.py"
+      - ".github/workflows/geothermal-deep-wedge-analysis.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install analysis dependencies
+        run: python -m pip install --disable-pip-version-check numpy pandas openpyxl
+
+      - name: Compile deep geothermal analysis
+        run: python -m py_compile experiments/energy_multisource/run_geothermal_deep_wedge.py
+
+      - name: Acquire FORGE 1109 data
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/geothermal-deep-analysis/raw/forge1109
+          curl --fail --location --retry 6 --retry-delay 4 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://gdr.openei.org/files/1109/58-32_Phase2B_injection_data_flow.csv" \
+            -o out/geothermal-deep-analysis/raw/forge1109/flow.csv
+          curl --fail --location --retry 6 --retry-delay 4 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://gdr.openei.org/files/1109/58-32_Phase2B_injection_data_pressure.csv" \
+            -o out/geothermal-deep-analysis/raw/forge1109/pressure.csv
+
+      - name: Acquire selected FORGE 1149 stimulation data
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/geothermal-deep-analysis/raw/forge1149
+          python - <<'PY'
+          import pathlib, urllib.parse, urllib.request
+          root=pathlib.Path('out/geothermal-deep-analysis/raw/forge1149')
+          names=[
+            '58-32_OpenHoleStimulation (1).xlsx',
+            '58-32_LowerPerfStimulation (1).xlsx',
+            '58-32_UpperPerforationStimulation_mm (1).xlsx',
+          ]
+          for name in names:
+              url='https://gdr.openei.org/files/1149/'+urllib.parse.quote(name, safe='()')
+              req=urllib.request.Request(url,headers={'User-Agent':'LumenCore-Research/1.0'})
+              with urllib.request.urlopen(req,timeout=120) as response:
+                  data=response.read()
+              (root/name).write_bytes(data)
+          PY
+
+      - name: Acquire complete USGS OFR 83-250 tables
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/geothermal-deep-analysis/raw/usgs
+          curl --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://www.sciencebase.gov/catalog/file/get/5d40b3f3e4b01d82ce8d9df5?f=__disk__63%2Fb7%2F80%2F63b7802742dd1ba7cc367f82981300c8a2b221c8" \
+            -o out/geothermal-deep-analysis/raw/usgs/source.zip
+          unzip -t out/geothermal-deep-analysis/raw/usgs/source.zip
+          unzip -q out/geothermal-deep-analysis/raw/usgs/source.zip -d out/geothermal-deep-analysis/raw/usgs/extracted
+
+      - name: Run frozen deep geothermal sweep
+        shell: bash
+        run: |
+          set -euo pipefail
+          python experiments/energy_multisource/run_geothermal_deep_wedge.py \
+            --forge1109-dir out/geothermal-deep-analysis/raw/forge1109 \
+            --forge1149-dir out/geothermal-deep-analysis/raw/forge1149 \
+            --usgs-dir out/geothermal-deep-analysis/raw/usgs/extracted \
+            --out out/geothermal-deep-analysis/results
+          python -m json.tool out/geothermal-deep-analysis/results/summary.json >/dev/null
+          python -m json.tool out/geothermal-deep-analysis/results/sha256_manifest.json >/dev/null
+
+      - name: Build chain of custody
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('out/geothermal-deep-analysis')
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if not p.is_file(): continue
+              h=hashlib.sha256()
+              with p.open('rb') as f:
+                  for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+              rows.append({'path':str(p.relative_to(root)),'size_bytes':p.stat().st_size,'sha256':h.hexdigest()})
+          receipt={
+            'files':rows,
+            'negative_results_retained':True,
+            'claim_boundary':'Offline retrospective analysis only; no live control, safety, stimulation procedure, siting recommendation, reserve claim, or commercial-performance claim.'
+          }
+          (root/'CHAIN_OF_CUSTODY.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          PY
+
+      - name: Upload deep geothermal analysis artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: geothermal-deep-wedge-${{ github.sha }}
+          path: out/geothermal-deep-analysis/
+          if-no-files-found: error
+          retention-days: 30
