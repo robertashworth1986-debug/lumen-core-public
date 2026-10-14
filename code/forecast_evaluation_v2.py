@@ -68,8 +68,8 @@ def _day(value: str) -> date:
 
 
 def _utc(value: str) -> datetime:
-    if not isinstance(value, str) or not value.endswith("Z"):
-        raise ValueError("timestamp must be an explicit UTC time ending in Z")
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,6})?Z", value):
+        raise ValueError("timestamp must use YYYY-MM-DDTHH:MM:SS[.ffffff]Z with at most six fractional digits")
     parsed = datetime.fromisoformat(value[:-1] + "+00:00")
     if parsed.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be UTC")
@@ -180,8 +180,12 @@ def calendar_lags(history, entity: str, target: date, issued_at: datetime, offse
 
 
 def calendar_seasonal_scale(history, entity: str, target: date, issued_at: datetime, lookback_days: int, min_pairs: int) -> dict:
-    start = target - timedelta(days=lookback_days)
-    available = {day: observation.value for (name, day), observation in history.items() if name == entity and start <= day < target and observation.available_at <= issued_at}
+    available = {}
+    for offset in range(1, lookback_days + 1):
+        day = target - timedelta(days=offset)
+        observation = history.get((entity, day))
+        if observation is not None and observation.available_at <= issued_at:
+            available[day] = observation.value
     differences = [abs(value - available[day - timedelta(days=7)]) for day, value in available.items() if day - timedelta(days=7) in available]
     if len(differences) < min_pairs:
         raise ValueError("insufficient as-of seven-calendar-day seasonal pairs")

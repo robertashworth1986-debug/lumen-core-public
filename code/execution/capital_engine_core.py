@@ -109,6 +109,10 @@ def build_strategy_returns(signal, ret, cost_bps=2.0):
     than clipped; missing realized returns are rejected rather than fabricated.
     """
     returns = _numeric_series(ret, name="market returns")
+    # These are simple spot-price returns. A value below -100% is an invalid
+    # market observation, even when short or flat exposure would mask the loss.
+    if (returns < -1).any():
+        raise ValueError("market simple returns below -100% are invalid")
     if isinstance(signal, pd.Series):
         if not signal.index.equals(returns.index):
             raise ValueError("signals and returns must have exactly matching indexes")

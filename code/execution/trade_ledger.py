@@ -185,14 +185,19 @@ class TradeLedger:
                 digest = record.get("event_payload_sha256") or _payload_hash(record)
                 if event_id is not None and record.get("event_id") == event_id and digest != payload_digest:
                     raise ValueError("event_id was already recorded with a different payload")
-                if digest == payload_digest:
+                if digest == payload_digest and existing is None:
                     existing = record
-                    break
+            # A source write can succeed before CSV fails, and a caller may
+            # advance to a different event rather than retry the interrupted
+            # one. Restore every verified missing projection before accepting
+            # another source event, while retaining all existing CSV bytes.
+            # Conflicting event IDs have already rejected without any repair.
+            for record in records:
+                if record["record_hash"] not in projected_hashes:
+                    self._append_csv(record, header, write_header)
+                    write_header = False
+                    projected_hashes.add(record["record_hash"])
             if existing is not None:
-                # A JSONL write can succeed before CSV fails. Retrying repairs
-                # only the missing projection and never repeats the source event.
-                if existing["record_hash"] not in projected_hashes:
-                    self._append_csv(existing, header, write_header)
                 return existing["record_hash"]
             record = {
                 **payload, "ledger_schema_version": LEDGER_SCHEMA_VERSION,

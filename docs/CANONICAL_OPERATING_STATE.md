@@ -32,6 +32,20 @@ activated. These repairs do not close historical strategy-selection bias,
 fee/fill/latency assumptions, account reconciliation, legacy provider closure,
 live release drift or prospective operating-evidence gates.
 
+The founder-requested follow-on continues in the same draft review change. It
+aligns mounted/proxy-root authorization with the router, rejects timestamp
+precision that would be silently truncated and bounds v2 seasonal-history
+lookups. Ledger recovery restores all verified missing CSV projections before
+accepting another event; the spot-return engine rejects impossible underlying
+losses below -100%. The local dashboard now separates configured intent,
+reported counts, modeled dollar rates and unverified source observations. The
+browser bridge labels poll attempts and report values without implying source
+freshness, and the refresh lock no longer expires an active owner's claim after
+six hours. Offline regression fixtures reproduce the prior failures. These
+source fixes do not establish their deployment, data freshness, reconciliation,
+operating benefit or institutional throughput. The existing review packet and
+tracked-file portfolio inventory are refreshed from the resulting source.
+
 The archive review distinguishes recovered files and indexed historical records
 from unavailable device roots and unreviewed images. The early infrastructure
 loop uses assumed gains and dollar rates; the legacy constraint detector uses

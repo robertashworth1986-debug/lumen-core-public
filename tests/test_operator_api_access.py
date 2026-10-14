@@ -171,6 +171,25 @@ class OperatorApiAccessTests(unittest.TestCase):
 
         self.assertEqual(len(app.calls), 4)
 
+    def test_proxy_root_path_matching_requires_exact_segment_boundary(self) -> None:
+        cases = (
+            ("/gateway", "/gateway/api/private", 503),
+            ("/gateway", "/api/private", 503),
+            ("/gate", "/gateway/api/private", 204),
+            ("/gateway", "/gateway/health", 200),
+            ("/gate", "/gateway/health", 204),
+            ("/gateway", "/gateway/api/public/status", 200),
+            ("/gate", "/gateway/api/public/status", 204),
+        )
+        for root_path, path, expected in cases:
+            with self.subTest(root_path=root_path, path=path):
+                app = _ProbeApp()
+                middleware = OperatorApiAccessMiddleware(app, token_provider=lambda: ())
+                scope = {**_scope(path), "root_path": root_path}
+                self.assertEqual(_status(_invoke(middleware, scope)), expected)
+                self.assertEqual(scope["path"], path)
+                self.assertEqual(len(app.calls), 1 if expected == 204 else 0)
+
     def test_sensitive_get_requires_valid_bearer_or_operator_header(self) -> None:
         app = _ProbeApp()
         middleware = OperatorApiAccessMiddleware(
@@ -433,6 +452,119 @@ class OperatorApiAccessTests(unittest.TestCase):
         install_operator_api_access(app)
         self.assertEqual(len(app.middleware), 1)
         self.assertIs(app.middleware[0][0][0], OperatorApiAccessMiddleware)
+
+
+@unittest.skipIf(httpx is None, "httpx is required for the static-output probe")
+class MountedOperatorAccessIntegrationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_mounted_private_http_routes_and_outputs_keep_auth_boundary(self) -> None:
+        from starlette.applications import Starlette
+        from starlette.responses import Response
+        from starlette.routing import Mount, Route
+        from starlette.staticfiles import StaticFiles
+
+        token = "synthetic-mounted-operator-token-0000"
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "fixture.txt").write_text("synthetic private output", encoding="utf-8")
+            for tokens in ((), (token,)):
+                for nested in (False, True):
+                    calls: list[str] = []
+
+                    async def private(request):
+                        calls.append(request.url.path)
+                        return Response("synthetic private API")
+
+                    inner = Starlette(routes=[
+                        Route("/api/private", private),
+                        Route("/docs", private),
+                        Mount("/out", app=StaticFiles(directory=str(output))),
+                    ])
+                    inner.add_middleware(
+                        OperatorApiAccessMiddleware,
+                        token_provider=lambda tokens=tokens: tokens,
+                    )
+                    outer = Starlette(routes=[Mount("/gateway", app=inner)])
+                    if nested:
+                        outer = Starlette(routes=[Mount("/parent", app=outer)])
+                    prefix = "/parent/gateway" if nested else "/gateway"
+                    async with httpx.AsyncClient(
+                        transport=httpx.ASGITransport(app=outer), base_url="http://test"
+                    ) as client:
+                        for route in ("/api/private", "/docs", "/out/fixture.txt"):
+                            with self.subTest(route=route, configured=bool(tokens), nested=nested):
+                                missing = await client.get(prefix + route)
+                                invalid = await client.get(
+                                    prefix + route, headers={"Authorization": "Bearer invalid"}
+                                )
+                                self.assertEqual(missing.status_code, 401 if tokens else 503)
+                                self.assertEqual(invalid.status_code, 401 if tokens else 503)
+                                self.assertNotIn("synthetic private", missing.text)
+                        self.assertEqual(calls, [])
+                        for route in (PUBLIC_HEALTH_PATH, PUBLIC_STATUS_PATH):
+                            public = await client.get(prefix + route)
+                            public_head = await client.head(prefix + route)
+                            self.assertEqual(public.status_code, 200)
+                            self.assertEqual(public.json()["public_surface"], "minimal")
+                            self.assertEqual(public_head.status_code, 200)
+                            self.assertEqual(public_head.content, b"")
+                        if tokens:
+                            for route in ("/api/private", "/docs", "/out/fixture.txt"):
+                                allowed = await client.get(
+                                    prefix + route,
+                                    headers={"Authorization": f"Bearer {token}"},
+                                )
+                                self.assertEqual(allowed.status_code, 200)
+                                self.assertIn("synthetic private", allowed.text)
+                            self.assertEqual(len(calls), 2)
+
+    async def test_mounted_websocket_cannot_reach_handler_without_auth(self) -> None:
+        from starlette.applications import Starlette
+        from starlette.routing import Mount, WebSocketRoute
+
+        token = "synthetic-mounted-operator-token-0000"
+        for tokens in ((), (token,)):
+            calls: list[bool] = []
+
+            async def private_socket(websocket):
+                calls.append(True)
+                await websocket.accept()
+                await websocket.close()
+
+            inner = Starlette(routes=[WebSocketRoute("/ws/live", private_socket)])
+            inner.add_middleware(
+                OperatorApiAccessMiddleware,
+                token_provider=lambda tokens=tokens: tokens,
+            )
+            outer = Starlette(routes=[Mount("/gateway", app=inner)])
+
+            async def invoke(headers):
+                messages = []
+                scope = {
+                    **_scope("/gateway/ws/live", scope_type="websocket", headers=headers),
+                    "root_path": "", "scheme": "ws", "query_string": b"",
+                    "subprotocols": [], "client": ("test", 1234), "server": ("test", 80),
+                    "asgi": {"version": "3.0", "spec_version": "2.3"},
+                }
+
+                async def receive():
+                    return {"type": "websocket.connect"}
+
+                async def send(message):
+                    messages.append(message)
+
+                await outer(scope, receive, send)
+                return messages
+
+            for headers in ([], [(b"authorization", b"Bearer invalid")]):
+                self.assertEqual(
+                    await invoke(headers),
+                    [{"type": "websocket.close", "code": 4401 if tokens else 1013}],
+                )
+            self.assertEqual(calls, [])
+            if tokens:
+                allowed = await invoke([(b"authorization", f"Bearer {token}".encode("ascii"))])
+                self.assertEqual(allowed[0]["type"], "websocket.accept")
+                self.assertEqual(calls, [True])
 
 
 @unittest.skipIf(httpx is None, "httpx is required for the static-output probe")

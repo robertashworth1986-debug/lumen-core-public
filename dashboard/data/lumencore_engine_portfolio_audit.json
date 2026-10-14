@@ -4,7 +4,7 @@
   "execution_verified_by_this_audit": false,
   "customer_acceptance_verified_by_this_audit": false,
   "observed_maturity_contract": "Legacy compatibility enum derived only from configured tracked-file presence; it does not establish execution, test results, operational readiness or customer acceptance.",
-  "generated_at_utc": "2026-10-14T06:00:36.676780Z",
+  "generated_at_utc": "2026-10-14T06:25:33.815944Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "1d6930af5d20338210f82b8f6fbf368474d3f793a15de8009a7a5cfabb01c705",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -93,9 +93,9 @@
             "path": "code/forecast_evaluation_v2.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "92dc4dfbf47db140647f08d1020906abc3cab264",
-            "bytes": 18330,
-            "sha256": "cd7f016035d654c5551410b411cefa79a084508c61f0ff201dbfd42e3b217c48"
+            "git_blob_sha": "4ab6dd4190d25aae124409d3f532d0441bf9198e",
+            "bytes": 18499,
+            "sha256": "be6db9104cc2928b86bc9ad7de8118eefbef48c55127d6c9e4bb632a4f8bc39d"
           }
         ],
         "entrypoint": [
@@ -103,9 +103,9 @@
             "path": "code/forecast_evaluation_v2.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "92dc4dfbf47db140647f08d1020906abc3cab264",
-            "bytes": 18330,
-            "sha256": "cd7f016035d654c5551410b411cefa79a084508c61f0ff201dbfd42e3b217c48"
+            "git_blob_sha": "4ab6dd4190d25aae124409d3f532d0441bf9198e",
+            "bytes": 18499,
+            "sha256": "be6db9104cc2928b86bc9ad7de8118eefbef48c55127d6c9e4bb632a4f8bc39d"
           }
         ],
         "test": [
@@ -113,9 +113,9 @@
             "path": "tests/test_forecast_evaluation_v2.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1ff0fe3d70f60b6834f726ac015ad619b7eb3567",
-            "bytes": 22148,
-            "sha256": "6426106524650312509b0b48ffa65d841b4a43c4580e0e7a78a70d4ba1d7e1ea"
+            "git_blob_sha": "c076fb6c3f8febed04029a0b51e63410927f64da",
+            "bytes": 25106,
+            "sha256": "c589aee975b7a1bc5b02b4b8c55daa7ca848ca0fa1cb0cae3b308189438b3b0a"
           }
         ],
         "documentation": [
@@ -131,9 +131,9 @@
             "path": "docs/FORECAST_EVALUATION_V2_REVIEW.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "6e7979b7873cd509fd8a644521749591c8893aef",
-            "bytes": 3986,
-            "sha256": "98b30bac2fcb67cbde04c4b13e64f7faaa503ec8fd01727841e102806902a5fd"
+            "git_blob_sha": "8b4c64c2f28a00a908f2b6ab7c91103372bd9083",
+            "bytes": 4376,
+            "sha256": "a3c2a0e1602c0af062e6355b8abe5e6370277f5ac372286a19967c1e1ba66c4d"
           }
         ],
         "artifact": [
@@ -1093,6 +1093,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "9b34cb7fa4487657f6911e4ff9a48b1da147789035eed18d0582e54e4e3f5800"
+    "payload_sha256": "19d36a89bf1b9d9c7710ee94433a75b3524ec7f41d6f32fb22ca442f6743bb62"
   }
 }

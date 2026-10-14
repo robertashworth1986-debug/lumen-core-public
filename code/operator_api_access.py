@@ -122,9 +122,19 @@ def token_is_authorized(provided: str, expected: Iterable[str]) -> bool:
     )
 
 
+def _app_relative_path(scope: Mapping[str, Any]) -> str:
+    """Match the router's mount/proxy-root semantics without changing scope."""
+
+    path = str(scope.get("path", ""))
+    root_path = str(scope.get("root_path", ""))
+    if root_path and (path == root_path or path.startswith(f"{root_path}/")):
+        return path[len(root_path):]
+    return path
+
+
 def is_public_api_read(scope: Mapping[str, Any]) -> bool:
     method = str(scope.get("method", "")).upper()
-    path = str(scope.get("path", ""))
+    path = _app_relative_path(scope)
     return method in {"GET", "HEAD"} and path in PUBLIC_API_READ_PATHS
 
 
@@ -233,7 +243,7 @@ class OperatorApiAccessMiddleware:
         send: Callable[..., Awaitable[Any]],
     ) -> None:
         scope_type = str(scope.get("type", ""))
-        path = str(scope.get("path", ""))
+        path = _app_relative_path(scope)
 
         if scope_type == "http":
             method = str(scope.get("method", "")).upper()

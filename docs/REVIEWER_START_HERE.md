@@ -85,6 +85,28 @@ python -m pytest -q tests/test_order_safety_gate.py tests/test_order_safety_faca
 python -m pytest -q tests/test_forecast_evaluation_v2.py tests/test_operator_api_access.py
 ```
 
+The follow-on repair also tests mounted/proxy-root API authorization, rejects
+timestamp precision that would be silently truncated, bounds seasonal-history
+lookups to the declared calendar window, restores missing verified ledger CSV
+rows before another event, and rejects market simple returns below -100%.
+These are software correctness controls; they do not establish fill quality,
+strategy returns, outside validation or broker reconciliation.
+
+The existing local dashboard refresh now accepts the current registry/config
+wrappers, requires explicit source enablement and keeps all assumed dollar
+rates labeled `MODELED`. Reported file counts do not become verified live rows.
+Paper configuration and historical records do not establish current operation.
+The browser bridge distinguishes a poll attempt from a source observation,
+labels accepted values as reported, and suppresses malformed or old reports.
+Its five-minute report-display cutoff is not a source-data freshness guarantee.
+The refresh singleton also preserves a live or unknown owner's old lock instead
+of evicting it after six hours. This remains a process-PID lock, not the gateway's
+separately tested native lifetime lock or multi-producer ownership proof.
+
+```bash
+python -m pytest -q tests/test_execution_accounting_regressions.py tests/test_dashboard_metric_provenance.py tests/test_live_registry_bridge.py tests/test_gov_snapshot_guard.py
+```
+
 ### Read the early rolling dashboards as historical research
 
 The [estate scope review](LUMENCORE_ESTATE_SCOPE_REVIEW_2026-10-04.md) locates the
