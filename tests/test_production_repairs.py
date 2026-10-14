@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import subprocess
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -18,7 +19,7 @@ from grant_submission_kit import build_preflight
 from build_symbol_timing_edge_model import Candle, analyze_symbol
 from collect_kraken_hourly_history import merge_rows
 from ensure_dashboard_command_fabric import ensure_fabric
-from assert_runtime_safety import assert_paper_mode
+from assert_runtime_safety import assert_paper_mode, load_json as load_runtime_json
 
 
 class ProductionRepairTests(unittest.TestCase):
@@ -272,6 +273,63 @@ class ProductionRepairTests(unittest.TestCase):
             }
         )
         self.assertEqual(len(failures), 3)
+
+    def test_runtime_preflight_requires_explicit_boolean_flags(self) -> None:
+        valid = {"mode": "paper", "allow_live_orders": False, "paper_enabled": True}
+        for flag, correct in (("allow_live_orders", False), ("paper_enabled", True)):
+            missing = {key: value for key, value in valid.items() if key != flag}
+            with self.subTest(flag=flag, missing=True):
+                self.assertTrue(assert_paper_mode(missing))
+            for value in (None, 0, 1, "false", "true", [], {}, not correct):
+                with self.subTest(flag=flag, value=value):
+                    self.assertTrue(assert_paper_mode({**valid, flag: value}))
+
+    def test_runtime_preflight_requires_the_exact_paper_mode(self) -> None:
+        for mode in ("PAPER", " paper ", "", None, 0, False, ["paper"], {}):
+            with self.subTest(mode=mode):
+                self.assertTrue(assert_paper_mode({
+                    "mode": mode, "allow_live_orders": False, "paper_enabled": True,
+                }))
+
+    def test_runtime_json_rejects_duplicate_keys_and_nonfinite_values(self) -> None:
+        payloads = (
+            '{"mode":"live","mode":"paper","allow_live_orders":false,"paper_enabled":true}',
+            '{"mode":"paper","allow_live_orders":true,"allow_live_orders":false,"paper_enabled":true}',
+            '{"mode":"paper","allow_live_orders":false,"paper_enabled":false,"paper_enabled":true}',
+            '{"mode":"paper","allow_live_orders":false,"paper_enabled":true,"extra":{"x":1,"x":2}}',
+            '{"mode":"paper","allow_live_orders":false,"paper_enabled":true,"extra":NaN}',
+            '{"mode":"paper","allow_live_orders":false,"paper_enabled":true,"extra":Infinity}',
+            '{"mode":"paper","allow_live_orders":false,"paper_enabled":true,"extra":-Infinity}',
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "runtime.json"
+            for payload in payloads:
+                with self.subTest(payload=payload):
+                    path.write_text(payload, encoding="utf-8")
+                    with self.assertRaises(ValueError):
+                        load_runtime_json(path)
+
+    def test_runtime_preflight_cli_rejects_ambiguous_config_without_modifying_it(self) -> None:
+        cases = (
+            ('{"mode":"paper","allow_live_orders":false,"paper_enabled":true}', 0),
+            ('{"mode":"paper","paper_enabled":"false"}', 3),
+            ('{"mode":"paper","allow_live_orders":true,"allow_live_orders":false,"paper_enabled":true}', 2),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "runtime.json"
+            for payload, expected_exit in cases:
+                with self.subTest(payload=payload):
+                    path.write_text(payload, encoding="utf-8")
+                    result = subprocess.run(
+                        [sys.executable, str(ROOT / "code/ops/assert_runtime_safety.py"),
+                         "--runtime-file", str(path)],
+                        capture_output=True, text=True, check=False,
+                    )
+                    self.assertEqual(result.returncode, expected_exit, result.stderr)
+                    self.assertEqual(path.read_text(encoding="utf-8"), payload)
+                    self.assertEqual(result.stderr, "")
+                    expected_status = "PASS" if expected_exit == 0 else "FAIL"
+                    self.assertTrue(result.stdout.startswith(f"RUNTIME_SAFETY={expected_status}"))
 
     def test_spike_hunter_uses_cross_platform_runtime_root(self) -> None:
         source = (ROOT / "code" / "kraken_spike_hunter_live.py").read_text(

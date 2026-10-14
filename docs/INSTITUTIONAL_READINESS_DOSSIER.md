@@ -20,6 +20,28 @@ to receive regulated or confidential buyer data without additional controls.
 
 **Production decision: `HOLD`.**
 
+## Trading readiness checks — October 14
+
+The source repairs merged in PR #253 improve correctness and access controls;
+they do not establish an executable trading edge or verified account state.
+The repository's `live_data_no_orders` policy and paper-only startup checks
+remain in force. Software checks, operational evidence and actual financial
+authority are separate decisions.
+
+| Check | Current evidence or defect | Evidence still required |
+|---|---|---|
+| Market observations | Current rolling wrappers validate supplied closed-candle cadence, finite prices and receipt-time freshness; failed screens clear the prior candidate. Retrospective research rankings are excluded from execution preferences. | Authenticate the actual deployed producer, source clock/publication history and raw data custody; source tests do not establish current market availability. |
+| Order and fill state | The paper ticker requires a terminal attributable fill with explicit quantity/price. A durable local intent blocks another submission after pending, partial or ambiguous responses. Legacy state requires reconciliation. | Actual broker records, outstanding-order and partial-fill reconciliation, fees and exercised recovery; local immediate-fill tests do not establish a complete order-management service. |
+| Account reconciliation | Local JSONL/CSV custody and synthetic cash checks exist. No actual account statement was evaluated in this continuation. | Reconcile opening cash, transfers, positions, fills, fees and closing equity to independently obtained account records. Deposits are not profit. |
+| Risk limits | Legacy checks feed cumulative P&L into a field named daily P&L and use assumed liquidity inputs. | A defined timezone/day boundary, reconciled net daily losses, accepted exposure/position limits, venue constraints and exercised stop/recovery behavior. |
+| After-cost performance | Historical candidates retain selection bias, reused data, modeled fills and incomplete comparators. | Frozen selection rules, declared adverse cases and a prospective paper sample assessed after fees, spread, slippage, rejected/partial fills and operating costs. Preserve failures and missing periods. |
+| Runtime identity | Source/CI checks are available; earlier deployment and ledger-ownership defects have dated receipts only. | Current deployment identity, protected credentials with least privilege, producer ownership, source-age observations and tested restart/recovery readback. |
+
+Passing a row's software tests does not close its operating-evidence requirement.
+No threshold, risk budget or strategy has been selected here to justify placing
+real-money orders, and no credential, runtime configuration or live gate is
+changed by this dossier.
+
 The first credible transaction remains a bounded Buyer-Owned Baseline
 Validation Sprint: one authorized source, one accepted incumbent baseline, one
 locked primary metric and threshold, one replayable evidence package, and one

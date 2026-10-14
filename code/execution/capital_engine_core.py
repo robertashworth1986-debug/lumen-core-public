@@ -1,5 +1,74 @@
+import re
+
 import numpy as np
 import pandas as pd
+
+
+def prepare_closed_ohlcv(ohlcv, timeframe, *, asof_ms):
+    """Validate a spot OHLCV response against its local receipt clock.
+
+    Missing intervals reject rather than being filled. The final open candle is
+    excluded; the newest closed candle must be less than one interval old. This
+    validates supplied rows, not venue publication history or clock accuracy.
+    """
+    match = re.fullmatch(r"([1-9][0-9]*)([mhdw])", str(timeframe))
+    if match is None:
+        raise ValueError("OHLCV timeframe must use whole minutes, hours, days or weeks")
+    unit_ms = {"m": 60_000, "h": 3_600_000, "d": 86_400_000, "w": 604_800_000}
+    duration_ms = int(match[1]) * unit_ms[match[2]]
+    try:
+        valid_clock = (
+            not isinstance(asof_ms, (bool, np.bool_))
+            and np.isfinite(asof_ms)
+            and asof_ms >= 0
+            and asof_ms == int(asof_ms)
+        )
+    except (TypeError, ValueError, OverflowError):
+        valid_clock = False
+    if not valid_clock:
+        raise ValueError("OHLCV receipt clock must be finite whole epoch milliseconds")
+    frame = pd.DataFrame(ohlcv, columns=["ts", "open", "high", "low", "close", "volume"])
+    try:
+        values = frame.to_numpy(dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("OHLCV rows must be numeric") from exc
+    if len(frame) == 0 or not np.isfinite(values).all():
+        raise ValueError("OHLCV requires nonempty finite observations")
+    if any(isinstance(value, (bool, np.bool_)) for row in ohlcv for value in row):
+        raise ValueError("OHLCV observations cannot be booleans")
+    timestamps = values[:, 0]
+    if (timestamps < 0).any() or (timestamps != np.floor(timestamps)).any():
+        raise ValueError("OHLCV timestamps must be whole nonnegative epoch milliseconds")
+    if len(timestamps) > 1 and not (np.diff(timestamps) == duration_ms).all():
+        raise ValueError("OHLCV timestamps must be unique, increasing and contiguous")
+    if (timestamps > asof_ms).any():
+        raise ValueError("OHLCV timestamps cannot be later than the receipt clock")
+    prices = values[:, 1:5]
+    if (prices <= 0).any() or (values[:, 5] < 0).any():
+        raise ValueError("OHLCV prices must be positive and volume nonnegative")
+    invalid_low = values[:, 3] > np.minimum(values[:, 1], values[:, 4])
+    invalid_high = values[:, 2] < np.maximum(values[:, 1], values[:, 4])
+    if invalid_low.any() or invalid_high.any():
+        raise ValueError("OHLCV high/low must contain open and close")
+    frame = pd.DataFrame(values, columns=frame.columns)
+    frame["ts"] = pd.to_datetime(timestamps, unit="ms", utc=True)
+    frame.index = pd.DatetimeIndex(frame["ts"], name="bar_open_utc")
+    closed = frame.loc[timestamps <= asof_ms - duration_ms].copy()
+    if len(closed) < 2:
+        raise ValueError("OHLCV requires at least two closed bars")
+    latest_close = closed.index[-1] + pd.Timedelta(milliseconds=duration_ms)
+    received = pd.to_datetime(asof_ms, unit="ms", utc=True)
+    if received - latest_close >= pd.Timedelta(milliseconds=duration_ms):
+        raise ValueError("latest closed OHLCV bar is stale")
+    closed["ret"] = closed["close"].pct_change(fill_method=None).fillna(0.0)
+    if not np.isfinite(closed["ret"].to_numpy()).all():
+        raise ValueError("OHLCV returns exceed finite numeric range")
+    closed.attrs.update(
+        received_asof_utc=received.isoformat(),
+        latest_closed_bar_utc=latest_close.isoformat(),
+        timeframe=str(timeframe),
+    )
+    return closed
 
 
 def _numeric_series(values, *, name, allow_nan=False):

@@ -1,9 +1,9 @@
 {
   "schema": "lumencore.external_technical_review_packet.v1",
-  "generated_at_utc": "2026-10-14T06:25:01Z",
+  "generated_at_utc": "2026-10-14T16:50:04Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "source_config": "config/external_technical_review_packet_v1.json",
-  "source_config_sha256": "60d6f912b76b37201e2ca4e565bcb7c7b19c85a88583440186e345a273eae32a",
+  "source_config_sha256": "a9d2a6e385f227e387adc9d88d1d77e71d474b2878492c8a6a5cb14fd32ad71f",
   "template_config_sha256": "0cfbda7dfd68aff39eab6a07676b0b44b13fb4455a0530fb3b3663f05a19e148",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -24,7 +24,7 @@
     "requested_outcome": "A written recommendation naming the strongest first buyer, the narrowest valuable problem, the incumbent baseline, the acceptance metric, the evidence still missing, and one practical next introduction or experiment."
   },
   "summary": {
-    "evidence_asset_count": 29,
+    "evidence_asset_count": 44,
     "public_surface_count": 7,
     "demo_surface_count": 1,
     "degraded_surface_count": 0,
@@ -137,8 +137,8 @@
     {
       "path": "docs/REVIEWER_START_HERE.md",
       "purpose": "Current-source reproduction route, dated repair scope and remaining gates.",
-      "bytes": 27397,
-      "sha256": "77753affd098aefa19c717bb7a78e006cffc0c9fe3717c544bf9c25f5a3277b4",
+      "bytes": 30109,
+      "sha256": "7035f56a1d6ff8ee02e4184f90b235ff795156c44b892b9b2a89aff36d63cd03",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -155,8 +155,8 @@
     {
       "path": "tests/test_execution_accounting_regressions.py",
       "purpose": "Synthetic trading causality, risk sizing and append-only ledger regressions.",
-      "bytes": 22976,
-      "sha256": "ddfd68ac518541d083efcc8839b630082f2a09d8b5cf8a43d3c55856f3dac207",
+      "bytes": 28990,
+      "sha256": "32daff111d1e6dd841f225c4a528abe3ef1e48e190d84e1f7c40f7267d2fa84f",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -271,9 +271,9 @@
     },
     {
       "path": "code/execution/capital_engine_core.py",
-      "purpose": "Causal spot-return accounting and impossible market-observation rejection.",
-      "bytes": 7003,
-      "sha256": "5ed4e9f9657afe1188bdfc5b81115db342b092a48a0b79aa9927e93a7871e129",
+      "purpose": "Causal spot-return accounting, impossible-return rejection and shared closed-candle validation.",
+      "bytes": 10547,
+      "sha256": "3a76fc57f7d370d1f856350b9864b039dc3a6724749d23a60c732a02bb56ce81",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -292,6 +292,141 @@
       "purpose": "Delivered browser JavaScript exercised using Node VM and mocked fetch/DOM.",
       "bytes": 8125,
       "sha256": "84aacacbb12fc9468ff6f07480a9c2b0ca931fd8461860880e56087483ca5bd4",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/rolling_capital_engine.py",
+      "purpose": "Closed-candle and receipt-time freshness checks before the rolling research screen.",
+      "bytes": 3063,
+      "sha256": "a816b91aae3566efae058f0a6a9b8021e634edda6d6683eb155fc1885d1b97c2",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/rolling_capital_engine_multi.py",
+      "purpose": "Shared closed-candle validation and stale recommendation clearing in the multi-source research screen.",
+      "bytes": 4339,
+      "sha256": "c5fe62572892baf5bcd79b182079f69efb8576ed937a188dd7a82b3221e9280b",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/multi_exchange_paper_ticker.py",
+      "purpose": "Confirmed paper-fill accounting and persisted unresolved-intent submission block; no real-order authority.",
+      "bytes": 148173,
+      "sha256": "437f73c47549ca2f2d3a625fbc4c38b1d5d6b9c5bce654fce51177edfd95bffe",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_alpaca_paper_fill_accounting.py",
+      "purpose": "Offline accepted/unfilled, ambiguous transport, restart and accounting failure counterexamples.",
+      "bytes": 19974,
+      "sha256": "1a4689cf947a25f695fed9c3e62fe7200e68392c7fe94c4727b1de1ed24f6e2b",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/ops/assert_runtime_safety.py",
+      "purpose": "Literal paper-mode and explicit boolean flags with strict JSON loading.",
+      "bytes": 2201,
+      "sha256": "dd6339d1521666e435fcc601fc4badb4a5be470b2d6b366ab54fc0e086235528",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_production_repairs.py",
+      "purpose": "Runtime startup and existing paper execution repair regressions.",
+      "bytes": 15923,
+      "sha256": "145985c953cd2df370b1c26e2974461f2169309906c1123fdcf014a2f9fda716",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/ops/audit_paper_accounting.py",
+      "purpose": "Strict microsecond UTC ledger timestamps and typed event validation.",
+      "bytes": 6019,
+      "sha256": "04479fc0ca472ba94503f7f19f0e720d86a701bd08a9abd864887c56874a6948",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_evidence_denominator_and_paper_audits.py",
+      "purpose": "Paper cash/position reconciliation fixtures and timestamp precision counterexamples.",
+      "bytes": 11305,
+      "sha256": "a612eb9aa781b950dda6529617576e1002837f0828c109f7d029724f0fd68948",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/ops/probe_public_health.py",
+      "purpose": "Exact minimal public JSON contract and bounded health timestamp validation.",
+      "bytes": 17472,
+      "sha256": "3cca61428ba8127d2baa41f8e145089cd4db320cabb38a54dd4d4151230d1ad2",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_public_health_probe.py",
+      "purpose": "Offline malformed, stale, future, duplicate and extra-field observer tests.",
+      "bytes": 18718,
+      "sha256": "aaa8b008d4cfa79af4a1ba0d03c6f3347601a29fba8155a0dcf05d63cba8d5ed",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_rolling_research_boundary.py",
+      "purpose": "Offline fixtures proving fresh, stale, legacy and HOLD rolling files do not promote execution preferences.",
+      "bytes": 5057,
+      "sha256": "185c0b75778d9c210f70bdb59c30bb76092ff744f4c808b2be9bf816b9ff2c9f",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/build_institutional_crypto_paper_dashboard.py",
+      "purpose": "Unknown or unreconciled return values remain unknown in the existing paper dashboard.",
+      "bytes": 76545,
+      "sha256": "d000c02eb9d97075e2569bdc0134ddd5e0ceb9424520e864694d8ec37c6c95a6",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/build_institutional_crypto_executive_brief.py",
+      "purpose": "Unknown unrealized profit and unreconciled return values remain unknown in the paper brief.",
+      "bytes": 8491,
+      "sha256": "ca7eaa6ca1670bd68c7c320d76ebabce18209f8999724e79d3d91aff14edebea",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_paper_report_display.py",
+      "purpose": "Offline display checks preserving unknown and negative paper accounting values.",
+      "bytes": 5658,
+      "sha256": "300e9b0add7c7d6062cebb01ad3c9e38628f1849b61e290535758b6d3b0dc8bb",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/live_executor.py",
+      "purpose": "Active fail-closed facade prevents rolling research preferences while preserving the historical implementation bytes.",
+      "bytes": 3494,
+      "sha256": "7397f09caa498de532edae75ea4666bba47ecff875b776e4a10b623050e5211b",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -538,9 +673,9 @@
     "No fit is found; record why and close the lane without implying endorsement."
   ],
   "known_gaps": [
-    "The October 14 continuation binds source and test hashes for private-order, ambiguous-retry, mounted authorization, timestamp/scale, ledger recovery and dashboard provenance repairs. It does not refresh separately dated live observations, create an outside review result or authorize paid review terms. Frozen scientific results and historical deployment receipts remain unchanged.",
+    "The October 14 continuation binds source and test hashes for private-order, ambiguous-retry, mounted authorization, timestamp/scale, ledger recovery, dashboard provenance, closed-candle screening, literal paper startup, strict health observation and paper-fill intent repairs. It does not refresh separately dated live observations, create an outside review result or authorize paid review terms. Frozen scientific results and historical deployment receipts remain unchanged.",
     "Historical infrastructure builders use assumed gains and dollar rates, and the provider simulator uses assumed failures. Current local dashboard outputs now retain modeled/report-only labels and unverified source observations; this does not convert historical displays into measured savings or revenue. Historical tournaments outside repaired engines retain selection/accounting limitations.",
-    "Current-source tests use offline synthetic controls. Broker fills, fees/spread/slippage, recovery after ambiguous order acceptance, net account reconciliation, sustained data freshness, external producer coordination and buyer workload scalability still require bounded evidence before promotion.",
+    "Current-source tests use offline synthetic controls. Pending, partial and ambiguous paper orders require operator reconciliation; immediate confirmed fills remain gross of fees. Actual broker records, fees/spread/slippage, partial-order recovery, net account reconciliation, daily risk, sustained data freshness, external producer coordination and buyer workload scalability still require bounded evidence before promotion.",
     "The versioned forecast-review fixture is synthetic and diagnostic/HOLD. Trading repairs have local synthetic checks only; after-fee prospective paper reconciliation and accepted risk controls remain required. The minimal gateway profile does not establish full legacy provider closure or production runtime parity.",
     "Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and parity for gateway, runtime, and later repository commits remain unestablished.",
     "The earlier August 10 legacy-route observation is superseded for named static release 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 by its retained first-party deployment and audit receipt, which recorded all 43 allowlisted files including the eight noindex HOLD stubs as exact live-byte matches. That receipt is bounded to the named static release and does not establish external validation, runtime parity, sustained availability, or broader production authorization.",

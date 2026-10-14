@@ -7,6 +7,7 @@ import math
 import os
 import subprocess
 import sys
+import types
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
@@ -164,6 +165,136 @@ def test_rolling_wrappers_use_one_canonical_scoring_implementation():
     assert rolling_capital_engine_multi.build_families is capital.build_families
     assert rolling_capital_engine.stats is capital.stats
     assert rolling_capital_engine_multi.build_strategy_returns is capital.build_strategy_returns
+
+
+MARKET_ASOF_MS = 1791981000000  # Synthetic 2026-10-14 12:30 UTC.
+HOUR_MS = 3_600_000
+
+
+def market_bars():
+    first = (MARKET_ASOF_MS // HOUR_MS - 4) * HOUR_MS
+    return [[first + i * HOUR_MS, 100 + i, 101 + i, 99 + i, 100 + i, 10] for i in range(5)]
+
+
+def mock_ohlcv(monkeypatch, module, rows):
+    exchange = types.SimpleNamespace(fetch_ohlcv=lambda *args, **kwargs: rows)
+    monkeypatch.setitem(sys.modules, 'ccxt', types.SimpleNamespace(kraken=lambda options: exchange))
+    monkeypatch.setattr(module.time, 'time_ns', lambda: MARKET_ASOF_MS * 1_000_000)
+
+
+@pytest.mark.parametrize('module', [rolling_capital_engine, rolling_capital_engine_multi])
+def test_rolling_prices_use_only_closed_bars_and_actual_utc_chronology(module, monkeypatch):
+    rows = market_bars()
+    mock_ohlcv(monkeypatch, module, rows)
+    frame = module.fetch_live_ohlcv('TOY/USD')
+    expected_index = pd.DatetimeIndex(pd.to_datetime([row[0] for row in rows[:-1]], unit='ms', utc=True), name='bar_open_utc')
+    assert frame.index.equals(expected_index)
+    assert frame['close'].tolist() == [100, 101, 102, 103]
+    assert frame['ret'].tolist() == pytest.approx([0, .01, 102 / 101 - 1, 103 / 102 - 1])
+    assert frame.attrs['received_asof_utc'] == '2026-10-14T12:30:00+00:00'
+    assert frame.attrs['latest_closed_bar_utc'] == '2026-10-14T12:00:00+00:00'
+
+
+@pytest.mark.parametrize('module', [rolling_capital_engine, rolling_capital_engine_multi])
+def test_open_candle_changes_cannot_rewrite_closed_history_and_closes_at_boundary(module, monkeypatch):
+    rows = market_bars()
+    mock_ohlcv(monkeypatch, module, rows)
+    original = module.fetch_live_ohlcv('TOY/USD')
+    rows[-1][2] = 10_001
+    rows[-1][4] = 10_000
+    pd.testing.assert_frame_equal(module.fetch_live_ohlcv('TOY/USD'), original)
+    boundary_ms = (MARKET_ASOF_MS // HOUR_MS + 1) * HOUR_MS
+    monkeypatch.setattr(module.time, 'time_ns', lambda: boundary_ms * 1_000_000)
+    matured = module.fetch_live_ohlcv('TOY/USD')
+    assert len(matured) == 5 and matured['close'].iloc[-1] == 10_000
+    assert matured.attrs['latest_closed_bar_utc'] == '2026-10-14T13:00:00+00:00'
+
+
+@pytest.mark.parametrize('module', [rolling_capital_engine, rolling_capital_engine_multi])
+@pytest.mark.parametrize('case', ['duplicate', 'reversed', 'gap', 'future', 'fractional_timestamp', 'stale', 'empty', 'only_open', 'nan_close', 'zero_close', 'inverted_range', 'negative_volume'])
+def test_rolling_rejects_broken_market_chronology_or_prices(module, case, monkeypatch):
+    rows = market_bars()
+    if case == 'duplicate':
+        rows[2][0] = rows[1][0]
+    elif case == 'reversed':
+        rows[1], rows[2] = rows[2], rows[1]
+    elif case == 'gap':
+        rows.pop(2)
+    elif case == 'future':
+        rows[-1][0] += HOUR_MS
+    elif case == 'fractional_timestamp':
+        rows[1][0] += .25
+    elif case == 'stale':
+        rows = rows[:-2]
+    elif case == 'empty':
+        rows = []
+    elif case == 'only_open':
+        rows = rows[-1:]
+    elif case == 'nan_close':
+        rows[2][4] = float('nan')
+    elif case == 'zero_close':
+        rows[2][4] = 0
+    elif case == 'inverted_range':
+        rows[2][2] = rows[2][3] - 1
+    elif case == 'negative_volume':
+        rows[2][5] = -1
+    mock_ohlcv(monkeypatch, module, rows)
+    with pytest.raises(ValueError):
+        module.fetch_live_ohlcv('TOY/USD')
+
+
+@pytest.mark.parametrize('module,entrypoint,best_name', [
+    (rolling_capital_engine, 'rolling_capital_engine', 'rolling_capital_best.json'),
+    (rolling_capital_engine_multi, 'rolling_capital_engine_multi', 'rolling_capital_best_multi.json'),
+])
+def test_rolling_market_failure_clears_prior_candidate_with_explicit_hold(module, entrypoint, best_name, monkeypatch, tmp_path):
+    monkeypatch.setattr(module, 'OUT', tmp_path)
+    prior = {'family': 'momentum_lowvol', 'symbol': 'TOY/USD', 'metrics': {'sharpe': 2}}
+    (tmp_path / best_name).write_text(json.dumps(prior))
+    (tmp_path / 'rolling_capital_heatmap.json').write_text(json.dumps([prior]))
+
+    def unavailable(*args, **kwargs):
+        raise ValueError('synthetic stale market data')
+
+    def end_cycle(seconds):
+        raise StopIteration('single offline cycle complete')
+
+    monkeypatch.setattr(module, 'fetch_live_ohlcv', unavailable)
+    monkeypatch.setattr(module.time, 'sleep', end_cycle)
+    with pytest.raises(StopIteration, match='offline cycle'):
+        getattr(module, entrypoint)()
+    report = json.loads((tmp_path / best_name).read_text())
+    assert report['status'] == 'HOLD'
+    assert report['family'] == report['symbol'] == '' and report['metrics'] == {}
+    if module is rolling_capital_engine_multi:
+        assert json.loads((tmp_path / 'rolling_capital_heatmap.json').read_text()) == []
+
+
+def test_partial_market_outage_publishes_only_valid_research_window(monkeypatch, tmp_path):
+    module = rolling_capital_engine_multi
+    mock_ohlcv(monkeypatch, module, market_bars())
+    valid = module.fetch_live_ohlcv('TOY/USD')
+    monkeypatch.setattr(module, 'OUT', tmp_path)
+    monkeypatch.setattr(module, 'SYMBOLS', ['STALE/USD', 'TOY/USD'])
+
+    def selected_feed(symbol):
+        if symbol == 'STALE/USD':
+            raise ValueError('synthetic stale feed')
+        return valid
+
+    def end_cycle(seconds):
+        raise StopIteration('single offline cycle complete')
+
+    monkeypatch.setattr(module, 'fetch_live_ohlcv', selected_feed)
+    monkeypatch.setattr(module.time, 'sleep', end_cycle)
+    with pytest.raises(StopIteration, match='offline cycle'):
+        module.rolling_capital_engine_multi()
+    report = json.loads((tmp_path / 'rolling_capital_best_multi.json').read_text())
+    assert report['status'] == 'RESEARCH_ONLY' and report['symbol'] == 'TOY/USD'
+    assert report['errors'] == {'STALE/USD': 'synthetic stale feed'}
+    assert report['received_asof_utc'] == '2026-10-14T12:30:00+00:00'
+    heatmap = json.loads((tmp_path / 'rolling_capital_heatmap.json').read_text())
+    assert heatmap and {row['symbol'] for row in heatmap} == {'TOY/USD'}
 
 
 @pytest.mark.parametrize('name',['rolling_capital_engine.py','rolling_capital_engine_multi.py'])

@@ -107,6 +107,50 @@ separately tested native lifetime lock or multi-producer ownership proof.
 python -m pytest -q tests/test_execution_accounting_regressions.py tests/test_dashboard_metric_provenance.py tests/test_live_registry_bridge.py tests/test_gov_snapshot_guard.py
 ```
 
+### October 14 paper-readiness continuation
+
+Startup verification requires the literal paper mode and explicit boolean
+paper/live flags; duplicate JSON keys and nonfinite constants reject. Rolling
+engines validate finite positive OHLC, nonnegative volume, chronological UTC
+cadence and receipt-time freshness, and exclude the unfinished candle. A failed
+screen clears the previous recommendation. Retrospectively selected rolling
+rankings remain diagnostic; the active paper reader and executor facade exclude
+them from execution preferences while historical implementations stay frozen.
+These checks use the supplied
+receipt clock; they do not authenticate a venue or its publication history.
+
+The Alpaca paper ticker distinguishes a confirmed terminal fill from request
+acceptance. Missing execution price or quantity cannot be replaced with the
+last mark or requested notional. A persisted unresolved intent blocks further
+submissions after pending, partial or ambiguous responses; an operator must
+reconcile it against broker records. Full-fill accounting remains gross of
+fees, and automated partial-fill recovery is not established. The report does
+not call inventory value profit: unrealized P&L and unreconciled returns remain
+unknown in the report, dashboard and brief. Account snapshot timing is separate
+from the post-fill local position projection; equity change includes external
+flows and is not a strategy return.
+The separate report manifest hashes the finalized report bytes, with no
+self-referential rewrite. Other runtime files remain mutable; this is a
+point-in-time hash manifest, not an atomic immutable archive of the account.
+
+The existing health observer now checks the exact minimal JSON contract and
+the health timestamp against a five-minute cutoff. Public status has no source
+timestamp. These are observer checks, not proof that the new source is deployed
+or that a trading feed is fresh. The paper-ledger auditor also rejects timestamp
+precision that Python would silently discard.
+
+```bash
+python -m pytest -q tests/test_production_repairs.py tests/test_execution_accounting_regressions.py
+python -m pytest -q tests/test_alpaca_paper_fill_accounting.py tests/test_evidence_denominator_and_paper_audits.py tests/test_public_health_probe.py
+python -m pytest -q tests/test_rolling_research_boundary.py tests/test_paper_report_display.py
+python code/ops/assert_runtime_safety.py
+```
+
+Use the [trading readiness table](INSTITUTIONAL_READINESS_DOSSIER.md) and the
+existing [nine live-order gates](LUMA_PRODUCTION_CONTEXT.md) to distinguish
+source repairs from missing account, daily-risk, runtime and prospective net
+performance evidence. No live-order gate is opened by these checks.
+
 ### Read the early rolling dashboards as historical research
 
 The [estate scope review](LUMENCORE_ESTATE_SCOPE_REVIEW_2026-10-04.md) locates the

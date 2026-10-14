@@ -14,21 +14,37 @@ def resolve_root() -> Path:
 
 
 def load_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload = json.loads(
+        path.read_text(encoding="utf-8"),
+        object_pairs_hook=_unique_fields,
+        parse_constant=_reject_nonfinite,
+    )
     if not isinstance(payload, dict):
         raise ValueError(f"expected JSON object: {path}")
     return payload
 
 
+def _unique_fields(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate runtime JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def _reject_nonfinite(value: str) -> None:
+    raise ValueError(f"nonfinite runtime JSON value: {value}")
+
+
 def assert_paper_mode(runtime: dict[str, Any]) -> list[str]:
     failures: list[str] = []
-    mode = str(runtime.get("mode") or "").strip().lower()
-    if mode != "paper":
-        failures.append(f"mode must be paper, found {mode or 'missing'}")
-    if bool(runtime.get("allow_live_orders", False)):
-        failures.append("allow_live_orders must be false")
-    if not bool(runtime.get("paper_enabled", False)):
-        failures.append("paper_enabled must be true")
+    if runtime.get("mode") != "paper":
+        failures.append("mode must be the exact string paper")
+    if runtime.get("allow_live_orders") is not False:
+        failures.append("allow_live_orders must be explicitly false")
+    if runtime.get("paper_enabled") is not True:
+        failures.append("paper_enabled must be explicitly true")
     return failures
 
 
