@@ -42,7 +42,7 @@ def test_every_evidence_asset_exists_and_is_hash_bound():
     module = load_module()
     payload = module.build_payload(module.read_json(CONFIG))
 
-    assert payload["summary"]["evidence_asset_count"] == 11
+    assert payload["summary"]["evidence_asset_count"] == 29
     for row in payload["evidence_assets"]:
         assert len(row["sha256"]) == 64
         assert row["bytes"] > 0

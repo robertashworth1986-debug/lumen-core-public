@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-10-05T16:42:06.172538+00:00",
+  "finished_utc": "2026-10-05T16:42:07.809387+00:00",
+  "duration_seconds": 1.637,
+  "returncode": 0,
+  "command": [
+    "python",
+    "experiments/energy_multisource/stage6/high_activity_diagnostic_20261005/run_diagnostic.py",
+    "--packet",
+    "EXTRACTED_ORIGINAL_STAGE6_PACKET",
+    "--out",
+    "NEW_OUTPUT_DIRECTORY"
+  ],
+  "pre_execution_freeze_sha256": "efd25abc9ab1aa493857dd4cc76d5bcb5da46c2695686e4585ca4f7dcf046276",
+  "protocol_runner_and_tests_match_freeze": true,
+  "new_candidate_real_data_execution_count": 1,
+  "fresh_holdout": false,
+  "promotion_allowed": false,
+  "command_display_note": "Absolute transient paths replaced by descriptive placeholders for publication; exact private execution receipt retained in the companion.",
+  "private_execution_receipt_sha256": "80351c13cac2d0a151bb5c0f7c40c8f17ff2a99fe325f93651b982b3c75a18b9"
+}

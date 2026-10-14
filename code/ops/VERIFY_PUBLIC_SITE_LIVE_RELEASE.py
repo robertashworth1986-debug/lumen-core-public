@@ -6,8 +6,10 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
+from http.client import HTTPException
 import json
-from pathlib import Path
+import math
+from pathlib import Path, PurePosixPath
 import re
 import sys
 from urllib.error import HTTPError, URLError
@@ -19,6 +21,10 @@ SCHEMA = "lumencore.public_site_release_manifest.v1"
 FULL_COMMIT = re.compile(r"[0-9a-f]{40}")
 SHA256 = re.compile(r"[0-9a-f]{64}")
 GIT_BLOB = re.compile(r"[0-9a-f]{40}")
+MAX_MANIFEST_BYTES = 1024 * 1024
+MAX_FILES = 1000
+MAX_FILE_BYTES = 64 * 1024 * 1024
+MAX_TOTAL_BYTES = 512 * 1024 * 1024
 MANIFEST_KEYS = {
     "archive_sha256",
     "file_count",
@@ -38,7 +44,29 @@ FILE_KEYS = {
 
 
 def content_type_allowed(archive_name: str, content_type: str) -> bool:
-    """Require standards-safe MIME types for public JSON review contracts."""
+    """Require standards-safe MIME types for public review files and downloads."""
+    if Path(archive_name).suffix in {".js", ".mjs"}:
+        # Module scripts require a JavaScript MIME type regardless of directory.
+        return content_type in {"application/javascript", "text/javascript"}
+    if archive_name.startswith(("bounded-light/", "portfolio/", "rights/", "art/")):
+        expected = {
+            ".html": {"text/html"}, ".css": {"text/css"},
+            ".json": {"application/json"}, ".svg": {"image/svg+xml"},
+            ".webp": {"image/webp"}, ".png": {"image/png"},
+            ".jpg": {"image/jpeg"}, ".jpeg": {"image/jpeg"},
+            ".pdf": {"application/pdf"},
+            ".md": {"text/markdown", "text/plain", "application/octet-stream"},
+        }
+        return content_type in expected.get(Path(archive_name).suffix, set())
+    if archive_name.startswith(("cohort/", "downloads/")):
+        expected = {
+            ".html": {"text/html"}, ".css": {"text/css"},
+            ".mjs": {"application/javascript", "text/javascript"},
+            ".js": {"application/javascript", "text/javascript"},
+            ".json": {"application/json"}, ".svg": {"image/svg+xml"},
+            ".zip": {"application/zip", "application/x-zip-compressed", "application/octet-stream"},
+        }
+        return content_type in expected.get(Path(archive_name).suffix, set())
     if archive_name not in {"manifest.json", "reviewer_docket.json"}:
         return True
     if archive_name == "manifest.json":
@@ -60,8 +88,12 @@ def _reject_constant(value: str) -> object:
 
 
 def load_manifest(path: Path) -> dict[str, object]:
+    with path.open("rb") as handle:
+        raw = handle.read(MAX_MANIFEST_BYTES + 1)
+    if len(raw) > MAX_MANIFEST_BYTES:
+        raise ValueError("release manifest exceeds bounded input size")
     payload = json.loads(
-        path.read_text(encoding="utf-8"),
+        raw.decode("utf-8"),
         object_pairs_hook=_strict_object,
         parse_constant=_reject_constant,
     )
@@ -81,6 +113,12 @@ def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
         "operator_home.html": "/",
         "evidence/index_bounded.html": "/evidence/",
         "build_week/prooflock_console/index.html": "/build_week/prooflock_console/",
+        "cohort/index.html": "/cohort/",
+        "portfolio/index.html": "/portfolio/",
+        "rights/index.html": "/rights/",
+        "art/index.html": "/art/",
+        "bounded-light/index.html": "/bounded-light/",
+        "bounded-light/observatory/index.html": "/bounded-light/observatory/",
     }
     path = route_map.get(archive_name)
     if path is None:
@@ -93,6 +131,8 @@ def live_url(base_url: str, archive_name: str, source_commit: str) -> str:
 def verify(
     *, manifest_path: Path, source_commit: str, base_url: str, timeout: float
 ) -> dict[str, object]:
+    if not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError("timeout must be positive and finite")
     manifest = load_manifest(manifest_path)
     if manifest.get("schema") != SCHEMA:
         raise ValueError("unexpected public-site manifest schema")
@@ -111,35 +151,52 @@ def verify(
         not isinstance(rows, list)
         or isinstance(file_count, bool)
         or not isinstance(file_count, int)
+        or not 1 <= file_count <= MAX_FILES
         or file_count != len(rows)
     ):
         raise ValueError("manifest file rows are incomplete")
 
-    results: list[dict[str, object]] = []
+    # Validate the whole manifest before any request. A malformed later row must
+    # not leave an apparently useful partial audit or trigger unnecessary I/O.
     seen_names: set[str] = set()
+    total_bytes = 0
     for row in rows:
         if not isinstance(row, dict) or set(row) != FILE_KEYS:
             raise ValueError("manifest file row must be an object")
-        name = str(row.get("archive_name", ""))
-        expected = str(row.get("sha256", ""))
-        name_path = Path(name)
+        name = row.get("archive_name")
+        expected = row.get("sha256")
+        if not isinstance(name, str) or not isinstance(expected, str):
+            raise ValueError("manifest path and hash must be strings")
+        name_path = PurePosixPath(name)
         byte_count = row.get("bytes")
         if (
             not name
+            or not name_path.parts
             or name in seen_names
             or name_path.is_absolute()
             or ".." in name_path.parts
             or "\\" in name
+            or name_path.as_posix() != name
+            or any(ord(char) < 32 or ord(char) == 127 for char in name)
             or not SHA256.fullmatch(expected)
             or not GIT_BLOB.fullmatch(str(row.get("git_blob_oid", "")))
             or row.get("install_mode") != "0644"
             or row.get("repo_path") != f"dashboard/{name}"
             or isinstance(byte_count, bool)
             or not isinstance(byte_count, int)
-            or byte_count < 0
+            or not 0 <= byte_count <= MAX_FILE_BYTES
         ):
             raise ValueError(f"invalid manifest row: {name or '<missing>'}")
         seen_names.add(name)
+        total_bytes += byte_count
+        if total_bytes > MAX_TOTAL_BYTES:
+            raise ValueError("release manifest exceeds bounded total size")
+
+    results: list[dict[str, object]] = []
+    for row in rows:
+        name = row["archive_name"]
+        expected = row["sha256"]
+        byte_count = row["bytes"]
         url = live_url(base_url, name, source_commit)
         request = Request(
             url,
@@ -151,10 +208,14 @@ def verify(
         )
         try:
             with urlopen(request, timeout=timeout) as response:
-                body = response.read()
+                # One extra byte detects oversized responses without reading an
+                # unbounded body supplied by an endpoint or intermediary.
+                body = response.read(byte_count + 1)
+                if len(body) > byte_count:
+                    raise ValueError("response exceeds manifest byte count")
                 status = getattr(response, "status", 200)
                 content_type = response.headers.get_content_type().casefold()
-        except (HTTPError, URLError, TimeoutError) as exc:
+        except (HTTPError, URLError, HTTPException, OSError, ValueError) as exc:
             results.append(
                 {
                     "archive_name": name,
@@ -179,7 +240,12 @@ def verify(
                 "http_status": status,
                 "status": (
                     "MATCH"
-                    if status == 200 and actual == expected and mime_ok
+                    if (
+                        status == 200
+                        and len(body) == byte_count
+                        and actual == expected
+                        and mime_ok
+                    )
                     else "MISMATCH"
                 ),
                 "url": url,

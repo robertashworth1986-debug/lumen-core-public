@@ -17,6 +17,8 @@ class PublicDiscoveryTests(unittest.TestCase):
             "Allow: /opportunity_sprint.html",
             "Allow: /proof_to_pilot.html",
             "Allow: /evidence/",
+            "Allow: /bounded-light/",
+            "Allow: /art/",
             "Allow: /external_review.html",
             "Allow: /build_week/prooflock_console/",
         ):
@@ -36,6 +38,12 @@ class PublicDiscoveryTests(unittest.TestCase):
         root = ET.parse(DASHBOARD / "sitemap.xml").getroot()
         namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
         locations = [node.text for node in root.findall("sm:url/sm:loc", namespace)]
+        catalog = json.loads((DASHBOARD / "cohort/catalog.json").read_text(encoding="utf-8"))
+        member_routes = [
+            f"https://lumen-core.ai/cohort/members/{member['id']}.html"
+            for member in catalog["companies"]
+        ]
+        self.assertEqual(len(member_routes), 69)
         self.assertEqual(
             locations,
             [
@@ -45,7 +53,9 @@ class PublicDiscoveryTests(unittest.TestCase):
                 "https://lumen-core.ai/evidence/",
                 "https://lumen-core.ai/external_review.html",
                 "https://lumen-core.ai/build_week/prooflock_console/",
-            ],
+                "https://lumen-core.ai/cohort/",
+                "https://lumen-core.ai/cohort/directory.html",
+            ] + member_routes + ["https://lumen-core.ai/bounded-light/", "https://lumen-core.ai/bounded-light/observatory/", "https://lumen-core.ai/portfolio/", "https://lumen-core.ai/portfolio/review.html", "https://lumen-core.ai/art/"],
         )
         serialized = (DASHBOARD / "sitemap.xml").read_text(encoding="utf-8")
         self.assertNotIn("mission_control", serialized)
@@ -78,6 +88,7 @@ class PublicDiscoveryTests(unittest.TestCase):
     def test_indexed_pages_declare_canonical_routes_and_public_mark(self):
         pages = {
             "operator_home.html": "https://lumen-core.ai/",
+            "art/index.html": "https://lumen-core.ai/art/",
             "opportunity_sprint.html": "https://lumen-core.ai/opportunity_sprint.html",
             "proof_to_pilot.html": "https://lumen-core.ai/proof_to_pilot.html",
             "external_review.html": "https://lumen-core.ai/external_review.html",

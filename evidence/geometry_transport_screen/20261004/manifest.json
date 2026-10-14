@@ -1,0 +1,43 @@
+{
+  "schema": "lumencore.geometry_transport_screen.repository_manifest.v1",
+  "created_utc": "2026-10-04",
+  "claim_level": "internal_synthetic_screening_only",
+  "promotion_gate_passed": false,
+  "files": [
+    {
+      "path": "code/research/geometry_transport_screen.py",
+      "bytes": 12538,
+      "sha256": "5a850a875daebcb0829f98c3a5215adb61a21d61e5b0f66bf3e3f5f3779ab3a4"
+    },
+    {
+      "path": "tests/test_geometry_transport_screen.py",
+      "bytes": 5483,
+      "sha256": "b455b44b59badc0f1df6b35d6e5c42ef7cdf0559e482c3ff82fcd9270c669114"
+    },
+    {
+      "path": "tests/portfolio_math_models.test.mjs",
+      "bytes": 4722,
+      "sha256": "20b742ee36a3a210b2fbcbdb660045a04ca15c9442be98ea92063383b6eff577"
+    },
+    {
+      "path": "dashboard/portfolio/math-models.mjs",
+      "bytes": 13667,
+      "sha256": "a08c96232c0fe6c246fae33c68835149d5febcb3d00d35ca4add45119b336d9b"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261004/results.json",
+      "bytes": 90659,
+      "sha256": "640509d22c7347826b5ac931a2135d60679fcca8981a648c5fa708352835910d"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261004/geometry_extension_registry.json",
+      "bytes": 10012,
+      "sha256": "17981643df1a701c36bfa961c5c3a62dfa6e3d0ceb9f952035d496e733d0871a"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261004/geometry_transport_screen.svg",
+      "bytes": 120954,
+      "sha256": "22af2a47ae51de73f69203b8ac687017d4459fff60f0957239dbc78354bcb8ae"
+    }
+  ]
+}

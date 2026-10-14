@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a fail-closed, public-safe LumenCore portfolio audit."""
+"""Build a public-safe tracked-file portfolio inventory, not an execution audit."""
 
 from __future__ import annotations
 
@@ -43,6 +43,13 @@ FORBIDDEN_PATH_MARKERS = {
     "token",
     "driver license",
     "insurance card",
+}
+AUDIT_SCOPE = "tracked_file_presence_only"
+INVENTORY_LABELS = {
+    "tested_implementation": "Tracked source, entrypoint and test files present",
+    "runnable_component": "Tracked source and entrypoint files present",
+    "component_only": "Tracked source files present",
+    "concept_only": "No tracked source file in the configured evidence",
 }
 
 
@@ -237,6 +244,7 @@ def verify_strategic_binding(
 
 
 def observed_maturity(present: dict[str, bool]) -> str:
+    """Legacy compatibility enum derived only from configured file presence."""
     if present["source"] and present["entrypoint"] and present["test"]:
         return "tested_implementation"
     if present["source"] and present["entrypoint"]:
@@ -327,6 +335,10 @@ def audit_engine(engine: dict[str, Any], tracked: dict[str, str]) -> dict[str, A
         "acceptance_gate": engine["acceptance_gate"],
         "claim_boundary": engine["claim_boundary"],
         "observed_maturity": maturity,
+        "inventory_label": INVENTORY_LABELS[maturity],
+        "scope": AUDIT_SCOPE,
+        "execution_verified_by_this_audit": False,
+        "customer_acceptance_verified_by_this_audit": False,
         "evidence_classes_present": sum(present.values()),
         "evidence_classes_total": len(EVIDENCE_CLASSES),
         "missing_paths": sorted(missing_paths),
@@ -387,6 +399,10 @@ def build_payload(
 
     payload: dict[str, Any] = {
         "schema": "lumencore_engine_portfolio_audit_v2",
+        "scope": AUDIT_SCOPE,
+        "execution_verified_by_this_audit": False,
+        "customer_acceptance_verified_by_this_audit": False,
+        "observed_maturity_contract": "Legacy compatibility enum derived only from configured tracked-file presence; it does not establish execution, test results, operational readiness or customer acceptance.",
         "generated_at_utc": generated_at_utc,
         "source_registry": DEFAULT_CONFIG.relative_to(ROOT).as_posix(),
         "source_registry_sha256": canonical_sha256(registry),
@@ -394,10 +410,14 @@ def build_payload(
         "source_note": registry["source_note"],
         "primary_offer_binding": binding,
         "summary": {
+            "scope": AUDIT_SCOPE,
+            "execution_verified_by_this_audit": False,
+            "customer_acceptance_verified_by_this_audit": False,
             "portfolio_lane_count": len(audited),
             "primary_offer_count": 1,
             "priority_lane_id": priority["id"],
             "priority_lane_maturity": priority["observed_maturity"],
+            "priority_lane_inventory_label": priority["inventory_label"],
             "priority_lane_scoping_candidate": priority["observed_maturity"]
             in {"tested_implementation", "runnable_component"},
             "maturity_counts": dict(sorted(maturity_counts.items())),
@@ -428,9 +448,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     binding = payload["primary_offer_binding"]
     lines = [
-        "# LumenCore Engine Portfolio Audit",
+        "# LumenCore Engine Portfolio — Tracked-File Inventory",
         "",
         f"Generated at: `{payload['generated_at_utc']}`",
+        "",
+        f"**Audit scope:** `{payload['scope']}`",
+        "This audit checks configured tracked-file presence and hashes Git blobs. It does not execute the listed engines or tests, evaluate their results, or verify customer acceptance.",
+        "The retained `observed_maturity` JSON enums are compatibility identifiers for file-presence combinations, not evidence of tested or runnable behavior.",
         "",
         "## Reviewer decision",
         "",
@@ -447,12 +471,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "The buyer supplies authorized data, accepts the incumbent baseline, and locks the metric and threshold before execution.",
         "LumenCore returns replay receipts, negative results, hashes, an offline verifier, and a buyer-readable Proof Capsule.",
         "",
-        "## Current commercial truth",
+        "## Current inventory and commercial boundaries",
         "",
         f"- Portfolio lanes audited: `{summary['portfolio_lane_count']}`",
         f"- Primary offers: `{summary['primary_offer_count']}`",
-        f"- Priority-lane maturity: `{summary['priority_lane_maturity']}`",
-        f"- Priority lane eligible for buyer scoping: `{str(summary['priority_lane_scoping_candidate']).lower()}`",
+        f"- Priority-lane inventory: {summary['priority_lane_inventory_label']}",
+        f"- Priority lane has configured files for a scoping review: `{str(summary['priority_lane_scoping_candidate']).lower()}`",
+        "- Execution verified by this audit: `false`",
+        "- Customer acceptance verified by this audit: `false`",
         f"- Subscription-ready products: `{summary['subscription_ready_count']}`",
         f"- Missing configured evidence paths: `{summary['missing_evidence_path_count']}`",
         f"- Untracked configured evidence paths: `{summary['untracked_evidence_path_count']}`",
@@ -464,13 +490,13 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Portfolio lanes",
         "",
-        "| Lane | Role | Repository maturity | Evidence classes | Buyer-safe scoping use |",
+        "| Lane | Role | Tracked-file inventory | Configured file classes present | Buyer-safe scoping use |",
         "|---|---|---|---:|---|",
     ]
     for engine in payload["engines"]:
         scoping_use = engine["scoping_use"].replace("|", "/")
         lines.append(
-            f"| {engine['name']} | `{engine['lane']}` | `{engine['observed_maturity']}` | "
+            f"| {engine['name']} | `{engine['lane']}` | {engine['inventory_label']} | "
             f"{engine['evidence_classes_present']}/{engine['evidence_classes_total']} | {scoping_use} |"
         )
 

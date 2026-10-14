@@ -25,6 +25,8 @@ on:
       - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'code/ops/probe_public_health.py'
+      - 'tests/test_public_health_probe.py'
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
@@ -55,6 +57,8 @@ on:
       - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'code/ops/probe_public_health.py'
+      - 'tests/test_public_health_probe.py'
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
@@ -89,6 +93,8 @@ jobs:
           # shellcheck disable=SC2086
           python -m py_compile $gateway_paths \
             tests/test_booth_public_contract_runtime.py \
+            code/ops/probe_public_health.py \
+            tests/test_public_health_probe.py \
             tests/test_vps_runtime_diagnostic_workflow.py
 
       - name: Run public contract tests without third-party dependencies
@@ -100,6 +106,7 @@ jobs:
           tests = []
           for path in (
               "tests/test_booth_public_contract_runtime.py",
+              "tests/test_public_health_probe.py",
               "tests/test_vps_runtime_diagnostic_workflow.py",
           ):
               namespace = runpy.run_path(path)

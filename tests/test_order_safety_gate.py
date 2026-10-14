@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "code"))
 
 from execution.order_safety_gate import (  # noqa: E402
     ADD_ORDER_PATH,
+    READ_ONLY_PRIVATE_PATHS,
     OrderSafetyError,
     evaluate_order_request,
     require_order_request_allowed,
@@ -21,12 +22,32 @@ from execution.order_safety_gate import (  # noqa: E402
 
 class OrderSafetyGateTests(unittest.TestCase):
     def test_non_order_private_calls_are_unchanged(self) -> None:
-        decision = require_order_request_allowed(
-            "/0/private/Balance",
-            {"nonce": "1"},
+        for path in READ_ONLY_PRIVATE_PATHS:
+            with self.subTest(path=path):
+                decision = require_order_request_allowed(path, {"nonce": "1"})
+                self.assertTrue(decision.allowed)
+                self.assertEqual(decision.mode, "non_order_private_call")
+
+    def test_private_mutations_and_unknown_routes_are_blocked_even_with_validate(self) -> None:
+        paths = (
+            "/0/private/AddOrderBatch",
+            "/0/private/EditOrder",
+            "/0/private/AmendOrder",
+            "/0/private/CancelOrder",
+            "/0/private/CancelAll",
+            "/0/private/CancelAllOrdersAfter",
+            "/0/private/Withdraw",
+            "/0/private/GetWebSocketsToken",
+            "/0/private/FuturePrivateMethod",
+            "/0/private/AddOrder/",
+            "/0/private/./AddOrder",
+            "/0/private/AddOrder?validate=true",
         )
-        self.assertTrue(decision.allowed)
-        self.assertEqual(decision.mode, "non_order_private_call")
+        for path in paths:
+            for validate in (True, False):
+                with self.subTest(path=path, validate=validate):
+                    with self.assertRaises(OrderSafetyError):
+                        require_order_request_allowed(path, {"validate": validate})
 
     def test_validate_true_is_the_only_allowed_add_order_mode(self) -> None:
         for value in (True, "true", " TRUE "):
@@ -141,6 +162,21 @@ class OrderSafetyGateTests(unittest.TestCase):
                 ADD_ORDER_PATH,
                 {"pair": "XBTUSD", "validate": "false"},
             )
+        self.assertEqual(calls, [])
+
+    def test_facade_blocks_batch_amend_and_unrecognized_routes_before_transport(self) -> None:
+        facade, calls = self._load_facade_with_stub()
+        for path in (
+            "/0/private/AddOrderBatch",
+            "/0/private/EditOrder",
+            "/0/private/AmendOrder",
+            "/0/private/CancelOrder",
+            "/0/private/AddOrder/",
+            "/0/private/FuturePrivateMethod",
+        ):
+            with self.subTest(path=path):
+                with self.assertRaises(facade.KrakenExecutionError):
+                    facade._private_post(path, {"validate": True})
         self.assertEqual(calls, [])
 
     def test_facade_validate_only_helper_emits_validate_true(self) -> None:

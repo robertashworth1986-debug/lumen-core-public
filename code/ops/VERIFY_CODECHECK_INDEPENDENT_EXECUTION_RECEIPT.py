@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 from datetime import datetime
 from pathlib import Path, PurePosixPath
@@ -11,6 +12,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_TEMPLATE = ROOT / "config" / "codecheck_independent_execution_receipt_template_v1.json"
+FROZEN_PROTOCOL = ROOT / "config" / "reviewer_reproducibility_protocol_v1.json"
+FROZEN_PROTOCOL_SHA256 = "c69fb78965cdf420e8354042f1e90d11c6b7dde59f0a4d9fb27d9dec58f4cb01"
+MAX_JSON_BYTES = 16_777_216
+MAX_ARTIFACT_BYTES = 268_435_456
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 EXPECTED_RUNTIME = {
     "system": "Linux",
@@ -28,14 +33,40 @@ EXPECTED_ENVIRONMENT = {
 }
 
 
+def reject_duplicate_keys(pairs: list[tuple]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def reject_nonfinite(value: str) -> None:
+    raise ValueError(f"nonfinite JSON value: {value}")
+
+
+def finite_json_float(value: str) -> float:
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("nonfinite JSON number")
+    return number
+
+
 def read_json(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    with path.open("rb") as stream:
+        raw = stream.read(MAX_JSON_BYTES + 1)
+    if len(raw) > MAX_JSON_BYTES:
+        raise ValueError("JSON exceeds size limit")
+    payload = json.loads(raw, object_pairs_hook=reject_duplicate_keys, parse_constant=reject_nonfinite, parse_float=finite_json_float)
     if not isinstance(payload, dict):
         raise ValueError(f"expected a JSON object at {path}")
     return payload
 
 
 def file_sha256(path: Path) -> str:
+    if path.stat().st_size > MAX_ARTIFACT_BYTES:
+        raise ValueError("artifact exceeds size limit")
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
@@ -44,10 +75,10 @@ def file_sha256(path: Path) -> str:
 
 
 def safe_relative_path(value: Any) -> bool:
-    if not isinstance(value, str) or not value:
+    if not isinstance(value, str) or not value or "\\" in value:
         return False
     path = PurePosixPath(value)
-    return not path.is_absolute() and ".." not in path.parts and ":" not in value
+    return not path.is_absolute() and not any(part in {"", ".", ".."} for part in value.split("/")) and ":" not in value
 
 
 def nonempty(value: Any) -> bool:
@@ -81,14 +112,16 @@ def inspect_manifest(
     if not isinstance(rows, list):
         rows = []
     root = artifact_root.resolve()
-    for row in rows:
+    for row in rows[:len(expected_paths) + 1]:
         if not isinstance(row, dict):
             observations.append({"safe": False, "matched": False})
             continue
         relative = row.get("path")
         safe = safe_relative_path(relative)
-        target = (root / PurePosixPath(relative)).resolve() if safe else root / "__unsafe__"
-        contained = safe and target.is_relative_to(root)
+        lexical_target = root / PurePosixPath(relative) if safe else root / "__unsafe__"
+        target = lexical_target.resolve()
+        symlinked = safe and any(part.is_symlink() for part in (lexical_target, *lexical_target.parents) if part != root and part.is_relative_to(root))
+        contained = safe and target.is_relative_to(root) and not symlinked
         present = contained and target.is_file()
         observed_sha = file_sha256(target) if present else None
         observed_bytes = target.stat().st_size if present else None
@@ -107,8 +140,8 @@ def inspect_manifest(
                     and isinstance(row.get("sha256"), str)
                     and bool(SHA256.fullmatch(row["sha256"]))
                     and observed_sha == row["sha256"]
-                    and isinstance(row.get("bytes"), int)
-                    and row["bytes"] >= 0
+                    and type(row.get("bytes")) is int
+                    and 0 <= row["bytes"] <= MAX_ARTIFACT_BYTES
                     and observed_bytes == row["bytes"]
                 ),
             }
@@ -118,7 +151,7 @@ def inspect_manifest(
         "expected_paths": expected_paths,
         "observed_paths": observed_paths,
         "path_order_exact": observed_paths == expected_paths,
-        "duplicate_path_count": len(observed_paths) - len(set(observed_paths)),
+        "duplicate_path_count": len([p for p in observed_paths if isinstance(p, str)]) - len({p for p in observed_paths if isinstance(p, str)}),
         "files": observations,
         "all_files_matched": (
             observed_paths == expected_paths
@@ -128,13 +161,126 @@ def inspect_manifest(
     }
 
 
+def canonical_sha256(payload: Any) -> str:
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")).hexdigest()
+
+
+def frozen_protocol() -> dict[str, Any]:
+    raw = FROZEN_PROTOCOL.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    if hashlib.sha256(raw.encode("utf-8")).hexdigest() != FROZEN_PROTOCOL_SHA256:
+        raise ValueError("reviewer protocol differs from the reviewed pin")
+    return read_json(FROZEN_PROTOCOL)
+
+
+def exact_value(actual: Any, expected: Any) -> bool:
+    """Do not accept bools as counts or malformed containers as scalar facts."""
+    return type(actual) is type(expected) and actual == expected
+
+
+def inspect_assertions(rows: Any, expected: dict[str, Any], *, tolerance: float | None = None, relative_tolerance: float | None = None) -> dict[str, Any]:
+    if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+        return {"valid": False, "passed": False, "rows": []}
+    expected_ids = list(expected)
+    if [row.get("assertion_id") for row in rows] != expected_ids:
+        return {"valid": False, "passed": False, "rows": rows}
+    valid = True
+    computed = []
+    for row, assertion_id in zip(rows, expected_ids):
+        reference = expected[assertion_id]
+        metric = type(reference) is float
+        allowed = {"assertion_id", "actual", "expected", "passed"}
+        actual = row.get("actual")
+        row_valid = exact_value(row.get("expected"), reference) and type(row.get("passed")) is bool
+        if metric:
+            absolute = tolerance if relative_tolerance is None else None
+            relative = relative_tolerance
+            if absolute is not None:
+                allowed.add("absolute_tolerance")
+                row_valid = row_valid and exact_value(row.get("absolute_tolerance"), absolute)
+            if relative is not None:
+                allowed.add("relative_tolerance")
+                row_valid = row_valid and exact_value(row.get("relative_tolerance"), relative)
+            allowed.update({"absolute_difference", "relative_difference"})
+            numeric = type(actual) in {int, float} and math.isfinite(actual)
+            difference = abs(actual - reference) if numeric else None
+            relative_difference = (difference / abs(reference) if reference else (0.0 if difference == 0.0 else None)) if numeric else None
+            passed = numeric and ((absolute is not None and difference <= absolute) or (relative is not None and relative_difference is not None and relative_difference <= relative))
+            row_valid = row_valid and numeric and exact_value(row.get("absolute_difference"), difference)
+            if relative_difference is not None:
+                row_valid = row_valid and exact_value(row.get("relative_difference"), relative_difference)
+            else:
+                row_valid = row_valid and "relative_difference" not in row
+        else:
+            passed = exact_value(actual, reference)
+            row_valid = row_valid and isinstance(actual, (str, int, bool)) and type(actual) is type(reference)
+        row_valid = row_valid and set(row).issubset(allowed) and {"assertion_id", "actual", "expected", "passed"}.issubset(row) and row.get("passed") is bool(passed)
+        valid = valid and row_valid
+        computed.append(bool(passed))
+    return {"valid": valid, "passed": all(computed), "rows": rows}
+
+
+PROJECTION_EXTRAS = {
+    "eia_wave": {"evaluation_rows", "baseline_comparison_count"},
+    "eia_residual": {"evaluation_rows", "holm_positive_point_improvement_count"},
+    "mda_open_set": {"fixture_chain_sha256"},
+}
+UNPROJECTED_ASSERTIONS = {"panel_rows", "holdout_rows", "holdout_authorities"}
+
+
+def inspect_suite(row: Any, contract: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(row, dict):
+        return {"valid": False, "negative_gates_preserved": False, "assertions": []}
+    identity = all(row.get(key) == contract[key] for key in ("suite_id", "kind", "runner"))
+    facts = row.get("fact_projection")
+    projection_valid = isinstance(facts, dict) and row.get("fact_projection_sha256") == canonical_sha256(facts)
+    # A runner exception is a documented non-pass, not an invented assertion set.
+    if row.get("assertions") == [] and row.get("passed") is False:
+        error = row.get("error")
+        valid = identity and projection_valid and facts == {} and isinstance(error, dict) and nonempty(error.get("type")) and nonempty(error.get("message"))
+        return {"valid": bool(valid), "negative_gates_preserved": bool(valid), "assertions": []}
+    expected = {key: value for key, value in contract["expected"].items() if key not in {"tolerance", "relative_tolerance"}}
+    assertions = inspect_assertions(row.get("assertions"), expected, tolerance=contract["expected"].get("tolerance"), relative_tolerance=contract["expected"].get("relative_tolerance"))
+    projected_ids = set(expected) - UNPROJECTED_ASSERTIONS
+    expected_keys = projected_ids | PROJECTION_EXTRAS[contract["runner"]]
+    projection_valid = projection_valid and set(facts or {}) == expected_keys
+    if projection_valid:
+        by_id = {assertion["assertion_id"]: assertion for assertion in assertions["rows"]}
+        projection_valid = all(key in by_id and exact_value(facts[key], by_id[key].get("actual")) for key in projected_ids)
+        for key in PROJECTION_EXTRAS[contract["runner"]]:
+            value = facts[key]
+            if key == "fixture_chain_sha256":
+                projection_valid = projection_valid and isinstance(value, str) and bool(SHA256.fullmatch(value))
+            else:
+                projection_valid = projection_valid and type(value) is int and value >= 0
+        if contract["runner"] == "eia_wave":
+            projection_valid = projection_valid and facts["baseline_comparison_count"] == 6
+        if contract["runner"] == "eia_residual":
+            projection_valid = projection_valid and facts["holm_positive_point_improvement_count"] <= expected["baseline_comparison_count"]
+    gates = [key for key, value in expected.items() if value is False]
+    preserved = projection_valid and all(facts.get(key) is False for key in gates)
+    valid = identity and assertions["valid"] and projection_valid and type(row.get("passed")) is bool and row.get("passed") is assertions["passed"]
+    return {"valid": bool(valid), "negative_gates_preserved": bool(preserved), "assertions": assertions["rows"]}
+
+
 def inspect_capsule_receipt(path: Path, expected_commit: str) -> dict[str, Any]:
     try:
         payload = read_json(path)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        protocol = frozen_protocol()
+    except (OSError, ValueError, UnicodeError, RecursionError) as exc:
         return {"parsed": False, "error": str(exc)}
     suites = payload.get("suites") if isinstance(payload.get("suites"), list) else []
-    assertions = [
+    suite_inspections = [inspect_suite(row, contract) for row, contract in zip(suites, protocol["suites"])]
+    frozen = payload.get("frozen_input") if isinstance(payload.get("frozen_input"), dict) else {}
+    input_contract = protocol["frozen_inputs"][0]
+    input_assertions = inspect_assertions(frozen.get("assertions"), {
+        "compressed_sha256": input_contract["compressed_sha256"],
+        "uncompressed_sha256": input_contract["uncompressed_sha256"],
+        "row_chain_sha256": input_contract["row_chain_sha256"],
+        "row_count": input_contract["row_count"],
+        "credential_serialized": False,
+    })
+    frozen_valid = input_assertions["valid"] and frozen.get("input_id") == input_contract["input_id"] and frozen.get("path") == input_contract["path"] and frozen.get("passed") is input_assertions["passed"]
+    assertions = input_assertions["rows"] + [
         assertion
         for suite in suites
         if isinstance(suite, dict) and isinstance(suite.get("assertions"), list)
@@ -145,7 +291,7 @@ def inspect_capsule_receipt(path: Path, expected_commit: str) -> dict[str, Any]:
     observed = {
         "capsule_status": payload.get("status"),
         "suite_count": len(suites),
-        "suite_pass_count": sum(suite.get("passed") is True for suite in suites),
+        "suite_pass_count": sum(isinstance(suite, dict) and suite.get("passed") is True for suite in suites),
         "assertion_count": len(assertions),
         "assertion_pass_count": sum(row.get("passed") is True for row in assertions),
     }
@@ -154,6 +300,16 @@ def inspect_capsule_receipt(path: Path, expected_commit: str) -> dict[str, Any]:
         "schema_exact": payload.get("schema") == "reviewer_reproducibility_capsule.v1",
         "source_commit_exact": nested_get(payload, "git", "commit") == expected_commit,
         "observed": observed,
+        "protocol_facts_reconciled": (
+            payload.get("protocol_id") == protocol["protocol_id"]
+            and len(suites) == len(protocol["suites"])
+            and all(row["valid"] for row in suite_inspections)
+            and frozen_valid
+            and all(exact_value(summary.get(key), observed[key]) for key in ("suite_count", "suite_pass_count", "assertion_count", "assertion_pass_count"))
+            and summary.get("frozen_input_passed") is input_assertions["passed"]
+            and (payload.get("status") != "BOUNDED_REPRODUCIBILITY_PASS" or (input_assertions["passed"] and all(row.get("passed") is True for row in suites)))
+            and payload.get("capsule_sha256") == canonical_sha256({key: value for key, value in payload.items() if key != "capsule_sha256"})
+        ),
         "dependency_lock_sha256": nested_get(payload, "summary", "dependency_lock_sha256"),
         "protocol_controls_passed": all(
             summary.get(key) is True
@@ -170,11 +326,13 @@ def inspect_capsule_receipt(path: Path, expected_commit: str) -> dict[str, Any]:
         "negative_gates_preserved": (
             summary.get("external_validation_complete") is False
             and summary.get("agency_certification_complete") is False
+            and len(suite_inspections) == len(protocol["suites"])
+            and all(row["negative_gates_preserved"] for row in suite_inspections)
         ),
     }
 
 
-def inspect_receipt(
+def _inspect_receipt(
     receipt_path: Path,
     artifact_root: Path,
     template_path: Path = DEFAULT_TEMPLATE,
@@ -279,6 +437,7 @@ def inspect_receipt(
         "capsule_parsed": capsule.get("parsed") is True,
         "capsule_schema_exact": capsule.get("schema_exact") is True,
         "capsule_source_commit_exact": capsule.get("source_commit_exact") is True,
+        "capsule_protocol_facts_reconciled": capsule.get("protocol_facts_reconciled") is True,
         "capsule_outcome_matches": all(
             result.get(key) == capsule_observed.get(key)
             for key in (
@@ -367,6 +526,30 @@ def inspect_receipt(
         },
         "claim_boundary": template["claim_boundary"],
     }
+
+
+def inspect_receipt(
+    receipt_path: Path,
+    artifact_root: Path,
+    template_path: Path = DEFAULT_TEMPLATE,
+) -> dict[str, Any]:
+    try:
+        return _inspect_receipt(receipt_path, artifact_root, template_path)
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, UnicodeError, RecursionError, OverflowError) as exc:
+        return {
+            "schema": "lumencore.codecheck_independent_execution_verification.v1",
+            "status": "INVALID_OR_INCOMPLETE_RECEIPT",
+            "passed": False,
+            "error": {"type": type(exc).__name__, "message": str(exc)},
+            "computed_claim_state": {
+                "independent_execution_documented": False,
+                "bounded_reproduction_passed": False,
+                "external_validation_complete": False,
+                "field_validation_complete": False,
+                "economic_validation_complete": False,
+                "valuation_validation_complete": False,
+            },
+        }
 
 
 def parse_args() -> argparse.Namespace:

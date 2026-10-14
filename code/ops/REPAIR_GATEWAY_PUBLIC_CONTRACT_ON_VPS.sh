@@ -19,6 +19,8 @@ LOCAL_HEALTH_URL="${LUMENCORE_LOCAL_HEALTH_URL:-http://127.0.0.1:8787/health}"
 PUBLIC_HEALTH_URL="${LUMENCORE_PUBLIC_HEALTH_URL:-https://lumen-core.ai/health}"
 LOCAL_STATUS_URL="${LUMENCORE_LOCAL_STATUS_URL:-http://127.0.0.1:8787/api/public/status}"
 PUBLIC_STATUS_URL="${LUMENCORE_PUBLIC_STATUS_URL:-https://lumen-core.ai/api/public/status}"
+LOCAL_GATEWAY_BASE_URL="${LUMENCORE_LOCAL_GATEWAY_BASE_URL:-http://127.0.0.1:8787}"
+PUBLIC_GATEWAY_BASE_URL="${LUMENCORE_PUBLIC_GATEWAY_BASE_URL:-https://lumen-core.ai}"
 EXPECTED_BUNDLE_SHA="${LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256:-}"
 EXPECTED_HARDENING_SHA="${LUMENCORE_EXPECTED_GATEWAY_HARDENING_SHA256:-}"
 SOURCE_COMMIT="${LUMENCORE_GATEWAY_SOURCE_COMMIT:-}"
@@ -61,6 +63,16 @@ BUNDLE_FILES=(
   "universe_v2_fetchers.py"
 )
 
+# These exact anonymous probes close the reviewer-visible introspection surface.
+# Query-string cache busters do not affect path matching in the ASGI boundary.
+PROTECTED_OPERATOR_HTTP_PATHS=(
+  "/metrics"
+  "/openapi.json"
+  "/docs"
+  "/redoc"
+)
+PROTECTED_OPERATOR_WEBSOCKET_PATH="/ws"
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -81,8 +93,9 @@ stops only luma-gateway, installs the exact files and a bounded systemd drop-in,
 migrates only the gateway run directory to lumencore:lumencore mode 750,
 removes only a verified dead-PID singleton lock, and restores source files,
 service configuration, runtime-directory metadata, and prior service state on
-failure unless identity, lock, source parity, and all four public/local JSON
-contracts pass.
+failure unless identity, lock, source parity, all four public/local JSON
+contracts, every anonymous HTTP introspection boundary, and the anonymous
+WebSocket upgrade boundary pass.
 EOF
 }
 
@@ -281,7 +294,7 @@ fi
 }
 for required_command in \
   systemctl curl install cp stat mktemp id getent chown chmod dirname rmdir \
-  awk seq sleep tr; do
+  awk grep seq sleep tr; do
   command -v "$required_command" >/dev/null 2>&1 || {
     echo "ERROR: $required_command is required" >&2
     exit 10
@@ -300,7 +313,9 @@ done
   && "$LOCAL_HEALTH_URL" == "http://127.0.0.1:8787/health" \
   && "$PUBLIC_HEALTH_URL" == "https://lumen-core.ai/health" \
   && "$LOCAL_STATUS_URL" == "http://127.0.0.1:8787/api/public/status" \
-  && "$PUBLIC_STATUS_URL" == "https://lumen-core.ai/api/public/status" ]] || {
+  && "$PUBLIC_STATUS_URL" == "https://lumen-core.ai/api/public/status" \
+  && "$LOCAL_GATEWAY_BASE_URL" == "http://127.0.0.1:8787" \
+  && "$PUBLIC_GATEWAY_BASE_URL" == "https://lumen-core.ai" ]] || {
   echo "ERROR: apply target, service, lock, runtime, or probe identity is not approved" >&2
   exit 11
 }
@@ -658,11 +673,95 @@ probe_json() {
   return 1
 }
 
+probe_operator_http_boundary() {
+  local url="$1"
+  local body_file="$2"
+  local header_file="$3"
+  local status="000"
+  local content_type=""
+  local curl_result
+  local normalized_headers
+  local attempt
+  for attempt in $(seq 1 12); do
+    : > "$body_file"
+    : > "$header_file"
+    curl_result="$(curl -sS --max-time 15 \
+      --header 'Cache-Control: no-cache' \
+      --output "$body_file" \
+      --dump-header "$header_file" \
+      --write-out '%{http_code}\t%{content_type}' \
+      "${url}?repair=${SOURCE_COMMIT:0:12}-${attempt}" || true)"
+    IFS=$'\t' read -r status content_type <<< "$curl_result"
+    if [[ "$status" == "401" || "$status" == "503" ]]; then
+      if [[ "${content_type,,}" == application/json* ]] && \
+        python3 - "$body_file" "$status" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+expected_detail = (
+    "operator API authentication required"
+    if sys.argv[2] == "401"
+    else "operator API access unavailable"
+)
+assert payload == {"detail": expected_detail}
+PY
+      then
+        normalized_headers="$(tr -d '\r' < "$header_file")"
+        if grep -Eiq '^cache-control:[[:space:]]*no-store([[:space:]]|$)' \
+          <<< "$normalized_headers" && \
+          grep -Eiq '^pragma:[[:space:]]*no-cache([[:space:]]|$)' \
+          <<< "$normalized_headers"; then
+          if [[ "$status" != "401" ]] || \
+            grep -Eiq '^www-authenticate:[[:space:]]*Bearer([[:space:]]|$)' \
+              <<< "$normalized_headers"; then
+            printf '%s\n' "$status"
+            return 0
+          fi
+        fi
+      fi
+    fi
+    sleep 3
+  done
+  printf '%s\n' "${status:-000}"
+  return 1
+}
+
+probe_operator_websocket_boundary() {
+  local url="$1"
+  local output="$2"
+  local allow_not_found="${3:-false}"
+  local status="000"
+  local attempt
+  for attempt in $(seq 1 12); do
+    status="$(curl -sS --max-time 15 --http1.1 \
+      --header 'Cache-Control: no-cache' \
+      --header 'Connection: Upgrade' \
+      --header 'Upgrade: websocket' \
+      --header 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
+      --header 'Sec-WebSocket-Version: 13' \
+      --output "$output" \
+      --write-out '%{http_code}' \
+      "${url}?repair=${SOURCE_COMMIT:0:12}-${attempt}" || true)"
+    if [[ "$status" == "403" || ( "$allow_not_found" == "true" && "$status" == "404" ) ]]; then
+      printf '%s\n' "$status"
+      return 0
+    fi
+    sleep 3
+  done
+  printf '%s\n' "$status"
+  return 1
+}
+
 LOCAL_HEALTH_BODY="$(mktemp)"
 PUBLIC_HEALTH_BODY="$(mktemp)"
 LOCAL_STATUS_BODY="$(mktemp)"
 PUBLIC_STATUS_BODY="$(mktemp)"
-trap 'rm -f -- "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY" "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY"; cleanup' EXIT
+OPERATOR_HTTP_BODY="$(mktemp)"
+OPERATOR_HTTP_HEADERS="$(mktemp)"
+OPERATOR_WEBSOCKET_BODY="$(mktemp)"
+trap 'rm -f -- "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY" "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY" "$OPERATOR_HTTP_BODY" "$OPERATOR_HTTP_HEADERS" "$OPERATOR_WEBSOCKET_BODY"; cleanup' EXIT
 
 LOCAL_HEALTH_STATUS="$(probe_json "$LOCAL_HEALTH_URL" "$LOCAL_HEALTH_BODY")" || {
   echo "ERROR: local gateway health failed (HTTP ${LOCAL_HEALTH_STATUS:-000})" >&2
@@ -720,6 +819,52 @@ assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", payload["generated_
 PY
 done
 
+LOCAL_OPERATOR_HTTP_STATUSES=()
+PUBLIC_OPERATOR_HTTP_STATUSES=()
+for path in "${PROTECTED_OPERATOR_HTTP_PATHS[@]}"; do
+  route_label="${path#/}"
+  route_label="${route_label//\//_}"
+  route_label="${route_label//./_}"
+  local_operator_status="$(
+    probe_operator_http_boundary \
+      "${LOCAL_GATEWAY_BASE_URL}${path}" \
+      "$OPERATOR_HTTP_BODY" \
+      "$OPERATOR_HTTP_HEADERS"
+  )" || {
+    echo "ERROR: local anonymous operator boundary failed for ${path} (HTTP ${local_operator_status:-000})" >&2
+    rollback 19
+  }
+  public_operator_status="$(
+    probe_operator_http_boundary \
+      "${PUBLIC_GATEWAY_BASE_URL}${path}" \
+      "$OPERATOR_HTTP_BODY" \
+      "$OPERATOR_HTTP_HEADERS"
+  )" || {
+    echo "ERROR: public anonymous operator boundary failed for ${path} (HTTP ${public_operator_status:-000})" >&2
+    rollback 20
+  }
+  LOCAL_OPERATOR_HTTP_STATUSES+=("${route_label}:${local_operator_status}")
+  PUBLIC_OPERATOR_HTTP_STATUSES+=("${route_label}:${public_operator_status}")
+done
+
+LOCAL_OPERATOR_WEBSOCKET_STATUS="$(
+  probe_operator_websocket_boundary \
+    "${LOCAL_GATEWAY_BASE_URL}${PROTECTED_OPERATOR_WEBSOCKET_PATH}" \
+    "$OPERATOR_WEBSOCKET_BODY"
+)" || {
+  echo "ERROR: local anonymous WebSocket boundary failed (HTTP ${LOCAL_OPERATOR_WEBSOCKET_STATUS:-000})" >&2
+  rollback 21
+}
+PUBLIC_OPERATOR_WEBSOCKET_STATUS="$(
+  probe_operator_websocket_boundary \
+    "${PUBLIC_GATEWAY_BASE_URL}${PROTECTED_OPERATOR_WEBSOCKET_PATH}" \
+    "$OPERATOR_WEBSOCKET_BODY" \
+    true
+)" || {
+  echo "ERROR: public anonymous WebSocket boundary failed (HTTP ${PUBLIC_OPERATOR_WEBSOCKET_STATUS:-000})" >&2
+  rollback 22
+}
+
 REPAIR_COMPLETE=true
 trap - ERR INT TERM
 echo "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK"
@@ -733,3 +878,7 @@ echo "Run directory identity: $(stat -c '%U:%G:%a' "$RUN_DIR")"
 echo "Singleton lock identity: $(stat -c '%U:%G:%a' "$LOCK_FILE") pid_matches_main=true"
 echo "Local health HTTP: $LOCAL_HEALTH_STATUS | Public health HTTP: $PUBLIC_HEALTH_STATUS"
 echo "Local status HTTP: $LOCAL_PUBLIC_STATUS | Public status HTTP: $PUBLIC_PUBLIC_STATUS"
+echo "Local anonymous operator HTTP boundaries: ${LOCAL_OPERATOR_HTTP_STATUSES[*]}"
+echo "Public anonymous operator HTTP boundaries: ${PUBLIC_OPERATOR_HTTP_STATUSES[*]}"
+echo "Local anonymous WebSocket boundary: ws:${LOCAL_OPERATOR_WEBSOCKET_STATUS}"
+echo "Public anonymous WebSocket boundary: ws:${PUBLIC_OPERATOR_WEBSOCKET_STATUS}"

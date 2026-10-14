@@ -1,0 +1,200 @@
+{
+  "dependencies": [
+    {
+      "name": "annotated-doc",
+      "version": "0.0.5",
+      "vulns": []
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "vulns": []
+    },
+    {
+      "name": "anyio",
+      "version": "4.14.2",
+      "vulns": []
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "vulns": []
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.4.9",
+      "vulns": []
+    },
+    {
+      "name": "fastapi",
+      "version": "0.138.2",
+      "vulns": []
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "vulns": []
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9",
+      "vulns": []
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1",
+      "vulns": []
+    },
+    {
+      "name": "idna",
+      "version": "3.18",
+      "vulns": []
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.0",
+      "vulns": []
+    },
+    {
+      "name": "joblib",
+      "version": "1.5.3",
+      "vulns": []
+    },
+    {
+      "name": "lightgbm",
+      "version": "4.6.0",
+      "vulns": []
+    },
+    {
+      "name": "lxml",
+      "version": "6.1.1",
+      "vulns": []
+    },
+    {
+      "name": "numpy",
+      "version": "2.3.5",
+      "vulns": []
+    },
+    {
+      "name": "nvidia-nccl-cu12",
+      "version": "2.31.2",
+      "vulns": []
+    },
+    {
+      "name": "packaging",
+      "version": "25.0",
+      "vulns": []
+    },
+    {
+      "name": "pandas",
+      "version": "2.3.3",
+      "vulns": []
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0",
+      "vulns": []
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.4",
+      "vulns": []
+    },
+    {
+      "name": "pydantic-core",
+      "version": "2.46.4",
+      "vulns": []
+    },
+    {
+      "name": "pygments",
+      "version": "2.20.0",
+      "vulns": []
+    },
+    {
+      "name": "pypdf",
+      "version": "6.17.0",
+      "vulns": []
+    },
+    {
+      "name": "pytest",
+      "version": "9.1.0",
+      "vulns": []
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "vulns": []
+    },
+    {
+      "name": "python-docx",
+      "version": "1.2.0",
+      "vulns": []
+    },
+    {
+      "name": "pytz",
+      "version": "2026.3.post1",
+      "vulns": []
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "vulns": []
+    },
+    {
+      "name": "requests",
+      "version": "2.33.0",
+      "vulns": []
+    },
+    {
+      "name": "scikit-learn",
+      "version": "1.8.0",
+      "vulns": []
+    },
+    {
+      "name": "scipy",
+      "version": "1.16.3",
+      "vulns": []
+    },
+    {
+      "name": "six",
+      "version": "1.17.0",
+      "vulns": []
+    },
+    {
+      "name": "starlette",
+      "version": "1.6.0",
+      "vulns": []
+    },
+    {
+      "name": "threadpoolctl",
+      "version": "3.6.0",
+      "vulns": []
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "vulns": []
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.3",
+      "vulns": []
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.3",
+      "vulns": []
+    },
+    {
+      "name": "urllib3",
+      "version": "2.7.0",
+      "vulns": []
+    },
+    {
+      "name": "xgboost",
+      "version": "3.2.0",
+      "vulns": []
+    }
+  ],
+  "fixes": []
+}

@@ -1,9 +1,9 @@
 """Fail-closed access boundary for the Luma operator gateway.
 
 The legacy gateway contains both reviewer-safe and operator-sensitive routes.
-This middleware keeps that distinction explicit: one minimal status route is
-public, while every other API route and live WebSocket requires a runtime
-operator token.
+This middleware keeps that distinction explicit: minimal liveness routes are
+public, while every other API route, runtime-introspection surface, workspace
+output route, and live WebSocket requires a runtime operator token.
 """
 
 from __future__ import annotations
@@ -34,7 +34,19 @@ OPERATOR_TOKEN_ENV_NAMES = (
 PUBLIC_STATUS_PATH = "/api/public/status"
 PUBLIC_HEALTH_PATH = "/health"
 PUBLIC_API_READ_PATHS = frozenset({PUBLIC_STATUS_PATH})
-PROTECTED_WEBSOCKET_PATHS = frozenset({"/ws", "/ws/live"})
+PROTECTED_OPERATOR_HTTP_ROOTS = frozenset(
+    {
+        "/api",
+        "/docs",
+        "/metrics",
+        "/openapi.json",
+        "/out",
+        "/proof",
+        "/INSTITUTIONAL_STACK_V2/out",
+        "/redoc",
+    }
+)
+PROTECTED_WEBSOCKET_ROOT = "/ws"
 MIN_OPERATOR_TOKEN_CHARS = 32
 _TOKEN_SPLIT_RE = re.compile(r"[\r\n,]+")
 
@@ -100,19 +112,45 @@ def presented_operator_token(scope: Mapping[str, Any]) -> str:
 
 
 def token_is_authorized(provided: str, expected: Iterable[str]) -> bool:
-    if not provided:
+    # compare_digest rejects non-ASCII strings. Malformed credentials must
+    # remain authentication failures rather than unhandled HTTP/WS errors.
+    if not provided or not provided.isascii():
         return False
-    return any(hmac.compare_digest(provided, token) for token in expected)
+    return any(
+        token.isascii() and hmac.compare_digest(provided, token)
+        for token in expected
+    )
+
+
+def _app_relative_path(scope: Mapping[str, Any]) -> str:
+    """Match the router's mount/proxy-root semantics without changing scope."""
+
+    path = str(scope.get("path", ""))
+    root_path = str(scope.get("root_path", ""))
+    if root_path and (path == root_path or path.startswith(f"{root_path}/")):
+        return path[len(root_path):]
+    return path
 
 
 def is_public_api_read(scope: Mapping[str, Any]) -> bool:
     method = str(scope.get("method", "")).upper()
-    path = str(scope.get("path", ""))
+    path = _app_relative_path(scope)
     return method in {"GET", "HEAD"} and path in PUBLIC_API_READ_PATHS
 
 
 def is_operator_http_path(path: str) -> bool:
-    return path == "/api" or path.startswith("/api/")
+    return any(
+        path == root or path.startswith(f"{root}/")
+        for root in PROTECTED_OPERATOR_HTTP_ROOTS
+    )
+
+
+def is_operator_websocket_path(path: str) -> bool:
+    """Protect the WebSocket route family without matching nearby paths."""
+
+    return path == PROTECTED_WEBSOCKET_ROOT or path.startswith(
+        f"{PROTECTED_WEBSOCKET_ROOT}/"
+    )
 
 
 async def _http_error(send: Callable[..., Awaitable[Any]], status: int) -> None:
@@ -205,7 +243,7 @@ class OperatorApiAccessMiddleware:
         send: Callable[..., Awaitable[Any]],
     ) -> None:
         scope_type = str(scope.get("type", ""))
-        path = str(scope.get("path", ""))
+        path = _app_relative_path(scope)
 
         if scope_type == "http":
             method = str(scope.get("method", "")).upper()
@@ -219,7 +257,7 @@ class OperatorApiAccessMiddleware:
                 await self.app(scope, receive, send)
                 return
         elif scope_type == "websocket":
-            if path not in PROTECTED_WEBSOCKET_PATHS:
+            if not is_operator_websocket_path(path):
                 await self.app(scope, receive, send)
                 return
         else:

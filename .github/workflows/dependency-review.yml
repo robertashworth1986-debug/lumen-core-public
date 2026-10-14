@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   review:
+    name: Dependency review
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

@@ -4,6 +4,51 @@ This document records the current repository consolidation state after reviewing
 
 ## Canonical product spine
 
+### October 8, 2026 queue reconciliation
+
+The founder authorized source commits and merges. All 26 then-open PR heads
+were inspected for current mergeability; available checks were read for clean
+heads. This is queue triage, not a complete code review of every old branch.
+The current continuation integrates #244, #232 and #222 with additional input
+and reporting repairs. It preserves complete ancestry and later mainline fixes.
+Other branches remain open, with no deletion or untested bulk merge.
+
+| PR | Inspected head | Disposition |
+|---|---|---|
+| #244 | 4a06d7bf3bd3 | Integrated in October 8 continuation; current combined CI required |
+| #232 | 7de14a825574 | Integrated in October 8 continuation; current combined CI required |
+| #222 | 1559a9d49aa4 | Integrated in October 8 continuation; current combined CI required |
+| #221 | 8ced74f671cf | Open: failing checks; do not merge unchanged |
+| #220 | 5acbf42c3b2e | Open: conflicts against inspected main; unique changes require reconciliation |
+| #219 | e29909c3890a | Open: conflicts against inspected main; unique changes require reconciliation |
+| #217 | 40f81fd8e919 | Open: separate governance change; not required for this authorized source repair |
+| #216 | 6a58e9b5d7ae | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #215 | e840cb197863 | Open: failing checks; do not merge unchanged |
+| #213 | 3a0b8e8e1c00 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #212 | c787be842649 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #211 | 6477860cd5f8 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #208 | ceac73bf3233 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #207 | 626e24f88d2c | Open: conflicts against inspected main; unique changes require reconciliation |
+| #206 | 6726e259a0fe | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #205 | 0c4f11193892 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #204 | 823b2d0a0e5b | Open: conflicts against inspected main; unique changes require reconciliation |
+| #203 | 4a9d6a65c5d6 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #201 | f5619341df7b | Open: conflicts against inspected main; unique changes require reconciliation |
+| #199 | 267886b8c114 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #198 | 01c143976219 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #197 | 102039df6124 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #196 | 313ac37c370a | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #195 | 2e7001ae18b3 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #194 | 24542ae5193f | Open: conflicts against inspected main; unique changes require reconciliation |
+| #187 | c7ac0ba6cc46 | Open: failing checks; do not merge unchanged |
+
+PR #221's full-suite log reports `dashboard dependency range drift: three`:
+the dependency update did not update the security contract. That requires a
+coordinated dependency/provenance review, not disabling the contract. Large
+conflicted #220/#219/#201 and causal/trading continuations remain separate work.
+The merged mainline and current CI receipts, not this dated queue snapshot,
+determine what is actually available for a reviewer.
+
 1. **Proof Capsule / ProofLock assurance**
    - merged foundation: PR #34
    - deployed demonstration and historical submission record: PR #36

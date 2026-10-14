@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import math
 
 @dataclass
 class LiquiditySnapshot:
@@ -23,7 +24,22 @@ class LiquidityGuard:
 
     def assess(self, snap: LiquiditySnapshot) -> LiquidityDecision:
         reasons = []
-        mid = (snap.bid + snap.ask) / 2
+        values = (snap.bid, snap.ask, snap.bid_size, snap.ask_size,
+                  snap.est_sweep_cost_bps, snap.quote_update_rate)
+        try:
+            valid = all(not isinstance(v, bool) and math.isfinite(v) for v in values)
+            valid = valid and snap.bid > 0 and snap.ask >= snap.bid
+            valid = valid and snap.bid_size > 0 and snap.ask_size > 0
+            valid = valid and snap.est_sweep_cost_bps >= 0 and snap.quote_update_rate >= 0
+        except (TypeError, ValueError):
+            valid = False
+        if not valid:
+            return LiquidityDecision(False, 0.0, 0.0, ["invalid_liquidity_snapshot"])
+        # Halve before adding: two individually finite large quotes can make
+        # (bid + ask) overflow and falsely report a zero spread.
+        mid = (snap.bid / 2) + (snap.ask / 2)
+        if not math.isfinite(mid) or mid <= 0:
+            return LiquidityDecision(False, 0.0, 0.0, ["invalid_liquidity_snapshot"])
         spread_bps = ((snap.ask - snap.bid) / max(mid, 1e-9)) * 10000
         score = 1.0
 

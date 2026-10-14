@@ -1,0 +1,40 @@
+{
+  "artifact_sha256": {
+    "baseline-pip-audit.json": "a628b959b593fca86fd91dedc29e846fb23786208c64c8350c71743f9b5397bb",
+    "candidate-npm-audit.json": "4595d734e570ab060d56f2b28a4bd0bfe701dd3d668e3a6871908f4a58727207",
+    "candidate-pip-audit.json": "db0d2fadb69678c8539c03ceecd3c8133da7b0caf56e1c5d0c91e31fbfcb12fd"
+  },
+  "baseline_description": "Existing PR #210 PDF candidate with pypdf 6.19.0 and urllib3 2.7.0; not unmodified main",
+  "baseline_lock_sha256": "db207432cca950b4d96fe5c16814a041adb1bd31c5cd295ed66e2db71c1b6015",
+  "boundaries": [
+    "A zero registry result does not establish absence of all vulnerabilities.",
+    "The historical frozen reviewer dependencies are unchanged.",
+    "GitHub CI and deployed-runtime evidence are separate checks."
+  ],
+  "candidate_lock_sha256": "ba601fda49dfa741dba9942880723d7437c840c213b44eb3f86ed11e9825b9cb",
+  "candidate_npm_lock_sha256": "1bebed92978e9a36767fd605edf6a07a866affa2be64e448794d6a4e06ae6ab7",
+  "npm_audit": {
+    "candidate_advisories": 0,
+    "candidate_installed_packages": 10,
+    "command": "npm audit --omit=dev --audit-level=moderate --json",
+    "node": "24.19.0",
+    "npm": "11.9.0",
+    "previous_installed_packages": 76,
+    "remaining_package_versions_changed": []
+  },
+  "observed_utc": "2026-10-07T23:55:15Z",
+  "python_audit": {
+    "baseline_advisories": 3,
+    "candidate_advisories": 0,
+    "command": "python -m pip_audit -r requirements-institutional-ubuntu-py311.lock --disable-pip --no-deps --format json",
+    "locked_packages": 39,
+    "note": "All 39 explicitly locked packages were queried; no resolver or runtime scan was performed.",
+    "tool": "pip-audit==2.10.1"
+  },
+  "schema": "lumencore.dependency_security_comparison.v1",
+  "scope": "Reviewer source dependency preparation; no runtime or remote-alert closure claim",
+  "urllib3_distribution_hashes_verified": {
+    "urllib3-2.8.0-py3-none-any.whl": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+    "urllib3-2.8.0.tar.gz": "63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63"
+  }
+}

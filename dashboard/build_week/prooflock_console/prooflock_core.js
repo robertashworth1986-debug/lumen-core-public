@@ -6,6 +6,11 @@
   root.ProofLockCore = api;
 }(typeof globalThis !== "undefined" ? globalThis : window, (root) => {
   const RECEIPT_SCHEMA = "lumencore.prooflock_receipt.v1";
+  const RECEIPT_SCHEMA_V2 = "lumencore.prooflock_receipt.v2";
+  const CANONICALIZATION_V1 = "lumencore.prooflock_c14n.legacy.v1";
+  const CANONICALIZATION_V2 = "lumencore.prooflock_c14n.binary64.v2";
+  const MAX_JSON_TEXT = 2000000;
+  const MAX_DEPTH = 100;
   const REPORT_SCHEMA = "lumencore.prooflock_verification_report.v1";
   const ALLOWED_GATE_STATUSES = new Set(["PASS", "FAIL", "OPEN", "NOT_APPLICABLE"]);
   const ALLOWED_DECISIONS = new Set(["HOLD", "PROMOTE", "REJECT"]);
@@ -22,8 +27,9 @@
   const SAFE_ARTIFACT_PATTERN = /^assets\/[A-Za-z0-9._/-]+$/;
   const SCHEME_PATTERN = /^[A-Za-z][A-Za-z0-9+.-]*:/;
 
-  function asciiJsonString(value) {
-    return JSON.stringify(value).replace(/[^\x00-\x7f]/gu, (character) => {
+  function asciiJsonString(value, profile) {
+    const expression = profile === CANONICALIZATION_V2 ? /[^\x00-\x7e]/gu : /[^\x00-\x7f]/gu;
+    return JSON.stringify(value).replace(expression, (character) => {
       const codePoint = character.codePointAt(0);
       if (codePoint <= 0xffff) return `\\u${codePoint.toString(16).padStart(4, "0")}`;
       const adjusted = codePoint - 0x10000;
@@ -37,15 +43,114 @@
     return String(value ?? "").replace(/\r\n?/gu, "\n");
   }
 
-  function canonicalize(value) {
-    if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
-    if (value && typeof value === "object") {
-      const entries = Object.keys(value)
-        .sort()
-        .map((key) => `${asciiJsonString(key)}:${canonicalize(value[key])}`);
-      return `{${entries.join(",")}}`;
+  function scalarString(value) {
+    for (const character of value) {
+      const code = character.codePointAt(0);
+      if (code >= 0xd800 && code <= 0xdfff) throw new Error("unpaired Unicode surrogate is prohibited");
     }
-    return asciiJsonString(value);
+    return value;
+  }
+
+  function compareUnicode(left, right) {
+    const a = Array.from(left, (c) => c.codePointAt(0));
+    const b = Array.from(right, (c) => c.codePointAt(0));
+    for (let i = 0; i < Math.min(a.length, b.length); i++) if (a[i] !== b[i]) return a[i] - b[i];
+    return a.length - b.length;
+  }
+
+  function serializationProfile(receipt) {
+    const profile = receipt?.schema === RECEIPT_SCHEMA_V2 ? CANONICALIZATION_V2 : CANONICALIZATION_V1;
+    if (receipt?.canonicalization !== undefined && receipt.canonicalization !== profile) throw new Error("unsupported canonicalization profile");
+    if (receipt?.schema === RECEIPT_SCHEMA_V2 && receipt.canonicalization !== profile) throw new Error("v2 receipts require an explicit canonicalization profile");
+    return profile;
+  }
+
+  function canonicalize(value, profile = serializationProfile(value)) {
+    if (![CANONICALIZATION_V1, CANONICALIZATION_V2].includes(profile)) throw new Error("unsupported canonicalization profile");
+    function encode(item, depth) {
+      if (depth > MAX_DEPTH) throw new Error("canonical payload exceeds the nesting limit");
+      if (item === null) return "null";
+      if (typeof item === "boolean") return item ? "true" : "false";
+      if (typeof item === "string") {
+        scalarString(item);
+        if (profile === CANONICALIZATION_V1 && item.includes("\x7f")) throw new Error("v1 does not support DEL characters; use an explicit v2 receipt");
+        return asciiJsonString(item, profile);
+      }
+      if (typeof item === "number") {
+        if (!Number.isFinite(item) || (Number.isInteger(item) && !Number.isSafeInteger(item))) throw new Error("nonfinite or unsafe integer number is prohibited");
+        if (profile === CANONICALIZATION_V1) {
+          if (!Number.isInteger(item) || Object.is(item, -0)) throw new Error("v1 supports safe integer numbers only; use an explicit v2 receipt");
+          return String(item);
+        }
+        const view = new DataView(new ArrayBuffer(8));
+        view.setFloat64(0, item === 0 ? 0 : item, false);
+        return `N${Array.from(new Uint8Array(view.buffer), (b) => b.toString(16).padStart(2, "0")).join("")};`;
+      }
+      if (Array.isArray(item)) return `[${item.map((entry) => encode(entry, depth + 1)).join(",")}]`;
+      if (item && typeof item === "object" && [Object.prototype, null].includes(Object.getPrototypeOf(item))) {
+        const keys = Object.keys(item);
+        for (const key of keys) {
+          scalarString(key);
+          if (profile === CANONICALIZATION_V1 && /[^\x00-\x7e]/u.test(key)) throw new Error("v1 requires ASCII object keys; use an explicit v2 receipt");
+        }
+        keys.sort(profile === CANONICALIZATION_V2 ? compareUnicode : undefined);
+        return `{${keys.map((key) => `${asciiJsonString(key, profile)}:${encode(item[key], depth + 1)}`).join(",")}}`;
+      }
+      throw new Error("canonical payload must contain only JSON data types");
+    }
+    return encode(value, 0);
+  }
+
+  // Parse raw text before object construction so decoded duplicate keys and
+  // unsafe integers cannot disappear through JSON.parse's last-wins/rounding.
+  function parseStrictJson(text, options = {}) {
+    if (typeof text !== "string" || text.length > MAX_JSON_TEXT || new TextEncoder().encode(text).length > MAX_JSON_TEXT) throw new Error("JSON input exceeds the text limit");
+    let at = 0;
+    const numericTokens = [];
+    const whitespace = () => { while (/[\x20\t\r\n]/u.test(text[at] || "!") ) at++; };
+    function string() {
+      const start = at++;
+      while (at < text.length) {
+        const char = text[at++];
+        if (char === '"') return scalarString(JSON.parse(text.slice(start, at)));
+        if (char === "\\") at++;
+      }
+      throw new Error("unterminated JSON string");
+    }
+    function value(depth) {
+      if (depth > MAX_DEPTH) throw new Error("JSON input exceeds the nesting limit");
+      whitespace();
+      if (text[at] === '"') return string();
+      if (text[at] === "{") {
+        at++; whitespace(); const object = Object.create(null), keys = new Set();
+        if (text[at] === "}") { at++; return object; }
+        while (at < text.length) {
+          whitespace(); if (text[at] !== '"') throw new Error("expected a JSON object key");
+          const key = string(); if (keys.has(key)) throw new Error(`duplicate decoded JSON key: ${key}`); keys.add(key);
+          whitespace(); if (text[at++] !== ":") throw new Error("expected a JSON colon");
+          object[key] = value(depth + 1); whitespace();
+          const end = text[at++]; if (end === "}") return object; if (end !== ",") throw new Error("expected a JSON comma");
+        }
+        throw new Error("unterminated JSON object");
+      }
+      if (text[at] === "[") {
+        at++; whitespace(); const array = [];
+        if (text[at] === "]") { at++; return array; }
+        while (at < text.length) { array.push(value(depth + 1)); whitespace(); const end = text[at++]; if (end === "]") return array; if (end !== ",") throw new Error("expected a JSON comma"); }
+        throw new Error("unterminated JSON array");
+      }
+      for (const [literal, parsed] of [["true", true], ["false", false], ["null", null]]) if (text.startsWith(literal, at)) { at += literal.length; return parsed; }
+      const token = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/u.exec(text.slice(at))?.[0];
+      if (!token) throw new Error("invalid JSON value");
+      at += token.length; const number = Number(token);
+      if (!Number.isFinite(number) || (Number.isInteger(number) && !Number.isSafeInteger(number))) throw new Error("nonfinite or unsafe integer number is prohibited");
+      numericTokens.push(token); return number;
+    }
+    const parsed = value(0); whitespace(); if (at !== text.length) throw new Error("unexpected trailing JSON content");
+    const profile = options.profile || (parsed?.schema === RECEIPT_SCHEMA ? CANONICALIZATION_V1 : parsed?.schema === RECEIPT_SCHEMA_V2 ? CANONICALIZATION_V2 : null);
+    if (profile === CANONICALIZATION_V1 && numericTokens.some((token) => !/^-?(?:0|[1-9][0-9]*)$/u.test(token) || token === "-0")) throw new Error("v1 raw JSON supports safe integer lexemes only; use an explicit v2 receipt");
+    if (profile) canonicalize(parsed, profile);
+    return parsed;
   }
 
   function toUint8Array(value) {
@@ -67,8 +172,8 @@
   }
 
   function receiptPayload(receipt) {
-    const payload = JSON.parse(JSON.stringify(receipt));
-    delete payload.receipt_sha256;
+    const payload = Object.create(null);
+    for (const key of Object.keys(receipt)) if (key !== "receipt_sha256") payload[key] = receipt[key];
     return payload;
   }
 
@@ -169,12 +274,14 @@
     const receiptIsObject = Boolean(receipt && typeof receipt === "object" && !Array.isArray(receipt));
     const safeReceipt = receiptIsObject ? receipt : {};
     if (!receiptIsObject) integrityErrors.push("receipt must be an object");
-    if (safeReceipt.schema !== RECEIPT_SCHEMA) integrityErrors.push("unsupported or missing receipt schema");
+    if (![RECEIPT_SCHEMA, RECEIPT_SCHEMA_V2].includes(safeReceipt.schema)) integrityErrors.push("unsupported or missing receipt schema");
     if (!String(safeReceipt.claim_boundary || "").trim()) integrityErrors.push("claim_boundary is required");
 
     const expectedReceiptHash = String(safeReceipt.receipt_sha256 || "").toLowerCase();
-    const computedReceiptHash = await sha256Text(canonicalize(receiptPayload(safeReceipt)));
-    const receiptHashMatches = expectedReceiptHash === computedReceiptHash;
+    let computedReceiptHash = "", profile = "";
+    try { profile = serializationProfile(safeReceipt); computedReceiptHash = await sha256Text(canonicalize(receiptPayload(safeReceipt), profile)); }
+    catch (error) { integrityErrors.push(`unsupported canonical receipt payload: ${error instanceof Error ? error.message : String(error)}`); }
+    const receiptHashMatches = Boolean(computedReceiptHash) && expectedReceiptHash === computedReceiptHash;
     if (!receiptHashMatches) integrityErrors.push("receipt_sha256 does not match the canonical receipt payload");
 
     const artifactRows = Array.isArray(safeReceipt.artifacts) ? safeReceipt.artifacts : [];
@@ -209,7 +316,7 @@
         if (!result.hash_matches) result.error = "Hash mismatch";
         if (result.hash_matches && ["current_protocol_manifest", "predecessor_protocol_manifest"].includes(result.role)) {
           try {
-            const payload = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+            const payload = parseStrictJson(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
             if (payload && typeof payload === "object" && !Array.isArray(payload)) {
               manifestPayloads.set(result.role, payload);
             }
@@ -323,6 +430,7 @@
     const verifiedUtc = typeof options.now === "function" ? options.now() : new Date().toISOString();
     return {
       schema: REPORT_SCHEMA,
+      serialization_profile: profile,
       verified_utc: verifiedUtc,
       receipt_id: String(safeReceipt.receipt_id || ""),
       integrity_valid: integrityValid,
@@ -377,15 +485,20 @@
 
   return Object.freeze({
     RECEIPT_SCHEMA,
+    RECEIPT_SCHEMA_V2,
+    CANONICALIZATION_V1,
+    CANONICALIZATION_V2,
     REPORT_SCHEMA,
     canonicalize,
     normalizeEditorText,
     normalizeArtifactPath,
     parseFailureReport,
+    parseStrictJson,
     receiptPayload,
     resolveArtifactUrl,
     sha256Bytes,
     sha256Text,
+    serializationProfile,
     verifyReceipt,
   });
 }));

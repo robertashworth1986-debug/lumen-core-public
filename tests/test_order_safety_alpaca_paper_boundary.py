@@ -6,6 +6,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import requests
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CODE = ROOT / "code"
@@ -134,6 +136,54 @@ class AlpacaPaperBoundaryTests(unittest.TestCase):
         self.assertEqual(len(fake.calls), 1)
         self.assertEqual(fake.calls[0]["url"], paper.PAPER_TRADING_ORIGIN + "/v2/orders")
         self.assertFalse(fake.calls[0]["allow_redirects"])
+
+    def test_lost_submission_response_never_replays_an_accepted_paper_buy(self) -> None:
+        client = paper.AlpacaPaperClient("paper-key", "paper-secret")
+        accepted_orders = []
+
+        class LostResponseSession:
+            def request(self, method, url, **kwargs):
+                # The broker accepts the order, then the response is lost. A
+                # repeated request would append another accepted order here.
+                accepted_orders.append(kwargs["json"])
+                raise requests.exceptions.Timeout("fixture: response lost after acceptance")
+
+        client.session = LostResponseSession()
+        with patch.object(paper.time, "sleep") as sleep:
+            with self.assertRaises(requests.exceptions.Timeout):
+                client.submit_buy("AAPL", 25)
+        self.assertEqual(len(accepted_orders), 1)
+        sleep.assert_not_called()
+
+    def test_failed_private_mutations_never_retry_but_account_reads_do(self) -> None:
+        client = paper.AlpacaPaperClient("paper-key", "paper-secret")
+
+        class RetrySession:
+            def __init__(self):
+                self.calls = []
+
+            def request(self, method, url, **kwargs):
+                self.calls.append((method, url))
+                if len(self.calls) == 1:
+                    raise requests.exceptions.ConnectionError("fixture: ambiguous disconnect")
+                return FakeResponse(200, payload={"equity": "1000"}, text='{"equity":"1000"}')
+
+        for method in ("POST", "DELETE", "PATCH", "PUT"):
+            with self.subTest(method=method):
+                fake = RetrySession()
+                client.session = fake
+                with patch.object(paper.time, "sleep") as sleep:
+                    with self.assertRaises(requests.exceptions.ConnectionError):
+                        client._request_json(method, paper.PAPER_TRADING_ORIGIN + "/v2/orders")
+                self.assertEqual(len(fake.calls), 1)
+                sleep.assert_not_called()
+
+        fake = RetrySession()
+        client.session = fake
+        with patch.object(paper.time, "sleep") as sleep:
+            self.assertEqual(client.get_account(), {"equity": "1000"})
+        self.assertEqual(len(fake.calls), 2)
+        sleep.assert_called_once()
 
 
 if __name__ == "__main__":

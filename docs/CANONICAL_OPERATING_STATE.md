@@ -1,11 +1,766 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-08-12 UTC
+**State date:** 2026-10-14 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
 ## One commercial sentence
+
+### October 14 bounded reviewer continuation
+
+Founder-directed archive recovery and repository preparation advance outcome 2,
+one bounded external evaluation or paid scope. The existing reviewer guide now
+organizes code quality, security, scalability and launch-effort questions, with
+written finding fields and separate commercial authority. Reviewer identities,
+private correspondence, shared attachments and proposed commercial terms remain
+outside this public repository. An existing shared packet does not require a
+duplicate send, and proposed review terms do not establish completed validation.
+
+The clean baseline at `3c61648e593e5e036681f9c32dd82bce18ef3970` passed 1,684
+tests and 224 subtests with eight explicit skips on CPython 3.11.9 using all
+39 packages from the institutional hash lock. This local host is Debian 13,
+glibc 2.41, not the Ubuntu 24.04/glibc 2.39 frozen scientific runtime. It is a
+current-source first-party check; the subsequent repairs require their own
+exact-source verification. Missing generated artifacts, optional native C and
+Windows-only checks are not counted as passing execution.
+
+The continuation closes alternative private-order route acceptance, ambiguous
+mutation retries and malformed CSV/token exception paths with offline regression
+fixtures. No broker, market feed, live worker or production configuration is
+activated. These repairs do not close historical strategy-selection bias,
+fee/fill/latency assumptions, account reconciliation, legacy provider closure,
+live release drift or prospective operating-evidence gates.
+
+The founder-requested follow-on continues in the same draft review change. It
+aligns mounted/proxy-root authorization with the router, rejects timestamp
+precision that would be silently truncated and bounds v2 seasonal-history
+lookups. Ledger recovery restores all verified missing CSV projections before
+accepting another event; the spot-return engine rejects impossible underlying
+losses below -100%. The local dashboard now separates configured intent,
+reported counts, modeled dollar rates and unverified source observations. The
+browser bridge labels poll attempts and report values without implying source
+freshness, and the refresh lock no longer expires an active owner's claim after
+six hours. Offline regression fixtures reproduce the prior failures. These
+source fixes do not establish their deployment, data freshness, reconciliation,
+operating benefit or institutional throughput. The existing review packet and
+tracked-file portfolio inventory are refreshed from the resulting source.
+
+The archive review distinguishes recovered files and indexed historical records
+from unavailable device roots and unreviewed images. The early infrastructure
+loop uses assumed gains and dollar rates; the legacy constraint detector uses
+modeled provider failures. Their displays cannot establish savings or revenue.
+Frozen scientific inputs, outputs, runners and dated results remain unchanged.
+Whole-estate reconciliation remains OPEN. The next commercial gate remains one
+authorized buyer problem, technical and budget owners, accepted scope and
+required payment, followed by a bounded delivered result and buyer acceptance.
+
+### October 13 reviewer-readiness and trading repairs
+
+Founder-authorized current-source repairs advance outcome 2: one bounded external
+evaluation or paid scope. The scope includes forecasting/evidence acceptance,
+ProofLock identities, gateway serving controls and the existing trading research
+lane. It does not authorize live orders, autonomous control, paid reviewer terms
+or a scientific performance promotion.
+
+Receipt acceptance now reconciles the original five frozen-input assertions and
+26 suite assertions against the immutable protocol, including failed promotion
+facts and the later packet's referenced environment identity. Frozen scientific
+runners, inputs, outputs and dated receipts remain unchanged. The executable v2
+forecast doorway instead reviews supplied forecasts under a separately pinned
+protocol, requires complete calendar/as-of comparisons and preserves dependent
+and adverse results in HUMAN_REVIEW_HOLD. Its included fixture is synthetic.
+
+ProofLock adds explicitly versioned binary64/scalar Unicode serialization and
+real JavaScript/Python parity checks. The historical portable v1 example retains
+its bytes; nonportable v1 inputs reject. Private output routes are protected by
+the operator boundary; nginx source no longer aliases the full output directory
+as a public proof surface. Malformed filesystem paths reject without an uncaught
+traceback. These source repairs do not establish their live deployment.
+
+Gateway work is serialized through a bounded executor and protected by an owned
+native lifetime lock. A separately locked minimal reviewer serving profile has
+no legacy worker/provider graph and retains HOLD components. Full legacy provider
+closure, cross-process producer ownership and server readback remain separate
+open gates. Linux/Windows CI covers the native lifetime-lock boundary.
+
+Trading repairs remove future-wide volatility normalization and same-period
+signal accounting, retain large losses and initial-capital drawdown, reject
+nonfinite risk inputs, cap sizing to declared risk and cash after entry costs,
+and give the append-only ledger a stable projection/replay contract. Synthetic
+fixtures do not establish trading alpha, realized balances or prospective
+after-cost paper performance. Historical ledger bytes remain available and
+require broker reconciliation before any economic restatement.
+
+The existing portfolio audit now identifies its maturity labels as tracked-file
+inventory only, with execution and customer acceptance explicitly unverified.
+The priority lane points to the bounded offline forecast reviewer; historical
+market-screening components remain identified as such. An infrastructure failure
+detector and buyer-specific false-alert acceptance gate are not implemented by
+that reviewer. The existing technical-review packet is regenerated with current
+source/test identities while separately dated live observations remain dated.
+
+The reviewer guide supplies focused trading, evidence and runtime commands plus
+the full hash-locked Python 3.11.9 reproduction route. Actual source/PR/CI/release
+receipts belong to the exact reviewed commit. Source merge, signed static build,
+live static deployment and runtime installation are separate evidence states.
+Independent evaluation, accepted buyer baseline, field benefit, revenue,
+certification and valuation remain open; passing software tests do not close them.
+
+### October 9 Wonder Studio creative-services publication
+
+Robert explicitly requested publication of the upgraded Wonder Studio and
+its business-design offer on GitHub. This scoped founder instruction extends
+the existing art and presentation showcase with a supplementary creative
+offer; the primary engineering validation offer and its HOLD gates remain.
+
+The public Studio's version 15 was published from source
+`c2b04f10ad1f555d1ed15d17eda66397949c94ec`. It adds a brand preview,
+three fictional business demonstrations, interactive projected 3D motion,
+two ten-second H.264 loops and a private custom-inquiry receipt with email
+fallback. The release reported 51 passing Node checks and a successful build;
+full browser visual QA was unavailable. These are first-party implementation
+checks, not client results or third-party validation.
+
+The README and existing visual-asset boundary now link to these public
+experiences. This documentation change contains no private Studio source,
+customer inquiries, scientific result changes or infrastructure deployment.
+The separately hosted Studio release does not resolve the custom domain's
+recorded release drift. Existing research, rights and production gates remain.
+Price, scope, schedule and rights require agreement for each paid commission.
+
+### October 8 founder-authorized consolidation and report repair
+
+Active outcome 2: one external validation or paid-pilot conversion. This branch
+integrates the complete histories of PRs #244, #232 and #222, resolving additive
+operating-state conflicts while preserving later mainline fixes. It corrects
+three newly supplied legacy report scripts in the existing research lane and
+updates the existing portfolio map rather than adding a separate product packet.
+
+The grant correction retains supplied facts, unknowns, immutable approved
+snapshots and byte-consistent exports. Denominator diagnostics partition missing
+inputs without double-counting overlapping exclusions. Revenue qualification now
+requires explicit comparison and handling facts, rejects non-text placeholders,
+excludes unknown/unbounded evidence nodes, and binds SOW prefills to the exact
+qualified input and opportunity identity. Prefills remain drafts; no customer,
+contract, revenue, submission or deployment is created.
+
+Report regression tests cover nonfinite/malformed data, timestamp alignment,
+undefined spectra, absent comparison versions, worse candidate loss, failed
+writes and overwritten outputs. Rendering fixtures are explicitly synthetic.
+The raw HyperCore histories are still unavailable; screenshot interpretation is
+not a numerical rerun. Unsupported historical KPI claims are excluded from the
+private business-plan revision. Public source contains no private reviewer names,
+correspondence, contact records or original investor dossiers.
+
+The existing PR consolidation map records the entire 26-PR open-queue triage.
+Unintegrated conflicts, stale branches and failing dependency checks remain open;
+no branch history is deleted. Production and external-validation HOLD gates remain.
+Fresh test and merge receipts belong to this continuation's exact Git subject.
+
+
+### October 7 technical reviewer preparation
+
+Founder-directed repository preparation advances outcome 2: one bounded external
+execution or owner-approved pilot. It updates the existing Proof Capsule verifier,
+adversarial tests, schema and reviewer entrypoint; it does not create another
+platform or change a frozen experiment. New regression cases reproduce malformed
+Unicode crashes, invalid API resource limits and reads beyond the remaining
+aggregate allowance. The verifier now rejects those inputs and bounds each read.
+The existing schema, receipt version, scientific comparisons and HOLD gates remain.
+The canonical technical-review packet is regenerated to bind the changed source
+and test bytes. Its generation time is refreshed; its separately dated live
+observations and historical receipts are preserved and explicitly distinguished.
+
+The reviewer page now leads with GitHub source, exact runtime and hash-locked
+setup, historical Git-object prerequisites, executable checks and reported skips.
+It distinguishes current-source tests from the frozen computation and identifies
+the October 7 live audit's 192/246 matches, 3 mismatches and 51 missing files.
+The continuation incorporates the existing PDF dependency PR #210 rather than
+creating a second repair: pypdf 6.19.0, verified distribution hashes and six
+bounded resource/compatibility fixtures. It removes unused TensorFlow.js and
+the argparse/sprintf-js/form-data closure responsible for the fresh npm audit
+failure. Strict installation, peer/provenance validation and the audit threshold
+remain enforced; regression checks reject root or nested reintroduction.
+The local 10-package candidate graph reports zero known npm vulnerabilities.
+Fresh auditing of the PDF candidate also found three urllib3 2.7.0 advisories.
+The same 39-package institutional lock now uses the upstream fixed 2.8.0
+release with both distribution hashes verified; its subsequent audit reports
+zero known advisories. The existing dependency-security evidence lane retains
+the dated comparison and outputs. Frozen research dependencies are unchanged.
+
+The canonical reviewer guide supplies three inspection tracks, reproducible
+finding fields and explicit open gates. No private reviewer identity is added.
+The supplementary GitHub AI review is unavailable because account quota is
+exhausted; this does not replace successful CodeQL/test receipts with a clean
+AI-scan claim. Live parity, unavailable legacy feeds, guarded server recovery,
+branch enforcement, provider-key closure and external evaluation remain open.
+Review preparation and first-party tests do not establish independent validation,
+production authorization, certification, a paid engagement or buyer acceptance.
+### October 6 bounded Grant Factory draft correction
+
+Active outcome 2 includes a separate draft correction to the existing grant
+workflow. Generated narrative uses supplied project facts, marks missing facts,
+preserves synthetic/unknown evidence type, and introduces no standalone software
+price or deployment claim. Package checks and permitted state/kit updates retain
+consistent file manifests and immutable local approved snapshots. The fictional
+local rehearsal remains blocked for submission and does not establish customer
+isolation, funding, accepted economics, a customer, or a software release. The
+original source-to-export receipts remain unchanged. This correction is reviewable
+on `codex/grant-factory-evidence-custody`; main and live deployments are unchanged.
+
+### October 5 fixed-material and high-activity diagnostic continuation
+
+Active outcome 2 now includes two diagnostic studies with protocols recorded locally
+before their single executions, addressing specific limits of the existing evidence. These are first-party
+synthetic or retrospective studies, not independent preregistration, fresh holdouts,
+physical validation or authorization to promote a family or deploy a candidate.
+
+The [fixed-volume geometry allocation study](GEOMETRY_TRANSPORT_SCREEN_2026-10-04.md#fixed-volume-cross-section-allocation-continuation)
+redistributed the same conductor volume with a 10%-of-uniform cross-section floor,
+fixed topology and five terminal-pair folds. All five paired held-out differences
+were positive within seven layouts; the serpentine chain lost in all five folds.
+Six layouts share terminal coordinates, while honeycomb and sunflower remain
+separate exploratory embeddings. These results do not rank unlike embeddings.
+Of 40 fits, 24 met the declared dual-gap tolerance and 16 exhausted the iteration
+budget. The 4,504 training solves used about 17.40 seconds, versus 0.046 seconds
+for 40 uniform-baseline evaluations: added design compute, not a speedup or energy
+saving. All allocations, losses, budgets and numerical residuals are retained.
+The historical 743-outage study results remain unchanged; their source binding is
+preserved at public commit `6b078afb13936e388c035f4442ffaee80027ac41`.
+
+The [high-activity interval diagnostic](../experiments/energy_multisource/stage6/high_activity_diagnostic_20261005/README.md)
+tested one fixed residual-calibration overlay on the already examined 2025 record.
+Only outcomes matured before each update under the stated, assumed 30-minute lag
+entered calibration. Ordinary-issue intervals were unchanged. Median high-activity
+coverage rose from 64.49% to 76.20%, but only one of 15 mandatory cells reached
+90%; 14 still failed. Median overall interval score fell 0.675% while interval
+width grew 3.289%; four cell-level score regressions remain explicit. Only 3,518
+of 5,754 high-issue rows had sufficient calibration support; the remaining rows
+used the unchanged baseline. These are dependent station/horizon rows, not
+independent events or verified historical publication availability. Eleven new
+software checks cover maturity, future-outcome isolation, fallback and identity.
+No second candidate or post-result threshold adjustment was executed.
+
+The registry validator now rejects disabled or missing promotion controls,
+invalid validation-fold budgets, malformed families and duplicate/non-finite JSON.
+This closes a software acceptance gap; the 26-family registry gains no performance
+promotion. Physical constraints, representative external validation, the 37
+unassigned prospective protocol fields and independent evaluator remain open.
+Phase guidance separates a pre-run rehearsal from a post-run independent-execution
+receipt and an external protocol digest; it does not fill fields or authorize a run.
+
+### October 5 bounded test and experiment completion
+
+Active outcome 2 includes the founder-requested completion of existing reviewer
+checks and reproducible experiments. This pass fixes identified source defects and
+closes finite test prerequisites; it does not finish every research family or
+establish institutional certification, independent validation or production readiness.
+
+- The [geometry transport continuation](GEOMETRY_TRANSPORT_SCREEN_2026-10-04.md)
+  evaluates all 743 distinct single-edge outages in the same eight fixed-budget
+  graphs. Optimized inverse updates agree with independent direct grounded solves
+  within 4.88498e-15 absolute error. Surviving weights stay fixed and disconnected
+  pair conductance is zero. A local median timing comparison was 0.077162 seconds
+  versus 0.375205 seconds for the new direct reference, about 4.86 times faster;
+  this is a host diagnostic, not physical signal efficiency or a platform speedup.
+  The 26-family championship, matched hardware and physical measurements remain open.
+- The existing economic-bridge producer now rejects non-finite values, invalid or
+  fractional counts, wins exceeding observations, and malformed benchmark flags.
+  Missing values cannot mask explicit invalid evidence. These repairs preserve
+  negative research outcomes, accepted-economics holds and fictional-funds boundaries;
+  they do not create trading returns, buyer savings or new observations.
+- The gateway uses the supported FastAPI lifespan, preserves the same six workers
+  and cooperatively cancels and awaits them at shutdown. Isolated lifecycle and
+  authentication tests preserve fail-closed behavior and pass with warnings treated
+  as errors. Cancellation is cooperative, not a time-bounded shutdown guarantee.
+- A separate native Windows CI job runs the three existing mocked PowerShell paper
+  runner fixtures using Python 3.11.9 and a hashed six-package test closure. It
+  rejects skipped or empty execution and does not connect to a broker. Linux
+  platform skips remain valid; native success requires the separate job receipt.
+- Native C verification now enforces Zig 0.15.2 for the primary build and names a
+  separate sanitizer compiler. A successful compile with sanitizer flags alone
+  previously produced an unjustified AddressSanitizer claim: a deliberate heap
+  overflow under the pinned Zig build exited successfully. The repaired producer
+  requires named AddressSanitizer and UndefinedBehaviorSanitizer detections on
+  deliberate faults, then a matching clean seven-vector result, before sealing
+  its receipt. A separate hash-locked CI job rejects skipped native execution.
+  This verifies host software instrumentation, not NIC/DPU hardware or expertise.
+
+The current-main frozen EIA capsule was actually executed at
+`e7e16954f27308c19f308e2e78a74eee0edb3bb0` on Ubuntu 24.04, glibc 2.39 and
+Python 3.11.9 with all 18 hash-locked packages. All three suites, 31 assertions
+and 28 fixtures passed. Four previously artifact-dependent checks then passed
+without skips against newly generated, dated offline outputs. These outputs are
+not recovered historical publication files. Capsule SHA-256 is
+`900a3b66891d21216bc876efccfa21f8e8703e2b57a784eb2437d318a24bb95b`;
+the frozen raw wave input remains
+`8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59`.
+The separately preserved research source
+`2c06c8315c667dec6bed426b533024ecb8300f59` passed 134 inherited research/custody
+tests and replayed 240 interval records, 90 comparisons and 465 arrays across
+187,987 dependent station/horizon targets. The numerical report exactly matches
+historical payload SHA-256
+`466c635a98721846e2981fd3ecfb71a5fbd093ae6c6ab46c44cd96d89e82e21f`.
+All 15 selected high-activity cells still fall below nominal 90% coverage; no
+fresh holdout, independent evaluator, electricity savings or geothermal benefit
+is established. The prospective protocol remains unfrozen and unstarted.
+
+The completed [PR #242 source suite](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37340889569)
+passed 1,296 tests and 87 subtests, with eight legitimate clean-checkout/platform
+skips and no warnings reported. Separate exact-head jobs passed 27 native C tests
+and three Windows fixtures without skips. All ten applicable maintained workflows
+passed at `6cc84d78af4072700985b22a047b0c0dc9199b04`; merge
+`6b078afb13936e388c035f4442ffaee80027ac41` preserved that exact tested tree.
+The two subsequent diagnostic studies above retain their own protocol/source/result
+identities; their integrated source checks are evidenced by the continuation PR
+and exact-head handoff, not by relabeling the preceding suite. The October 5 15:35 UTC
+[exact live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37333941141)
+found 192 of 246 files matching, three mismatches and 51 HTTP 404 responses.
+`HOLD_PUBLIC_RELEASE_PROMOTION` remains. Source/test improvements do not replace
+separate exact-main deployment, signed provenance and live-byte verification.
+
+### October 5 public art showcase and deployment boundary
+
+Active outcome 2 includes Robert's explicit request to make the existing artwork
+and presentation previews easier to share. The bounded `/art/` doorway presents
+19 concept artworks, an 18-second vertical film and a ten-layout slide
+preview. Native artwork detail remains 1672 × 941 pixels. Creator attribution,
+rights limits and technical-evidence boundaries remain unchanged. This public
+showcase does not publish an editable paid pack, private correspondence or owner
+archives, and does not promise viral reach or revenue.
+
+At Robert's request, the October 5 audio edition adds original procedural stereo
+sound effects to the existing 18-second film. The video bitstream is preserved;
+only the audio and media container changed. The public media manifest records the
+new hash, size and audio metadata, and versioned video URLs refresh cached playback.
+The 246-file release inventory is unchanged. Production deployment retains its
+existing separate gates. The full media remains externally hosted in Wonder Studio.
+
+Four small source files join the exact release allowlist, now 246 files. Artwork
+and three public preview files retain absolute canonical Wonder Studio URLs;
+their external bytes are not part of the repository's exact-release guarantee.
+The media manifest records published preview hashes and identifies their external
+hosting. Social-card editing opens the Studio, while portfolio, rights and
+mathematical-observatory navigation remains local to the custom domain.
+
+The preceding main commit `605e028226f831fba422ab0ee3ccd1d0439c9881` passed its
+[full source suite](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37243004604)
+with 1,223 tests and 82 subtests passing, 8 tests skipped and 5 warnings. All 18
+repository-maintained PR #239 workflows passed; the separate optional AI review
+could not run because of account quota. These are first-party checks, not
+institutional certification or independent validation.
+
+The latest [exact live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37303581337)
+at October 5 11:32 UTC still found 192 of the prior 242 files matching, three
+mismatches and 47 HTTP 404 responses. `HOLD_PUBLIC_RELEASE_PROMOTION` remains.
+A later [health probe](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37311464748)
+passed 64 observations of 16 existing contracts; it did not check the new art,
+portfolio or rights routes. The 12:48 UTC
+[metrics capture](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37312141273)
+observed a reachable homepage and minimal gateway, but all four legacy feeds
+returned explicit HTTP 503 `operator_access_unconfigured` with unknown freshness.
+Their owner-approved producer, route, schema and disposition remain the separate
+[issue #234](https://github.com/robertashworth1986-debug/lumen-core-public/issues/234)
+contract gap. Reachability does not establish static-release parity or data recovery.
+
+The existing CSP allowed only same-origin image and video embeds, which would
+block the Studio-hosted gallery. This reviewed source candidate adds only the
+exact canonical Studio HTTPS origin to `img-src` and `media-src` in the config
+and its existing repair helpers. Every other CSP directive remains unchanged;
+no wildcard or script/connection permission is added. The historical August 9
+security-header receipt remains immutable. Applying the new policy requires the
+separate current-main security-header workflow and its explicit approval.
+
+No production mutation is part of this source pass. Both that security-header
+action and the existing exact-main static release, signed provenance/SBOM,
+production environment and full live-byte verification remain required. The available connector does not expose workflow
+dispatch or branch-protection writes; `main` has no enforced required contexts.
+No control is weakened to resolve those capability gaps. Estate scope and external
+validation remain OPEN; broader production promotion remains `HOLD`.
+
+### October 4 current-main readiness and creator attribution
+
+Active outcome 2 includes the founder-requested **Bounded Light Speed** naming
+correction and explicit credit, **Created by Robert Ashworth using AI tools**.
+Stable `/bounded-light/` URLs remain unchanged. The 19-asset creator register
+records source dimensions, hashes and AI generation; it does not establish
+copyright registration or exclusive rights in purely AI-generated material.
+Existing repository and third-party licenses remain unchanged.
+
+The exact-main audit at `39b20a3f3af0d8410529fd2081456575a3c04a1c` found
+1,221 passing tests, 8 skipped tests, 82 passing subtests and 5 warnings in the
+[authoritative full-suite run](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223735).
+Both CodeQL language analyses passed. These are bounded first-party checks,
+not institutional certification or independent validation. The skipped checks
+include four missing artifact-dependent cases, one unavailable optional Zig
+toolchain case and three Windows PowerShell cases on Linux.
+
+The same main commit did **not** pass its
+[exact live-domain audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223673):
+192 of 240 files matched, three differed and 45 returned HTTP 404. The incident
+receipt records SEV-2 and `HOLD_PUBLIC_RELEASE_PROMOTION`. The unmatched paths
+are the old homepage/discovery files and the missing Bounded Light/portfolio
+collections. New source tests cannot replace a successful exact-release and
+live-byte receipt. The current source candidate adds two rights files to the
+bounded allowlist, for 242 expected files at its later release commit.
+
+A fresh GitHub branch/ruleset read found `main` unprotected, no enforced
+required-status contexts, and no rulesets. No protection or permission setting
+was changed. The prior PR #238 optional dynamic AI review was unavailable due
+to monthly account quota; it did not produce a clean review. The current main
+failure is the live-domain audit, a separate issue.
+
+The installed connector has no workflow-dispatch operation. The prepared
+production path remains the existing manual exact-main release workflow, its
+literal approval input, signed provenance/SBOM, configured production gate,
+rollback capture and full live verification. This update neither executes that
+production action nor reclassifies production readiness. The portfolio estate
+and external validation remain OPEN.
+
+
+### October 4 expanded estate reconciliation — OPEN
+
+The first portfolio edition was a selected sample. The expanded review now
+contains 64 overlapping catalogue records covering all 15 configured engine
+names, recovered trading and dashboard work, Grant Factory and institutional
+submission stages, identity/immersive/haptics, geometry and energy research.
+The [expanded scope review](LUMENCORE_ESTATE_SCOPE_REVIEW_2026-10-04.md) is the
+sanitized item-level handoff for active outcome 2. It does not change the single
+primary commercial offer or create 64 finished products.
+
+Accessible Drive metadata covers 3,111 records and includes shared-reference
+material with unverified ownership. Discovery counts are not owned-asset or
+experiment counts. Whole-estate completion, disconnected device roots, shortcut
+targets, all screenshots and larger numerical archive replay remain OPEN.
+
+The exact research history was restored offline at `2c06c8315c667dec6bed426b533024ecb8300f59`
+with 2,456 reachable commits, 1,308 tracked paths, 58 selected source/receipt
+files and 24 matching artifact-integrity comparisons. No recovered project code
+or scientific tests ran in this recovery. Historical Stage 6 and later assurance
+receipts remain retrospective, correlated and unpromoted; their test scopes
+must not be summed. The public source index now distinguishes recovered source
+from remaining data replay and independent-validation gates.
+
+EchoForm now has a privately reviewed conventional memory-boundary prototype:
+32/32 authored invariants, 50/50 event handling and a deliberately wrong
+upstream identity challenge failing 0/1. This does not validate harmonic identity.
+LumaJet has recovered synthetic baseline source and later assurance receipts:
+v1 failed its gate; v2 has a tiny internal effect with about 5.08 times baseline
+planner expansions. Neither is flight or hardware validation. The canonical
+portfolio map carries these corrected stages; repository-only file-presence
+maturity labels do not measure privately held evidence or all historical work.
+
+The final 64-record review-room source and public PDF are synchronized with the
+sanitized Studio publication. Custom-domain deployment remains a separate,
+paused exact-main signed release action. No domain login, production mutation,
+external message, grant submission, legal acceptance or valuation uplift is
+part of this source update.
+
+### October 4 portfolio, registry and meeting preparation
+
+At Robert's explicit request to organize and publish his portfolio for a
+founder-reported October 5 meeting, active outcome 2 now includes an integrated
+portfolio doorway and an expansion of the existing geometry registry. The
+registry has 26 named candidate families across 11 lanes, preserving all 18
+historical entries and negative results; none is promoted to performance-ready.
+Five Platonic solids are grouped as one family. The existing four Echo Geometry
+families are a conceptual taxonomy, not a physical law or performance receipt.
+
+The June 19 registry snapshot remains immutable. The expanded catalog, artwork,
+formula renderers and bounded synthetic benchmark have separate denominators
+and evidence types. A screenshot, candidate name, synthetic trial, software test
+and independently executed physical experiment are not interchangeable counts.
+Current source preparation neither substantiates thousands of prior experiments
+nor raises the existing valuation bands. The most recent located evaluation
+must retain its assumptions, uncertainty and commercial-evidence gaps.
+
+Public material uses sanitized institutional status and source-linked evidence.
+Raw private emails, contact details, private agreements and private third-party
+materials are excluded. The founder's public-release request authorizes this
+sanitized preparation; static production still follows the exact-main signed
+release workflow and configured environment gate. No external message, grant
+submission, legal acceptance or runtime repair is included.
+
+The sanitized Wonder Studio is publicly published at
+`https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/` and contains
+the 19-artwork collection and review room. The domain homepage links to that
+public Studio and its local `/portfolio/` route. The prior private-Studio
+restriction below describes the earlier preparation stage and is superseded
+for this sanitized collection by the founder's explicit publication request.
+The custom-domain release still requires its own verified deployment receipt.
+The October 4 evidence-index expansion also refreshes two dependent Argos
+custody hashes. Historical evaluation dates, failed and blocked checks, and
+expired action authority remain unchanged; no submission is authorized.
+
+### October 4 Bounded Light visual collection candidate
+
+At Robert's explicit request to continue the domain and use his wormhole and
+EchoForm papers as visual inspiration, active outcome 2 includes a bounded
+presentation update to the existing reviewer surface. The existing homepage
+links to `/bounded-light/`: six original AI-generated concept illustrations
+and an educational light-time and wave-interference lab. This extends the
+visual-presentation lineage of draft PR #207 without importing that conflicted
+branch or changing the sole primary buyer-owned validation offer.
+
+Every conceptual image remains **CONCEPT ILLUSTRATION**. The lab uses declared
+ideal assumptions; it is not a wormhole simulation, quantum-advantage result,
+new physical theory, faster-than-light communication, or validation of the
+source papers. Source papers and private Studio links are not published.
+The shared static bundle introduces no login, tracking, telemetry or control
+connection. Website artwork is compressed for delivery; any large-format
+exports are separately labeled enlargements rather than native 16K/20K detail.
+
+The same founder-directed collection now includes `/bounded-light/observatory/`:
+an interactive geometry study with four defined families, three additional
+concept artworks, a bounded point budget, shareable settings and local exports.
+Trefoil tubes, projected Hopf fibers, a trigonometric gyroid approximation and
+superformula shells retain their formulas and assumptions. WebGL rendering and
+a Canvas fallback visualize those mathematical samples; they do not establish
+physical, hardware, quantum, wormhole or performance validation. Share settings
+and exports are user-operated; no account, telemetry or operator endpoint is
+connected. The geometry module has numerical invariant and invalid-input tests.
+
+This is an isolated source candidate, not a live deployment receipt. The
+existing exact-main release approval, signed provenance and SBOM verification,
+production-environment gate, rollback capture and exact live-byte checks remain
+required. DNS, email records, VPS runtime and operator routes are unchanged.
+PR #207 and deployment-control PR #208 must be reconciled by file overlap
+before their later merges; neither old branch is a deployment shortcut.
+
+### October 4 runtime follow-up
+
+PR #235 merged as `1350a1a97ab8bc75f1c965f331905a4578092214` after all
+pull-request checks passed, including CodeQL and the full repository suite.
+The October 3 23:50:30–23:54:53 UTC local public sampler recorded **64/64**
+successful contract observations across four rounds. These observations cover
+one bounded request path and do not establish sustained uptime.
+
+The fresh [VPS diagnostic run 37163621741](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37163621741)
+captured origin evidence at October 4 00:01–00:02 UTC and returned
+**ACTION_REQUIRED: two checks passed, six failed**. Public and loopback
+endpoint expectations passed. The gateway was active with no systemd restarts,
+but still lacked the required explicit non-root service identity and retained a
+root-owned lock. Eighteen of twenty runtime files matched current main;
+`grant_application_factory.py` and `operator_api_access.py` differed. The paper
+ticker was in auto-restart at 380,075 restarts; its ledger was `opc:opc:644`,
+not writable by the service account, with twelve permission-error matches in
+the bounded recent journal sample. These are confirmed runtime defects, not a
+proven cause of the intermittent public availability reports.
+
+Memory available was 13,064,052 KiB of 15,906,768 KiB; the OOM-kill counter since
+boot was zero. Disk space was approximately 100 GiB free, with one percent
+inode use. The current fixed nginx error log had no parsed records in the
+requested day; the previous fixed log was unavailable. All three new journal
+history queries were unavailable, so their zero signature counts are **not**
+negative evidence. The follow-up collector uses explicitly UTC, space-separated
+journal timestamps for older systemd compatibility and bounded error enums;
+a fresh origin receipt remains the gate for confirming that collection works.
+
+The two existing mutation paths remain
+`REPAIR_PAPER_TICKER_LEDGER_OWNERSHIP` and
+`REPAIR_PUBLIC_GATEWAY_DEPENDENCY_CLOSURE`. They require exact current-main
+workflow dispatch and the configured private HumanUnlock secret. No restart,
+runtime installation, ledger ownership change or authentication bypass was
+performed by this diagnostic pass. Issue #234 remains open for the four
+unmapped legacy data contracts. Public reachability, runtime integrity and
+data-product availability retain separate verdicts.
+
+### October 3 public-availability monitoring repair
+
+Active outcome 2 includes correction of two confirmed monitoring defects, based
+on main `6be9b1456472ef01e38ebe1838539297111da406`. Site Health Probe run
+`37128009457` sampled the 15 contracts within four seconds; that dated green
+sample did not establish continuous availability. The revised sampler records
+four rounds across at least three minutes, adds the www homepage, bypasses
+request caches, retains each timestamped observation and preserves failures
+even when a later round recovers. Daily scheduling remains unchanged.
+
+The metrics capture now reports homepage reachability, minimal public gateway
+health, each legacy feed's response disposition and data freshness separately.
+A read-only October 3 observation at 23:50–23:51 UTC found the homepage and both
+minimal gateway routes healthy, while all four legacy feeds returned HTTP 503
+with `operator API access unavailable`. This is a specific operator-boundary
+response, not evidence that the public site was down. The source mapping and
+remaining service-contract gate are in [PUBLIC_METRICS_CONTRACT.md](PUBLIC_METRICS_CONTRACT.md).
+Issue #234 remains unresolved; no producer was restored and no operator route,
+credential or private payload was made public.
+
+The existing VPS diagnostic now captures bounded retained memory/OOM and
+nginx/gateway/kernel history using reviewed code over SSH stdin. It emits
+allowlisted counters and timestamps, explicitly reports collection limits and
+does not mutate the VPS. Its push-main run provides a new opportunity to collect
+origin evidence. Neither source repair nor a successful current HTTP request
+establishes the cause or durable resolution of the reported intermittent
+failures. Existing release, authentication and production controls remain in
+force; this pass does not authorize a blind restart or redeployment.
+
+The seven focused health, metrics, operator-access and diagnostic modules pass
+99 local tests plus 37 subtests on Python 3.12 / pytest 9.1.0. The collector's
+regressions include request-controlled filenames that must not become outage
+signatures. This local result is not an exact-commit full-suite CI receipt or a
+production recovery receipt.
+
+### September 25 live-loop integrity repairs
+
+Active outcome 2 includes a bounded repair of the existing source-to-evidence
+path, based on main commit `dfc45fe2a05102c835dafe05d9b847cd04566086`.
+The API source monitor now accepts the checked-in registry and provider-config
+shapes, rejects ambiguous inputs, and requires an explicit successful probe
+with a valid, non-future timestamp inside the accepted age limit before showing
+ACTIVE. Credential presence remains a separate diagnostic. The report itself
+does not perform network probes or establish dataset readiness.
+
+The canonical government collector now preserves direct collection failures;
+historical registry records cannot replace them or increase current successful
+source and row counts. Metadata, content items and output-field counts remain
+separate from data rows. Diagnostic credential assignments are redacted by
+removing their values. The public live-breadth manifest separately checks probe
+and dataset snapshot observation age, with finite positive age thresholds;
+missing, stale or future snapshot timestamps cannot become review-ready.
+
+Seven focused modules passed **134 local tests** on Python 3.12.14 / pytest
+9.1.1. This is not a full-suite or exact-commit CI pass. The
+[bounded review receipt](evidence/live_loop_integrity_review_20260925.md)
+records the command, source identities, covered failures and remaining gates.
+No provider collection, current availability measurement, new performance
+experiment, frozen-delta promotion, production deployment or external
+validation occurred in this repair pass. Existing frozen EIA evidence remains
+unchanged and on HOLD. The next operating gate remains a permissioned,
+timestamped source snapshot followed by the accepted comparison protocol and
+human review; code repair alone does not prove continuous operation or savings.
+### September 24 sector coverage diagnostic
+
+Active outcome 2 now includes a source-level extension of the existing offline
+denominator audit for grid, marine and geothermal research. Each scheduled
+target excluded from a comparison is attributed to its complete missing-input
+pattern; overlapping marginal counts are explicitly separated from exclusive
+lost-target totals. This makes the next source-repair work more precise without
+changing forecasts, thresholds, frozen results or research-only decisions.
+The [existing assurance note](DENOMINATOR_AND_PAPER_ASSURANCE_2026-09-11.md)
+records 81 passing focused local tests and both intact EIA packet identities.
+No complete-suite CI pass, rescored historical packet, improved coverage,
+independent validation, deployment or external action is established by this
+source change. Buyer-owned scope, chronology and prospective capture remain
+the next validation gates.
+
+### September 21 live-release audit hardening
+
+Active outcome 2 now includes a bounded correction to the existing exact-byte
+audit: an empty manifest cannot produce a passing release receipt, all rows are
+validated before HTTP requests, and manifest inputs and response bodies have
+explicit size limits. Both the live verifier and incident classifier require
+the declared byte count to match in addition to SHA-256. Oversized and
+interrupted responses remain visible failures. The existing signed release,
+human approval, installation, rollback and trading boundaries are unchanged.
+
+The focused local release, incident, supply-chain, historical-receipt,
+repository-security and institutional-crosswalk suite passed 167 tests and
+eight subtests on Python 3.12; three existing root-incompatible POSIX installation
+tests were skipped. This is not a complete-suite pass. The existing hash-locked
+Python 3.11.9 CI remains the authoritative complete-suite gate for the eventual
+reviewed commit.
+
+A fresh September 21 read-only GitHub branch observation at main commit
+`01edc688003e3e22387cd78d7db4715b0f75f675` still reported `protected=false`,
+required-status enforcement `off`, and no required checks. This is an open
+repository-setting gap; no setting was changed. No certification, independent
+security review, historical credential revocation or broader production
+authorization is established by the source correction or local tests.
+
+The follow-up evidence review also reproduced an empty-manifest acceptance in
+the new frozen replay runner's generic check. The original runner and manifest
+bytes remain immutable. The dedicated `VERIFY_EIA_CONSTRAINT_REVIEW.py` now
+supersedes that check with reviewed digest pins, exact required membership,
+strict schemas and contained paths. Seventeen adversarial tests and both retained
+packets pass. This establishes bounded first-party integrity only.
+
+### September 21 frozen constraint replay
+
+Active outcome 2 now includes a retained replay of the unchanged July EIA
+residual protocol. The review plan and runner were committed before execution;
+all seven development candidates, six holdout baselines and original failed
+gates remain visible. On 1,176 identical authority-days, the selected residual
+candidate reduced descriptive MAE from 36,568.783 to 15,979.087 MWh (56.304%)
+versus EIA's archival DF series; WAPE was 3.53355% versus 1.54402%. This is an
+actual historical candidate-versus-comparator comparison. EIA permits forecast
+scope to differ from physical demand, so DF is not an established matched
+operational incumbent. The reduction versus the strongest aggregate algorithmic
+baseline, direct LightGBM, is 10.602% MAE.
+
+Promotion remains HOLD: four authorities fail the 150-day minimum, and SWPP's
+0.074058 seasonal-MASE regression against autoregressive ridge exceeds 0.05.
+The panel was already inspected; the new run is reproduction, not a fresh
+untouched or prospective holdout. As-of data availability, independent replay,
+a buyer action/cost function and operating savings remain unestablished. No
+sector-dollar extrapolation or production authority follows from forecast-error
+reduction. The existing [CODECHECK note](CODECHECK_EIA_EXECUTABLE_COMPUTATION_NOTE_2026-07-20.md)
+contains full comparisons and the hash-verifiable input/code/output receipt.
+
+A fixed-model later-archive test on July 13–September 8 also reduced MAE by
+18.509% versus the same direct LightGBM baseline. Only 285 of 464 possible
+authority-days survive (61.42%); SWPP has zero eligible rows and its original
+regression remains unresolved. The model was not refitted on 2026 labels and
+all six comparators remain visible. This additional retrospective test fails
+the original coverage gates and establishes no matched operational baseline,
+prospective forecast, independent validation or operating savings.
+
+### September 21 portfolio and review-path update
+
+At the founder's request, the canonical homepage, README, investor brief and
+reviewer start page now show the wider LumenCore engineering portfolio. The
+existing `docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md` is the portfolio
+source map, with asset-specific implementation, research, simulation and concept
+states. This work supports active outcome 2 and retains the buyer-owned baseline
+validation sprint as the primary commercial entry point.
+
+The public story now includes the trading/exchange architecture, Grant Factory,
+Mission Control, Quant Lab, ProofLock, utility/geothermal and thermal research,
+HyperCore, EchoLock, LumaJet, the LumaSkin virtual engineering lab, digital-twin
+concepts and Node-RED/immersive prototypes. Historical transaction evidence is
+recognized without asserting strategy-attributed net profit. Virtual engineering
+receipts are not physical or human validation. Science-museum work is a possible
+application, not a verified counterparty deployment. Founder-held evidence is
+identified separately from public source artifacts.
+
+The shared navigation now compares normalized complete paths; the homepage no
+longer marks nested Evidence and ProofLock routes active. The public reviewer
+docket points to the portfolio map while preserving every unestablished claim
+gate as false. The legacy operator routes remain noindex HOLD stubs, and no live
+order, hardware, data-rights or public-sector certification authority changes.
+
+This source update is not a production deployment receipt. Release identity,
+attestation verification, bounded installation, rollback capture and live-byte
+verification remain separate requirements of the guarded static-site workflow.
+
+### September 21 production release preflight
+
+Active outcome 2 now has a stricter static-release workflow: production access
+requires an explicitly approved exact main commit and successful verification
+of both GitHub signed provenance and SBOM attestations for the rebuilt archive.
+The source change adds no deployment, runtime repair, DNS change, or broader
+platform production approval. The September 20 main audit for `ea842a2` matched
+188 of 189 files and held the release because `operator_home.html` differed;
+that dated observation requires a fresh audit after any approved deployment.
+
+### September 20 reviewer-surface update
+
+The canonical homepage, repository introduction, investor brief, and reviewer
+start page have been refreshed as one evidence-led review path for EC mentors,
+technical reviewers, and prospective buyers. The former trading-led investor
+brief is superseded; its valuation ranges and broad production-readiness claims
+are not current company claims. The review path uses source-linked, dated
+first-party receipts and exposes the remaining independent-execution,
+buyer-acceptance, and production-authorization gates.
+
+This is a presentation and navigation update supporting active outcome 2. It
+does not create another product, validation package, external-review result,
+customer relationship, or outreach authorization. Public-site deployment is a
+separate exact-snapshot action under the existing guarded release workflow;
+this source update is not a live deployment receipt. The August operating and
+runtime observations below remain dated historical observations.
+
+### Company scope
 
 LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routing, or infrastructure candidate against an accepted baseline under predeclared rules, then packages the result, failures, provenance, and claim boundary into a hash-verifiable decision record.
 
@@ -20,6 +775,21 @@ LumenCore helps a buyer or technical reviewer compare an AI, forecasting, routin
 **Next allowed action:** Return to the no-duplicate hold. Attend the recurring Member Representative Committee and selected Work Group meetings, review public/non-proprietary materials, and share bounded thoughts during those calls when useful. Keep IP and publicity actions separately agreement-gated; do not send another logo correction, onboarding acknowledgment, or contribution-path follow-up unless EPRI/OPAI asks.
 
 ### 2. One external validation or paid-pilot conversion
+
+**September 28 Revenue Engine import repair:** The existing PR #222 test
+modules now load the three revenue scripts by exact repository path, following
+the existing test convention. This removes their collision with Python's
+standard-library `code` module without making the source directory a package,
+changing the revenue behavior, or altering frozen evidence. The original
+collection error was reproduced before the correction. On local Python
+3.12.14 with pytest 9.1.0, all seven existing revenue tests passed with the
+standard-library `code` module already loaded; its module identity remained
+unchanged. Repository-wide collection reached 826 tests, including all seven
+revenue tests, but remained blocked by 11 unrelated import errors for missing
+local NumPy, pandas, Requests, FastAPI and PyYAML dependencies. This is a
+bounded local repair, not a full-suite pass. The hash-locked Python 3.11.9 CI
+suite remains the authoritative merge gate. No deployment, external action,
+buyer acceptance, revenue or validation is established.
 
 **Reviewer doorway:** PR #66 was merged on July 23 at `aed61134407426114148e3201cd357099d155864`. It is the canonical human-and-machine evidence-navigation layer. PR #74 is the current merged CODECHECK/reviewer package. Route a qualified non-author evaluator through those existing surfaces; do not create another platform or validation package.
 
@@ -456,3 +1226,42 @@ locks and claim boundaries remain intact. The urgent patent action remains
 retrieval of the official application record through the USPTO-directed
 authenticated or Document Services path. No duplicate or unsolicited outbound
 message is authorized. No other outbound message is currently authorized.
+
+
+## Founder-directed EC cohort contribution - 2026-09-12
+
+Robert's current direction adds a strengths-first cohort contribution: **Our strength is making everyone else stronger.** Energy remains a major research focus. The existing evidence discipline applies to each owner's workflow: understand what already works, identify a testable constraint, agree a baseline and verify the effect. This dated instruction supersedes earlier no-new-EC-outbound statements for the scoped cohort contribution; administrative onboarding and unrelated outreach holds remain.
+
+The [published cohort research](EC_COHORT_STRENGTH_RESEARCH_2026-09-11.md) covers all 69 businesses on the official TakeOff roster, with three hypotheses per company and unknown baselines. Research publication is complete. Owner interviews, participation, measured losses and savings remain unestablished.
+
+On September 12, one resource introduction was sent to both official cohort mailing groups, followed by one direct request to the EC program manager after the AM group returned a delivery failure. Both sends were verified by exact Gmail readback and recorded under `ec-takeoff-strengths-resource`. The AM failure does not distinguish a missing group from posting restrictions. Delivery to individual PM members and any manager redistribution are unconfirmed. Do not retry the group addresses or treat the messages as completed customer conversations. Wait for a substantive response. Exact message content, private identifiers and delivery-failure receipts remain in the existing private review estate.
+
+The 69 public profiles, personalized workspaces and downloadable toolkits were published on the domain at source `5dbdf654caa630923869b3e6d3cf7ace221d5e16`; deployment `34703378307` verified all 189 exact files. The packages include Grant Factory drafts, public-source LumaScout, fictional-funds paper trading, nonclinical LumaCare, measurement tools and optional local AI drafting. Robert delegated the key choice and the existing key was selected; the last inference attempt was blocked by exhausted API credits. No successful AI inference, hosted team deployment, government certification, owner acceptance or savings is established.
+
+At Robert's renewed request, a software-is-live update with a forwardable gift announcement was sent to the same program manager in the existing thread on September 12. Gmail SENT content and Outreach Lock were verified. This makes three scoped outbounds under `ec-takeoff-strengths-resource`; no group retry occurred. Manager forwarding, all-member delivery, six actual customer conversations and owner baselines remain unconfirmed. The earlier in-development text describes the first research note, not the current package availability. The full requested scope remains open.
+
+The member runtime now checks a saved revision before updating its SQLite workspace. Competing browser versions pause backup and offer separate downloads and an owner choice; queued edits wait for the preceding write to finish. Regression checks reproduce the former stale-write overwrite and verify its rejection. This is local data-preservation behavior, not multi-user authorization or external business validation.
+
+The existing Measure & improve view now includes an optional offline energy evidence and constraint review. It preserves the full-batch calculator and records declared service equivalence, source timing, overhead, allowed changes, hard limits, uncertainty and fallback. A candidate can advance only to owner review; every result retains the baseline and disables actuation. Synthetic counterexamples cover net losses, uncertain constraints, missing evidence and binary arithmetic residue. This implements the recommendation-review portion of the research charter without a new dashboard or a performance experiment. Physical metrology, independently accepted results, owner participation, cohort redistribution and successful AI inference remain unestablished. Exact publication and validation receipts stay in the existing private review estate.
+
+
+## EC portal cohort announcement - 2026-09-12
+
+Robert explicitly provided the signed-in EC portal route and requested delivery of the existing gift announcement. One group-scoped message was posted to TakeOff Fall 2026. The portal confirmed successful sending; the posted title, author, substantive body, public directory link and group recipient list were read back. This is the fourth scoped outbound under `ec-takeoff-strengths-resource`. No email group was retried and no new campaign was created.
+
+The cohort announcement requirement is complete for group posting. Individual notification delivery, reads, owner adoption, six actual customer conversations, baselines and measured results remain unconfirmed. The prior waiting-for-distribution checkpoint is superseded by this verified portal event; other external dependencies remain. Exact portal identifiers, displayed recipients, message text and delivery evidence are retained in the existing private E-drive review estate. Continue substantive replies in that thread or follow new explicit founder direction; do not repost the announcement.
+
+
+## Frozen breadth review and owner outreach - 2026-09-22
+
+Robert explicitly requested current-work backup, commit, push, merge and publication, together with targeted outreach toward one owner-approved pilot. This dated scope authorizes delivery of this reviewed change; it does not accept commercial terms, authorize spending or establish revenue.
+
+The existing [live breadth proof addendum](LUMENCORE_LIVE_BREADTH_PROOF_ADDENDUM.md) now identifies six retained result cards across five sectors, including two complete public EIA replay windows and all relevant failed gates. Descriptive MAE improvement against the same-feature LightGBM comparator is 10.602% in the original window and 18.509% in the later window. Both remain retrospective, first-party results on potentially revised historical data. They do not establish electricity saved, an operational incumbent win, independent validation or buyer savings. The legacy 921-row infrastructure ledger remains a scenario inventory, with 19 latest source/constraint entries rather than 921 distinct interventions.
+
+The canonical value-panel, multi-asset and truth-chain producers now preserve signed losses, conflicting reports, unknown dollar values and adverse results. Input/intake flags cannot establish accepted economics. The existing buyer-outreach and economic-bridge builders now use source-derived counts, record input identities and staleness, exclude private source detail, and correct a tenfold arithmetic overstatement in illustrative scenarios. Their stale upstream research remains under source-review hold. No new performance experiment or accepted-economic result is claimed by these repairs.
+
+The [proof-to-pilot page](https://lumen-core.ai/proof_to_pilot.html) includes the two-window comparison, evidence limits and a checksum-bound ZIP for external reproduction. The existing signed release lane now names 190 static files, including that exact ZIP; successful deployment must be established by its separate commit-bound receipt. The preceding source 1585909361c0d6e906ab2ad82e4df4c0aae576b9 was reconciled by deployment 35800572553 and a 189-of-189 live check on September 23 UTC. That receipt does not cover this subsequent source change.
+
+Three scoped emails were sent and verified through authoritative SENT readback: two cohort business invitations to choose one measurable workflow, and one ORNL partnership-routing follow-up with the two frozen EIA windows. One requested written tutorial was posted and read back in the existing EC member thread. Dollar examples were explicitly hypothetical staff-capacity arithmetic; no measured client savings were asserted. Exact recipients, messages and receipts remain in the existing private E-drive estate. No reply accepting a pilot, signed contract, license or cleared payment is established by these sends.
+
+The next commercial gate remains an owner, permissioned baseline, metric, prospective observation plan and agreed scope. Continue substantive responses through the existing threads. Maintain the cohort contribution as free, paper-only or nonclinical where applicable. Our strength is making everyone else stronger.

@@ -1,0 +1,3 @@
+# Review-only HTTP serving backbone. No operator/research feature readiness implied.
+fastapi==0.138.2
+uvicorn==0.54.0

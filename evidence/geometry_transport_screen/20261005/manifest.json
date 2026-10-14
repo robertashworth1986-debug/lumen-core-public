@@ -1,0 +1,50 @@
+{
+  "schema": "lumencore.geometry_transport_screen.continuation_manifest.v1",
+  "source_base_commit": "e7e16954f27308c19f308e2e78a74eee0edb3bb0",
+  "claim_level": "internal_synthetic_screening_only",
+  "promotion_gate_passed": false,
+  "historical_receipt_unchanged": {
+    "path": "evidence/geometry_transport_screen/20261004/results.json",
+    "sha256": "640509d22c7347826b5ac931a2135d60679fcca8981a648c5fa708352835910d"
+  },
+  "completed_unique_outages": 743,
+  "targeted_checks": {
+    "python_transport": 16,
+    "python_registry": 6,
+    "python_protocol": 16,
+    "node_portfolio_and_math": 13,
+    "all_passed": true
+  },
+  "files": [
+    {
+      "path": "code/research/geometry_transport_screen.py",
+      "bytes": 17124,
+      "sha256": "10d3688fea373349e0ebd1bc7d3d4023c976d48290eb8b4291356a90f76acd82"
+    },
+    {
+      "path": "tests/test_geometry_transport_screen.py",
+      "bytes": 12846,
+      "sha256": "12469e8cc16a3fe82aceb60677366d88bf56483c4fd17dd54a66d9513306b2ae"
+    },
+    {
+      "path": "docs/GEOMETRY_TRANSPORT_SCREEN_2026-10-04.md",
+      "bytes": 12664,
+      "sha256": "a0e67fd3a4f7640f62d5d186dfc9a64bff8ededde1a1de0ed1f8cc3edd8b1a07"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261005/outage_protocol.json",
+      "bytes": 2462,
+      "sha256": "ee0846e78a444321dad2c1cd5c2ee333bd8cec3b1db079691c3a90a9102db03c"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261005/outage_results.json",
+      "bytes": 344375,
+      "sha256": "7173f5f43b4de742c7a8771057659636e9f2898dc72080d62b56e08aa1c8e9b0"
+    },
+    {
+      "path": "evidence/geometry_transport_screen/20261005/solver_comparison.json",
+      "bytes": 1188,
+      "sha256": "7c17a42f464f20dc1ae36cf7ebbf46a83d0d317020a5d476c04efb1f72a0a67d"
+    }
+  ]
+}

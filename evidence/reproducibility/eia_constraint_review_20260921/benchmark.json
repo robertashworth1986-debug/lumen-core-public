@@ -1,0 +1,524 @@
+{
+  "artifact_chain_sha256": "00dc4de899f8d6463f57d731f0b0c8309d2aa1c43313a8512d34582fd38bc872",
+  "baseline_comparisons": [
+    {
+      "authority_mean_skill": {
+        "CISO": 1.3631939082167506,
+        "ERCO": 0.01112384231870052,
+        "ISNE": 0.15448906492510997,
+        "MISO": 0.19283993276679193,
+        "NYIS": 0.09923324520629248,
+        "PJM": 0.11549245022327853,
+        "SWPP": 0.9417701523872092,
+        "TVA": 0.06989987772057854
+      },
+      "authority_mean_win_count": 8,
+      "baseline": "eia_day_ahead_forecast",
+      "cluster_bootstrap_mean_skill_ci95": [
+        0.09208252574301687,
+        0.73812023923729
+      ],
+      "holm_adjusted_p_value": 2.092143045473449e-07,
+      "mean_skill_delta": 0.37414411852535234,
+      "median_skill_delta": 0.1616189327310614,
+      "month_loss_count": 7,
+      "month_tie_count": 0,
+      "month_win_count": 45,
+      "month_win_rate": 0.8653846153846154,
+      "paired_authority_month_count": 52,
+      "passes_comparison_gate": true,
+      "raw_two_sided_sign_test_p_value": 6.973810151578164e-08,
+      "worst_authority_mean_skill": 0.01112384231870052
+    },
+    {
+      "authority_mean_skill": {
+        "CISO": 0.1777910644779215,
+        "ERCO": 0.2572752573110316,
+        "ISNE": 0.5429219577521144,
+        "MISO": 0.22994102067159972,
+        "NYIS": 0.3401337923559646,
+        "PJM": 0.26771309518558406,
+        "SWPP": -0.07405811364821571,
+        "TVA": 0.36471923804114825
+      },
+      "authority_mean_win_count": 7,
+      "baseline": "autoregressive_ridge_p14",
+      "cluster_bootstrap_mean_skill_ci95": [
+        0.14901617634990813,
+        0.3739280541666799
+      ],
+      "holm_adjusted_p_value": 5.139291658906586e-09,
+      "mean_skill_delta": 0.2644143659661537,
+      "median_skill_delta": 0.26133924318018853,
+      "month_loss_count": 5,
+      "month_tie_count": 0,
+      "month_win_count": 47,
+      "month_win_rate": 0.9038461538461539,
+      "paired_authority_month_count": 52,
+      "passes_comparison_gate": false,
+      "raw_two_sided_sign_test_p_value": 1.2848229147266466e-09,
+      "worst_authority_mean_skill": -0.07405811364821571
+    },
+    {
+      "authority_mean_skill": {
+        "CISO": 0.6515468209865282,
+        "ERCO": 0.8051280165520295,
+        "ISNE": 1.1324272991709927,
+        "MISO": 0.9015588315443946,
+        "NYIS": 1.0591608283928506,
+        "PJM": 1.06308816532452,
+        "SWPP": 0.38666983628369933,
+        "TVA": 1.0726166742378105
+      },
+      "authority_mean_win_count": 8,
+      "baseline": "seasonal_naive_7",
+      "cluster_bootstrap_mean_skill_ci95": [
+        0.7131075222193408,
+        1.036661956331811
+      ],
+      "holm_adjusted_p_value": 3.674394122299418e-12,
+      "mean_skill_delta": 0.8829675248903386,
+      "median_skill_delta": 0.8132287936025869,
+      "month_loss_count": 2,
+      "month_tie_count": 0,
+      "month_win_count": 50,
+      "month_win_rate": 0.9615384615384616,
+      "paired_authority_month_count": 52,
+      "passes_comparison_gate": true,
+      "raw_two_sided_sign_test_p_value": 6.123990203832363e-13,
+      "worst_authority_mean_skill": 0.38666983628369933
+    },
+    {
+      "authority_mean_skill": {
+        "CISO": 0.5757990271173425,
+        "ERCO": 0.09579078324645912,
+        "ISNE": 0.2472569521613703,
+        "MISO": 0.10864581692942366,
+        "NYIS": 0.14512896718345877,
+        "PJM": 0.09205367035943045,
+        "SWPP": 0.2014071016163033,
+        "TVA": 0.1522740793583255
+      },
+      "authority_mean_win_count": 8,
+      "baseline": "official_ar_equal_blend",
+      "cluster_bootstrap_mean_skill_ci95": [
+        0.11874122851107612,
+        0.3291151685512892
+      ],
+      "holm_adjusted_p_value": 5.21338527903481e-11,
+      "mean_skill_delta": 0.20533481842862275,
+      "median_skill_delta": 0.15734571021537064,
+      "month_loss_count": 3,
+      "month_tie_count": 0,
+      "month_win_count": 49,
+      "month_win_rate": 0.9423076923076923,
+      "paired_authority_month_count": 52,
+      "passes_comparison_gate": true,
+      "raw_two_sided_sign_test_p_value": 1.042677055806962e-11,
+      "worst_authority_mean_skill": 0.09205367035943045
+    },
+    {
+      "authority_mean_skill": {
+        "CISO": 0.061837036319488836,
+        "ERCO": 0.01540562955167654,
+        "ISNE": 0.08349170115390733,
+        "MISO": 0.0415482447006664,
+        "NYIS": -0.00522008110363823,
+        "PJM": 0.04953446688206864,
+        "SWPP": 0.010521480672833596,
+        "TVA": 0.05558859861885689
+      },
+      "authority_mean_win_count": 7,
+      "baseline": "direct_xgboost_stack",
+      "cluster_bootstrap_mean_skill_ci95": [
+        0.020336834398007046,
+        0.05855998520193123
+      ],
+      "holm_adjusted_p_value": 4.075539722592225e-06,
+      "mean_skill_delta": 0.03985521039930982,
+      "median_skill_delta": 0.04699524787551273,
+      "month_loss_count": 9,
+      "month_tie_count": 0,
+      "month_win_count": 43,
+      "month_win_rate": 0.8269230769230769,
+      "paired_authority_month_count": 52,
+      "passes_comparison_gate": true,
+      "raw_two_sided_sign_test_p_value": 2.0377698612961126e-06,
+      "worst_authority_mean_skill": -0.00522008110363823
+    },
+    {
+      "authority_mean_skill": {
+        "CISO": 0.06397298383293515,
+        "ERCO": 0.005811820467940274,
+        "ISNE": 0.05459759389336749,
+        "MISO": 0.06493006574064449,
+        "NYIS": -0.026431333257290784,
+        "PJM": 0.03167769850122683,
+        "SWPP": -0.023032329261545022,
+        "TVA": 0.04805695369396307
+      },
+      "authority_mean_win_count": 6,
+      "baseline": "direct_lightgbm_stack",
+      "cluster_bootstrap_mean_skill_ci95": [
+        0.0031542541079656134,
+        0.050902495735578646
+      ],
+      "holm_adjusted_p_value": 4.075539722592225e-06,
+      "mean_skill_delta": 0.028662190969415385,
+      "median_skill_delta": 0.03162891646305426,
+      "month_loss_count": 9,
+      "month_tie_count": 0,
+      "month_win_count": 43,
+      "month_win_rate": 0.8269230769230769,
+      "paired_authority_month_count": 52,
+      "passes_comparison_gate": true,
+      "raw_two_sided_sign_test_p_value": 2.0377698612961126e-06,
+      "worst_authority_mean_skill": -0.026431333257290784
+    }
+  ],
+  "claim_boundary": "This protocol can produce measured public EIA-930 software forecast evidence in native MWh. It cannot by itself establish field control, grid reliability improvement, realized savings, procurement acceptance, safety, external validation, trading edge, or an unbeatable claim.",
+  "development_candidate_error_correlation": {
+    "agreement_gated_residual_moe": {
+      "agreement_gated_residual_moe": 1.0,
+      "half_median_residual_ensemble": 0.8169294731585861,
+      "lightgbm_residual": 0.9306450478692919,
+      "median_residual_ensemble": 0.933110706339015,
+      "official_ar_blend_75_25": 0.6767763613704384,
+      "ridge_residual": 0.833011872180158,
+      "xgboost_residual": 0.9290946125382709
+    },
+    "half_median_residual_ensemble": {
+      "agreement_gated_residual_moe": 0.8169294731585862,
+      "half_median_residual_ensemble": 0.9999999999999999,
+      "lightgbm_residual": 0.8117894453742048,
+      "median_residual_ensemble": 0.8152637895023647,
+      "official_ar_blend_75_25": 0.9352551340265006,
+      "ridge_residual": 0.7202905684961248,
+      "xgboost_residual": 0.8205645534298459
+    },
+    "lightgbm_residual": {
+      "agreement_gated_residual_moe": 0.930645047869292,
+      "half_median_residual_ensemble": 0.8117894453742048,
+      "lightgbm_residual": 1.0,
+      "median_residual_ensemble": 0.9877865776408615,
+      "official_ar_blend_75_25": 0.6604763195169117,
+      "ridge_residual": 0.8569935383788968,
+      "xgboost_residual": 0.9767513143412865
+    },
+    "median_residual_ensemble": {
+      "agreement_gated_residual_moe": 0.9331107063390152,
+      "half_median_residual_ensemble": 0.8152637895023647,
+      "lightgbm_residual": 0.9877865776408614,
+      "median_residual_ensemble": 1.0,
+      "official_ar_blend_75_25": 0.6766378440193354,
+      "ridge_residual": 0.8979360387882515,
+      "xgboost_residual": 0.9912523798713396
+    },
+    "official_ar_blend_75_25": {
+      "agreement_gated_residual_moe": 0.6767763613704385,
+      "half_median_residual_ensemble": 0.9352551340265005,
+      "lightgbm_residual": 0.6604763195169117,
+      "median_residual_ensemble": 0.6766378440193354,
+      "official_ar_blend_75_25": 1.0,
+      "ridge_residual": 0.7091602529291858,
+      "xgboost_residual": 0.6719110894308089
+    },
+    "ridge_residual": {
+      "agreement_gated_residual_moe": 0.833011872180158,
+      "half_median_residual_ensemble": 0.7202905684961248,
+      "lightgbm_residual": 0.8569935383788968,
+      "median_residual_ensemble": 0.8979360387882515,
+      "official_ar_blend_75_25": 0.7091602529291858,
+      "ridge_residual": 1.0,
+      "xgboost_residual": 0.8751343378352118
+    },
+    "xgboost_residual": {
+      "agreement_gated_residual_moe": 0.929094612538271,
+      "half_median_residual_ensemble": 0.8205645534298459,
+      "lightgbm_residual": 0.9767513143412865,
+      "median_residual_ensemble": 0.9912523798713396,
+      "official_ar_blend_75_25": 0.6719110894308089,
+      "ridge_residual": 0.8751343378352119,
+      "xgboost_residual": 1.0
+    }
+  },
+  "development_leaderboard": [
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 13572.461356372167,
+      "mean_absolute_percentage_error": 0.014332228554616785,
+      "mean_directional_accuracy": 0.8911128903122498,
+      "mean_seasonal_mase_7": 0.18033926450776722,
+      "median_seasonal_mase_7": 0.11641048476008611,
+      "rank": 1,
+      "row_count": 1249,
+      "strategy": "xgboost_residual"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 13650.893653487114,
+      "mean_absolute_percentage_error": 0.014506111217738352,
+      "mean_directional_accuracy": 0.8879103282626101,
+      "mean_seasonal_mase_7": 0.1819958643048557,
+      "median_seasonal_mase_7": 0.11819463689540972,
+      "rank": 2,
+      "row_count": 1249,
+      "strategy": "median_residual_ensemble"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 13962.405595246833,
+      "mean_absolute_percentage_error": 0.014966570417939697,
+      "mean_directional_accuracy": 0.8839071257005604,
+      "mean_seasonal_mase_7": 0.18787416064540174,
+      "median_seasonal_mase_7": 0.12049340972479722,
+      "rank": 3,
+      "row_count": 1249,
+      "strategy": "lightgbm_residual"
+    },
+    {
+      "abstention_rate": 0.013610888710968775,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 14381.573769196237,
+      "mean_absolute_percentage_error": 0.015452464813966229,
+      "mean_directional_accuracy": 0.88871096877502,
+      "mean_seasonal_mase_7": 0.1954176183371242,
+      "median_seasonal_mase_7": 0.11887624200919208,
+      "rank": 4,
+      "row_count": 1249,
+      "strategy": "agreement_gated_residual_moe"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 15800.182880474009,
+      "mean_absolute_percentage_error": 0.01721444849924057,
+      "mean_directional_accuracy": 0.8622898318654924,
+      "mean_seasonal_mase_7": 0.2121792475786021,
+      "median_seasonal_mase_7": 0.15272113760168116,
+      "rank": 5,
+      "row_count": 1249,
+      "strategy": "ridge_residual"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 19075.34783412858,
+      "mean_absolute_percentage_error": 0.021105184770183055,
+      "mean_directional_accuracy": 0.8438751000800641,
+      "mean_seasonal_mase_7": 0.27691699537787334,
+      "median_seasonal_mase_7": 0.16309754165325904,
+      "rank": 6,
+      "row_count": 1249,
+      "strategy": "half_median_residual_ensemble"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 24704.64783489042,
+      "mean_absolute_percentage_error": 0.027997764776285912,
+      "mean_directional_accuracy": 0.799839871897518,
+      "mean_seasonal_mase_7": 0.371296321323937,
+      "median_seasonal_mase_7": 0.2337656843988057,
+      "rank": 7,
+      "row_count": 1249,
+      "strategy": "official_ar_blend_75_25"
+    }
+  ],
+  "feature_diagnostics": {
+    "authority_order": [
+      "CISO",
+      "ERCO",
+      "ISNE",
+      "MISO",
+      "NYIS",
+      "PJM",
+      "SWPP",
+      "TVA"
+    ],
+    "feature_contract_sha256": "294613987812825c8d02adafc1ccb718abfb960e7816d68e946c7d2c4bd6032d",
+    "feature_count": 26,
+    "feature_row_count": 5949,
+    "rows_by_authority": {
+      "CISO": 716,
+      "ERCO": 803,
+      "ISNE": 833,
+      "MISO": 662,
+      "NYIS": 775,
+      "PJM": 739,
+      "SWPP": 691,
+      "TVA": 730
+    },
+    "rows_by_split": {
+      "development": 1249,
+      "holdout": 1176,
+      "training": 3524
+    },
+    "skip_reasons": {
+      "actual_lag_gap": 28,
+      "official_lag_gap": 610
+    }
+  },
+  "fit_runtime_ms": {
+    "final_refit": {
+      "direct_lightgbm_stack": 164.12034199674963,
+      "direct_xgboost_stack": 136.31048400202417,
+      "lightgbm_residual": 141.0278820003441,
+      "ridge_residual": 3.1047350021253806,
+      "xgboost_residual": 117.95890199937276
+    },
+    "selection_fit": {
+      "direct_lightgbm_stack": 126.05469100162736,
+      "direct_xgboost_stack": 144.94040900171967,
+      "lightgbm_residual": 134.888607000903,
+      "ridge_residual": 5.366607001633383,
+      "xgboost_residual": 113.8844679990143
+    }
+  },
+  "frozen_panel": {
+    "path": "data/live_measured/eia_grid_validation/eia_grid_validation_panel_latest.json",
+    "row_chain_sha256": "594684318e85e3440e385cff3e30c5d095930410572c6c4b39472814ae4655dd",
+    "row_count": 14704,
+    "sha256": "8b480ec4923c17d3782eacd428ee5ea599525145ce2a0772ba934aba0a40da59"
+  },
+  "generated_utc": "2026-09-21T13:24:50.525066+00:00",
+  "holdout_coverage": {
+    "authority_count": 8,
+    "common_holdout_days_by_authority": {
+      "CISO": 164,
+      "ERCO": 190,
+      "ISNE": 193,
+      "MISO": 107,
+      "NYIS": 135,
+      "PJM": 164,
+      "SWPP": 133,
+      "TVA": 90
+    },
+    "minimum_common_holdout_days": 90
+  },
+  "holdout_leaderboard": [
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "residual_candidate",
+      "mean_absolute_error_mwh": 15979.086850308855,
+      "mean_absolute_percentage_error": 0.016838731992581263,
+      "mean_directional_accuracy": 0.8732993197278912,
+      "mean_seasonal_mase_7": 0.2112062642583228,
+      "median_seasonal_mase_7": 0.12972902847798207,
+      "rank": 1,
+      "row_count": 1176,
+      "strategy": "xgboost_residual"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "baseline",
+      "mean_absolute_error_mwh": 17874.171755209874,
+      "mean_absolute_percentage_error": 0.018657821163118884,
+      "mean_directional_accuracy": 0.8579931972789115,
+      "mean_seasonal_mase_7": 0.23587101659807305,
+      "median_seasonal_mase_7": 0.16600899297273014,
+      "rank": 2,
+      "row_count": 1176,
+      "strategy": "direct_lightgbm_stack"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "baseline",
+      "mean_absolute_error_mwh": 18741.620711046493,
+      "mean_absolute_percentage_error": 0.01969558074880811,
+      "mean_directional_accuracy": 0.8571428571428571,
+      "mean_seasonal_mase_7": 0.24833806743964976,
+      "median_seasonal_mase_7": 0.18085089601327436,
+      "rank": 3,
+      "row_count": 1176,
+      "strategy": "direct_xgboost_stack"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "baseline",
+      "mean_absolute_error_mwh": 28852.556325551446,
+      "mean_absolute_percentage_error": 0.03323078223730781,
+      "mean_directional_accuracy": 0.7976190476190477,
+      "mean_seasonal_mase_7": 0.4251705300561644,
+      "median_seasonal_mase_7": 0.317543283318331,
+      "rank": 4,
+      "row_count": 1176,
+      "strategy": "official_ar_equal_blend"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "baseline",
+      "mean_absolute_error_mwh": 37149.77278268291,
+      "mean_absolute_percentage_error": 0.04047348497968201,
+      "mean_directional_accuracy": 0.6675170068027211,
+      "mean_seasonal_mase_7": 0.49137826542571955,
+      "median_seasonal_mase_7": 0.38821282625929665,
+      "rank": 5,
+      "row_count": 1176,
+      "strategy": "autoregressive_ridge_p14"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "baseline",
+      "mean_absolute_error_mwh": 36568.7831632653,
+      "mean_absolute_percentage_error": 0.0436511494837535,
+      "mean_directional_accuracy": 0.7959183673469388,
+      "mean_seasonal_mase_7": 0.5793834362739427,
+      "median_seasonal_mase_7": 0.282018749076077,
+      "rank": 6,
+      "row_count": 1176,
+      "strategy": "eia_day_ahead_forecast"
+    },
+    {
+      "abstention_rate": 0.0,
+      "authority_count": 8,
+      "kind": "baseline",
+      "mean_absolute_error_mwh": 88617.23554421769,
+      "mean_absolute_percentage_error": 0.08556354730623536,
+      "mean_directional_accuracy": 0.5952380952380952,
+      "mean_seasonal_mase_7": 1.0661751412652074,
+      "median_seasonal_mase_7": 0.8102907302323987,
+      "rank": 7,
+      "row_count": 1176,
+      "strategy": "seasonal_naive_7"
+    }
+  ],
+  "promotion_gate": {
+    "all_baseline_comparisons_pass": false,
+    "allowed_claim": "No protocol-grade internal champion; retain the incumbent and report the result.",
+    "coverage_pass": false,
+    "external_replication_complete": false,
+    "field_validation_complete": false,
+    "protocol_grade_internal_champion": false
+  },
+  "protocol": {
+    "git_commit": "9fdde5f0d9836e3bdc995df22b04b8c3b72188cd",
+    "path": "config/eia_grid_residual_moe_protocol_v1.json",
+    "sha256": "79b4e6f92fb9dbd51eaa349ffebbc9b944bc95f7587bf26617e241dafa5380b8"
+  },
+  "schema": "eia_grid_residual_moe_benchmark.v1",
+  "selection": {
+    "development_mean_seasonal_mase_7": 0.18033926450776722,
+    "development_rank": 1,
+    "holdout_used_for_selection": false,
+    "post_selection_substitution": false,
+    "rule": "Choose exactly one candidate with the lowest mean seasonal-MASE across all development rows. Ties break by lower mean absolute error, then candidate id.",
+    "selected_candidate": "xgboost_residual"
+  }
+}

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -150,9 +151,11 @@ def validate_governance(
 def safe_int(value: Any) -> int | None:
     if isinstance(value, bool):
         return None
+    if isinstance(value, float) and (not math.isfinite(value) or not value.is_integer()):
+        return None
     try:
         parsed = int(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
     return parsed if parsed >= 0 else None
 
@@ -162,9 +165,22 @@ def safe_float(value: Any) -> float | None:
         return None
     try:
         parsed = float(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
-    return parsed if parsed > 0 else None
+    return parsed if math.isfinite(parsed) and parsed > 0 else None
+
+
+def parse_snapshot_utc(value: Any) -> datetime | None:
+    """Snapshot observation time must identify an instant, without timezone guessing."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            return None
+        return parsed.astimezone(timezone.utc)
+    except (ValueError, OverflowError):
+        return None
 
 
 def strict_sha256(value: Any) -> str | None:
@@ -236,7 +252,9 @@ def build_source_row(
         freshness_status = "threshold_missing"
     elif observed_age_hours is None:
         freshness_status = "unknown"
-    elif observed_age_hours <= max_age_hours:
+    elif last_probe > generated_at:
+        freshness_status = "invalid_future_timestamp"
+    elif (generated_at - last_probe).total_seconds() / 3600.0 <= max_age_hours:
         freshness_status = "passed"
     else:
         freshness_status = "stale"
@@ -246,6 +264,20 @@ def build_source_row(
         governance.get("relevance_status"), RELEVANCE_STATUSES
     )
     dataset_snapshot_sha256 = strict_sha256(governance.get("dataset_snapshot_sha256"))
+    snapshot_observed = parse_snapshot_utc(governance.get("dataset_snapshot_observed_utc"))
+    snapshot_age_hours = age_hours(snapshot_observed, generated_at)
+    # The accepted per-source maximum age applies independently to both clocks.
+    # Refreshing an API probe must never refresh the age of the bound dataset.
+    if snapshot_observed is None:
+        dataset_freshness_status = "unknown"
+    elif snapshot_observed > generated_at:
+        dataset_freshness_status = "invalid_future_timestamp"
+    elif max_age_hours is None:
+        dataset_freshness_status = "threshold_missing"
+    elif (generated_at - snapshot_observed).total_seconds() / 3600.0 <= max_age_hours:
+        dataset_freshness_status = "passed"
+    else:
+        dataset_freshness_status = "stale"
     probe_status = classify_probe(row)
     enabled = row.get("enabled") is True
 
@@ -255,6 +287,7 @@ def build_source_row(
             probe_status == "passed",
             row_depth_status == "passed",
             freshness_status == "passed",
+            dataset_freshness_status == "passed",
             rights_status == "verified_for_review",
             relevance_status == "verified",
             dataset_snapshot_sha256 is not None,
@@ -280,6 +313,9 @@ def build_source_row(
         "relevance_status": relevance_status,
         "dataset_snapshot_sha256": dataset_snapshot_sha256,
         "dataset_snapshot_bound": dataset_snapshot_sha256 is not None,
+        "dataset_snapshot_observed_utc": snapshot_observed.isoformat() if snapshot_observed else None,
+        "dataset_snapshot_age_hours": snapshot_age_hours,
+        "dataset_freshness_status": dataset_freshness_status,
         "review_ready": review_ready,
         "quality_issues": sorted(issues),
     }
@@ -347,7 +383,7 @@ def build_manifest(
     elif registry_max_age_hours is None:
         registry_freshness_status = "threshold_missing"
         registry_time_valid = True
-    elif registry_age_hours is not None and registry_age_hours <= registry_max_age_hours:
+    elif (generated_at - registry_generated_at).total_seconds() / 3600.0 <= registry_max_age_hours:
         registry_freshness_status = "passed"
         registry_time_valid = True
     else:
@@ -363,6 +399,8 @@ def build_manifest(
         and row["rights_status"] != "unknown"
         and row["relevance_status"] != "unknown"
         and row["dataset_snapshot_bound"]
+        and row["dataset_snapshot_observed_utc"] is not None
+        and row["dataset_freshness_status"] != "invalid_future_timestamp"
         for row in public_rows
     )
 
@@ -378,6 +416,9 @@ def build_manifest(
             row["row_depth_status"] == "passed" for row in public_rows
         ),
         "fresh_sources": sum(row["freshness_status"] == "passed" for row in public_rows),
+        "fresh_dataset_sources": sum(
+            row["dataset_freshness_status"] == "passed" for row in public_rows
+        ),
         "rights_verified_sources": sum(
             row["rights_status"] == "verified_for_review" for row in public_rows
         ),
@@ -431,10 +472,13 @@ def build_manifest(
                 "Rows meeting a source-specific minimum accepted in the governance sidecar."
             ),
             "fresh_sources": (
-                "Rows within a source-specific maximum age accepted in the governance sidecar."
+                "Probe observations within the source-specific maximum age accepted in the governance sidecar; not dataset freshness."
+            ),
+            "fresh_dataset_sources": (
+                "Dataset snapshot observations with explicit timezones, not in the future, within the same accepted source-specific maximum age."
             ),
             "review_ready_sources": (
-                "Rows passing probe, row-depth, freshness, rights, relevance, snapshot-hash, and validity gates."
+                "Rows passing probe, row-depth, both probe and dataset freshness, rights, relevance, snapshot-hash, and validity gates."
             ),
         },
         "summary": summary,
@@ -455,6 +499,11 @@ def build_manifest(
             ),
             "row_depth_assessable_sources": sum(
                 row["minimum_rows"] is not None and row["observed_rows"] is not None
+                for row in public_rows
+            ),
+            "dataset_freshness_assessable_sources": sum(
+                row["max_age_hours"] is not None
+                and row["dataset_snapshot_observed_utc"] is not None
                 for row in public_rows
             ),
             "governance_gap_sources": len(public_rows) - governance_complete_sources,
@@ -482,6 +531,7 @@ def build_manifest(
         "limitations": [
             "This is a first-party point-in-time manifest, not an independent validation.",
             "A source probe can succeed while the observation is too thin, stale, irrelevant, or restricted.",
+            "A fresh probe does not refresh a dataset snapshot. Snapshot observation age is checked separately; it does not establish the recency or as-of availability of individual data rows.",
             "The registry hash binds the input registry, not any underlying dataset unless a per-source dataset hash is supplied.",
             "No source count in this artifact proves alpha, savings, field performance, or production readiness.",
         ],
@@ -533,7 +583,8 @@ def render_markdown(manifest: dict[str, Any]) -> str:
         f"| First-party measured flag | {summary['first_party_measured_flag_sources']} |",
         f"| Explicit probe success | {summary['probe_success_sources']} |",
         f"| Material row depth | {summary['material_row_depth_sources']} |",
-        f"| Fresh under accepted threshold | {summary['fresh_sources']} |",
+        f"| Probe fresh under accepted threshold | {summary['fresh_sources']} |",
+        f"| Dataset observation fresh under accepted threshold | {summary['fresh_dataset_sources']} |",
         f"| Rights verified for review | {summary['rights_verified_sources']} |",
         f"| Decision relevance verified | {summary['relevance_verified_sources']} |",
         f"| Dataset snapshot bound | {summary['snapshot_bound_sources']} |",
@@ -566,10 +617,11 @@ def render_markdown(manifest: dict[str, Any]) -> str:
         "For each source intended to count as review-ready, supply a private governance sidecar with:",
         "",
         "- accepted minimum row depth,",
-        "- accepted maximum probe age,",
+        "- accepted finite maximum age, applied separately to the probe and dataset observation,",
         "- rights status for reviewer use,",
         "- relevance to the named decision, and",
-        "- SHA-256 of the underlying dataset snapshot.",
+        "- SHA-256 of the underlying dataset snapshot, and",
+        "- dataset snapshot observation timestamp with an explicit timezone, no later than manifest generation.",
         "",
         "## Reproduction",
         "",

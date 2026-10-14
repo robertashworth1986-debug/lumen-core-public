@@ -17,16 +17,34 @@ One calendar invitation already exists and is accepted. Do not send another repl
 | Artifact | Purpose | Observed status | SHA-256 |
 |---|---|---|---|
 | `QUICKSTART.md` | Five-minute public reproduction entry point. | `FILE_PRESENT` | `25c607878d731a5c36cba4866d352e318e5c4f4c11b5a64279942b35ca7f12db` |
-| `docs/PROOF_CAPSULE_SCHEMA.md` | Proof Capsule field, hash, and verification contract. | `FILE_PRESENT` | `a9a6aeafbcef4a7386070c069a9bc71b0a9891e16372c8df0beda81cbc09f973` |
+| `docs/PROOF_CAPSULE_SCHEMA.md` | Proof Capsule field, hash, and verification contract. | `FILE_PRESENT` | `c291967c831818ee490a8d2bbe8aadb45610b7b4688f3f9847245d492b4b928a` |
 | `examples/proof_capsule/dice_eia_public_capsule.json` | Concrete bounded public-data capsule example. | `FILE_PRESENT` | `8376af18ca354d25b34cdd08d15a0df1d814fc5a0915f981b06318ca2e9bf250` |
-| `code/proof_capsule_verifier.py` | Local verifier used to inspect capsule integrity. | `FILE_PRESENT` | `1213f995ab87bb371452296e95f9213a64e5d5e3cb8b52d61979563c35997351` |
+| `code/proof_capsule_verifier.py` | Local verifier used to inspect capsule integrity. | `FILE_PRESENT` | `49e263e5e577870cf2362ff7c389c935f6daa968177834c5d015758c66c98be8` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/reviewer_reproducibility_receipt.json` | Bounded first-party reproducibility receipt. | `BOUNDED_REPRODUCIBILITY_PASS` | `3bcf0f18506b459ad5b92679f70d4c78d68f06545ed05b6471c16dbc0898316d` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/runtime_receipt.json` | Recorded first-party reviewer runtime receipt. | `AUTHORITATIVE_RUNTIME_PASS` | `6908148d421a10f9592c7a9a5ccd4283cd66f3147b33b6381e27ddae9577ab8c` |
 | `evidence/reproducibility/codecheck_reviewer_container_1c0eb517_20260721/container_rebuild_receipt.json` | Operator-controlled container rebuild receipt. | `OPERATOR_CONTAINER_REBUILD_PASS` | `188d62b4b36d1dc417801d630782632a542de64312ce77e796a1517282c8a916` |
 | `docs/EXTERNAL_REPLICATION_DOCKET_V1.md` | Controlled non-author execution, independence, deviation, and negative-result protocol. | `FILE_PRESENT` | `3151940f4852af1d22d0ac7d0ccb387310b48e278995012a6014714e4bc0bdcd` |
 | `docs/AGENT_ARENA.md` | Synthetic adversarial holdout harness and explicit non-field-performance boundary. | `FILE_PRESENT` | `38e7ccd5c97edc4c95c281a06536beb403ccc214f09850cbcb160b2037f31452` |
-| `dashboard/build_week/prooflock_console/THREAT_MODEL.md` | ProofLock trust assumptions, covered attacks, authority boundary, and non-guarantees. | `FILE_PRESENT` | `13995a40cf5e1ef7dfcee3d9995a31cb4fa9c07ec9a86c5334079473bda16388` |
+| `dashboard/build_week/prooflock_console/THREAT_MODEL.md` | ProofLock trust assumptions, covered attacks, authority boundary, and non-guarantees. | `FILE_PRESENT` | `fe03218ebe40a3125028e973eff854267d51cc0d21ed21ac666968eae12a9a8f` |
 | `evidence/public-site-deployments/1ce7c35975a4011fa844e8b39ccbc950c8c0f398/deployment-receipt.json` | Retained first-party deployment, rollback, 43-of-43 exact live-byte, and read-only audit receipt for the named static release only. | `FILE_PRESENT` | `d70224cc048de288540f1b04bb75ca5cef3ec01756ef9e965e559269f2ae1930` |
+| `docs/REVIEWER_START_HERE.md` | Current-source reproduction route, dated repair scope and remaining gates. | `FILE_PRESENT` | `77753affd098aefa19c717bb7a78e006cffc0c9fe3717c544bf9c25f5a3277b4` |
+| `docs/FORECAST_EVALUATION_V2_REVIEW.md` | Versioned calendar-keyed review of precomputed forecasts; synthetic fixture remains HOLD. | `FILE_PRESENT` | `a3c2a0e1602c0af062e6355b8abe5e6370277f5ac372286a19967c1e1ba66c4d` |
+| `tests/test_execution_accounting_regressions.py` | Synthetic trading causality, risk sizing and append-only ledger regressions. | `FILE_PRESENT` | `ddfd68ac518541d083efcc8839b630082f2a09d8b5cf8a43d3c55856f3dac207` |
+| `tests/test_prooflock_canonicalization_parity.py` | Actual JavaScript/Python receipt serialization parity and strict raw-input checks. | `FILE_PRESENT` | `3b6acfb15c2df4443897668737f8653f34a8bad1caaae1f8828f022de125d903` |
+| `code/execution/order_safety_gate.py` | Closed private-endpoint policy; unknown and mutating routes reject before signed transport. | `FILE_PRESENT` | `e86074d6b1b3c76817103fd36250d461c518abf24d3152202272da8bae8ab30f` |
+| `code/execution/alpaca_paper_executor.py` | Paper-only facade; ambiguous mutation failures are not automatically replayed. | `FILE_PRESENT` | `51460b6c0870b1f173d47c1680884ce88b3323f65a199f0115cba8cbc0069401` |
+| `code/forecast_evaluation_v2.py` | Bounded forecast evaluator with structured malformed/oversized CSV rejection. | `FILE_PRESENT` | `be6db9104cc2928b86bc9ad7de8118eefbef48c55127d6c9e4bb632a4f8bc39d` |
+| `code/operator_api_access.py` | HTTP/WebSocket operator authorization with malformed-token rejection. | `FILE_PRESENT` | `9079694f63a235c5cf8e007d7dd263c1ca05854f669c237b6c8ff7ac5e135854` |
+| `tests/test_order_safety_gate.py` | Private endpoint and validate-only policy adversarial fixtures. | `FILE_PRESENT` | `29eeb6393d5ee29b07025bb8cc3257a61acd96d98d23a1aeb9406fbbe9d5ab2a` |
+| `tests/test_order_safety_facades.py` | Mocked Kraken facade tests proving disallowed requests do not reach transport. | `FILE_PRESENT` | `92801e7fc8fda30ada38b47d7b468d8a6274315666547e35216fdb91745ca530` |
+| `tests/test_order_safety_alpaca_paper_boundary.py` | Paper-only host boundary and lost-response mutation-retry fixtures. | `FILE_PRESENT` | `9fc28549279515195fe1686635ec225d1c8058683fb77e965bd7b4dfd5132e2a` |
+| `tests/test_forecast_evaluation_v2.py` | Calendar/as-of review and malformed CSV CLI/API rejection fixtures. | `FILE_PRESENT` | `c589aee975b7a1bc5b02b4b8c55daa7ca848ca0fa1cb0cae3b308189438b3b0a` |
+| `code/dashboard_unified_refresh.py` | Local dashboard provenance, explicit enablement, modeled economics and process-owner lock checks. | `FILE_PRESENT` | `ba28ca82aa4d0d6f7728e8393ca91697033484d134d255494d60a0a4742c4455` |
+| `dashboard/js/live_registry_bridge.js` | Browser bridge distinguishes report values and poll attempts from unverified source freshness. | `FILE_PRESENT` | `e67dd705ea93b03e580bab4fd52d66da1060758217ce1ad323fa0a83bbae035f` |
+| `code/execution/trade_ledger.py` | Canonical append-only ledger with verified CSV projection recovery. | `FILE_PRESENT` | `ebdfff90601ff21e71224c2c0736e6bcf42c88825738c4fb0a6c7a67f8ef8001` |
+| `code/execution/capital_engine_core.py` | Causal spot-return accounting and impossible market-observation rejection. | `FILE_PRESENT` | `5ed4e9f9657afe1188bdfc5b81115db342b092a48a0b79aa9927e93a7871e129` |
+| `tests/test_dashboard_metric_provenance.py` | Offline wrapper, modeled-value, unknown-liveness and lock-ownership counterexamples. | `FILE_PRESENT` | `ca041c0eefaad77dc984c62039da540e1773982d66b787a1e753924126eeed8c` |
+| `tests/test_live_registry_bridge.py` | Delivered browser JavaScript exercised using Node VM and mocked fetch/DOM. | `FILE_PRESENT` | `84aacacbb12fc9468ff6f07480a9c2b0ca931fd8461860880e56087483ca5bd4` |
 
 The receipt statuses above are bounded first-party or operator-controlled evidence. Their own claim boundaries remain controlling.
 
@@ -102,6 +120,10 @@ Active targeting, private-system access, production load testing, and external a
 
 ## Known Gaps
 
+- The October 14 continuation binds source and test hashes for private-order, ambiguous-retry, mounted authorization, timestamp/scale, ledger recovery and dashboard provenance repairs. It does not refresh separately dated live observations, create an outside review result or authorize paid review terms. Frozen scientific results and historical deployment receipts remain unchanged.
+- Historical infrastructure builders use assumed gains and dollar rates, and the provider simulator uses assumed failures. Current local dashboard outputs now retain modeled/report-only labels and unverified source observations; this does not convert historical displays into measured savings or revenue. Historical tournaments outside repaired engines retain selection/accounting limitations.
+- Current-source tests use offline synthetic controls. Broker fills, fees/spread/slippage, recovery after ambiguous order acceptance, net account reconciliation, sustained data freshness, external producer coordination and buyer workload scalability still require bounded evidence before promotion.
+- The versioned forecast-review fixture is synthetic and diagnostic/HOLD. Trading repairs have local synthetic checks only; after-fee prospective paper reconciliation and accepted risk controls remain required. The minimal gateway profile does not establish full legacy provider closure or production runtime parity.
 - Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and parity for gateway, runtime, and later repository commits remain unestablished.
 - The earlier August 10 legacy-route observation is superseded for named static release 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 by its retained first-party deployment and audit receipt, which recorded all 43 allowlisted files including the eight noindex HOLD stubs as exact live-byte matches. That receipt is bounded to the named static release and does not establish external validation, runtime parity, sustained availability, or broader production authorization.
 - The reproducibility receipts are first-party or operator-controlled, not independent external validation.

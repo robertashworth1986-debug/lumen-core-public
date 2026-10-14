@@ -4,7 +4,8 @@
 
 ProofLock must distinguish three questions:
 
-1. Are the receipt and declared repository files byte-consistent?
+1. Does the receipt match its declared canonical payload identity, and do the
+   declared repository files match their raw-byte hashes?
 2. Do machine-verifiable facts support each automatic gate?
 3. Has an authorized external or human reviewer approved the remaining gates?
 
@@ -26,6 +27,12 @@ The receipt author, receipt text, recorded gate statuses, and recorded decision 
 - Removal or downgrading of a canonical required gate: rejected as a malformed receipt contract.
 - Setting external or human gates to `PASS`, selecting `PROMOTE`, and recomputing a valid receipt hash: integrity can remain valid, but policy fails and promotion remains blocked.
 - Malformed top-level receipts or artifact/gate rows: structured fail-closed report.
+- Raw receipt and manifest duplicate decoded keys, unsafe integral numbers,
+  nonfinite values and unpaired Unicode surrogates: rejected before parsing can
+  discard a key or round an unsafe integer into a different identity.
+- Runtime-dependent numeric spelling, Unicode key ordering and DEL escaping:
+  v2 uses the explicit shared binary64/scalar/escaping contract; ambiguous v1
+  inputs are rejected while the retained portable v1 sample is preserved.
 
 ## Gate Authority
 
@@ -35,7 +42,16 @@ Baseline authorization, held-out evaluation, independent review, and human relea
 
 ## Non-Guarantees
 
-SHA-256 detects byte changes but does not authenticate who authored or approved a receipt. Internal manifest consistency is not independent provenance. The bundled console does not provide digital signatures, trusted issuer identity, non-repudiation, external validation, legal authorization, safety certification, patent conclusions, or engineering performance proof.
+Artifact SHA-256 detects raw-byte changes. Receipt SHA-256 binds the declared
+canonical payload rather than raw JSON formatting. V2 deliberately normalizes
+equivalent binary64 number values, including signed zero, so it does not bind
+an exact decimal spelling. Canonicalization does not authenticate who authored
+or approved a receipt. Object APIs cannot recover duplicates or lexemes lost
+by an earlier parser; external text must use the strict parser. Internal
+manifest consistency is not independent provenance. The bundled console does
+not provide digital signatures, trusted issuer identity, non-repudiation,
+external validation, legal authorization, safety certification, patent
+conclusions, or engineering performance proof.
 
 ## Promotion Invariant
 

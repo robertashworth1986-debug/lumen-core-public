@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_commit:
-        description: Full commit SHA at the selected workflow ref
+        description: Full commit SHA at the selected main workflow ref
         required: true
         type: string
       approval:
@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: read
+  attestations: read
 
 concurrency:
   group: lumencore-production-site
@@ -38,9 +39,11 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           RELEASE_COMMIT: ${{ inputs.release_commit }}
           WORKFLOW_COMMIT: ${{ github.sha }}
+          WORKFLOW_REF: ${{ github.ref }}
         run: |
           set -euo pipefail
           [[ "$EVENT_NAME" == "workflow_dispatch" ]]
+          [[ "$WORKFLOW_REF" == "refs/heads/main" ]]
           [[ "$APPROVAL" == "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT" ]]
           [[ "$RELEASE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
           [[ "$RELEASE_COMMIT" == "$WORKFLOW_COMMIT" ]]
@@ -78,6 +81,31 @@ jobs:
             --manifest /tmp/public-site-release/public-site-release-manifest.json \
             | tee /tmp/public-site-package-receipt.json
 
+      - name: Verify signed provenance and SBOM before production access
+        id: verify_attestations
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for predicate in https://slsa.dev/provenance/v1 https://cyclonedx.org/bom; do
+            case "$predicate" in
+              https://slsa.dev/provenance/v1) receipt=provenance ;;
+              https://cyclonedx.org/bom) receipt=sbom ;;
+            esac
+            gh attestation verify \
+              /tmp/public-site-release/public-site-release.tar \
+              --repo "$GITHUB_REPOSITORY" \
+              --predicate-type "$predicate" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/public-site-supply-chain.yml" \
+              --source-digest "$RELEASE_COMMIT" \
+              --source-ref refs/heads/main \
+              --cert-oidc-issuer https://token.actions.githubusercontent.com \
+              --deny-self-hosted-runners \
+              --format json \
+              > "/tmp/public-site-release/signed-$receipt-verification.json"
+          done
+
       - name: Install SSH key
         uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
         with:
@@ -100,6 +128,7 @@ jobs:
           '
 
       - name: Upload bounded release package
+        id: transfer
         shell: bash
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
@@ -139,7 +168,7 @@ jobs:
             --output /tmp/public-site-live-gate.json
 
       - name: Remove remote transfer staging
-        if: always()
+        if: always() && steps.verify_attestations.outcome == 'success' && steps.transfer.outcome != 'skipped'
         continue-on-error: true
         shell: bash
         env:
@@ -158,5 +187,7 @@ jobs:
             /tmp/public-site-package-receipt.json
             /tmp/public-site-deploy-receipt.txt
             /tmp/public-site-live-gate.json
+            /tmp/public-site-release/signed-provenance-verification.json
+            /tmp/public-site-release/signed-sbom-verification.json
           if-no-files-found: warn
           retention-days: 30

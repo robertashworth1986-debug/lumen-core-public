@@ -136,6 +136,12 @@ def expected_live_url(archive_name: str, source_commit: str) -> str:
         "operator_home.html": "/",
         "evidence/index_bounded.html": "/evidence/",
         "build_week/prooflock_console/index.html": "/build_week/prooflock_console/",
+        "cohort/index.html": "/cohort/",
+        "portfolio/index.html": "/portfolio/",
+        "rights/index.html": "/rights/",
+        "art/index.html": "/art/",
+        "bounded-light/index.html": "/bounded-light/",
+        "bounded-light/observatory/index.html": "/bounded-light/observatory/",
     }
     path = route_map.get(archive_name, "/" + quote(archive_name, safe="/"))
     return urljoin("https://lumen-core.ai/", path.lstrip("/")) + (
@@ -435,6 +441,7 @@ def validate_audit(
             raise IncidentClassificationError(f"MIME decision is invalid for {name}")
         computed_match = (
             row["http_status"] == 200
+            and row["bytes"] == manifest_row["bytes"]
             and row["actual_sha256"] == row["expected_sha256"]
             and row["content_type_allowed"] is True
         )
