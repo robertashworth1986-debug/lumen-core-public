@@ -221,6 +221,69 @@ class OperatorApiAccessTests(unittest.TestCase):
         )
         self.assertEqual(presented_operator_token(scope), "")
 
+    def test_non_ascii_credentials_fail_closed_for_http_and_websocket(self) -> None:
+        app = _ProbeApp()
+        middleware = OperatorApiAccessMiddleware(
+            app,
+            token_provider=lambda: ("synthetic-review-token-1234567890123456",),
+        )
+        for scope_type, path in (
+            ("http", "/api/operator/health"), ("websocket", "/ws/live")
+        ):
+            for header_name, prefix in (
+                (b"authorization", b"Bearer "), (b"x-luma-operator-token", b"")
+            ):
+                for token in (b"\xff", "synthetic-\u2603-token".encode("utf-8")):
+                    with self.subTest(scope_type=scope_type, header=header_name, token=token):
+                        messages = _invoke(
+                            middleware,
+                            _scope(
+                                path,
+                                scope_type=scope_type,
+                                headers=[(header_name, prefix + token)],
+                            ),
+                        )
+                        if scope_type == "http":
+                            self.assertEqual(_status(messages), 401)
+                        else:
+                            self.assertEqual(
+                                messages, [{"type": "websocket.close", "code": 4401}]
+                            )
+        self.assertEqual(app.calls, [])
+
+    def test_unrepresentable_configured_token_cannot_break_valid_token_access(self) -> None:
+        secret = "synthetic-review-token-1234567890123456"
+        app = _ProbeApp()
+        middleware = OperatorApiAccessMiddleware(
+            app,
+            token_provider=lambda: ("\u2603" * 32, secret),
+        )
+        for scope_type, path in (
+            ("http", "/api/operator/health"), ("websocket", "/ws/live")
+        ):
+            for token in ("synthetic-invalid", secret):
+                with self.subTest(scope_type=scope_type, valid=token == secret):
+                    messages = _invoke(
+                        middleware,
+                        _scope(
+                            path,
+                            scope_type=scope_type,
+                            headers=[
+                                (b"authorization", f"Bearer {token}".encode("ascii"))
+                            ],
+                        ),
+                    )
+                    if scope_type == "http":
+                        self.assertEqual(_status(messages), 204 if token == secret else 401)
+                    else:
+                        self.assertEqual(
+                            messages,
+                            [{"type": "websocket.accept"}]
+                            if token == secret
+                            else [{"type": "websocket.close", "code": 4401}],
+                        )
+        self.assertEqual(len(app.calls), 2)
+
     def test_public_status_and_health_are_minimal_liveness_only(self) -> None:
         app = _ProbeApp()
         middleware = OperatorApiAccessMiddleware(app, token_provider=lambda: ())

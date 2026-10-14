@@ -2,8 +2,9 @@
 
 The complete implementation is preserved byte-for-byte in
 ``live_executor_legacy.py``. This module remains the canonical import and
-script path, but every Kraken AddOrder request is evaluated before nonce
-creation, signing, credential use, or network I/O.
+script path, but every Kraken private request is evaluated before nonce
+creation, signing, credential use, or network I/O. Only explicitly allowed reads
+and exact validate-only AddOrder calls can reach the transport.
 
 Current promotion stage: live market data with no live orders.
 """
@@ -34,12 +35,12 @@ def _guarded_kraken_private(
     endpoint: str,
     data: dict[str, Any],
 ) -> dict[str, Any]:
-    """Block non-validate AddOrder before the legacy private transport runs."""
+    """Apply the private-endpoint allowlist before legacy transport runs."""
 
     decision = evaluate_order_request(endpoint, data)
     if not decision.allowed:
         return {
-            "error": ["ELUMEN:Order safety gate blocked live AddOrder"],
+            "error": ["ELUMEN:Order safety gate blocked private request"],
             "order_safety": decision.as_dict(),
         }
     return _ORIGINAL_KRAKEN_PRIVATE(self, endpoint, data)

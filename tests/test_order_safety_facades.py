@@ -85,6 +85,20 @@ class OrderSafetyFacadeTests(unittest.TestCase):
         self.assertEqual(blocked["order_safety"]["mode"], "blocked_live_order")
         self.assertEqual(calls, [])
 
+        for path in (
+            "/0/private/AddOrderBatch",
+            "/0/private/EditOrder",
+            "/0/private/AmendOrder",
+            "/0/private/CancelAll",
+            "/0/private/AddOrder/",
+            "/0/private/FuturePrivateMethod",
+        ):
+            with self.subTest(path=path):
+                rejected = client._private(path, {"validate": True})
+                self.assertIn("error", rejected)
+                self.assertEqual(rejected["order_safety"]["mode"], "blocked_private_side_effect")
+        self.assertEqual(calls, [])
+
         validated = client._private(
             ADD_ORDER_PATH,
             {"pair": "XBTUSD", "validate": "true"},

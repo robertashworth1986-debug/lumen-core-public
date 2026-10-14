@@ -472,6 +472,40 @@ def test_cli_does_not_emit_review_artifact_for_wrong_protocol(tmp_path):
     assert not output.exists()
 
 
+@pytest.mark.parametrize("input_name", ["history", "predictions"])
+@pytest.mark.parametrize("field_location", ["header", "data"])
+def test_oversized_csv_fields_return_structured_rejection(module, inputs, tmp_path, input_name, field_location):
+    fields, rows = read_rows(inputs[input_name])
+    oversized = "A" * (csv.field_size_limit() + 1)
+    if field_location == "header":
+        previous = fields[0]
+        fields[0] = oversized
+        for row in rows:
+            row[oversized] = row.pop(previous)
+    else:
+        rows[0][fields[0]] = oversized
+    write_rows(inputs[input_name], fields, rows)
+    assert inputs[input_name].stat().st_size < module.MAX_FILE_BYTES
+    with pytest.raises(ValueError, match="CSV parser rejected"):
+        evaluate(module, inputs)
+    output = tmp_path / "rejected_review.json"
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--protocol", str(inputs["protocol"]),
+         "--protocol-sha256", digest(inputs["protocol"]),
+         "--predictions", str(inputs["predictions"]),
+         "--history", str(inputs["history"]), "--json-out", str(output)],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 1
+    assert result.stdout == ""
+    rejection = json.loads(result.stderr)
+    assert rejection["status"] == "HUMAN_REVIEW_HOLD"
+    assert rejection["input_rejected"] is True
+    assert rejection["promotion_gate_passed"] is False
+    assert rejection["production_authorized"] is False
+    assert not output.exists()
+
+
 def test_cli_preserves_existing_review_artifact(tmp_path):
     output = tmp_path / "existing.json"
     original = b'{"existing_review":"keep"}\n'

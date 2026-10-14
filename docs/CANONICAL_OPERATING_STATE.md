@@ -1,11 +1,45 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-10-13 UTC
+**State date:** 2026-10-14 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
 ## One commercial sentence
+
+### October 14 bounded reviewer continuation
+
+Founder-directed archive recovery and repository preparation advance outcome 2,
+one bounded external evaluation or paid scope. The existing reviewer guide now
+organizes code quality, security, scalability and launch-effort questions, with
+written finding fields and separate commercial authority. Reviewer identities,
+private correspondence, shared attachments and proposed commercial terms remain
+outside this public repository. An existing shared packet does not require a
+duplicate send, and proposed review terms do not establish completed validation.
+
+The clean baseline at `3c61648e593e5e036681f9c32dd82bce18ef3970` passed 1,684
+tests and 224 subtests with eight explicit skips on CPython 3.11.9 using all
+39 packages from the institutional hash lock. This local host is Debian 13,
+glibc 2.41, not the Ubuntu 24.04/glibc 2.39 frozen scientific runtime. It is a
+current-source first-party check; the subsequent repairs require their own
+exact-source verification. Missing generated artifacts, optional native C and
+Windows-only checks are not counted as passing execution.
+
+The continuation closes alternative private-order route acceptance, ambiguous
+mutation retries and malformed CSV/token exception paths with offline regression
+fixtures. No broker, market feed, live worker or production configuration is
+activated. These repairs do not close historical strategy-selection bias,
+fee/fill/latency assumptions, account reconciliation, legacy provider closure,
+live release drift or prospective operating-evidence gates.
+
+The archive review distinguishes recovered files and indexed historical records
+from unavailable device roots and unreviewed images. The early infrastructure
+loop uses assumed gains and dollar rates; the legacy constraint detector uses
+modeled provider failures. Their displays cannot establish savings or revenue.
+Frozen scientific inputs, outputs, runners and dated results remain unchanged.
+Whole-estate reconciliation remains OPEN. The next commercial gate remains one
+authorized buyer problem, technical and budget owners, accepted scope and
+required payment, followed by a bounded delivered result and buyer acceptance.
 
 ### October 13 reviewer-readiness and trading repairs
 

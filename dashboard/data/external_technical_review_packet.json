@@ -1,9 +1,9 @@
 {
   "schema": "lumencore.external_technical_review_packet.v1",
-  "generated_at_utc": "2026-10-13T18:13:58Z",
+  "generated_at_utc": "2026-10-14T05:58:24Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "source_config": "config/external_technical_review_packet_v1.json",
-  "source_config_sha256": "52da0e0b03b4da0e86bd819f928c138504908905739b41fb6c3c76d4ba9b291f",
+  "source_config_sha256": "82b51860707ac71329097f0ac064ddb3d5e46834ab41490d84d7e75a9a118720",
   "template_config_sha256": "0cfbda7dfd68aff39eab6a07676b0b44b13fb4455a0530fb3b3663f05a19e148",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -24,14 +24,14 @@
     "requested_outcome": "A written recommendation naming the strongest first buyer, the narrowest valuable problem, the incumbent baseline, the acceptance metric, the evidence still missing, and one practical next introduction or experiment."
   },
   "summary": {
-    "evidence_asset_count": 15,
+    "evidence_asset_count": 23,
     "public_surface_count": 7,
     "demo_surface_count": 1,
     "degraded_surface_count": 0,
     "reviewer_question_count": 7,
     "assurance_scenario_count": 6,
     "active_targeting_allowed": false,
-    "known_gap_count": 8,
+    "known_gap_count": 10,
     "duplicate_invite_blocked": true
   },
   "evidence_assets": [
@@ -137,8 +137,8 @@
     {
       "path": "docs/REVIEWER_START_HERE.md",
       "purpose": "Current-source reproduction route, dated repair scope and remaining gates.",
-      "bytes": 21403,
-      "sha256": "6404f23e86f889b43e2bcaef9e0146552d31852d26457b5c4dffb6942598fbfd",
+      "bytes": 25977,
+      "sha256": "750fa978598fd7574891d9b74aa99dc99401b84d66b3f3facd2490e79e5b5f44",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -166,6 +166,78 @@
       "purpose": "Actual JavaScript/Python receipt serialization parity and strict raw-input checks.",
       "bytes": 9435,
       "sha256": "3b6acfb15c2df4443897668737f8653f34a8bad1caaae1f8828f022de125d903",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/order_safety_gate.py",
+      "purpose": "Closed private-endpoint policy; unknown and mutating routes reject before signed transport.",
+      "bytes": 3731,
+      "sha256": "e86074d6b1b3c76817103fd36250d461c518abf24d3152202272da8bae8ab30f",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/alpaca_paper_executor.py",
+      "purpose": "Paper-only facade; ambiguous mutation failures are not automatically replayed.",
+      "bytes": 7293,
+      "sha256": "51460b6c0870b1f173d47c1680884ce88b3323f65a199f0115cba8cbc0069401",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/forecast_evaluation_v2.py",
+      "purpose": "Bounded forecast evaluator with structured malformed/oversized CSV rejection.",
+      "bytes": 18330,
+      "sha256": "cd7f016035d654c5551410b411cefa79a084508c61f0ff201dbfd42e3b217c48",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/operator_api_access.py",
+      "purpose": "HTTP/WebSocket operator authorization with malformed-token rejection.",
+      "bytes": 9589,
+      "sha256": "a491da1d3b17b24a610bbf9ea2e98eb079878af0b9602d723a5b9ffff2271145",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_order_safety_gate.py",
+      "purpose": "Private endpoint and validate-only policy adversarial fixtures.",
+      "bytes": 7650,
+      "sha256": "29eeb6393d5ee29b07025bb8cc3257a61acd96d98d23a1aeb9406fbbe9d5ab2a",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_order_safety_facades.py",
+      "purpose": "Mocked Kraken facade tests proving disallowed requests do not reach transport.",
+      "bytes": 8764,
+      "sha256": "92801e7fc8fda30ada38b47d7b468d8a6274315666547e35216fdb91745ca530",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_order_safety_alpaca_paper_boundary.py",
+      "purpose": "Paper-only host boundary and lost-response mutation-retry fixtures.",
+      "bytes": 7377,
+      "sha256": "9fc28549279515195fe1686635ec225d1c8058683fb77e965bd7b4dfd5132e2a",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_forecast_evaluation_v2.py",
+      "purpose": "Calendar/as-of review and malformed CSV CLI/API rejection fixtures.",
+      "bytes": 22148,
+      "sha256": "6426106524650312509b0b48ffa65d841b4a43c4580e0e7a78a70d4ba1d7e1ea",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -370,8 +442,8 @@
         "expected_blue_control": "The gateway defaults to deny, validates the runtime bearer, minimizes public status, and rejects ambiguous credentials.",
         "pass_condition": "Unauthorized requests cannot reach protected operator functionality.",
         "boundary": "Local integration tests do not establish production identity-provider integration, penetration-test completion, or certification.",
-        "test_bytes": 20544,
-        "test_sha256": "608ff2ad7e74a0c3f1c5e33d02d69972610c8c0704e367870e3e09b2292f369b",
+        "test_bytes": 23402,
+        "test_sha256": "10dbd1f18f7d103fd8a179d053c7eda6fb7a9186c6e34840fa3a3b1fc3eb0db4",
         "verification_command": "python -m pytest -q tests/test_operator_api_access.py"
       },
       {
@@ -412,7 +484,9 @@
     "No fit is found; record why and close the lane without implying endorsement."
   ],
   "known_gaps": [
-    "The October 13 reviewer repair refresh rebinds current source and test hashes only. It does not refresh the separately dated live-surface observations, confirm a meeting outcome or create independent execution evidence. Frozen computation and historical deployment receipts remain unchanged.",
+    "The October 14 continuation rebinds current source and test hashes and adds private-order endpoint, ambiguous retry and malformed input repairs. It does not refresh separately dated live observations, create an outside review result or authorize paid review terms. Frozen scientific results and historical deployment receipts remain unchanged.",
+    "Early infrastructure dashboards use fixed source counts, assumed gains and loss rates; the provider constraint simulator uses assumed failure probabilities. Their frozen artifacts and dollar projections are modeled research, not measured savings or collected revenue. Historical trading tournaments retain same-period accounting and selection bias outside the repaired canonical engines.",
+    "Current-source tests use offline synthetic controls. Broker fills, fees/spread/slippage, recovery after ambiguous order acceptance, net account reconciliation, sustained data freshness, external producer coordination and buyer workload scalability still require bounded evidence before promotion.",
     "The versioned forecast-review fixture is synthetic and diagnostic/HOLD. Trading repairs have local synthetic checks only; after-fee prospective paper reconciliation and accepted risk controls remain required. The minimal gateway profile does not establish full legacy provider closure or production runtime parity.",
     "Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and parity for gateway, runtime, and later repository commits remain unestablished.",
     "The earlier August 10 legacy-route observation is superseded for named static release 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 by its retained first-party deployment and audit receipt, which recorded all 43 allowlisted files including the eight noindex HOLD stubs as exact live-byte matches. That receipt is bounded to the named static release and does not establish external validation, runtime parity, sustained availability, or broader production authorization.",

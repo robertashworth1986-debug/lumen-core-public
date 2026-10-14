@@ -112,9 +112,14 @@ def presented_operator_token(scope: Mapping[str, Any]) -> str:
 
 
 def token_is_authorized(provided: str, expected: Iterable[str]) -> bool:
-    if not provided:
+    # compare_digest rejects non-ASCII strings. Malformed credentials must
+    # remain authentication failures rather than unhandled HTTP/WS errors.
+    if not provided or not provided.isascii():
         return False
-    return any(hmac.compare_digest(provided, token) for token in expected)
+    return any(
+        token.isascii() and hmac.compare_digest(provided, token)
+        for token in expected
+    )
 
 
 def is_public_api_read(scope: Mapping[str, Any]) -> bool:

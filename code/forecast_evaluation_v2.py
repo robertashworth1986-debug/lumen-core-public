@@ -140,13 +140,16 @@ def load_protocol(path: Path, protocol_sha256: str) -> tuple[dict, bytes]:
 
 def _csv_rows(raw: bytes, fields: set[str]) -> list[dict]:
     reader = csv.DictReader(io.StringIO(raw.decode("utf-8"), newline=""))
-    if reader.fieldnames is None or len(reader.fieldnames) != len(fields) or set(reader.fieldnames) != fields:
-        raise ValueError("CSV header must contain exactly the declared columns")
     rows = []
-    for row in reader:
-        if len(rows) >= MAX_ROWS or set(row) != fields or any(not isinstance(value, str) or not value.strip() for value in row.values()):
-            raise ValueError("CSV has empty/malformed fields or exceeds the row budget")
-        rows.append(row)
+    try:
+        if reader.fieldnames is None or len(reader.fieldnames) != len(fields) or set(reader.fieldnames) != fields:
+            raise ValueError("CSV header must contain exactly the declared columns")
+        for row in reader:
+            if len(rows) >= MAX_ROWS or set(row) != fields or any(not isinstance(value, str) or not value.strip() for value in row.values()):
+                raise ValueError("CSV has empty/malformed fields or exceeds the row budget")
+            rows.append(row)
+    except csv.Error as exc:
+        raise ValueError("CSV parser rejected malformed input or an oversized field") from exc
     if not rows:
         raise ValueError("CSV input is empty")
     return rows
