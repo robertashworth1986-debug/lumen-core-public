@@ -5,11 +5,15 @@ import atexit
 import hashlib
 import hmac
 import json
+import math
 import os
+import stat
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.parse
+from decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -1016,6 +1020,7 @@ def _execution_friction_rates(preset: Dict[str, Any]) -> Dict[str, float]:
 
 
 def _load_external_intel() -> Dict[str, Any]:
+    """Retain rolling research diagnostics without promoting them to preferences."""
     kpi = load_json(DUCKDB_KPI_FILE, {})
     rolling_best = load_json(ROLLING_BEST_FILE, {})
 
@@ -1048,18 +1053,6 @@ def _load_external_intel() -> Dict[str, Any]:
     preferred_regime = ""
     preferred_family = ""
     preferred_symbol = ""
-    if isinstance(rolling_best, dict) and rolling_best:
-        preferred_family = str(rolling_best.get("family", "")).lower()
-        preferred_symbol = str(rolling_best.get("symbol", "")).upper().replace("/", "")
-        if preferred_family in {"breakout_pressure", "torsion_trend"}:
-            preferred_regime = "breakout"
-            scan_multiplier *= 1.08
-        elif preferred_family in {"momentum_lowvol", "harmonic_hybrid", "helix_cycle"}:
-            preferred_regime = "moonshot"
-            scan_multiplier *= 1.06
-        elif preferred_family in {"dispersion_harvest", "fractal_balance"}:
-            preferred_regime = "fallback"
-            scan_multiplier *= 1.04
 
     return {
         "risk_multiplier": min(max(risk_multiplier, 0.70), 1.20),
@@ -1069,6 +1062,7 @@ def _load_external_intel() -> Dict[str, Any]:
         "preferred_symbol": preferred_symbol,
         "kpi": kpi if isinstance(kpi, dict) else {},
         "rolling_best": rolling_best if isinstance(rolling_best, dict) else {},
+        "rolling_preference_rejection_reason": "rolling_research_preferences_disabled",
     }
 
 
@@ -1647,7 +1641,9 @@ def build_institutional_crypto_paper_report(payload: Dict[str, Any], seed_capita
     scientific_allocator = state.get("scientific_allocator", {}) if isinstance(state, dict) else {}
     regime_controller = state.get("regime_controller", {}) if isinstance(state, dict) else {}
 
-    use_alpaca_truth = bool(alpaca_true.get("ok")) and bool(alpaca_state)
+    use_alpaca_truth = (bool(alpaca_true.get("ok")) and bool(alpaca_state)
+                        and alpaca_state.get("accounting_schema") == "alpaca_paper_accounting.v2"
+                        and not alpaca_true.get("requires_operator_reconciliation"))
 
     if use_alpaca_truth:
         initial_equity = _f(alpaca_state.get("initial_cash_usd"), max(seed_capital, 1000.0))
@@ -1657,8 +1653,13 @@ def build_institutional_crypto_paper_report(payload: Dict[str, Any], seed_capita
         cash = _f(alpaca_state.get("cash_usd"), initial_equity)
         realized = _f(alpaca_state.get("realized_pnl_usd"), 0.0)
         gross = max(equity - cash, 0.0)
-        unrealized = max((equity - cash) - realized, 0.0)
-        positions_open = len(alpaca_state.get("open_positions", {})) if isinstance(alpaca_state.get("open_positions", {}), dict) else 0
+        # Inventory value is not profit. This path does not capture a matched
+        # broker positions/cost-basis snapshot from which to report unrealized PnL.
+        unrealized = None
+        local_positions_open = len(alpaca_state.get("open_positions", {})) if isinstance(alpaca_state.get("open_positions", {}), dict) else 0
+        snapshot_precedes_order = alpaca_state.get("account_snapshot_precedes_order")
+        # A filled order updates the local projection after the account snapshot.
+        positions_open = local_positions_open if snapshot_precedes_order is False else None
     else:
         initial_equity = _f(state.get("initial_cash_usd"), max(seed_capital, 1000.0))
         equity = _f(state.get("equity_usd"), initial_equity)
@@ -1672,7 +1673,7 @@ def build_institutional_crypto_paper_report(payload: Dict[str, Any], seed_capita
     report = {
         "generated_utc": now_utc(),
         "mode": "alpaca_true_paper_execution" if use_alpaca_truth else "seeded_institutional_crypto_paper",
-        "truth_mode": "real_alpaca_paper_fills" if use_alpaca_truth else "simulated_multi_exchange_paper",
+        "truth_mode": "broker_paper_snapshot_gross_fill_accounting" if use_alpaca_truth else "simulated_multi_exchange_paper",
         "profile": payload.get("profile"),
         "seed_request": {
             "requested_seed_capital_usd": round(max(seed_capital, 1000.0), 6),
@@ -1684,8 +1685,8 @@ def build_institutional_crypto_paper_report(payload: Dict[str, Any], seed_capita
             "gross_position_value_usd": round(gross, 6),
             "equity_usd": round(equity, 6),
             "realized_pnl_usd": round(realized, 6),
-            "unrealized_pnl_usd": round(unrealized, 6),
-            "return_pct": round(equity_return, 6),
+            "unrealized_pnl_usd": round(unrealized, 6) if unrealized is not None else None,
+            "return_pct": None if use_alpaca_truth else round(equity_return, 6),
             "positions_open": positions_open,
         },
         "decision_audit": {
@@ -1719,6 +1720,22 @@ def build_institutional_crypto_paper_report(payload: Dict[str, Any], seed_capita
             "alpaca_true_ledger_file": str(ALPACA_TRUE_PAPER_LEDGER_FILE),
         },
     }
+    if use_alpaca_truth:
+        report["portfolio"].update({
+            "account_snapshot_utc": alpaca_state.get("account_snapshot_utc"),
+            "account_snapshot_timestamp_basis": "local_broker_response_receipt_time",
+            "account_snapshot_precedes_order": snapshot_precedes_order,
+            "cash_equity_basis": "broker_account_snapshot_not_post_fill_balances",
+            "gross_position_value_basis": "nonnegative_snapshot_equity_less_cash_estimate_not_profit",
+            "unrealized_pnl_status": "unknown_not_captured_in_snapshot",
+            "local_confirmed_positions_open": local_positions_open,
+            "local_positions_basis": "confirmed_fill_projection_may_follow_account_snapshot",
+            "realized_pnl_basis": "confirmed_fill_gross_excludes_fees",
+            "realized_pnl_observation_basis": "local_confirmed_fill_projection_not_broker_snapshot",
+            "equity_change_pct": round(equity_return, 6),
+            "equity_change_pct_basis": "includes_external_flows_not_strategy_return",
+            "return_pct_status": "unknown_cash_flows_not_reconciled",
+        })
     save_json(INSTITUTIONAL_PAPER_REPORT_FILE, report)
 
     hashes = {
@@ -2819,225 +2836,323 @@ def _alpaca_pick_candidate(candidates: List[Dict[str, Any]], supported: Set[str]
     return None
 
 
+def _alpaca_paper_number(value: Any) -> Decimal:
+    if isinstance(value, bool) or not isinstance(value, (str, int, float)):
+        raise ValueError("invalid_paper_number")
+    try:
+        number = Decimal(str(value))
+    except InvalidOperation as exc:
+        raise ValueError("invalid_paper_number") from exc
+    if not number.is_finite() or not math.isfinite(float(number)) or (number != 0 and float(number) == 0):
+        raise ValueError("nonfinite_paper_number")
+    return number
+
+
+def _save_alpaca_paper_state(state: Dict[str, Any]) -> None:
+    """Atomic projection; an order-intent lock remains until ledger and state persist."""
+    path = ALPACA_TRUE_PAPER_STATE_FILE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.is_symlink():
+        raise ValueError("symlink_paper_state")
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
+                                         prefix=path.name + ".", delete=False) as handle:
+            temporary = Path(handle.name)
+            json.dump(state, handle, allow_nan=False)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        _sync_alpaca_paper_directory(path.parent)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def _sync_alpaca_paper_directory(path: Path) -> None:
+    # POSIX directory metadata durability; Windows has no O_DIRECTORY equivalent.
+    if hasattr(os, "O_DIRECTORY"):
+        directory_fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+
+
+def _read_alpaca_paper_state(default: Dict[str, Any]) -> Dict[str, Any]:
+    path = ALPACA_TRUE_PAPER_STATE_FILE
+    try:
+        info = path.lstat()
+    except FileNotFoundError:
+        return default
+    if not stat.S_ISREG(info.st_mode) or info.st_size > 1024 * 1024:
+        raise ValueError("invalid_paper_state_file")
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("duplicate_paper_state_key")
+            result[key] = value
+        return result
+
+    def finite_float(value):
+        result = float(value)
+        if not math.isfinite(result):
+            raise ValueError("nonfinite_paper_state_json")
+        return result
+
+    def reject_constant(value):
+        raise ValueError("nonfinite_paper_state_json")
+
+    state = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_object,
+                       parse_float=finite_float, parse_constant=reject_constant)
+    if not isinstance(state, dict) or state.get("accounting_schema") != "alpaca_paper_accounting.v2":
+        raise ValueError("legacy_or_invalid_state_requires_reconciliation")
+    positions, booked = state.get("open_positions"), state.get("booked_order_ids")
+    if not isinstance(positions, dict) or not isinstance(booked, list) or len(booked) > 10000:
+        raise ValueError("invalid_paper_state")
+    if any(not isinstance(item, str) or not item for item in booked) or len(set(booked)) != len(booked):
+        raise ValueError("invalid_paper_order_history")
+    for symbol, position in positions.items():
+        if not isinstance(symbol, str) or not isinstance(position, dict):
+            raise ValueError("invalid_paper_position")
+        if _alpaca_paper_number(position.get("qty")) <= 0 or _alpaca_paper_number(position.get("entry_price")) <= 0:
+            raise ValueError("invalid_paper_position")
+    for field in ("realized_pnl_usd",):
+        _alpaca_paper_number(state.get(field, 0))
+    for field in ("trade_count", "wins", "losses"):
+        value = state.get(field, 0)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError("invalid_paper_counter")
+    return state
+
+
+def _write_alpaca_paper_intent(fd: int, intent: Dict[str, Any]) -> None:
+    data = json.dumps(intent, allow_nan=False).encode("utf-8")
+    os.lseek(fd, 0, os.SEEK_SET)
+    os.ftruncate(fd, 0)
+    while data:
+        written = os.write(fd, data)
+        if written <= 0:
+            raise OSError("short_intent_write")
+        data = data[written:]
+    os.fsync(fd)
+
+
+def _release_alpaca_paper_intent(path: Path, owned: os.stat_result) -> bool:
+    """Never unlink a lock replaced by another owner or a symlink."""
+    try:
+        current = path.lstat()
+        if not stat.S_ISREG(current.st_mode) or (current.st_dev, current.st_ino) != (owned.st_dev, owned.st_ino):
+            return False
+        path.unlink()
+        _sync_alpaca_paper_directory(path.parent)
+        return True
+    except OSError:
+        return False
+
+
+def _append_alpaca_paper_event(event: Dict[str, Any]) -> None:
+    path = ALPACA_TRUE_PAPER_LEDGER_FILE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd = os.open(path, os.O_CREAT | os.O_APPEND | os.O_WRONLY | getattr(os, "O_NOFOLLOW", 0), 0o600)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError("invalid_paper_ledger_file")
+        data = (json.dumps(event, allow_nan=False) + "\n").encode("utf-8")
+        while data:
+            written = os.write(fd, data)
+            if written <= 0:
+                raise OSError("short_ledger_write")
+            data = data[written:]
+        os.fsync(fd)
+        _sync_alpaca_paper_directory(path.parent)
+    finally:
+        os.close(fd)
+
+
 def run_alpaca_true_paper_logic(cycle: int, profile: str, preset: Dict[str, Any], binanceus_engine: Dict[str, Any]) -> Dict[str, Any]:
+    """Bounded immediate-fill accounting, not an automatic order-recovery service.
+
+    The local O_EXCL intent serializes cycles before any broker read or mutation.
+    A submitted request keeps this lock across errors/restarts until a complete,
+    attributable fill is durably booked. Pending/partial/ambiguous orders require
+    an operator to reconcile broker orders, positions, state and ledger. Never
+    delete an aged lock automatically. This assumes a single trusted local
+    filesystem; cross-host/network-filesystem ownership is not established.
+    Legacy state is held for reconciliation rather than silently restated.
+    """
     key = os.getenv("ALPACA_API_KEY", "").strip()
     secret = os.getenv("ALPACA_API_SECRET", "").strip()
     base = os.getenv("ALPACA_PAPER_BASE_URL", "").strip() or os.getenv("ALPACA_BASE_URL", "").strip() or "https://paper-api.alpaca.markets"
+    state: Dict[str, Any] = {"accounting_schema": "alpaca_paper_accounting.v2",
+        "started_utc": now_utc(), "profile": profile, "initial_cash_usd": 0.0,
+        "trade_count": 0, "wins": 0, "losses": 0, "realized_pnl_usd": 0.0,
+        "open_positions": {}, "booked_order_ids": []}
+    result: Dict[str, Any] = {}
 
+    def hold(reason: str) -> Dict[str, Any]:
+        state.update(last_action="HOLD", last_reason=reason,
+                     data_truth_mode="alpaca_paper_reconciliation_required")
+        return {"ok": False, "error": reason, "base_url": base, "state": state,
+            "requires_operator_reconciliation": True,
+            "order_lock_file": str(lock_path),
+            "event": {"event_type": "alpaca_paper_reconciliation_hold", "action": "HOLD", "reason": reason}}
+
+    lock_path = ALPACA_TRUE_PAPER_STATE_FILE.with_name(ALPACA_TRUE_PAPER_STATE_FILE.stem + ".order_lock.json")
+    if base != "https://paper-api.alpaca.markets":
+        return hold("paper_origin_required")
     if not key or not secret:
         return {"ok": False, "error": "missing_alpaca_credentials", "base_url": base}
+    fd = None
+    submitted = False
+    owned = None
+    try:
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        except FileExistsError:
+            try:
+                state = _read_alpaca_paper_state(state)
+            except (OSError, ValueError, TypeError):
+                pass
+            return hold("unresolved_order_lock_requires_operator_reconciliation")
+        owned = os.fstat(fd)
+        _write_alpaca_paper_intent(fd, {"phase": "preflight", "cycle": cycle, "created_utc": now_utc()})
+        _sync_alpaca_paper_directory(lock_path.parent)
+        state = _read_alpaca_paper_state(state)
+        if state.get("unresolved_order"):
+            return hold("unresolved_order_requires_operator_reconciliation")
+        if len(state["booked_order_ids"]) >= 10000:
+            return hold("paper_order_history_limit_requires_reconciliation")
 
-    default_state = {
-        "started_utc": now_utc(),
-        "profile": profile,
-        "initial_cash_usd": 0.0,
-        "trade_count": 0,
-        "wins": 0,
-        "losses": 0,
-        "realized_pnl_usd": 0.0,
-        "last_action": "HOLD",
-        "open_positions": {},
-        "last_candidate": {},
-    }
-    state = load_json(ALPACA_TRUE_PAPER_STATE_FILE, default_state)
-    if not isinstance(state, dict):
-        state = dict(default_state)
+        account_res = _alpaca_request("GET", base, "/v2/account", key, secret)
+        positions_res = _alpaca_request("GET", base, "/v2/positions", key, secret)
+        if not account_res.get("ok") or not isinstance(account_res.get("data"), dict):
+            return hold("account_fetch_failed")
+        if not positions_res.get("ok") or not isinstance(positions_res.get("data"), list):
+            return hold("positions_fetch_failed")
+        account = account_res["data"]
+        cash = _alpaca_paper_number(account.get("cash"))
+        equity = _alpaca_paper_number(account.get("equity"))
+        if cash < 0 or equity < 0:
+            return hold("invalid_paper_account")
+        positions = state["open_positions"]
+        broker = {}
+        for row in positions_res["data"]:
+            if not isinstance(row, dict) or not isinstance(row.get("symbol"), str):
+                return hold("invalid_broker_position")
+            symbol = row["symbol"].upper().replace("/", "")
+            if symbol in broker or _alpaca_paper_number(row.get("qty")) <= 0:
+                return hold("unsupported_or_duplicate_broker_position")
+            broker[symbol] = row
+        if {s.upper().replace("/", "") for s in positions} != set(broker):
+            return hold("broker_positions_require_reconciliation")
+        for symbol, position in positions.items():
+            row = broker[symbol.upper().replace("/", "")]
+            if _alpaca_paper_number(row.get("qty")) != _alpaca_paper_number(position["qty"]):
+                return hold("broker_quantity_requires_reconciliation")
 
-    account_res = _alpaca_request("GET", base, "/v2/account", key, secret)
-    if not account_res.get("ok"):
-        return {
-            "ok": False,
-            "error": f"account_fetch_failed:{account_res.get('error')}",
-            "base_url": base,
-            "state": state,
-        }
-    account = account_res.get("data", {}) if isinstance(account_res.get("data", {}), dict) else {}
-    account_cash = _f(account.get("cash"), 0.0)
-    account_equity = _f(account.get("equity"), account_cash)
+        state.update(last_tick_utc=now_utc(), account_snapshot_utc=now_utc(), account_snapshot_precedes_order=False,
+            profile=profile, cash_usd=float(cash), equity_usd=float(equity),
+            realized_pnl_basis="confirmed_fill_gross_excludes_fees",
+            data_truth_mode="alpaca_paper_account_snapshot_and_confirmed_fills")
+        if _alpaca_paper_number(state.get("initial_cash_usd", 0)) <= 0:
+            state["initial_cash_usd"] = float(equity)
+        tp, sl = _alpaca_paper_number(preset.get("tp_moon", .012)), _alpaca_paper_number(preset.get("sl", -.010))
+        payload = None
+        pick = None
+        for symbol, position in positions.items():
+            row = broker[symbol.upper().replace("/", "")]
+            mark = _alpaca_paper_number(row.get("current_price"))
+            entry = _alpaca_paper_number(position["entry_price"])
+            if mark <= 0:
+                return hold("invalid_broker_mark")
+            pnl_pct = mark / entry - 1
+            if pnl_pct >= tp or pnl_pct <= sl:
+                payload = {"symbol": symbol, "side": "sell", "type": "market", "time_in_force": "gtc", "qty": str(position["qty"])}
+                break
+        if payload is None and not positions:
+            candidates = binanceus_engine.get("hybrid_top", []) if isinstance(binanceus_engine, dict) else []
+            supported = _alpaca_supported_crypto_symbols(base, key, secret)
+            pick = _alpaca_pick_candidate(candidates if isinstance(candidates, list) else [], supported,
+                                         min_edge=float(_alpaca_paper_number(preset.get("min_edge", .08))))
+            if pick is not None:
+                minimum = max(_alpaca_paper_number(preset.get("entry_min_notional_usd", 25)), Decimal(20))
+                fraction = min(max(_alpaca_paper_number(preset.get("entry_max_risk_fraction", .25)), Decimal(".05")), Decimal(".60"))
+                notional = min(max(cash * fraction, minimum), cash).quantize(Decimal(".01"))
+                if notional >= minimum and notional <= cash:
+                    payload = {"symbol": pick["alpaca_symbol"], "side": "buy", "type": "market", "time_in_force": "gtc", "notional": str(notional)}
 
-    positions_res = _alpaca_request("GET", base, "/v2/positions", key, secret)
-    positions_rows = positions_res.get("data", []) if positions_res.get("ok") else []
-    if not isinstance(positions_rows, list):
-        positions_rows = []
-
-    open_positions = state.get("open_positions", {}) if isinstance(state.get("open_positions", {}), dict) else {}
-
-    tp = _f(preset.get("tp_moon"), 0.012)
-    sl = _f(preset.get("sl"), -0.010)
-    min_edge = _f(preset.get("min_edge"), 0.08)
-    entry_min_notional = max(_f(preset.get("entry_min_notional_usd"), 25.0), 20.0)
-    entry_frac = min(max(_f(preset.get("entry_max_risk_fraction"), 0.25), 0.05), 0.60)
-
-    events: List[Dict[str, Any]] = []
-    action = "HOLD"
-    reason = "none"
-    entry_error = ""
-
-    # Exit first: lock in real PnL based on live open positions.
-    for pos in positions_rows:
-        if not isinstance(pos, dict):
-            continue
-        symbol = str(pos.get("symbol", "")).upper().strip()
-        qty = abs(_f(pos.get("qty"), 0.0))
-        avg_entry = _f(pos.get("avg_entry_price"), 0.0)
-        mark = _f(pos.get("current_price"), avg_entry)
-        if qty <= 0.0 or avg_entry <= 0.0:
-            continue
-        pnl_pct = (mark / avg_entry) - 1.0
-        if pnl_pct < tp and pnl_pct > sl:
-            continue
-
-        close_side = "sell" if _f(pos.get("qty"), 0.0) > 0 else "buy"
-        close_payload = {
-            "symbol": symbol,
-            "side": close_side,
-            "type": "market",
-            "time_in_force": "gtc",
-            "qty": str(qty),
-        }
-        order_res = _alpaca_request("POST", base, "/v2/orders", key, secret, payload=close_payload)
-        if not order_res.get("ok"):
-            continue
-        order = order_res.get("data", {}) if isinstance(order_res.get("data", {}), dict) else {}
-        fill_price = _f(order.get("filled_avg_price"), mark)
-        entry_ref = open_positions.get(symbol, {}) if isinstance(open_positions.get(symbol, {}), dict) else {}
-        entry_price = _f(entry_ref.get("entry_price"), avg_entry)
-        realized_pnl = (fill_price - entry_price) * qty
-
-        state["trade_count"] = _i(state.get("trade_count"), 0) + 1
-        state["realized_pnl_usd"] = _f(state.get("realized_pnl_usd"), 0.0) + realized_pnl
-        if realized_pnl >= 0.0:
-            state["wins"] = _i(state.get("wins"), 0) + 1
-        else:
-            state["losses"] = _i(state.get("losses"), 0) + 1
-        open_positions.pop(symbol, None)
-
-        action = "SELL"
-        reason = "tp_or_sl"
-        events.append(
-            {
-                "timestamp_utc": now_utc(),
-                "cycle": cycle,
-                "event_type": "alpaca_true_paper_fill",
-                "side": "sell",
-                "symbol": symbol,
-                "qty": round(qty, 10),
-                "fill_price": round(fill_price, 8),
-                "entry_price": round(entry_price, 8),
-                "pnl_usd": round(realized_pnl, 8),
-                "order_id": str(order.get("id", "")),
-                "status": str(order.get("status", "unknown")),
-                "source": "alpaca_paper_api",
-                "truth": "real_fill_path",
-            }
-        )
-
-    # Entry: use top ranked multi-exchange candidates, but execute only on Alpaca-supported symbols.
-    candidates = []
-    if isinstance(binanceus_engine, dict):
-        candidates = binanceus_engine.get("hybrid_top", [])
-        if not isinstance(candidates, list):
-            candidates = []
-    supported = _alpaca_supported_crypto_symbols(base, key, secret)
-    pick = _alpaca_pick_candidate(candidates, supported, min_edge=min_edge)
-
-    has_open = any(abs(_f(pos.get("qty"), 0.0)) > 0.0 for pos in open_positions.values() if isinstance(pos, dict))
-    if not has_open and pick is not None:
-        notional = min(max(account_cash * entry_frac, entry_min_notional), account_cash)
-        if notional >= entry_min_notional:
-            buy_payload = {
-                "symbol": pick["alpaca_symbol"],
-                "side": "buy",
-                "type": "market",
-                "time_in_force": "gtc",
-                "notional": f"{notional:.2f}",
-            }
-            order_res = _alpaca_request("POST", base, "/v2/orders", key, secret, payload=buy_payload)
-            if order_res.get("ok"):
-                order = order_res.get("data", {}) if isinstance(order_res.get("data", {}), dict) else {}
-                fill_price = _f(order.get("filled_avg_price"), pick.get("price", 0.0))
-                qty = _f(order.get("filled_qty"), 0.0)
-                if qty <= 0.0 and fill_price > 0.0:
-                    qty = notional / fill_price
-                open_positions[pick["alpaca_symbol"]] = {
-                    "entry_price": fill_price,
-                    "qty": qty,
-                    "opened_cycle": cycle,
-                    "order_id": str(order.get("id", "")),
-                    "edge": _f(pick.get("edge"), 0.0),
-                }
-                action = "BUY"
-                reason = "ranked_entry"
-                events.append(
-                    {
-                        "timestamp_utc": now_utc(),
-                        "cycle": cycle,
-                        "event_type": "alpaca_true_paper_fill",
-                        "side": "buy",
-                        "symbol": pick["alpaca_symbol"],
-                        "qty": round(qty, 10),
-                        "fill_price": round(fill_price, 8),
-                        "notional_usd": round(notional, 6),
-                        "edge": round(_f(pick.get("edge"), 0.0), 6),
-                        "pct24": round(_f(pick.get("pct24"), 0.0), 6),
-                        "order_id": str(order.get("id", "")),
-                        "status": str(order.get("status", "unknown")),
-                        "source": "alpaca_paper_api",
-                        "truth": "real_fill_path",
-                    }
-                )
+        event = {"timestamp_utc": now_utc(), "cycle": cycle, "event_type": "alpaca_true_paper_mark",
+                 "action": "HOLD", "source": "alpaca_paper_api", "reason": "no_immediate_order"}
+        if payload is not None:
+            state["account_snapshot_precedes_order"] = True
+            payload["client_order_id"] = "luma-paper-" + os.urandom(12).hex()
+            intent = {"phase": "submission_intent", "cycle": cycle, "created_utc": now_utc(), "request": payload}
+            _write_alpaca_paper_intent(fd, intent)
+            state["unresolved_order"] = intent
+            _save_alpaca_paper_state(state)
+            submitted = True  # From here, even a timeout may mean the broker accepted it.
+            response = _alpaca_request("POST", base, "/v2/orders", key, secret, payload=payload)
+            order = response.get("data")
+            if not response.get("ok") or not isinstance(order, dict):
+                return hold("ambiguous_order_response_requires_reconciliation")
+            if (order.get("status") != "filled" or not isinstance(order.get("id"), str) or not order["id"].strip()
+                    or order.get("client_order_id") != payload["client_order_id"]
+                    or str(order.get("symbol", "")).upper().replace("/", "") != payload["symbol"].upper().replace("/", "")
+                    or order.get("side") != payload["side"]):
+                return hold("unconfirmed_or_mismatched_fill_requires_reconciliation")
+            qty, price = _alpaca_paper_number(order.get("filled_qty")), _alpaca_paper_number(order.get("filled_avg_price"))
+            if qty <= 0 or price <= 0 or not math.isfinite(float(qty * price)) or order["id"] in state["booked_order_ids"]:
+                return hold("invalid_or_repeated_fill_requires_reconciliation")
+            symbol = payload["symbol"]
+            if payload["side"] == "sell":
+                if qty != _alpaca_paper_number(payload["qty"]):
+                    return hold("incomplete_close_requires_reconciliation")
+                entry = _alpaca_paper_number(positions[symbol]["entry_price"])
+                pnl = (price - entry) * qty
+                total = _alpaca_paper_number(state.get("realized_pnl_usd", 0)) + pnl
+                if not math.isfinite(float(total)):
+                    return hold("invalid_fill_pnl_requires_reconciliation")
+                state["realized_pnl_usd"] = float(total)
+                state["trade_count"] = _i(state.get("trade_count"), 0) + 1
+                field = "wins" if pnl >= 0 else "losses"
+                state[field] = _i(state.get(field), 0) + 1
+                positions.pop(symbol)
+                event.update(entry_price=float(entry), pnl_usd=float(pnl), pnl_basis="gross_excludes_fees")
             else:
-                entry_error = f"buy_order_failed:{order_res.get('error', 'unknown')}"
+                if abs(qty * price - _alpaca_paper_number(payload["notional"])) > Decimal(".01"):
+                    return hold("fill_notional_mismatch_requires_reconciliation")
+                positions[symbol] = {"entry_price": str(price), "qty": str(qty), "opened_cycle": cycle, "order_id": order["id"]}
+            event.update(event_type="alpaca_true_paper_fill", side=payload["side"], symbol=symbol,
+                         qty=float(qty), fill_price=float(price), notional_usd=float(qty * price),
+                         order_id=order["id"], client_order_id=payload["client_order_id"], status="filled",
+                         truth="confirmed_broker_paper_fill")
+            state["booked_order_ids"].append(order["id"])
+            state["unresolved_order"]["accounting_applied"] = True
+            _save_alpaca_paper_state(state)
+            _append_alpaca_paper_event(event)
+            state.pop("unresolved_order")
+            state.update(last_action=payload["side"].upper(), last_reason="confirmed_immediate_fill")
+            _save_alpaca_paper_state(state)
+            submitted = False
         else:
-            entry_error = f"insufficient_notional:cash={account_cash:.6f}:min={entry_min_notional:.6f}"
-    elif not has_open and pick is None:
-        entry_error = "no_supported_candidate_above_edge_gate"
-
-    if not events:
-        events.append(
-            {
-                "timestamp_utc": now_utc(),
-                "cycle": cycle,
-                "event_type": "alpaca_true_paper_mark",
-                "action": "HOLD",
-                "source": "alpaca_paper_api",
-                "reason": reason,
-                "entry_error": entry_error,
-            }
-        )
-
-    for ev in events:
-        append_jsonl(ALPACA_TRUE_PAPER_LEDGER_FILE, ev)
-
-    state.update(
-        {
-            "last_tick_utc": now_utc(),
-            "profile": profile,
-            "initial_cash_usd": _f(state.get("initial_cash_usd"), account_cash) if _f(state.get("initial_cash_usd"), 0.0) > 0.0 else account_cash,
-            "last_action": action,
-            "last_reason": reason,
-            "last_error": entry_error,
-            "cash_usd": round(account_cash, 6),
-            "equity_usd": round(account_equity, 6),
-            "open_positions": open_positions,
-            "last_candidate": pick or {},
-            "supported_symbol_count": len(supported),
-            "data_truth_mode": "alpaca_paper_real_orders",
-        }
-    )
-    save_json(ALPACA_TRUE_PAPER_STATE_FILE, state)
-
-    return {
-        "ok": True,
-        "base_url": base,
-        "state": state,
-        "event": events[-1],
-        "events_count": len(events),
-        "positions_count": len(open_positions),
-        "supported_symbol_count": len(supported),
-        "ledger_file": str(ALPACA_TRUE_PAPER_LEDGER_FILE),
-        "state_file": str(ALPACA_TRUE_PAPER_STATE_FILE),
-    }
+            state.update(last_action="HOLD", last_reason="no_immediate_order")
+            _save_alpaca_paper_state(state)
+            _append_alpaca_paper_event(event)
+        result = {"ok": True, "base_url": base, "state": state, "event": event, "events_count": 1,
+                  "positions_count": len(positions), "requires_operator_reconciliation": False,
+                  "ledger_file": str(ALPACA_TRUE_PAPER_LEDGER_FILE), "state_file": str(ALPACA_TRUE_PAPER_STATE_FILE)}
+        return result
+    except (OSError, ValueError, TypeError, KeyError, ArithmeticError, RecursionError) as exc:
+        result = hold("paper_cycle_failed:" + type(exc).__name__)
+        return result
+    finally:
+        if fd is not None:
+            if not submitted and owned is not None and not _release_alpaca_paper_intent(lock_path, owned):
+                result.update(hold("order_lock_release_requires_reconciliation"))
+            os.close(fd)
 
 
 def run_alpaca_builder(python_exe: str) -> Dict[str, Any]:

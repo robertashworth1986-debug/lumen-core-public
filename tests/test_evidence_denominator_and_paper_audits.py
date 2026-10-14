@@ -175,6 +175,35 @@ def test_bad_ledger_headers(key, value):
     with pytest.raises(ValueError): paper.audit_paper_ledger(d)
 
 
+@pytest.mark.parametrize('location', ['as_of', 'event', 'mark'])
+def test_paper_timestamps_cannot_round_away_future_precision(location):
+    d = ledger()
+    if location == 'as_of':
+        d['as_of_utc'] = '2026-09-11T12:05:00.0000009Z'
+    elif location == 'event':
+        d['events'][-1]['time_utc'] = '2026-09-11T12:05:00.0000009Z'
+    else:
+        d['marks']['TEST']['time_utc'] = '2026-09-11T12:05:00.0000009Z'
+    with pytest.raises(ValueError, match='precision|timestamp'):
+        paper.audit_paper_ledger(d)
+
+
+@pytest.mark.parametrize('suffix', ['Z', '+00:00'])
+def test_paper_supported_utc_microseconds_preserve_cutoff(suffix):
+    d = ledger()
+    d['as_of_utc'] = '2026-09-11T12:05:00.123456' + suffix
+    d['marks']['TEST']['time_utc'] = d['as_of_utc']
+    assert paper.audit_paper_ledger(d)['net_paper_pnl'] == '13'
+
+
+@pytest.mark.parametrize('kind', [[], {}, True, None])
+def test_malformed_paper_event_kind_rejects_without_type_error(kind):
+    d = ledger()
+    d['events'][0]['type'] = kind
+    with pytest.raises(ValueError, match='event type'):
+        paper.audit_paper_ledger(d)
+
+
 @pytest.mark.parametrize('key,value', [('fee', '-1'), ('fee', 'Infinity'), ('quantity', '0'),
     ('quantity', '3'), ('price', '0'), ('id', 'b1'), ('type', 'order'),
     ('instrument', '../bad'), ('time_utc', '2026-09-11T12:00:30Z'), ('time_utc', '2026-09-11T13:00:00Z')])

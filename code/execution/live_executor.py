@@ -51,6 +51,15 @@ def _guarded_kraken_private(
 # preserved executor without changing the 10,000-line implementation.
 _legacy.KrakenClient._private = _guarded_kraken_private
 
+
+def _no_rolling_research_preference() -> None:
+    """Retrospective rolling research cannot choose an execution preference."""
+    return None
+
+
+# Preserve the historical source bytes while closing this active facade path.
+_legacy._preferred_live_symbol = _no_rolling_research_preference
+
 from live_executor_legacy import *  # noqa: E402,F401,F403
 
 # Make the protected class explicit for tools that inspect module attributes.

@@ -25,7 +25,9 @@ def amount(value: Any, positive: bool = False) -> Decimal:
 
 
 def utc(value: Any) -> datetime:
-    require(isinstance(value, str), "UTC timestamp required")
+    require(isinstance(value, str) and bool(re.fullmatch(
+        r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,6})?(?:Z|\+00:00)", value
+    )), "UTC timestamp must use supported microsecond precision")
     result = datetime.fromisoformat(value.replace("Z", "+00:00"))
     require(result.tzinfo is not None and result.utcoffset().total_seconds() == 0, "UTC timestamp required")
     return result.astimezone(timezone.utc)
@@ -51,7 +53,7 @@ def audit_paper_ledger(data: dict) -> dict:
             require(isinstance(event, dict), "Event must be an object")
             base = {"id", "time_utc", "type"}
             kind = event.get("type")
-            require(kind in {"deposit", "withdrawal", "buy", "sell", "fee"}, "Unsupported event type")
+            require(isinstance(kind, str) and kind in {"deposit", "withdrawal", "buy", "sell", "fee"}, "Unsupported event type")
             wanted = base | ({"instrument", "quantity", "price", "fee"} if kind in {"buy", "sell"} else {"amount"})
             require(set(event) == wanted, "Unexpected event fields")
             identity = event["id"]

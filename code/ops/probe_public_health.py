@@ -12,12 +12,25 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import time
 from urllib.parse import urlencode, urlsplit, urlunsplit
 import uuid
+
+HEALTH_MAX_AGE_SECONDS = 300
+PUBLIC_FIELDS = {
+    "status": "ok", "service": "luma-experience-gateway",
+    "access_boundary": "operator_api_v1", "public_surface": "minimal",
+}
+# Require an explicit timezone and reject precision Python would silently drop.
+HEALTH_TIMESTAMP = re.compile(
+    r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]{1,6})?(?:Z|[+-][0-9]{2}:[0-9]{2})"
+)
 
 MARKERS = {
     "home": "proof-to-pilot-home-v1",
@@ -65,8 +78,47 @@ def same_origin(left: str, right: str) -> bool:
         return False
 
 
+def _unique_object(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def _finite_float(value: str) -> float:
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("non-finite JSON number")
+    return number
+
+
+def _reject_constant(value: str) -> None:
+    raise ValueError("non-finite JSON constant")
+
+
+def _health_age(value: object, now: datetime) -> tuple[str, float | None]:
+    if not isinstance(value, str) or HEALTH_TIMESTAMP.fullmatch(value) is None:
+        return "invalid", None
+    if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
+        return "invalid_reference_time", None
+    try:
+        stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        # Reject invalid offset minutes that fromisoformat otherwise normalizes.
+        if value[-1] != "Z" and (int(value[-5:-3]) > 23 or int(value[-2:]) > 59):
+            return "invalid", None
+        age = (now - stamp).total_seconds()
+    except (ValueError, OverflowError):
+        return "invalid", None
+    if age < 0:
+        return "future", age
+    return ("fresh" if age <= HEALTH_MAX_AGE_SECONDS else "stale"), age
+
+
 def classify(contract: str, status: int, content_type: str, body: bytes,
-             *, transport_ok: bool, same_origin_ok: bool) -> dict:
+             *, transport_ok: bool, same_origin_ok: bool,
+             now: datetime | None = None) -> dict:
     static = contract in MARKERS
     if not static and contract not in ("public_status", "gateway_health"):
         raise ValueError(f"unknown endpoint contract: {contract}")
@@ -80,20 +132,37 @@ def classify(contract: str, status: int, content_type: str, body: bytes,
                               and content_type.lower().startswith("text/html")
                               and MARKERS[contract].encode() in body)
     else:
+        row.update({"json_ok": False, "freshness": "unknown" if contract == "gateway_health"
+                    else "not_provided_by_contract", "age_seconds": None,
+                    "validation_error": None})
         try:
-            payload = json.loads(body) if http_ok else None
+            payload = json.loads(body.decode("utf-8"), object_pairs_hook=_unique_object,
+                                 parse_constant=_reject_constant, parse_float=_finite_float) if http_ok else None
             row["json_ok"] = http_ok and isinstance(payload, dict)
-        except (ValueError, UnicodeError):
+        except (ValueError, UnicodeError, RecursionError):
             payload, row["json_ok"] = None, False
         row["reachable"] = http_ok and row["json_ok"]
-        if row["json_ok"] and same_origin_ok:
-            row["contract_ok"] = all(payload.get(k) == v for k, v in {
-                "status": "ok", "service": "luma-experience-gateway",
-                "access_boundary": "operator_api_v1", "public_surface": "minimal",
-            }.items())
+        expected_keys = set(PUBLIC_FIELDS) | ({"generated_utc"} if contract == "gateway_health" else set())
+        if not transport_ok:
+            row["validation_error"] = "transport_failure"
+        elif status != 200:
+            row["validation_error"] = "unexpected_http_status"
+        elif not same_origin_ok:
+            row["validation_error"] = "unexpected_origin"
+        elif content_type.partition(";")[0].strip().lower() != "application/json":
+            row["validation_error"] = "unexpected_media_type"
+        elif not row["json_ok"]:
+            row["validation_error"] = "invalid_json_object"
+        elif set(payload) != expected_keys or any(payload[key] != value for key, value in PUBLIC_FIELDS.items()):
+            row["validation_error"] = "public_schema_mismatch"
+        else:
+            row["contract_ok"] = True
             if contract == "gateway_health":
-                generated = payload.get("generated_utc")
-                row["contract_ok"] &= isinstance(generated, str) and bool(generated)
+                freshness, age = _health_age(payload["generated_utc"], now if now is not None else datetime.now(timezone.utc))
+                row.update({"freshness": freshness, "age_seconds": age,
+                            "contract_ok": freshness == "fresh"})
+                if not row["contract_ok"]:
+                    row["validation_error"] = "health_timestamp_" + freshness
     row["ok"] = row["contract_ok"]
     return row
 

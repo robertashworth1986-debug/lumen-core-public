@@ -4,6 +4,34 @@ This document records the current repository consolidation state after reviewing
 
 ## Canonical product spine
 
+### October 14, 2026 authorized merge and continuation
+
+The founder requested review and merge of compatible drafts. PR #253 merged at
+`22dc828ccabc3d14accbc9b3e3f3316b8d2f6464` after all 15 applicable head workflows
+passed, including the full suite, both CodeQL languages and separate Windows
+and native C jobs. The hosted full suite recorded 1,773 tests and 307 subtests
+passing with eight explicit skips. The merge retained the exact tested tree;
+it did not deploy a runtime or change financial authority.
+
+The 25 other open PRs were triaged separately. Drafts #221, #249 and #250 have
+failing pin/dependency/lock checks and are not merge candidates unchanged.
+Preflight-only #252 awaits actual deployment evidence; research #216 is stacked
+on missing predecessor material. Neither is promoted by mechanical mergeability.
+PR #203's coordinated CodeQL pin/verifier update merged at
+`7d871ccdcbd59b2ebb200773470f165e2f918cce` after reconciliation with current main
+and all seven applicable workflows passed. Its hosted full suite recorded
+1,774 tests and 307 subtests passing with eight explicit skips. Useful strict
+public-health validation from #211 is ported
+into the existing observer; its superseded workflow is not restored. Other
+conflicting, superseded or separately scoped drafts retain their history and
+require a specific integration review. No branch is deleted or bulk merged.
+
+The current paper-readiness continuation advances outcome 2 by correcting
+startup flags, market chronology, confirmed paper-fill accounting, timestamp
+acceptance and health-contract validation. The reviewed consumers exclude
+retrospective rolling research from execution preferences. Real-order activation remains separate from code
+merge; tests cannot establish net performance, fills or broker reconciliation.
+
 ### October 8, 2026 queue reconciliation
 
 The founder authorized source commits and merges. All 26 then-open PR heads

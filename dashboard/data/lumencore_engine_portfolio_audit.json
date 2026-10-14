@@ -4,7 +4,7 @@
   "execution_verified_by_this_audit": false,
   "customer_acceptance_verified_by_this_audit": false,
   "observed_maturity_contract": "Legacy compatibility enum derived only from configured tracked-file presence; it does not establish execution, test results, operational readiness or customer acceptance.",
-  "generated_at_utc": "2026-10-14T06:25:33.815944Z",
+  "generated_at_utc": "2026-10-14T16:44:19.743410Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
   "source_registry_sha256": "1d6930af5d20338210f82b8f6fbf368474d3f793a15de8009a7a5cfabb01c705",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
@@ -1093,6 +1093,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "19d36a89bf1b9d9c7710ee94433a75b3524ec7f41d6f32fb22ca442f6743bb62"
+    "payload_sha256": "481be15b3448d11cc90b90fba4595c6630ce67ed3018bfe0cd4a4bbed5a49f4e"
   }
 }

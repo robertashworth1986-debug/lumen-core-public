@@ -7,6 +7,32 @@
 
 ## One commercial sentence
 
+### October 14 authorized merges and paper-readiness repairs
+
+The founder explicitly requested review and merge of compatible draft changes
+and further trading-readiness work. PR #253 merged at
+`22dc828ccabc3d14accbc9b3e3f3316b8d2f6464`, retaining the exact source tree whose
+15 applicable workflows passed. Its hosted full suite recorded 1,773 tests and
+307 subtests passing with eight documented skips. This is first-party source
+verification; no runtime installation or real-money order authority follows.
+PR #203's coordinated CodeQL update then merged at
+`7d871ccdcbd59b2ebb200773470f165e2f918cce` after all seven applicable workflows
+passed, including 1,774 tests and 307 subtests with eight explicit skips.
+
+The existing PR consolidation map records the triage of the 25 other drafts
+inspected after #253, including #203. This bounded source
+pass tightens paper startup flags, candle chronology/freshness, confirmed-fill
+accounting, paper timestamp acceptance and public-health validation. The active
+paper reader and executor facade exclude retrospective rolling research from
+execution preferences; archived consumers retain their original bytes. Unknown
+unrealized profit and unreconciled returns remain unknown in the report and
+display. The readiness dossier now names the unresolved fill, account,
+daily-risk, after-cost performance and runtime-evidence
+requirements. Local fields labeled live, filled, measured or daily cannot close
+those requirements by themselves. Paper mode, order blocks and production HOLD
+remain; no broker connection, order, credential or financial-control activation
+is performed by this continuation.
+
 ### October 14 bounded reviewer continuation
 
 Founder-directed archive recovery and repository preparation advance outcome 2,
