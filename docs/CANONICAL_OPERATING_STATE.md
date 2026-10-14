@@ -7,6 +7,52 @@
 
 ## One commercial sentence
 
+### October 14 public static repair preflight — pending deployment
+
+Founder-requested repair advances outcome 2 by restoring the existing reviewer
+surface to its reviewed source. Current main is
+`3c61648e593e5e036681f9c32dd82bce18ef3970`. The October 13 19:01 UTC
+[custom-domain audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/38451404101)
+recorded 190 of 246 matches, five mismatches and 51 HTTP 404 responses. The
+five mismatches are the homepage, `robots.txt`, `sitemap.xml`, and the ProofLock
+console's `app.js` and `prooflock_core.js`. The unavailable collections are
+Bounded Light, portfolio, rights and art. A fresh cache-busted HTTPS-proxy sample
+at October 14 00:32 UTC reproduced those five mismatches and all four collection
+doorway 404s. This sample does not establish the VPS filesystem or routing cause.
+
+The separate Pages deployment published to the repository's `github.io` host;
+it did not establish deployment to `lumen-core.ai`. The custom-domain audit
+completed before that Pages deployment. The prior attribution of increased
+live drift to the Pages deployment is unsupported; newer source changed the
+expected bytes while the custom domain continued serving older content.
+
+The existing 246-file package was rebuilt from immutable main Git blobs. Archive
+SHA-256 is `316e1cf27862dd569688b75e8b0d6ea4fc11c842230c12e455e8e279ed08b92c`,
+identical to the subject signed and verified by both jobs in
+[supply-chain run 38451404074](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/38451404074).
+Local inventory and attestation-policy checks passed with complete coverage.
+The two existing deployment/supply-chain test modules passed 86 tests on Python
+3.12.14 / pytest 9.1.0; four POSIX installation fixtures skipped because the
+local process is root and test mode deliberately refuses root. The environment
+also refused a non-root test-user switch. These skips are not passes or a
+current full-suite receipt.
+
+Installation remains pending. The connected GitHub tools do not expose workflow
+dispatch, and this execution environment has no configured VPS or GitHub CLI
+credential. The canonical action is the existing exact-main VPS release workflow
+with `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT`, its production environment gate,
+signature checks, bounded file application and rollback capture. Do not bypass
+that lane, weaken the audit, reinstall the generic Nginx template or infer live
+recovery from the prepared archive. Verify all 246 public file hashes/MIME types
+and repeat the four-round public health sampler after installation. Local apply
+failure triggers rollback; a later public HTTP-verification failure retains the
+captured rollback state and requires separate review.
+
+No production mutation or runtime repair occurred in this preflight. The
+minimal public gateway and the four legacy structured-feed contracts remain
+separate lanes; issue #234 stays open. TLS expiry, runtime provenance, independent
+validation, buyer acceptance and sustained uptime remain unestablished.
+
 ### October 13 reviewer-readiness and trading repairs
 
 Founder-authorized current-source repairs advance outcome 2: one bounded external
