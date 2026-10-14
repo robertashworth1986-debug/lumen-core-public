@@ -1,9 +1,9 @@
 {
   "schema": "lumencore.external_technical_review_packet.v1",
-  "generated_at_utc": "2026-10-14T16:44:10Z",
+  "generated_at_utc": "2026-10-14T16:50:04Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "source_config": "config/external_technical_review_packet_v1.json",
-  "source_config_sha256": "a681911899c0f2dcc18f5011ea300c322690e64bb9f86b013d8960f58be3cca8",
+  "source_config_sha256": "a9d2a6e385f227e387adc9d88d1d77e71d474b2878492c8a6a5cb14fd32ad71f",
   "template_config_sha256": "0cfbda7dfd68aff39eab6a07676b0b44b13fb4455a0530fb3b3663f05a19e148",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -137,8 +137,8 @@
     {
       "path": "docs/REVIEWER_START_HERE.md",
       "purpose": "Current-source reproduction route, dated repair scope and remaining gates.",
-      "bytes": 29888,
-      "sha256": "fb81588df8d4a74b88379bd32c909dc711f2af3697de44c797704400ab6f3970",
+      "bytes": 30109,
+      "sha256": "7035f56a1d6ff8ee02e4184f90b235ff795156c44b892b9b2a89aff36d63cd03",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -317,8 +317,8 @@
     {
       "path": "code/multi_exchange_paper_ticker.py",
       "purpose": "Confirmed paper-fill accounting and persisted unresolved-intent submission block; no real-order authority.",
-      "bytes": 148113,
-      "sha256": "27c6a015963d22d5a4bab3e10f57f9fee9c1916a24d9e0281a9aef585798f914",
+      "bytes": 148173,
+      "sha256": "437f73c47549ca2f2d3a625fbc4c38b1d5d6b9c5bce654fce51177edfd95bffe",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -326,8 +326,8 @@
     {
       "path": "tests/test_alpaca_paper_fill_accounting.py",
       "purpose": "Offline accepted/unfilled, ambiguous transport, restart and accounting failure counterexamples.",
-      "bytes": 18169,
-      "sha256": "0278e9c94fa606de7f3d99c52c1291e989dd281595c72634ce645f78e08f8dd5",
+      "bytes": 19974,
+      "sha256": "1a4689cf947a25f695fed9c3e62fe7200e68392c7fe94c4727b1de1ed24f6e2b",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null

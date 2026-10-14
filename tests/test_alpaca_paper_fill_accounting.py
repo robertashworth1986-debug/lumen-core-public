@@ -1,5 +1,6 @@
 """Offline broker responses cannot turn acknowledgments into paper fills."""
 import json
+import hashlib
 import os
 import subprocess
 import sys
@@ -356,3 +357,37 @@ def test_deposit_is_not_reported_as_trading_profit(monkeypatch):
     assert portfolio["return_pct"] is None
     assert portfolio["equity_change_pct"] == 1
     assert portfolio["unrealized_pnl_usd"] is None
+
+
+def test_separate_manifest_hashes_final_report_bytes_and_survives_readback(tmp_path, monkeypatch):
+    names = ["STATUS_FILE", "BINANCEUS_PAPER_LEDGER_FILE", "BINANCEUS_PAPER_STATE_FILE",
+             "BINANCEUS_PAPER_SCOREBOARD_FILE", "ALPACA_TRUE_PAPER_STATE_FILE",
+             "ALPACA_TRUE_PAPER_LEDGER_FILE", "INSTITUTIONAL_PAPER_REPORT_FILE",
+             "INSTITUTIONAL_PAPER_HASH_FILE"]
+    for name in names:
+        path = tmp_path / (name.lower() + ".json")
+        monkeypatch.setattr(ticker, name, path)
+        if name not in ("INSTITUTIONAL_PAPER_REPORT_FILE", "INSTITUTIONAL_PAPER_HASH_FILE"):
+            path.write_text('{"fixture":"offline"}')
+    original_save = ticker.save_json
+    report_writes = []
+
+    def save(path, data):
+        if path == ticker.INSTITUTIONAL_PAPER_REPORT_FILE:
+            report_writes.append(1)
+        original_save(path, data)
+
+    monkeypatch.setattr(ticker, "save_json", save)
+    monkeypatch.setattr(ticker.requests, "request", lambda *a, **k: pytest.fail("network forbidden"))
+    returned = ticker.build_institutional_crypto_paper_report({}, 1000, False)
+    report_bytes = ticker.INSTITUTIONAL_PAPER_REPORT_FILE.read_bytes()
+    saved_report = json.loads(report_bytes)
+    manifest_path = Path(saved_report["artifact_hash_file"])
+    assert manifest_path == ticker.INSTITUTIONAL_PAPER_HASH_FILE
+    manifest = json.loads(manifest_path.read_bytes())
+    report_entry = next(entry for entry in manifest["files"]
+                        if entry["path"] == str(ticker.INSTITUTIONAL_PAPER_REPORT_FILE))
+    assert report_entry["sha256"] == hashlib.sha256(report_bytes).hexdigest()
+    assert returned == saved_report
+    assert "artifact_hashes" not in saved_report  # No self-referential hash copies.
+    assert report_writes == [1]

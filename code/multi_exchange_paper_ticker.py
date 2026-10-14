@@ -1736,6 +1736,9 @@ def build_institutional_crypto_paper_report(payload: Dict[str, Any], seed_capita
             "equity_change_pct_basis": "includes_external_flows_not_strategy_return",
             "return_pct_status": "unknown_cash_flows_not_reconciled",
         })
+    # Finalize the report before hashing it. The separate manifest can bind the
+    # complete report bytes without embedding an impossible self-referential hash.
+    report["artifact_hash_file"] = str(INSTITUTIONAL_PAPER_HASH_FILE)
     save_json(INSTITUTIONAL_PAPER_REPORT_FILE, report)
 
     hashes = {
@@ -1751,9 +1754,6 @@ def build_institutional_crypto_paper_report(payload: Dict[str, Any], seed_capita
         ],
     }
     save_json(INSTITUTIONAL_PAPER_HASH_FILE, hashes)
-    report["artifact_hash_file"] = str(INSTITUTIONAL_PAPER_HASH_FILE)
-    report["artifact_hashes"] = hashes["files"]
-    save_json(INSTITUTIONAL_PAPER_REPORT_FILE, report)
     return report
 
 

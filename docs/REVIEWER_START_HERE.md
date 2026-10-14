@@ -129,6 +129,9 @@ not call inventory value profit: unrealized P&L and unreconciled returns remain
 unknown in the report, dashboard and brief. Account snapshot timing is separate
 from the post-fill local position projection; equity change includes external
 flows and is not a strategy return.
+The separate report manifest hashes the finalized report bytes, with no
+self-referential rewrite. Other runtime files remain mutable; this is a
+point-in-time hash manifest, not an atomic immutable archive of the account.
 
 The existing health observer now checks the exact minimal JSON contract and
 the health timestamp against a five-minute cutoff. Public status has no source

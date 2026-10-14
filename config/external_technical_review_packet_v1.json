@@ -1,6 +1,6 @@
 {
   "schema": "lumencore.external_technical_review_packet_config.v1",
-  "generated_at_utc": "2026-10-14T16:44:10Z",
+  "generated_at_utc": "2026-10-14T16:50:04Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
