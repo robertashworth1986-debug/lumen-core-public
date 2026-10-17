@@ -5,6 +5,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "code" / "ops" / "build_public_live_breadth_manifest.py"
@@ -68,6 +70,7 @@ def fixture_governance(module) -> dict:
                 "minimum_rows": 100,
                 "max_age_hours": 2,
                 "dataset_snapshot_sha256": "a" * 64,
+                "dataset_snapshot_observed_utc": "2026-08-08T09:15:00+00:00",
             },
             "PRIVATE_PROVIDER_B": {
                 "rights_status": "unknown",
@@ -94,6 +97,7 @@ def test_manifest_separates_probe_success_from_review_readiness() -> None:
     assert manifest["summary"]["probe_success_sources"] == 2
     assert manifest["summary"]["material_row_depth_sources"] == 1
     assert manifest["summary"]["fresh_sources"] == 1
+    assert manifest["summary"]["fresh_dataset_sources"] == 1
     assert manifest["summary"]["review_ready_sources"] == 1
     assert manifest["claim_gate"]["review_ready_source_count_claim_allowed"] is True
     assert manifest["claim_gate"]["performance_claim_allowed"] is False
@@ -121,6 +125,112 @@ def test_manifest_is_public_safe_and_omits_provider_and_credential_names() -> No
     assert "$" not in markdown
     assert manifest["source_snapshot"]["source_names_disclosed"] is False
     assert manifest["source_snapshot"]["credential_field_names_disclosed"] is False
+
+
+@pytest.mark.parametrize(
+    ("observed", "expected_status"),
+    [
+        (None, "unknown"),
+        ("", "unknown"),
+        ("not-a-date", "unknown"),
+        ("2026-08-08T09:00:00", "unknown"),
+        ("2020-01-01T00:00:00Z", "stale"),
+        ("2026-08-08T07:59:59.999Z", "stale"),
+        ("2027-01-01T00:00:00Z", "invalid_future_timestamp"),
+    ],
+)
+def test_fresh_probe_cannot_promote_an_unfresh_or_unclocked_dataset(
+    observed, expected_status
+) -> None:
+    module = load_module()
+    governance = fixture_governance(module)
+    governance["sources"]["PRIVATE_PROVIDER_A"]["dataset_snapshot_observed_utc"] = observed
+    governance = module.seal_governance(governance)
+    manifest = module.build_manifest(
+        fixture_registry(), "b" * 64, governance, "2026-08-08T10:00:00Z"
+    )
+    source = next(row for row in manifest["sources"] if row["sector"] == "energy")
+
+    assert source["probe_status"] == "passed"
+    assert source["freshness_status"] == "passed"
+    assert source["dataset_snapshot_bound"] is True
+    assert source["dataset_freshness_status"] == expected_status
+    assert source["review_ready"] is False
+    assert manifest["summary"]["fresh_sources"] == 1
+    assert manifest["summary"]["fresh_dataset_sources"] == 0
+    assert manifest["summary"]["review_ready_sources"] == 0
+    assert manifest["claim_gate"]["review_ready_source_count_claim_allowed"] is False
+    assert module.verify_manifest(manifest) is True
+
+
+@pytest.mark.parametrize("observed", ["2026-08-08T08:00:00Z", "2026-08-08T03:00:00-05:00"])
+def test_dataset_freshness_includes_exact_threshold_and_normalizes_timezone(observed) -> None:
+    module = load_module()
+    governance = fixture_governance(module)
+    governance["sources"]["PRIVATE_PROVIDER_A"]["dataset_snapshot_observed_utc"] = observed
+    manifest = module.build_manifest(
+        fixture_registry(), "b" * 64, module.seal_governance(governance), "2026-08-08T10:00:00Z"
+    )
+    source = next(row for row in manifest["sources"] if row["sector"] == "energy")
+    assert source["dataset_snapshot_observed_utc"] == "2026-08-08T08:00:00+00:00"
+    assert source["dataset_snapshot_age_hours"] == 2
+    assert source["dataset_freshness_status"] == "passed"
+    assert source["review_ready"] is True
+
+
+@pytest.mark.parametrize("threshold", [float("inf"), float("nan"), "Infinity", 0, -1, True])
+def test_unbounded_or_invalid_max_age_cannot_promote_dataset(threshold) -> None:
+    module = load_module()
+    governance = fixture_governance(module)
+    governance["sources"]["PRIVATE_PROVIDER_A"]["max_age_hours"] = threshold
+    manifest = module.build_manifest(
+        fixture_registry(), "b" * 64, module.seal_governance(governance), "2026-08-08T10:00:00Z"
+    )
+    source = next(row for row in manifest["sources"] if row["sector"] == "energy")
+    assert source["max_age_hours"] is None
+    assert source["dataset_freshness_status"] == "threshold_missing"
+    assert manifest["summary"]["review_ready_sources"] == 0
+    assert manifest["claim_gate"]["review_ready_source_count_claim_allowed"] is False
+
+
+def test_fresh_dataset_cannot_hide_stale_probe() -> None:
+    module = load_module()
+    registry = fixture_registry()
+    registry["rows"][0]["last_probe_utc"] = "2026-08-07T10:00:00Z"
+    manifest = module.build_manifest(
+        registry, "b" * 64, fixture_governance(module), "2026-08-08T10:00:00Z"
+    )
+    source = next(row for row in manifest["sources"] if row["sector"] == "energy")
+    assert source["freshness_status"] == "stale"
+    assert source["dataset_freshness_status"] == "passed"
+    assert source["review_ready"] is False
+    assert manifest["claim_gate"]["review_ready_source_count_claim_allowed"] is False
+
+
+@pytest.mark.parametrize("field", ["rows", "minimum_rows"])
+def test_fractional_row_count_or_threshold_cannot_be_rounded_into_a_pass(field) -> None:
+    module = load_module()
+    registry = fixture_registry()
+    governance = fixture_governance(module)
+    if field == "rows":
+        registry["rows"][0][field] = 100.5
+    else:
+        governance["sources"]["PRIVATE_PROVIDER_A"][field] = 99.5
+    manifest = module.build_manifest(
+        registry, "b" * 64, module.seal_governance(governance), "2026-08-08T10:00:00Z"
+    )
+    assert manifest["summary"]["review_ready_sources"] == 0
+    assert manifest["claim_gate"]["review_ready_source_count_claim_allowed"] is False
+
+
+def test_registry_age_is_not_rounded_down_into_a_pass() -> None:
+    module = load_module()
+    registry = fixture_registry()
+    registry["generated_utc"] = "2026-08-08T07:59:59.999Z"
+    manifest = module.build_manifest(
+        registry, "b" * 64, fixture_governance(module), "2026-08-08T10:00:00Z"
+    )
+    assert manifest["claim_gate"]["review_ready_source_count_claim_allowed"] is False
 
 
 def test_missing_governance_fails_closed() -> None:

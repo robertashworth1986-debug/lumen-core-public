@@ -20,11 +20,82 @@ to receive regulated or confidential buyer data without additional controls.
 
 **Production decision: `HOLD`.**
 
+## Trading readiness checks — October 14
+
+The source repairs merged in PR #253 improve correctness and access controls;
+they do not establish an executable trading edge or verified account state.
+The repository's `live_data_no_orders` policy and paper-only startup checks
+remain in force. Software checks, operational evidence and actual financial
+authority are separate decisions.
+
+| Check | Current evidence or defect | Evidence still required |
+|---|---|---|
+| Market observations | Current rolling wrappers validate supplied closed-candle cadence, finite prices and receipt-time freshness; failed screens clear the prior candidate. Retrospective research rankings are excluded from execution preferences. | Authenticate the actual deployed producer, source clock/publication history and raw data custody; source tests do not establish current market availability. |
+| Order and fill state | The paper ticker requires a terminal attributable fill with explicit quantity/price. A durable local intent blocks another submission after pending, partial or ambiguous responses. Legacy state requires reconciliation. | Actual broker records, outstanding-order and partial-fill reconciliation, fees and exercised recovery; local immediate-fill tests do not establish a complete order-management service. |
+| Account reconciliation | Local JSONL/CSV custody and synthetic cash checks exist. No actual account statement was evaluated in this continuation. | Reconcile opening cash, transfers, positions, fills, fees and closing equity to independently obtained account records. Deposits are not profit. |
+| Risk limits | Legacy checks feed cumulative P&L into a field named daily P&L and use assumed liquidity inputs. | A defined timezone/day boundary, reconciled net daily losses, accepted exposure/position limits, venue constraints and exercised stop/recovery behavior. |
+| After-cost performance | Historical candidates retain selection bias, reused data, modeled fills and incomplete comparators. | Frozen selection rules, declared adverse cases and a prospective paper sample assessed after fees, spread, slippage, rejected/partial fills and operating costs. Preserve failures and missing periods. |
+| Runtime identity | Source/CI checks are available; earlier deployment and ledger-ownership defects have dated receipts only. | Current deployment identity, protected credentials with least privilege, producer ownership, source-age observations and tested restart/recovery readback. |
+
+Passing a row's software tests does not close its operating-evidence requirement.
+No threshold, risk budget or strategy has been selected here to justify placing
+real-money orders, and no credential, runtime configuration or live gate is
+changed by this dossier.
+
 The first credible transaction remains a bounded Buyer-Owned Baseline
 Validation Sprint: one authorized source, one accepted incumbent baseline, one
 locked primary metric and threshold, one replayable evidence package, and one
 explicit decision. A neutral, incomplete, or negative result remains a valid
 deliverable.
+
+## October 4 operational check
+
+Current main `39b20a3f3af0d8410529fd2081456575a3c04a1c` passed the
+[full first-party repository suite](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223735):
+1,221 tests and 82 subtests passed; eight tests were skipped and five warnings
+remain. The skips cover artifact-dependent checks, optional Zig and Windows-only
+PowerShell coverage. Both CodeQL language checks also passed. These results
+support the reviewed source; they do not certify the institution or product.
+
+Its [live-domain audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37237223673)
+failed: 192/240 exact file matches, three mismatches and 45 missing files.
+`HOLD_PUBLIC_RELEASE_PROMOTION` remains in effect until the approved current
+release passes exact-byte verification. Earlier successful 43-file releases
+below remain historical evidence only. Branch protection and required status
+checks were observed as unenforced; the ruleset list was empty. Those settings
+were not changed by this source update.
+
+## Proposed required-check policy
+
+The following minimal policy is prepared for `main`; it is **not installed**.
+The connected repository tools cannot write branch protection or rulesets.
+These five uniquely named contexts run on every pull request. The full suite
+includes immutable release packaging, rollback, MIME and live-verifier unit
+coverage; a successful unit test is not a successful production deployment.
+
+| Required status context | Expected app | Purpose |
+|---|---|---|
+| `Full repository suite (bounded first-party)` | GitHub Actions | Entire pinned Python test collection, including release regressions |
+| `Readiness register and claim boundaries` | GitHub Actions | Bounded readiness register, limits and adversarial checks |
+| `Analyze python` | GitHub Actions | Python CodeQL analysis |
+| `Analyze javascript-typescript` | GitHub Actions | JavaScript/TypeScript CodeQL analysis |
+| `Dependency review` | GitHub Actions | Pull-request dependency policy |
+
+In repository **Settings → Rules → Rulesets**, add an active branch ruleset
+for `refs/heads/main`, require a pull request and these five checks, and require
+the branch to be up to date before merging. Select GitHub Actions as the expected
+check source (observed app ID `15368`). Block force pushes and branch deletion.
+Do not add a bypass actor or change write permissions. Do not require an
+unavailable second reviewer for this single-founder workflow; independent
+scientific review remains its own explicit external-validation gate.
+
+Before activating, confirm the renamed checks have successful receipts on a
+current pull request and re-read existing settings to avoid overwriting any
+new protection. The exact-live audit and signed production attestation belong
+to the existing deployment gate, not this pre-merge list. Dynamic AI review is
+an additional service and is not substituted for CodeQL or the full suite.
+Setting this policy does not supply certification, buyer acceptance, security
+assessment or any other external readiness evidence.
 
 ## Control register
 

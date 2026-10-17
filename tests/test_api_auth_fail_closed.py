@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
 import pytest
+import httpx
 from fastapi import FastAPI, HTTPException
-from fastapi.testclient import TestClient
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +37,16 @@ AUTH_CASES = (
 ALL_AUTH_ENV_NAMES = {
     name for _, env_names, _ in AUTH_CASES for name in env_names
 }
+
+
+def _get(app: FastAPI, route: str, **kwargs) -> httpx.Response:
+    async def request() -> httpx.Response:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://testserver"
+        ) as client:
+            return await client.get(route, **kwargs)
+
+    return asyncio.run(request())
 
 
 def _clear_auth_config(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -81,7 +92,7 @@ def test_protected_router_denies_when_api_token_config_is_missing(
     app = FastAPI()
     app.include_router(module.router)
 
-    response = TestClient(app).get(route)
+    response = _get(app, route)
 
     assert response.status_code == 503
     assert response.json() == {"detail": "api authentication is not configured"}
@@ -144,7 +155,7 @@ def test_query_string_token_is_not_an_accepted_auth_mechanism(
     app = FastAPI()
     app.include_router(module.router)
 
-    response = TestClient(app).get(route, params={"token": token})
+    response = _get(app, route, params={"token": token})
 
     assert response.status_code == 401
     assert response.json() == {"detail": "missing api token"}
@@ -166,8 +177,6 @@ def test_router_keeps_app_health_and_docs_public(
         return {"status": "ok"}
 
     app.include_router(module.router)
-    client = TestClient(app)
-
-    assert client.get("/health").status_code == 200
-    assert client.get("/docs").status_code == 200
-    assert client.get("/openapi.json").status_code == 200
+    assert _get(app, "/health").status_code == 200
+    assert _get(app, "/docs").status_code == 200
+    assert _get(app, "/openapi.json").status_code == 200

@@ -51,6 +51,14 @@ the reviewer identity reference, conflict disclosure, immutable source,
 environment, timestamps, attestation, six artifact hashes, nested capsule facts,
 and preserved negative gates reconcile.
 
+The 31 assertions comprise five frozen-input checks and 26 suite checks
+(nine wave, ten residual and seven synthetic checks). The current administrative
+verifier counts both groups, checks their identities and expected values against
+the reviewed protocol pin, recomputes pass decisions and reconciles fact
+projections and hashes. A runner exception can remain a documented non-pass
+without inventing missing assertions. Altered promotion, coverage, field or
+operational gates cannot support an accepted receipt.
+
 ## Interpretation
 
 `DOCUMENTED_INDEPENDENT_REPRODUCTION_PASS` supports one bounded independent
@@ -63,6 +71,13 @@ The verifier does not cryptographically prove the reviewer's real-world identity
 The identity reference and evidence URL must therefore remain available for human
 or institutional reconciliation. Formal CODECHECK assignment and certification
 remain separate external gates.
+
+The current template requires `employed_or_contracted_by_lumencore=false`,
+separately from `paid_for_favorable_result=false`. A commissioned engineering
+review can provide useful external judgment, but it does not meet this template's
+executor-eligibility rule. Record a compensated review as such; do not attest
+that a contracted reviewer is uncontracted. Changing that eligibility policy
+requires an explicit, disclosed template revision.
 
 ## HumanUnlock
 

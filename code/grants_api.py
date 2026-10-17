@@ -38,6 +38,16 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Res
 from pydantic import BaseModel
 
 from application_context_resolver import load_application_profile, resolve_application_context
+from grant_application_factory import (
+    BundleIntegrityError, bundle_lock, refresh_bundle_manifest, verified_bundle_files,
+)
+
+
+def _verified_bundle(run: Path) -> dict[str, bytes]:
+    try:
+        return verified_bundle_files(run)
+    except (BundleIntegrityError, OSError, UnicodeError) as exc:
+        raise HTTPException(status_code=409, detail="bundle integrity check failed; regenerate a fresh draft") from exc
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -175,7 +185,10 @@ def _run_factory(args: list[str]) -> dict:
     except Exception:
         raise HTTPException(status_code=500,
                             detail="grant factory is unavailable")
-    rc = factory_main(args)
+    try:
+        rc = factory_main(args)
+    except (BundleIntegrityError, OSError, UnicodeError) as exc:
+        raise HTTPException(status_code=409, detail="bundle integrity check failed; regenerate a fresh draft") from exc
     if rc != 0:
         raise HTTPException(status_code=500,
                             detail=f"factory returned non-zero: {rc}")
@@ -542,11 +555,11 @@ def bundle_zip(grant_id: str) -> Response:
     run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
+    files = _verified_bundle(run)
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        for p in run.iterdir():
-            if p.is_file():
-                z.write(p, arcname=p.name)
+        for name, content in files.items():
+            z.writestr(name, content)
     buf.seek(0)
     safe_filename_id = re.sub(r"[^A-Za-z0-9._-]+", "_", grant_id).strip("._") or "grant"
     fname = f"{safe_filename_id}_{run.name}.zip"
@@ -572,6 +585,8 @@ def grant_diff(grant_id: str) -> JSONResponse:
     if not current:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
     approved = _latest_grant_run(grant_id, approved=True)
+    current_bytes = _verified_bundle(current)
+    approved_bytes = _verified_bundle(approved) if approved else None
 
     out: dict = {
         "grant_id": grant_id,
@@ -587,8 +602,8 @@ def grant_diff(grant_id: str) -> JSONResponse:
                         for p in current.iterdir() if p.is_file()]
         return JSONResponse(out)
 
-    cur_man = _load(current / "manifest.sha256.json").get("files", {})
-    app_man = _load(approved / "manifest.sha256.json").get("files", {})
+    cur_man = json.loads(current_bytes["manifest.sha256.json"]).get("files", {})
+    app_man = json.loads(approved_bytes["manifest.sha256.json"]).get("files", {})
     names = sorted(set(cur_man) | set(app_man))
     for n in names:
         cur_h = cur_man.get(n, {}).get("sha256")
@@ -609,8 +624,8 @@ def grant_diff(grant_id: str) -> JSONResponse:
         })
 
     # Headline diff from application.json
-    cur_app = _load(current / "application.json")
-    app_app = _load(approved / "application.json")
+    cur_app = json.loads(current_bytes["application.json"])
+    app_app = json.loads(approved_bytes["application.json"])
     headline: dict = {}
 
     def cmp(label: str, cur, prev):
@@ -672,11 +687,16 @@ def _load_submission_tooling():
 
 
 def _prepare_submission_for_run(grant_id: str, run: Path, catalog_entry: dict | None) -> dict:
-    build_preflight, write_submission_kit = _load_submission_tooling()
-    pf = build_preflight(grant_id, run, catalog_entry)
-    files = write_submission_kit(grant_id, run, pf)
-    pf["written"] = {k: str(v) for k, v in files.items()}
-    return pf
+    with bundle_lock(run):
+        _verified_bundle(run)
+        build_preflight, write_submission_kit = _load_submission_tooling()
+        pf = build_preflight(grant_id, run, catalog_entry)
+        try:
+            files = write_submission_kit(grant_id, run, pf)
+        except (BundleIntegrityError, OSError, UnicodeError) as exc:
+            raise HTTPException(status_code=409, detail="bundle integrity check failed; regenerate a fresh draft") from exc
+        pf["written"] = {k: str(v) for k, v in files.items()}
+        return pf
 
 
 @router.get("/submission/dashboard")
@@ -892,6 +912,8 @@ def approve(grant_id: str) -> JSONResponse:
         state = _approve(grant_id)
     except SystemExit as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except (BundleIntegrityError, OSError, UnicodeError) as exc:
+        raise HTTPException(status_code=409, detail="bundle integrity check failed; regenerate a fresh draft") from exc
     queue = update_queue()
     _emit("approved", grant_id=grant_id, state=state, queue_summary={
         "n_total": queue.get("n_total"),
@@ -907,55 +929,65 @@ def mark_submitted(grant_id: str, req: SubmittedRequest) -> JSONResponse:
     run = _latest_grant_run(grant_id)
     if not run:
         raise HTTPException(status_code=404, detail=f"no draft for {grant_id}")
-    state_p = run / "approval_state.json"
-    if not state_p.exists():
-        raise HTTPException(status_code=500, detail="approval_state missing")
-    state = json.loads(state_p.read_text(encoding="utf-8"))
-    if state.get("state") not in ("approved", "submitted"):
-        raise HTTPException(
-            status_code=400,
-            detail=f"grant must be approved before marking submitted (state={state.get('state')})")
-    preflight = _prepare_submission_for_run(
-        grant_id,
-        run,
-        _catalog_entry_for(grant_id),
-    )
-    if preflight.get("target_stage") == "project_pitch":
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                "This package is at the NSF Project Pitch stage, not full-proposal "
-                "submission. Record the pitch case/invitation in submission_readiness first."
-            ),
+    with bundle_lock(run):
+        verified = _verified_bundle(run)
+        state_p = run / "approval_state.json"
+        if not state_p.exists():
+            raise HTTPException(status_code=500, detail="approval_state missing")
+        state = json.loads(verified["approval_state.json"])
+        if state.get("state") not in ("approved", "submitted"):
+            raise HTTPException(
+                status_code=400,
+                detail=f"grant must be approved before marking submitted (state={state.get('state')})")
+        preflight = _prepare_submission_for_run(
+            grant_id,
+            run,
+            _catalog_entry_for(grant_id),
         )
-    if not preflight.get("ready"):
-        raise HTTPException(
-            status_code=409,
-            detail={
-                "message": "submission preflight failed",
-                "blockers": preflight.get("blockers", []),
-            },
-        )
-    if not str(req.external_tracking_id or "").strip():
-        raise HTTPException(
-            status_code=400,
-            detail="external_tracking_id is required to mark a grant submitted",
-        )
-    state["state"] = "submitted"
-    state["submitted_utc"] = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    state["submitted_by"] = req.submitted_by
-    state["external_tracking_id"] = req.external_tracking_id
-    if req.notes:
-        state["notes"] = req.notes
-    state_p.write_text(json.dumps(state, indent=2), encoding="utf-8")
+        if preflight.get("target_stage") == "project_pitch":
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "This package is at the NSF Project Pitch stage, not full-proposal "
+                    "submission. Record the pitch case/invitation in submission_readiness first."
+                ),
+            )
+        if not preflight.get("ready"):
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "message": "submission preflight failed",
+                    "blockers": preflight.get("blockers", []),
+                },
+            )
+        if not str(req.external_tracking_id or "").strip():
+            raise HTTPException(
+                status_code=400,
+                detail="external_tracking_id is required to mark a grant submitted",
+            )
+        state["state"] = "submitted"
+        state["submitted_utc"] = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        state["submitted_by"] = req.submitted_by
+        state["external_tracking_id"] = req.external_tracking_id
+        if req.notes:
+            state["notes"] = req.notes
+        previous = _verified_bundle(run)
+        try:
+            state_p.write_text(json.dumps(state, indent=2), encoding="utf-8")
+            refresh_bundle_manifest(run, previous, {"approval_state.json"})
+            _prepare_submission_for_run(grant_id, run, _catalog_entry_for(grant_id))
+        except BaseException:
+            for name, content in previous.items():
+                (run / name).write_bytes(content)
+            raise
 
-    sys.path.insert(0, str(ROOT / "code"))
-    from grant_application_factory import update_queue
-    queue = update_queue()
-    _emit("submitted", grant_id=grant_id, state=state, queue_summary={
-        "n_total": queue.get("n_total"),
-        "n_draft": queue.get("n_draft"),
-        "n_approved": queue.get("n_approved"),
-        "n_submitted": queue.get("n_submitted"),
-    })
-    return JSONResponse({"ok": True, "state": state, "queue": queue})
+        sys.path.insert(0, str(ROOT / "code"))
+        from grant_application_factory import update_queue
+        queue = update_queue()
+        _emit("submitted", grant_id=grant_id, state=state, queue_summary={
+            "n_total": queue.get("n_total"),
+            "n_draft": queue.get("n_draft"),
+            "n_approved": queue.get("n_approved"),
+            "n_submitted": queue.get("n_submitted"),
+        })
+        return JSONResponse({"ok": True, "state": state, "queue": queue})

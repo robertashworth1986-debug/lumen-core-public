@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -36,6 +37,40 @@ def now_iso() -> str:
 
 def now_tag() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+CLAIM_BOUNDARY = (
+    "This chain verifies artifact custody, not causal effects, accepted economics, revenue or savings. "
+    "Legacy dollar values remain source-specific reported context. Model deltas are not field improvements."
+)
+
+
+def reject_duplicate_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON member: {key}")
+        result[key] = value
+    return result
+
+
+def reject_nonfinite_constant(value: str) -> Any:
+    raise ValueError(f"Nonfinite JSON number: {value}")
+
+
+def optional_number(value: Any) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def optional_count(value: Any) -> int | None:
+    number = optional_number(value)
+    return int(number) if number is not None and number >= 0 and number.is_integer() else None
 
 
 def safe_float(v: Any, default: float = 0.0) -> float:
@@ -81,7 +116,7 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    tmp.write_text(json.dumps(payload, indent=2, allow_nan=False), encoding="utf-8")
     tmp.replace(path)
 
 
@@ -159,17 +194,40 @@ def read_prev_entry_sha(ledger_path: Path) -> str:
 
 
 def collect_state() -> dict[str, Any]:
-    live = load_json(LIVE_PANEL)
-    val = load_json(MASTER_VAL)
-    readiness = load_json(READINESS)
-    public_truth = load_json(PUBLIC_TRUTH)
-    grants = load_json(GRANTS_QUEUE)
-    jobs = load_json(JOBS_QUEUE)
-    tracker = load_json(OPP_TRACKER)
-
+    source_paths = {
+        "live_breadth_value_panel_latest": LIVE_PANEL, "master_valuation_latest": MASTER_VAL,
+        "investor_metric_readiness_latest": READINESS, "public_truth_latest": PUBLIC_TRUTH,
+        "grant_approval_queue": GRANTS_QUEUE, "jobs_queue_index": JOBS_QUEUE,
+        "opportunities_tracker": OPP_TRACKER,
+    }
     exec_events_path = find_exec_events_path()
-    events_tail = load_jsonl(exec_events_path)[-3:] if exec_events_path else []
-    latest_event = events_tail[-1] if events_tail else {}
+    if exec_events_path:
+        source_paths["execution_events"] = exec_events_path
+    source_hashes: dict[str, str] = {}
+    source_bytes: dict[str, int] = {}
+    documents: dict[str, Any] = {}
+    for name, path in source_paths.items():
+        if not path.exists():
+            documents[name] = None
+            continue
+        # Bind the hash to the exact bytes parsed, rather than re-read a changing source later.
+        raw = path.read_bytes()
+        source_hashes[name] = hashlib.sha256(raw).hexdigest()
+        source_bytes[name] = len(raw)
+        try:
+            text = raw.decode("utf-8-sig")
+            documents[name] = [json.loads(line, object_pairs_hook=reject_duplicate_members, parse_constant=reject_nonfinite_constant) for line in text.splitlines() if line.strip()] if name == "execution_events" else json.loads(text, object_pairs_hook=reject_duplicate_members, parse_constant=reject_nonfinite_constant)
+        except (UnicodeError, ValueError) as exc:
+            raise ValueError(f"Invalid frozen-chain input: {name}") from exc
+    live = documents.get("live_breadth_value_panel_latest")
+    val = documents.get("master_valuation_latest")
+    readiness = documents.get("investor_metric_readiness_latest")
+    public_truth = documents.get("public_truth_latest")
+    grants = documents.get("grant_approval_queue")
+    jobs = documents.get("jobs_queue_index")
+    tracker = documents.get("opportunities_tracker")
+    events_tail = documents.get("execution_events") or []
+    latest_event = events_tail[-1] if events_tail and isinstance(events_tail[-1], dict) else {}
 
     live_headline = (live.get("headline", {}) or {}) if isinstance(live, dict) else {}
     val_block = (val.get("valuation", {}) or {}) if isinstance(val, dict) else {}
@@ -177,37 +235,37 @@ def collect_state() -> dict[str, Any]:
     readiness_summary = (readiness.get("summary", {}) or {}) if isinstance(readiness, dict) else {}
 
     metrics = {
-        "annual_value_signal_usd": max(
-            safe_float(live_headline.get("total_estimated_annual_value_usd"), 0.0),
-            safe_float(val_inputs.get("annual_value_signal_usd"), 0.0),
-        ),
-        "measured_sources": max(
-            safe_int(live_headline.get("measured_sources"), 0),
-            safe_int(val_inputs.get("measured_sources"), 0),
-        ),
-        "enabled_sources": max(
-            safe_int(live_headline.get("enabled_sources"), 0),
-            safe_int(val_inputs.get("enabled_sources"), 0),
-        ),
-        "measured_coverage_pct": max(
-            safe_float(live_headline.get("measured_coverage_pct"), 0.0),
-            safe_float(val_inputs.get("measured_coverage_pct"), 0.0),
-        ),
-        "benchmark_prevented_pct": safe_float(live_headline.get("cross_sector_recommended_prevented_pct"), 0.0),
-        "router_edge_pct": safe_float(live_headline.get("router_edge_pct"), safe_float(val_inputs.get("router_edge_pct"), 0.0)),
-        "harmonic_win_rate_pct": safe_float(
-            live_headline.get("harmonic_win_rate_pct"),
-            safe_float(val_inputs.get("harmonic_win_rate_pct"), 0.0),
-        ),
+        "annual_value_signal_usd": None,
+        "top_sector_hourly_value_usd": None,
+        "modeled_annual_value_usd": optional_number(live_headline.get("modeled_annual_value_usd")),
+        "top_sector_modeled_hourly_value_usd": optional_number(live_headline.get("top_sector_modeled_hourly_value_usd")),
+        "measured_sources": optional_count(live_headline.get("measured_sources")),
+        "enabled_sources": optional_count(live_headline.get("enabled_sources")),
+        "measured_coverage_pct": optional_number(live_headline.get("measured_coverage_pct")),
+        "benchmark_prevented_pct": None,
+        "router_edge_pct": optional_number(live_headline.get("router_edge_pct")),
+        "harmonic_win_rate_pct": optional_number(live_headline.get("harmonic_win_rate_pct")),
         "top_sector": str(live_headline.get("top_sector") or ""),
-        "top_sector_hourly_value_usd": safe_float(live_headline.get("top_sector_hourly_value_usd"), 0.0),
-        "valuation_proxy_usd": safe_float(val_block.get("master_valuation_proxy_usd"), 0.0),
-        "valuation_increment_usd": safe_float(val_block.get("valuation_increment_usd"), 0.0),
-        "grant_pipeline_value_usd": safe_float(val_block.get("grant_and_opportunity_pipeline_value_usd"), 0.0),
-        "grant_license_value_usd": safe_float(val_block.get("grant_finding_and_ranking_system_license_value_usd"), 0.0),
-        "digital_scout_value_usd": safe_float(val_block.get("digital_scout_value_usd"), 0.0),
-        "institutional_trading_value_usd": safe_float(val_block.get("institutional_trading_system_value_usd"), 0.0),
-        "validated_autonomy_value_usd": safe_float(val_block.get("validated_engine_autonomy_value_usd"), 0.0),
+        "valuation_proxy_usd": None, "valuation_increment_usd": None,
+        "grant_pipeline_value_usd": None, "grant_license_value_usd": None,
+        "digital_scout_value_usd": None, "institutional_trading_value_usd": None,
+        "validated_autonomy_value_usd": None,
+        "economic_claim_status": "NO_ACCEPTED_ECONOMICS",
+        "public_economic_value_claim_allowed": False,
+        "claim_boundary": CLAIM_BOUNDARY,
+        "reported_economic_context": {
+            "live_panel_annual_value_usd": optional_number(live_headline.get("total_estimated_annual_value_usd")),
+            "master_valuation_annual_value_usd": optional_number(val_inputs.get("annual_value_signal_usd")),
+            "live_panel_top_sector_hourly_value_usd": optional_number(live_headline.get("top_sector_hourly_value_usd")),
+            "master_valuation_proxy_usd": optional_number(val_block.get("master_valuation_proxy_usd")),
+            "valuation_increment_usd": optional_number(val_block.get("valuation_increment_usd")),
+            "grant_pipeline_value_usd": optional_number(val_block.get("grant_and_opportunity_pipeline_value_usd")),
+            "grant_license_value_usd": optional_number(val_block.get("grant_finding_and_ranking_system_license_value_usd")),
+            "digital_scout_value_usd": optional_number(val_block.get("digital_scout_value_usd")),
+            "institutional_trading_value_usd": optional_number(val_block.get("institutional_trading_system_value_usd")),
+            "validated_autonomy_value_usd": optional_number(val_block.get("validated_engine_autonomy_value_usd")),
+            "benchmark_prevented_pct": optional_number(live_headline.get("cross_sector_recommended_prevented_pct")),
+        },
         "readiness_status": str(
             readiness_summary.get("performance_metrics_status")
             or live_headline.get("performance_metrics_status")
@@ -221,25 +279,6 @@ def collect_state() -> dict[str, Any]:
         "latest_execution_event_utc": str(latest_event.get("generated_utc") or latest_event.get("timestamp_utc") or ""),
     }
 
-    source_paths = {
-        "live_breadth_value_panel_latest": LIVE_PANEL,
-        "master_valuation_latest": MASTER_VAL,
-        "investor_metric_readiness_latest": READINESS,
-        "public_truth_latest": PUBLIC_TRUTH,
-        "grant_approval_queue": GRANTS_QUEUE,
-        "jobs_queue_index": JOBS_QUEUE,
-        "opportunities_tracker": OPP_TRACKER,
-    }
-    if exec_events_path:
-        source_paths["execution_events"] = exec_events_path
-
-    source_hashes: dict[str, str] = {}
-    source_bytes: dict[str, int] = {}
-    for name, path in source_paths.items():
-        if path.exists():
-            source_hashes[name] = sha256_file(path)
-            source_bytes[name] = int(path.stat().st_size)
-
     return {
         "metrics": metrics,
         "source_paths": {k: rel(v) for k, v in source_paths.items()},
@@ -251,8 +290,15 @@ def collect_state() -> dict[str, Any]:
 def build_numeric_deltas(current: dict[str, Any], previous: dict[str, Any]) -> dict[str, float]:
     out: dict[str, float] = {}
     for key, value in current.items():
-        if isinstance(value, (int, float)) and key in previous and isinstance(previous.get(key), (int, float)):
-            out[key] = float(value) - float(previous.get(key))
+        old = previous.get(key)
+        if isinstance(value, bool) or isinstance(old, bool):
+            continue
+        if not isinstance(value, (int, float)) or not isinstance(old, (int, float)):
+            continue
+        if optional_number(value) is not None and optional_number(old) is not None:
+            delta = optional_number(value - old)
+            if delta is not None:
+                out[key] = delta
     return out
 
 
@@ -266,6 +312,8 @@ def write_delta(name: str, run_tag: str, generated_utc: str, current: dict[str, 
         "previous": previous,
         "numeric_delta": build_numeric_deltas(current, previous),
         "source_hashes": source_hashes,
+        "claim_boundary": CLAIM_BOUNDARY,
+        "public_economic_value_claim_allowed": False,
     }
 
     DELTA_DIR.mkdir(parents=True, exist_ok=True)
@@ -285,11 +333,16 @@ def build_markdown_report(payload: dict[str, Any]) -> str:
     lines.append(f"Entry SHA256: {payload.get('entry_sha256', '')}")
     lines.append(f"Previous Entry SHA256: {payload.get('previous_entry_sha256', '')}")
     lines.append("")
+    lines.append(CLAIM_BOUNDARY)
+    lines.append("Accepted annual savings: UNKNOWN; economic claims remain closed.")
+    lines.append("")
     lines.append("## Core Metrics")
     lines.append("")
     metrics = payload.get("metrics", {}) if isinstance(payload, dict) else {}
     for key in (
         "annual_value_signal_usd",
+        "modeled_annual_value_usd",
+        "economic_claim_status",
         "measured_sources",
         "enabled_sources",
         "measured_coverage_pct",
@@ -300,7 +353,8 @@ def build_markdown_report(payload: dict[str, Any]) -> str:
         "valuation_increment_usd",
         "readiness_status",
     ):
-        lines.append(f"- {key}: {metrics.get(key, '')}")
+        value = metrics.get(key)
+        lines.append(f"- {key}: {'UNKNOWN' if value is None else value}")
     lines.append("")
     lines.append("## Artifacts")
     lines.append("")
@@ -405,7 +459,9 @@ def build_chain(strict: bool) -> int:
     prev_metrics = (prev_snapshot.get("metrics", {}) or {}) if isinstance(prev_snapshot, dict) else {}
 
     live_current = {
-        "annual_value_signal_usd": metrics.get("annual_value_signal_usd", 0.0),
+        "modeled_annual_value_usd": metrics.get("modeled_annual_value_usd"),
+        "economic_claim_status": metrics.get("economic_claim_status", "LEGACY_UNVERIFIED_CONTEXT"),
+        "annual_value_signal_usd": metrics.get("annual_value_signal_usd"),
         "measured_sources": metrics.get("measured_sources", 0),
         "enabled_sources": metrics.get("enabled_sources", 0),
         "measured_coverage_pct": metrics.get("measured_coverage_pct", 0.0),
@@ -413,10 +469,12 @@ def build_chain(strict: bool) -> int:
         "router_edge_pct": metrics.get("router_edge_pct", 0.0),
         "harmonic_win_rate_pct": metrics.get("harmonic_win_rate_pct", 0.0),
         "top_sector": metrics.get("top_sector", ""),
-        "top_sector_hourly_value_usd": metrics.get("top_sector_hourly_value_usd", 0.0),
+        "top_sector_hourly_value_usd": metrics.get("top_sector_hourly_value_usd"),
     }
     live_prev = {
-        "annual_value_signal_usd": prev_metrics.get("annual_value_signal_usd", 0.0),
+        "modeled_annual_value_usd": prev_metrics.get("modeled_annual_value_usd"),
+        "economic_claim_status": prev_metrics.get("economic_claim_status", "LEGACY_UNVERIFIED_CONTEXT"),
+        "annual_value_signal_usd": prev_metrics.get("annual_value_signal_usd"),
         "measured_sources": prev_metrics.get("measured_sources", 0),
         "enabled_sources": prev_metrics.get("enabled_sources", 0),
         "measured_coverage_pct": prev_metrics.get("measured_coverage_pct", 0.0),
@@ -424,26 +482,28 @@ def build_chain(strict: bool) -> int:
         "router_edge_pct": prev_metrics.get("router_edge_pct", 0.0),
         "harmonic_win_rate_pct": prev_metrics.get("harmonic_win_rate_pct", 0.0),
         "top_sector": prev_metrics.get("top_sector", ""),
-        "top_sector_hourly_value_usd": prev_metrics.get("top_sector_hourly_value_usd", 0.0),
+        "top_sector_hourly_value_usd": prev_metrics.get("top_sector_hourly_value_usd"),
     }
 
     valuation_current = {
-        "valuation_proxy_usd": metrics.get("valuation_proxy_usd", 0.0),
-        "valuation_increment_usd": metrics.get("valuation_increment_usd", 0.0),
-        "grant_pipeline_value_usd": metrics.get("grant_pipeline_value_usd", 0.0),
-        "grant_license_value_usd": metrics.get("grant_license_value_usd", 0.0),
-        "digital_scout_value_usd": metrics.get("digital_scout_value_usd", 0.0),
-        "institutional_trading_value_usd": metrics.get("institutional_trading_value_usd", 0.0),
-        "validated_autonomy_value_usd": metrics.get("validated_autonomy_value_usd", 0.0),
+        "reported_economic_context": metrics.get("reported_economic_context", {}),
+        "valuation_proxy_usd": metrics.get("valuation_proxy_usd"),
+        "valuation_increment_usd": metrics.get("valuation_increment_usd"),
+        "grant_pipeline_value_usd": metrics.get("grant_pipeline_value_usd"),
+        "grant_license_value_usd": metrics.get("grant_license_value_usd"),
+        "digital_scout_value_usd": metrics.get("digital_scout_value_usd"),
+        "institutional_trading_value_usd": metrics.get("institutional_trading_value_usd"),
+        "validated_autonomy_value_usd": metrics.get("validated_autonomy_value_usd"),
     }
     valuation_prev = {
-        "valuation_proxy_usd": prev_metrics.get("valuation_proxy_usd", 0.0),
-        "valuation_increment_usd": prev_metrics.get("valuation_increment_usd", 0.0),
-        "grant_pipeline_value_usd": prev_metrics.get("grant_pipeline_value_usd", 0.0),
-        "grant_license_value_usd": prev_metrics.get("grant_license_value_usd", 0.0),
-        "digital_scout_value_usd": prev_metrics.get("digital_scout_value_usd", 0.0),
-        "institutional_trading_value_usd": prev_metrics.get("institutional_trading_value_usd", 0.0),
-        "validated_autonomy_value_usd": prev_metrics.get("validated_autonomy_value_usd", 0.0),
+        "reported_economic_context": prev_metrics.get("reported_economic_context", {}),
+        "valuation_proxy_usd": prev_metrics.get("valuation_proxy_usd"),
+        "valuation_increment_usd": prev_metrics.get("valuation_increment_usd"),
+        "grant_pipeline_value_usd": prev_metrics.get("grant_pipeline_value_usd"),
+        "grant_license_value_usd": prev_metrics.get("grant_license_value_usd"),
+        "digital_scout_value_usd": prev_metrics.get("digital_scout_value_usd"),
+        "institutional_trading_value_usd": prev_metrics.get("institutional_trading_value_usd"),
+        "validated_autonomy_value_usd": prev_metrics.get("validated_autonomy_value_usd"),
     }
 
     ops_current = {

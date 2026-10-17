@@ -184,7 +184,7 @@ async function fetchCanonicalSample() {
   const response = await fetch(target, { cache: "no-store", credentials: "same-origin", redirect: "error" });
   if (!response.ok) throw new Error(`Unable to load sample receipt: HTTP ${response.status}`);
   const text = Core.normalizeEditorText(await response.text());
-  return { text, receipt: JSON.parse(text) };
+  return { text, receipt: Core.parseStrictJson(text) };
 }
 
 function setCommandState(disabled) {
@@ -202,7 +202,7 @@ async function runVerification(options = {}) {
     : "Verifying canonical receipt and repository artifacts...";
   let receipt = options.receipt || null;
   try {
-    if (!receipt) receipt = JSON.parse(elements.editor.value);
+    if (!receipt) receipt = Core.parseStrictJson(elements.editor.value);
     latestReport = await Core.verifyReceipt(receipt, { loadArtifact });
     renderReport(latestReport, receipt);
     return latestReport;

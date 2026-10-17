@@ -42,6 +42,17 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
         self.assertEqual(receipt["claim_boundary_count"], 11)
         self.assertFalse(receipt["workflow_boundaries"]["automatic_merge"])
         self.assertFalse(receipt["workflow_boundaries"]["runtime_scan"])
+        self.assertEqual(
+            receipt["workflow_boundaries"]["codeql_action_version"],
+            "v4.37.8",
+        )
+        self.assertEqual(
+            receipt["workflow_boundaries"]["codeql_action_commit"],
+            "db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28",
+        )
+        self.assertTrue(
+            receipt["workflow_boundaries"]["codeql_action_immutable_pin"]
+        )
         self.assertTrue(
             receipt["workflow_boundaries"]["secret_scanning_enabled"]
         )
@@ -192,6 +203,14 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
         )
         text = text.replace("security-events: write", "security-events: read")
         with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "security-events"):
+            MODULE.verify_codeql_workflow(text)
+
+    def test_codeql_version_comment_must_match_immutable_pin(self) -> None:
+        text = (ROOT / ".github" / "workflows" / "codeql.yml").read_text(
+            encoding="utf-8"
+        )
+        text = text.replace("# v4.37.8", "# v4.37.7", 1)
+        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "CodeQL"):
             MODULE.verify_codeql_workflow(text)
 
     def test_dependency_gate_threshold_cannot_be_weakened(self) -> None:
@@ -455,12 +474,25 @@ class RepositorySecurityAssuranceTests(unittest.TestCase):
         with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "echarts"):
             MODULE.verify_dashboard_dependencies(package, lock)
 
-    def test_vulnerable_form_data_override_is_rejected(self) -> None:
-        package = MODULE.read_json(ROOT / "dashboard" / "package.json")
-        lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
-        package["overrides"]["form-data"] = "4.0.5"
-        with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "form-data"):
-            MODULE.verify_dashboard_dependencies(package, lock)
+    def test_removed_dependency_chain_cannot_return_in_manifest_scopes(self) -> None:
+        for name in ("@tensorflow/tfjs", "argparse", "sprintf-js", "form-data"):
+            for scope in ("dependencies", "devDependencies", "optionalDependencies", "overrides"):
+                with self.subTest(name=name, scope=scope):
+                    package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+                    lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+                    package.setdefault(scope, {})[name] = "*"
+                    with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "removed.*reintroduced"):
+                        MODULE.verify_dashboard_dependencies(package, lock)
+
+    def test_removed_dependency_chain_cannot_return_through_nested_lock_entries(self) -> None:
+        for name in ("@tensorflow/tfjs", "argparse", "sprintf-js", "form-data"):
+            for prefix in ("", "node_modules/unreviewed-parent/"):
+                with self.subTest(name=name, prefix=prefix):
+                    package = MODULE.read_json(ROOT / "dashboard" / "package.json")
+                    lock = MODULE.read_json(ROOT / "dashboard" / "package-lock.json")
+                    lock["packages"][f"{prefix}node_modules/{name}"] = {"version": "1.0.0"}
+                    with self.assertRaisesRegex(MODULE.SecurityAssuranceError, "removed.*lock.*reintroduced"):
+                        MODULE.verify_dashboard_dependencies(package, lock)
 
     def test_security_policy_must_retain_exception_expiry(self) -> None:
         text = (ROOT / "SECURITY.md").read_text(encoding="utf-8")

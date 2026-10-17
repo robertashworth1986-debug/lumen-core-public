@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "source_protocol_sha256": "54c63b0e49fa892c543c1d8907b3e899d07c7f66f39ee846d127a93ac80a3f23",
+  "null_required_field_count": 37,
+  "null_fields": [
+    "candidate_design.initial_state.calibration_data_inventory_sha256",
+    "candidate_design.initial_state.calibration_cutoff_utc",
+    "candidate_design.initial_state.point_forecaster_state_sha256",
+    "candidate_design.initial_state.wrapper_initial_state_sha256",
+    "candidate_design.initial_state.station_horizon_2023_scales_and_thresholds_sha256",
+    "estimand.smallest_material_primary_effect",
+    "estimand.smallest_material_ablation_effect",
+    "regime_contract.minimum_high_activity_labels_per_cell",
+    "regime_contract.minimum_high_activity_calendar_blocks_per_cell",
+    "regime_contract.maximum_acceptable_coverage_shortfall",
+    "regime_contract.maximum_acceptable_width_or_score_degradation",
+    "freshness_and_source_vintage.consumed_data_inventory_sha256",
+    "freshness_and_source_vintage.independent_freeze_timestamp_utc",
+    "freshness_and_source_vintage.independent_timestamp_receipt_sha256",
+    "freshness_and_source_vintage.source_vintage_contract_sha256",
+    "freshness_and_source_vintage.source_acquisition_implementation_sha256",
+    "freshness_and_source_vintage.maximum_source_age_minutes",
+    "freshness_and_source_vintage.settlement_grace_hours",
+    "freshness_and_source_vintage.maximum_missing_label_fraction",
+    "window_and_stopping.first_eligible_issue_utc",
+    "window_and_stopping.last_eligible_target_utc",
+    "window_and_stopping.outcome_blind_embargo_hours",
+    "window_and_stopping.fixed_calendar_duration_days",
+    "window_and_stopping.terminal_settlement_cutoff_utc",
+    "inference.base_inference_method",
+    "inference.dependence_unit_and_block_rule",
+    "inference.confidence_bound_construction",
+    "inference.coverage_guardrail_error_control",
+    "inference.reference_implementation_sha256",
+    "reproducibility_and_review.prospective_code_commit",
+    "reproducibility_and_review.environment_digest",
+    "reproducibility_and_review.dependency_lock_sha256",
+    "reproducibility_and_review.prospective_runtime_test_receipt_sha256",
+    "reproducibility_and_review.candidate_and_baseline_state_transition_verifier_sha256",
+    "reproducibility_and_review.frozen_protocol_sha256",
+    "reproducibility_and_review.evaluator_acceptance_receipt_sha256",
+    "reproducibility_and_review.independent_execution_receipt_sha256"
+  ],
+  "status": "DRAFT_REMAINS_UNEXECUTABLE",
+  "prospective_execution_allowed": false,
+  "gaps": [
+    "No prospective acquisition/forecast-seal implementation or retained actual retrieval chronology is present in recovered lane; assumed historical lag does not fill this.",
+    "Material effect, sample/regime support, missingness, utility and future-window values need a justified frozen owner/evaluator decision.",
+    "Initial model/calibration states and dependence-aware confirmatory inference implementation are not bound.",
+    "No independent evaluator or acceptance/execution receipt is assigned."
+  ],
+  "phase_definition_ambiguities": [
+    {
+      "field": "reproducibility_and_review.independent_execution_receipt_sha256",
+      "problem": "The blanket null rule says every required null blocks execution, but this field may describe evidence produced after the target execution. Clarify whether a preflight rehearsal or final independent run is intended; do not manufacture the receipt.",
+      "resolution_needed": "Separate pre-execution eligibility, scoring eligibility and external promotion requirements while preserving the independent-validation gate."
+    },
+    {
+      "field": "reproducibility_and_review.frozen_protocol_sha256",
+      "problem": "The digest field does not define an external immutable envelope or canonical exclusion of its own value. A literal file self-hash is circular.",
+      "resolution_needed": "Declare the exact digest scope and signed/dated external freeze envelope before any prospective freeze."
+    }
+  ],
+  "changes_made_to_original_draft": false,
+  "phase_definition_guidance": {
+    "before_execution": "Require bound input/source-vintage/model identities, collector and sealing implementation, approved fixed window and evaluator/threshold/inference plan. No such evidence is supplied by this historical diagnostic.",
+    "after_execution": "The final independent-execution receipt must be collected after the run it attests. If a pre-run independent rehearsal is required, name and bind a separate rehearsal receipt; it does not replace the final receipt.",
+    "before_promotion": "Require the final independent-execution/acceptance receipts and all declared empirical and integrity gates. This remains HOLD.",
+    "protocol_digest": "Hash a declared canonical protocol payload in an external immutable freeze envelope, or explicitly exclude only its own digest field from a defined canonical form; record and test that exact rule before freezing."
+  }
+}

@@ -4,6 +4,117 @@ This document records the current repository consolidation state after reviewing
 
 ## Canonical product spine
 
+### October 17, 2026 complete open-queue audit
+
+All 24 open PRs were checked against main `e706e91de133e039cc16ed25ec5021a293edbf2b`;
+16 were drafts. Eleven heads conflict with main. Historic green checks do not
+replace integration tests on current source.
+
+- #196: integrate the buyer-owned replay after repairing frozen-input output
+  aliasing and predictable temporary-file clobbering; preserve the HOLD and
+  unverified-custody boundaries.
+- #205: hold unchanged; expiry classification trusts `closed` without comparing
+  the declared deadline with the evaluation clock.
+- #206: hold unchanged; future prediction/settlement events can satisfy the
+  maturity thresholds, and output paths can overwrite source evidence.
+- #197/#198: hold unchanged; the 43-file August continuity assumptions do not
+  match the 246-file current release. Current-main tests reproduce the mismatch
+  and missing historical source paths.
+- #250: hold; direct Python requirements drift from the institutional hash lock.
+- #249: hold; upgraded action pins do not match the signed-supply-chain verifier
+  and multiple exact-pin assertions. Do not bypass those assertions.
+- #221: hold; dashboard dependency updates lack matching provenance/security
+  contract updates.
+- #215: hold; full-suite collection fails on an undeclared `openpyxl` dependency.
+  #216 is stacked on #215's research branch, not main, and requires integrated
+  dependency, historical-input and research-boundary review.
+- #252/#247: retain dated preflight/audit history pending reconciliation and real
+  deployment receipts; neither documentation draft proves a repair.
+- #220/#219/#208/#207/#204/#201/#211/#195/#194: hold unchanged for explicit
+  current-source conflict reconciliation. Preserve later authorization, ledger,
+  freshness, deployment and paper-accounting repairs; do not resolve by taking
+  an old branch wholesale. #211's strict observer checks are already ported.
+- #217: separate outreach-governance policy change; no actor permission or
+  approval policy is changed by this source integration.
+- #212/#213: commercial draft copy needs current pricing/platform and vendor
+  status checks before adopting its publication instructions. No social post,
+  Fiverr listing or outbound communication is authorized by a source merge.
+
+No branch history was deleted. Production and trading HOLD gates remain.
+
+### October 14, 2026 authorized merge and continuation
+
+The founder requested review and merge of compatible drafts. PR #253 merged at
+`22dc828ccabc3d14accbc9b3e3f3316b8d2f6464` after all 15 applicable head workflows
+passed, including the full suite, both CodeQL languages and separate Windows
+and native C jobs. The hosted full suite recorded 1,773 tests and 307 subtests
+passing with eight explicit skips. The merge retained the exact tested tree;
+it did not deploy a runtime or change financial authority.
+
+The 25 other open PRs were triaged separately. Drafts #221, #249 and #250 have
+failing pin/dependency/lock checks and are not merge candidates unchanged.
+Preflight-only #252 awaits actual deployment evidence; research #216 is stacked
+on missing predecessor material. Neither is promoted by mechanical mergeability.
+PR #203's coordinated CodeQL pin/verifier update merged at
+`7d871ccdcbd59b2ebb200773470f165e2f918cce` after reconciliation with current main
+and all seven applicable workflows passed. Its hosted full suite recorded
+1,774 tests and 307 subtests passing with eight explicit skips. Useful strict
+public-health validation from #211 is ported
+into the existing observer; its superseded workflow is not restored. Other
+conflicting, superseded or separately scoped drafts retain their history and
+require a specific integration review. No branch is deleted or bulk merged.
+
+The current paper-readiness continuation advances outcome 2 by correcting
+startup flags, market chronology, confirmed paper-fill accounting, timestamp
+acceptance and health-contract validation. The reviewed consumers exclude
+retrospective rolling research from execution preferences. Real-order activation remains separate from code
+merge; tests cannot establish net performance, fills or broker reconciliation.
+
+### October 8, 2026 queue reconciliation
+
+The founder authorized source commits and merges. All 26 then-open PR heads
+were inspected for current mergeability; available checks were read for clean
+heads. This is queue triage, not a complete code review of every old branch.
+The current continuation integrates #244, #232 and #222 with additional input
+and reporting repairs. It preserves complete ancestry and later mainline fixes.
+Other branches remain open, with no deletion or untested bulk merge.
+
+| PR | Inspected head | Disposition |
+|---|---|---|
+| #244 | 4a06d7bf3bd3 | Integrated in October 8 continuation; current combined CI required |
+| #232 | 7de14a825574 | Integrated in October 8 continuation; current combined CI required |
+| #222 | 1559a9d49aa4 | Integrated in October 8 continuation; current combined CI required |
+| #221 | 8ced74f671cf | Open: failing checks; do not merge unchanged |
+| #220 | 5acbf42c3b2e | Open: conflicts against inspected main; unique changes require reconciliation |
+| #219 | e29909c3890a | Open: conflicts against inspected main; unique changes require reconciliation |
+| #217 | 40f81fd8e919 | Open: separate governance change; not required for this authorized source repair |
+| #216 | 6a58e9b5d7ae | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #215 | e840cb197863 | Open: failing checks; do not merge unchanged |
+| #213 | 3a0b8e8e1c00 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #212 | c787be842649 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #211 | 6477860cd5f8 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #208 | ceac73bf3233 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #207 | 626e24f88d2c | Open: conflicts against inspected main; unique changes require reconciliation |
+| #206 | 6726e259a0fe | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #205 | 0c4f11193892 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #204 | 823b2d0a0e5b | Open: conflicts against inspected main; unique changes require reconciliation |
+| #203 | 4a9d6a65c5d6 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #201 | f5619341df7b | Open: conflicts against inspected main; unique changes require reconciliation |
+| #199 | 267886b8c114 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #198 | 01c143976219 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #197 | 102039df6124 | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #196 | 313ac37c370a | Open: structurally mergeable; current-main integration review and tests outstanding |
+| #195 | 2e7001ae18b3 | Open: conflicts against inspected main; unique changes require reconciliation |
+| #194 | 24542ae5193f | Open: conflicts against inspected main; unique changes require reconciliation |
+| #187 | c7ac0ba6cc46 | Open: failing checks; do not merge unchanged |
+
+PR #221's full-suite log reports `dashboard dependency range drift: three`:
+the dependency update did not update the security contract. That requires a
+coordinated dependency/provenance review, not disabling the contract. Large
+conflicted #220/#219/#201 and causal/trading continuations remain separate work.
+The merged mainline and current CI receipts, not this dated queue snapshot,
+determine what is actually available for a reviewer.
+
 1. **Proof Capsule / ProofLock assurance**
    - merged foundation: PR #34
    - deployed demonstration and historical submission record: PR #36

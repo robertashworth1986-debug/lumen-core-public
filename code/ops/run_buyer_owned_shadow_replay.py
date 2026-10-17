@@ -17,6 +17,7 @@ import json
 import math
 import os
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -26,7 +27,7 @@ CASES_SCHEMA = "lumencore_buyer_owned_shadow_cases_v1"
 PREDICTIONS_SCHEMA = "lumencore_buyer_owned_shadow_predictions_v1"
 RECEIPT_SCHEMA = "lumencore_buyer_owned_shadow_receipt_v1"
 VERSION = "1.0.0"
-RUNNER_VERSION = "1.0.1"
+RUNNER_VERSION = "1.0.2"
 MAX_INPUT_BYTES = 16 * 1024 * 1024
 MAX_ROWS = 100_000
 
@@ -580,20 +581,40 @@ def evaluate_shadow_replay(
     return receipt
 
 
-def write_receipt(path: Path, receipt: dict[str, Any]) -> None:
+def _validate_receipt_output(path: Path, inputs: tuple[Path, ...]) -> Path:
     resolved = path.resolve()
+    for source in inputs:
+        if resolved == source.resolve() or (
+            resolved.exists() and resolved.samefile(source)
+        ):
+            raise ShadowReplayError("output must not overwrite a frozen input")
+    return resolved
+
+
+def write_receipt(
+    path: Path, receipt: dict[str, Any], *, inputs: tuple[Path, ...] = ()
+) -> None:
+    resolved = _validate_receipt_output(path, inputs)
     if not resolved.parent.is_dir():
         raise ShadowReplayError("output parent directory must already exist")
     payload = json.dumps(
         receipt, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False
     ) + "\n"
-    temporary = resolved.with_name(f".{resolved.name}.tmp")
+    temporary: Path | None = None
     try:
-        temporary.write_text(payload, encoding="utf-8")
+        # Exclusive creation owns a unique file. A predictable temporary name
+        # could alias a frozen input or follow a pre-existing symlink to it.
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", newline="\n", dir=resolved.parent,
+            prefix=f".{resolved.name}.", suffix=".tmp", delete=False,
+        ) as handle:
+            temporary = Path(handle.name)
+            handle.write(payload)
+        _validate_receipt_output(resolved, inputs)
         os.replace(temporary, resolved)
     finally:
-        if temporary.exists():
-            temporary.unlink()
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -607,15 +628,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    inputs = {args.protocol.resolve(), args.cases.resolve(), args.predictions.resolve()}
-    if args.output.resolve() in inputs:
-        print("shadow replay failed: output must not overwrite a frozen input", file=sys.stderr)
-        return 2
+    inputs = (args.protocol, args.cases, args.predictions)
     try:
+        _validate_receipt_output(args.output, inputs)
         receipt = evaluate_shadow_replay(
             args.protocol, args.cases, args.predictions
         )
-        write_receipt(args.output, receipt)
+        write_receipt(args.output, receipt, inputs=inputs)
     except (OSError, ShadowReplayError) as exc:
         print(f"shadow replay failed: {exc}", file=sys.stderr)
         return 2

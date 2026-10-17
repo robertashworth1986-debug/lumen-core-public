@@ -108,3 +108,40 @@ Concept files must not be placed inside canonical evidence, external-validation,
 **Use visuals to explain the research direction. Use Proof Capsules and external records to support claims.**
 
 Bounded light speed means moving quickly without allowing a compelling image to outrun evidence, rights, safety, or human authority.
+
+## Wonder Studio creative services
+
+The founder-authorized public [Wonder Studio](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/)
+offers presentation design, business graphics and one-page marketing website
+design alongside the concept-art collection.
+
+| Start here | Available experience |
+|---|---|
+| [Make it your brand](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/brand/) | Choose among 15 artwork directions, add a local logo, set colors and copy, export four PNG formats and save a reusable JSON brand kit. |
+| [Business examples](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/examples/) | Three fictional businesses, nine compositions and a free editable SVG sample. |
+| [Motion studio](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/motion/) | Interactive projected 3D geometric motion with user controls, plus two downloadable ten-second H.264 loops. |
+| [Custom work](https://lumencore-wonder-studio.robertashworth4444.chatgpt.site/services/) | Slide Polish, Story & Deck and Business Launch Kit; a short inquiry with a private receipt and email fallback. |
+
+These are design capabilities and service invitations, not client case studies,
+sales receipts or independent technical validation. Demonstration brands are
+fictional. The downloadable loops are rendered video, not editable 3D scenes.
+Available file formats, privacy behavior and use limits are described with the
+corresponding tool or asset. A submitted inquiry is not an accepted commission
+or payment.
+
+Robert Ashworth directs the creative work using AI tools. Paid work requires
+agreement on scope, price, schedule, revisions and deliverable rights before
+work begins. Rights in third-party logos, fonts and supplied material must be
+cleared for the intended use. This publication does not change the repository's
+existing license or grant exclusive ownership of purely AI-generated imagery.
+
+Plasma, atomic, quasar and quantum-inspired artwork remains imaginative design.
+The moving geometry demonstrates visual form; neither it nor a cinematic render
+establishes a physical simulation, novel physics, model superiority, savings or
+certification. The engineering portfolio keeps its separate evidence and
+validation gates.
+
+The Studio has its own deployment history. This repository links to its public
+experience without importing its private source, customer inquiries or assets
+into canonical scientific evidence. A Studio release does not establish
+current live parity for `lumen-core.ai`.

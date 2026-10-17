@@ -64,8 +64,10 @@ and passing:
 9. A human records the approved account, capital cap, symbols, and expiry time
    for the live authorization.
 
-Current timing coverage is approximately 30 days. Candidate timing patterns are
-research observations only and do not satisfy the release gates.
+The inherited timing snapshot recorded approximately 30 days. That dated count
+is not a fresh inventory of the current estate. Candidate timing patterns remain
+research observations until clean, source-bound coverage and every other gate
+are actually verified for the intended symbol and interval.
 
 ## Market Intelligence
 

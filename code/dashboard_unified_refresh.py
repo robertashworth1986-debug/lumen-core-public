@@ -238,31 +238,68 @@ def html_escape(s):
 
 def load_enabled_sources():
     cfg = read_json(SRC_PATH, {})
+    if not isinstance(cfg, dict):
+        raise ValueError("source configuration must be an object")
+    if "providers" in cfg and "sources" in cfg:
+        raise ValueError("source configuration has conflicting wrappers")
+    entries = cfg.get("providers", cfg.get("sources", cfg))
+    if not isinstance(entries, dict):
+        raise ValueError("configured sources must be a mapping")
     enabled = {}
-    if isinstance(cfg, dict):
-        for k, v in cfg.items():
-            if isinstance(v, dict):
-                enabled[k] = bool(v.get("enabled", False))
+    for name, value in entries.items():
+        if entries is cfg and name == "generated_utc":
+            continue
+        if not isinstance(name, str) or not name.strip() or not isinstance(value, dict):
+            raise ValueError("configured source must be a named object")
+        key = name.strip().casefold()
+        if key in enabled:
+            raise ValueError("duplicate configured source")
+        enabled[key] = value.get("enabled") is True
     return enabled
 
+
+def reported_row_count(value):
+    """Validate a declared count; a valid count does not verify its source rows."""
+    if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+        return value
+    if isinstance(value, str) and value.isascii() and value.isdecimal():
+        return int(value)
+    try:
+        count = float(value)
+    except (ValueError, TypeError, OverflowError):
+        raise ValueError("source row count must be a finite nonnegative integer") from None
+    if isinstance(value, bool) or not math.isfinite(count) or count < 0 or not count.is_integer():
+        raise ValueError("source row count must be a finite nonnegative integer")
+    return int(count)
+
 def normalize_registry():
-    reg = read_json(REG_PATH, {"sources": []})
-    rows = reg.get("sources", []) if isinstance(reg, dict) else []
+    reg = read_json(REG_PATH, {"rows": []})
+    if not isinstance(reg, dict) or ("rows" in reg and "sources" in reg):
+        raise ValueError("source registry must have one unambiguous rows wrapper")
+    rows = reg.get("rows", reg.get("sources", []))
+    if not isinstance(rows, list):
+        raise ValueError("source registry rows must be a list")
     out = []
+    seen = set()
     enabled_map = load_enabled_sources()
 
     for r in rows:
-        source = str(r.get("source", "UNKNOWN"))
+        if not isinstance(r, dict) or not isinstance(r.get("source"), str) or not r["source"].strip():
+            raise ValueError("registry source must be a named object")
+        source = r["source"].strip()
+        key = source.casefold()
+        if key in seen:
+            raise ValueError("duplicate registry source")
+        seen.add(key)
         sector = str(r.get("sector", "unknown"))
         status = str(r.get("status", "UNKNOWN"))
-        row_count = int(safe_float(r.get("rows", 0), 0))
+        row_count = reported_row_count(r.get("rows", 0))
         last_probe_utc = str(r.get("last_probe_utc", ""))
         env = str(r.get("env", ""))
-        enabled = enabled_map.get(source.lower(), enabled_map.get(source.replace("_SECRET","").replace("_KEY","").lower(), True))
+        enabled = enabled_map.get(key, False) and r.get("enabled", True) is True
 
-        est_per_hour = round(DEFAULT_SECTOR_VALUES.get(sector, 250.0), 2)
-        measured_flag = row_count > 1
-        value_basis = "MEASURED" if measured_flag else "ESTIMATED"
+        # These fixed rates are illustrative scenarios, not observed economics.
+        est_per_hour = round(DEFAULT_SECTOR_VALUES.get(sector, 250.0), 2) if enabled else 0.0
 
         out.append({
             "source": source,
@@ -273,7 +310,7 @@ def normalize_registry():
             "env": env,
             "enabled": enabled,
             "estimated_hour_value": est_per_hour,
-            "value_basis": value_basis
+            "value_basis": "MODELED"
         })
     return out
 
@@ -361,11 +398,13 @@ def build_paper_metrics():
     sharpe = sharpe_from_equity(eq_curve)
     max_dd = max_drawdown_from_equity(eq_curve)
 
-    live_now = bool(runtime.get("live", True) or state or ledger)
-
     out = {
         "generated_utc": now_iso(),
-        "live_now": live_now,
+        # No accepted worker-heartbeat contract is consumed here. Configuration
+        # and historical ledger presence cannot establish current operation.
+        "live_now": False,
+        "live_observation_status": "UNVERIFIED",
+        "runtime_live_requested": runtime.get("live") is True,
         "state_path": str(state_path),
         "ledger_path": str(ledger_path),
         "runtime_path": str(runtime_path),
@@ -382,7 +421,7 @@ def build_paper_metrics():
         "last_side": last_side,
         "ledger_rows_scanned": len(ledger),
         "equity_curve_points": len(eq_curve),
-        "value_basis": "MEASURED" if len(ledger) > 0 else "ESTIMATED"
+        "value_basis": "PAPER_REPORTED_UNRECONCILED" if state or ledger else "NO_EVIDENCE"
     }
     ROLLING_PERF_PATH.write_text(json.dumps(out, indent=2), encoding="utf-8")
     return out
@@ -400,17 +439,18 @@ def build_infra_metrics():
         est_hour = safe_float(r.get("estimated_hour_value", 0.0), 0.0)
         enabled = bool(r.get("enabled", False))
         live_key = status == "LIVE_KEY_PRESENT"
-        measured = row_count > 1
-        live_measured = enabled and live_key and measured
+        # This registry declares counts and key status, with no accepted dataset
+        # observation/freshness contract. Keep legacy eligibility flags closed.
+        live_measured = False
 
         if not enabled:
             failure_reason = "DISABLED"
         elif not live_key:
             failure_reason = "KEY_MISSING_OR_INVALID"
-        elif not measured:
+        elif row_count == 0:
             failure_reason = "NO_USABLE_ROWS"
         else:
-            failure_reason = "NONE"
+            failure_reason = "SOURCE_OBSERVATION_UNVERIFIED"
 
         modeled_capture_pct = 0.35 if sector in {"energy", "rates", "market_data", "crypto_exec"} else 0.22
         annual_exposure = est_hour * 24.0 * 365.0
@@ -426,7 +466,8 @@ def build_infra_metrics():
             "env": str(r.get("env", "")),
             "enabled": enabled,
             "estimated_hour_value": round(est_hour, 2),
-            "value_basis": "MEASURED" if measured else "ESTIMATED",
+            "value_basis": "MODELED",
+            "source_observation_status": "UNVERIFIED",
             "live_key": live_key,
             "live_measured": live_measured,
             "failure_reason": failure_reason,
@@ -476,7 +517,7 @@ def build_infra_metrics():
             "week": week,
             "month": month,
             "year": year,
-            "basis": "MEASURED" if item["live_measured_sources"] > 0 else "ESTIMATED",
+            "basis": "MODELED",
             "failure_count": item["failing_sources"],
             "annual_exposure_usd": round(item["annual_exposure_usd"], 2),
             "exposure_20y_usd": round(item["exposure_20y_usd"], 2),
@@ -491,6 +532,10 @@ def build_infra_metrics():
 
     totals = {
         "generated_utc": now_iso(),
+        "value_basis": "MODELED",
+        "economics_verified": False,
+        "source_observation_status": "UNVERIFIED",
+        "aggregation_basis": "sum_of_assumed_source_scenarios_overlaps_possible",
         "enabled_sources": sum(1 for r in source_rows if r["enabled"]),
         "registry_detected_sources": len(source_rows),
         "sector_count": len(sector_matrix),
@@ -507,9 +552,10 @@ def build_infra_metrics():
         "modeled_annual_upside_usd": round(sum(x["modeled_annual_upside_usd"] for x in source_rows), 2),
         "top_current_optimization_lane": sector_matrix[0]["sector"] if sector_matrix else "n/a",
         "top_current_lane_hour_value": sector_matrix[0]["hour"] if sector_matrix else 0.0,
-        "measured_source_rows": sum(int(r["rows"]) for r in source_rows),
-        "sources_with_measured_rows": sum(1 for r in source_rows if int(r["rows"]) > 1),
-        "sources_with_estimate_only": sum(1 for r in source_rows if int(r["rows"]) <= 1),
+        "reported_source_rows": sum(int(r["rows"]) for r in source_rows),
+        "measured_source_rows": 0,
+        "sources_with_measured_rows": 0,
+        "sources_with_estimate_only": len(source_rows),
         "sector_value_matrix": sector_matrix,
         "source_truth_rows": source_rows,
         "high_priority_failures": high_priority_failures[:20],
@@ -820,8 +866,8 @@ def css():
 def build_paper_dashboard(p):
     html = f"""
     <html><head><meta charset='utf-8'><title>LumenCore Paper Dashboard</title>{css()}</head><body>
-    <h1>LumenCore — Alpaca Paper Live Dashboard</h1>
-    <div class='sub'>Continuous paper-trading proof loop with ledger, state snapshots, and chain-of-custody hashes.</div>
+    <h1>LumenCore — Local Paper Artifact Review</h1>
+    <div class='sub'>Reported local paper artifacts; current operation and broker balances are unverified. Default capital is illustrative when no source is available.</div>
     <div class='grid'>
       <div class='card'><div class='label'>Starting capital</div><div class='value'>${p['starting_capital']:,.2f}</div></div>
       <div class='card'><div class='label'>Current equity</div><div class='value'>${p['current_equity']:,.2f}</div></div>
@@ -887,17 +933,17 @@ def build_infra_dashboard(m, p):
             ])
 
         html = f"""
-        <html><head><meta charset='utf-8'><title>LumenCore Institutional Infrastructure Live Dashboard</title>{css()}</head><body>
-        <h1>LumenCore — Institutional Infrastructure Live Dashboard</h1>
-        <div class='sub'>Production truth only: live-measured source coverage, failed-source exposure, and sector-level 20-year cost attribution.</div>
+        <html><head><meta charset='utf-8'><title>LumenCore Infrastructure Scenario Review</title>{css()}</head><body>
+        <h1>LumenCore — Infrastructure Scenario Review</h1>
+        <div class='sub'>Registry-reported counts and modeled loss-rate scenarios; not measured savings or revenue. Source observation and freshness remain unverified.</div>
 
         <div class='grid'>
                 <div class='card'><div class='label'>Enabled sources</div><div class='value'>{m['enabled_sources']}</div></div>
-                <div class='card'><div class='label'>Live key sources</div><div class='value'>{m['live_key_sources']}</div></div>
-                <div class='card'><div class='label'>Live measured sources</div><div class='value'>{m['live_measured_sources']}</div></div>
+                <div class='card'><div class='label'>Reported key-present sources</div><div class='value'>{m['live_key_sources']}</div></div>
+                <div class='card'><div class='label'>Verified live sources</div><div class='value'>{m['live_measured_sources']}</div></div>
                 <div class='card'><div class='label'>Failing enabled sources</div><div class='value'>{m['failing_enabled_sources']}</div></div>
 
-                <div class='card'><div class='label'>Hourly value (all enabled)</div><div class='value'>${m['estimated_hourly_preserved_value']:,.2f}</div></div>
+                <div class='card'><div class='label'>Modeled scenario sum ($/hour; overlaps possible)</div><div class='value'>${m['estimated_hourly_preserved_value']:,.2f}</div></div>
                 <div class='card'><div class='label'>Annual exposure</div><div class='value'>${m['annual_exposure_usd']:,.2f}</div></div>
                 <div class='card'><div class='label'>20-year exposure</div><div class='value'>${m['exposure_20y_usd']:,.2f}</div></div>
                 <div class='card'><div class='label'>Modeled annual upside</div><div class='value'>${m['modeled_annual_upside_usd']:,.2f}</div></div>
@@ -911,13 +957,13 @@ def build_infra_dashboard(m, p):
         <div class='section card'>
                 <h3>Sector Priority Matrix</h3>
                 {render_table(
-                        ["Sector","Live Measured Sources","Failing Sources","Rows","Hourly","Annual Exposure","20Y Exposure","Modeled Annual Upside","Basis"],
+                        ["Sector","Verified Live Sources","Failing Sources","Rows","Hourly","Annual Exposure","20Y Exposure","Modeled Annual Upside","Basis"],
                         matrix_rows
                 )}
         </div>
 
         <div class='section card'>
-            <h3>High-Priority Failed Sources (Production Fix Queue)</h3>
+            <h3>Enabled sources needing evidence review</h3>
             {render_table(
                 ["Source","Sector","Status","Failure Reason","Rows","Est $/hr","Annual Exposure","20Y Exposure","Modeled Annual Upside","Modeled Capture %","Last Probe UTC"],
                 failure_rows
@@ -925,7 +971,7 @@ def build_infra_dashboard(m, p):
         </div>
 
         <div class='section card'>
-            <h3>Live-Measured Production Sources</h3>
+            <h3>Verified source observations (none established by this registry)</h3>
             {render_table(
                 ["Source","Sector","Rows","Est $/hr","Annual Exposure","Last Probe UTC"],
                 live_rows
@@ -934,8 +980,8 @@ def build_infra_dashboard(m, p):
 
         <div class='section card'>
             <h3>Investor / reviewer readout</h3>
-            <p><b>What this proves</b>: only sources with live key + measured rows are counted as production evidence.</p>
-            <p><b>Failure attribution</b>: each failed source shows the failure mode plus annual and 20-year exposure if left unresolved.</p>
+            <p><b>What this proves</b>: registry entries report file counts and key labels only. Neither verifies a live source, production operation or economic benefit.</p>
+            <p><b>Failure attribution</b>: source issues require review. Dollar rates are fixed assumptions; annual and 20-year arithmetic is illustrative, with possible overlap between sources.</p>
             <p><b>Modeled upside</b>: annual upside uses a transparent sector capture-rate model (22%-35%) and is explicitly marked modeled.</p>
             <p class='mono'>Generated UTC: {html_escape(m['generated_utc'])}</p>
             <p class='mono'>Proof files: live_source_registry.json, live_sources.json, rolling_performance.json, sector_value_matrix.json, source_truth_table.json, unified_dashboard_chain_of_custody_sha256.json</p>
@@ -1018,7 +1064,8 @@ def acquire_loop_lock() -> bool:
         fd = None
         return True
     except FileExistsError:
-        # Recycle stale locks when the owner PID is gone or the file is too old.
+        # A long-running owner's lock must not expire just because it is old.
+        # Unknown ownership fails closed; recycle only a confirmed dead PID.
         try:
             payload = read_json(LOOP_LOCK_PATH, {})
             owner_pid = payload.get("pid") if isinstance(payload, dict) else None
@@ -1026,10 +1073,6 @@ def acquire_loop_lock() -> bool:
                 LOOP_LOCK_PATH.unlink(missing_ok=True)
                 return acquire_loop_lock()
 
-            age_sec = time.time() - LOOP_LOCK_PATH.stat().st_mtime
-            if age_sec > 21600:
-                LOOP_LOCK_PATH.unlink(missing_ok=True)
-                return acquire_loop_lock()
         except Exception:
             pass
         return False
@@ -1049,7 +1092,9 @@ def acquire_loop_lock() -> bool:
 
 def release_loop_lock():
     try:
-        LOOP_LOCK_PATH.unlink(missing_ok=True)
+        payload = read_json(LOOP_LOCK_PATH, {})
+        if isinstance(payload, dict) and payload.get("pid") == os.getpid():
+            LOOP_LOCK_PATH.unlink(missing_ok=True)
     except Exception:
         pass
 

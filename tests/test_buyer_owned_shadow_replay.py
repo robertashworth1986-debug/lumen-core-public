@@ -7,6 +7,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -142,7 +143,7 @@ class BuyerOwnedShadowReplayTests(unittest.TestCase):
         self.assertTrue(first["gates"]["declared_prediction_time_order"])
         self.assertFalse(first["gates"]["sealed_before_outcome"])
         self.assertEqual(first["version"], "1.0.0")
-        self.assertEqual(first["runner_version"], "1.0.1")
+        self.assertEqual(first["runner_version"], "1.0.2")
         claimed_hash = first.pop("receipt_sha256")
         actual_hash = hashlib.sha256(MODULE._canonical_json(first)).hexdigest()
         self.assertEqual(claimed_hash, actual_hash)
@@ -329,6 +330,64 @@ class BuyerOwnedShadowReplayTests(unittest.TestCase):
         receipt = json.loads(output.read_text(encoding="utf-8"))
         self.assertEqual(receipt["schema"], "lumencore_buyer_owned_shadow_receipt_v1")
         self.assertFalse(receipt["production_change_authorized"])
+
+    def run_cli(self, output: Path) -> int:
+        return MODULE.main([
+            "--protocol", str(self.protocol_path),
+            "--cases", str(self.cases_path),
+            "--predictions", str(self.predictions_path),
+            "--output", str(output),
+        ])
+
+    def test_cli_preserves_input_named_like_old_temporary_file(self) -> None:
+        self.protocol_path = self.write(".receipt.json.tmp", protocol())
+        before = self.protocol_path.read_bytes()
+        self.assertEqual(self.run_cli(self.root / "receipt.json"), 0)
+        self.assertEqual(self.protocol_path.read_bytes(), before)
+
+    def test_cli_preserves_existing_temporary_name_and_symlink_target(self) -> None:
+        legacy_temporary = self.root / ".receipt.json.tmp"
+        legacy_temporary.write_bytes(b"unrelated existing bytes")
+        self.assertEqual(self.run_cli(self.root / "receipt.json"), 0)
+        self.assertEqual(legacy_temporary.read_bytes(), b"unrelated existing bytes")
+        legacy_temporary.unlink()
+        try:
+            legacy_temporary.symlink_to(self.protocol_path)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlink creation is unavailable on this platform")
+        before = self.protocol_path.read_bytes()
+        self.assertEqual(self.run_cli(self.root / "receipt.json"), 0)
+        self.assertTrue(legacy_temporary.is_symlink())
+        self.assertEqual(self.protocol_path.read_bytes(), before)
+
+    def test_cli_rejects_output_input_and_aliases_without_modification(self) -> None:
+        inputs = (self.protocol_path, self.cases_path, self.predictions_path)
+        before = {path: path.read_bytes() for path in inputs}
+        for source in inputs:
+            with self.subTest(source=source.name):
+                self.assertEqual(self.run_cli(source), 2)
+                alias = self.root / f"{source.name}.hardlink"
+                alias.hardlink_to(source)
+                self.assertEqual(self.run_cli(alias), 2)
+                self.assertEqual(alias.read_bytes(), before[source])
+                symlink = self.root / f"{source.name}.symlink"
+                try:
+                    symlink.symlink_to(source)
+                except (OSError, NotImplementedError):
+                    continue
+                self.assertEqual(self.run_cli(symlink), 2)
+                self.assertTrue(symlink.is_symlink())
+        self.assertEqual({path: path.read_bytes() for path in inputs}, before)
+
+    def test_failed_receipt_replace_cleans_only_owned_temporary_file(self) -> None:
+        output = self.root / "receipt.json"
+        output.write_bytes(b"previous receipt")
+        legacy_temporary = self.root / ".receipt.json.tmp"
+        legacy_temporary.write_bytes(b"unrelated bytes")
+        before = {path: path.read_bytes() for path in self.root.iterdir()}
+        with mock.patch.object(MODULE.os, "replace", side_effect=OSError("blocked")):
+            self.assertEqual(self.run_cli(output), 2)
+        self.assertEqual({path: path.read_bytes() for path in self.root.iterdir()}, before)
 
 
 if __name__ == "__main__":

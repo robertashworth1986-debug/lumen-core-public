@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/vps-storage-diagnostic.yml'
       - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
+      - 'code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py'
+      - 'tests/test_collect_vps_instability_evidence.py'
       - 'tests/test_assess_vps_runtime_diagnostic.py'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
   push:
@@ -12,6 +14,8 @@ on:
     paths:
       - '.github/workflows/vps-storage-diagnostic.yml'
       - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
+      - 'code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py'
+      - 'tests/test_collect_vps_instability_evidence.py'
       - 'tests/test_assess_vps_runtime_diagnostic.py'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
   workflow_dispatch:
@@ -44,6 +48,7 @@ jobs:
         run: >-
           python -m pytest -q
           tests/test_assess_vps_runtime_diagnostic.py
+          tests/test_collect_vps_instability_evidence.py
           tests/test_vps_runtime_diagnostic_workflow.py
 
   diagnose:
@@ -521,6 +526,25 @@ jobs:
             "opc@$VPS_HOST" 'bash -s' \
             | tee -a /tmp/lumencore-vps-runtime-diagnostic.txt
 
+      - name: Capture bounded origin instability history without raw logs
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          # Execute reviewed source on stdin; install or change nothing on the VPS.
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes \
+            "opc@$VPS_HOST" 'sudo -n python3 -' \
+            < code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py \
+            > /tmp/lumencore-vps-instability-evidence.json
+          python3 - <<'PY' | tee -a /tmp/lumencore-vps-runtime-diagnostic.txt
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path('/tmp/lumencore-vps-instability-evidence.json').read_text())
+          assert evidence['schema'] == 'lumencore.vps_instability_evidence.v1'
+          print('origin_instability_json=' + json.dumps(evidence, sort_keys=True))
+          PY
+
       - name: Classify bounded runtime readiness
         id: assess
         env:
@@ -554,6 +578,7 @@ jobs:
             /tmp/lumencore-vps-runtime-diagnostic.txt
             /tmp/lumencore-vps-runtime-assessment.json
             /tmp/lumencore-vps-runtime-assessment.md
+            /tmp/lumencore-vps-instability-evidence.json
           if-no-files-found: error
           retention-days: 7
 

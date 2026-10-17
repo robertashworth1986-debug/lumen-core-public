@@ -148,6 +148,11 @@ class AlpacaPaperClient(_legacy.AlpacaPaperClient):
         payload: dict | None = None,
     ) -> Any:
         self._assert_request_url(method, url)
+        # A timeout does not prove that the broker rejected a mutation. Replaying
+        # an accepted buy whose response was lost creates another order because
+        # the historical payload has no stable client_order_id. Only reads may
+        # retry automatically; mutation failures require broker reconciliation.
+        retry_read = method.upper() == "GET"
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             try:
@@ -172,7 +177,7 @@ class AlpacaPaperClient(_legacy.AlpacaPaperClient):
                 raise
             except requests.exceptions.RequestException as exc:
                 last_error = exc
-                if attempt < self.max_retries:
+                if retry_read and attempt < self.max_retries:
                     time.sleep(min(2 * attempt, 5))
                     continue
                 raise

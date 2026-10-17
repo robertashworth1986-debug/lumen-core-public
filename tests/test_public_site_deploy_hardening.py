@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import hashlib
+from email.message import Message
+from http.client import IncompleteRead
 import importlib.util
+import io
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import shutil
 import stat
@@ -113,7 +116,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 43
+    assert len(names) == len(set(names)) == 246
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -148,6 +151,7 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert "assets/prooflock/bounded_validation_protocol_v2.json" in names
     assert "build_week/prooflock_console/index.html" in names
     assert "build_week/prooflock_console/three.module.min.js" in names
+    assert "downloads/eia-two-window-review-20260922.zip" in names
     assert not any(name.startswith("data/") for name in names)
 
     apply_script = APPLY_SCRIPT.read_text(encoding="utf-8")
@@ -159,12 +163,29 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert match is not None
     root_allowlist = re.findall(r'^\s+"([^"]+)"$', match.group("body"), re.MULTILINE)
     assert root_allowlist == names
+    directories_match = re.search(
+        r"readonly -a RELEASE_DIRECTORIES=\(\n(?P<body>.*?)\n\)",
+        apply_script,
+        flags=re.DOTALL,
+    )
+    assert directories_match is not None
+    release_directories = re.findall(
+        r'^\s+"([^"]+)"$', directories_match.group("body"), re.MULTILINE
+    )
+    required_directories = {
+        parent.as_posix()
+        for name in names
+        for parent in PurePosixPath(name).parents
+        if parent != PurePosixPath(".")
+    }
+    assert set(release_directories) == required_directories
+    assert len(release_directories) == len(required_directories)
 
 
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 43
+    assert release_count == 246
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
@@ -236,6 +257,121 @@ def test_exact_snapshot_workflow_is_manual_commit_pinned_and_non_destructive():
     assert "rm -rf -- \"$target_root\"" not in apply_script
 
 
+def workflow_shell_step(name: str) -> str:
+    workflow = PUBLIC_WORKFLOW.read_text(encoding="utf-8")
+    section = workflow.split(f"- name: {name}\n", maxsplit=1)[1]
+    section = section.split("\n      - name:", maxsplit=1)[0]
+    script = section.split("        run: |\n", maxsplit=1)[1]
+    lines = []
+    for line in script.splitlines():
+        if not line.strip():
+            continue
+        if not line.startswith(" " * 10):
+            break
+        lines.append(line[10:])
+    return "\n".join(lines)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="executes the Linux deployment gate")
+@pytest.mark.parametrize(
+    ("overrides", "accepted"),
+    [
+        ({}, True),
+        ({"WORKFLOW_REF": "refs/heads/unmerged-change"}, False),
+        ({"WORKFLOW_REF": "refs/tags/release"}, False),
+        ({"RELEASE_COMMIT": "b" * 40}, False),
+        ({"APPROVAL": "HOLD"}, False),
+        ({"EVENT_NAME": "push"}, False),
+    ],
+)
+def test_production_authorization_executes_main_and_exact_identity_gate(tmp_path, overrides, accepted):
+    output = tmp_path / "github-output"
+    env = {
+        **os.environ,
+        "APPROVAL": "DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT",
+        "EVENT_NAME": "workflow_dispatch",
+        "RELEASE_COMMIT": "a" * 40,
+        "WORKFLOW_COMMIT": "a" * 40,
+        "WORKFLOW_REF": "refs/heads/main",
+        "GITHUB_OUTPUT": str(output),
+        **overrides,
+    }
+    result = subprocess.run(
+        ["bash", "-c", workflow_shell_step("Fail closed unless this exact workflow commit is approved")],
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert (result.returncode == 0) is accepted
+    if accepted:
+        assert output.read_text() == f"source_commit={'a' * 40}\n"
+    else:
+        assert not output.exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="executes the Linux attestation gate")
+@pytest.mark.parametrize(
+    ("failed_predicate", "expected_calls"),
+    [("", 2), ("https://slsa.dev/provenance/v1", 1), ("https://cyclonedx.org/bom", 2)],
+)
+def test_attestation_failure_stops_before_production_access(tmp_path, failed_predicate, expected_calls):
+    workflow = PUBLIC_WORKFLOW.read_text(encoding="utf-8")
+    step_name = "Verify signed provenance and SBOM before production access"
+    assert workflow.index(step_name) < workflow.index("Install SSH key")
+    assert "attestations: read" in workflow
+    assert "attestations: write" not in workflow
+    cleanup = workflow.split("- name: Remove remote transfer staging\n", maxsplit=1)[1]
+    assert "if: always() && steps.verify_attestations.outcome == 'success' && steps.transfer.outcome != 'skipped'" in cleanup.split("shell:", maxsplit=1)[0]
+    signing_workflow = (ROOT / ".github/workflows/public-site-supply-chain.yml").read_text()
+    pr_trigger = signing_workflow.split("  pull_request:\n", maxsplit=1)[1].split("  push:\n", maxsplit=1)[0]
+    assert "      - '.github/workflows/deploy-public-site-release.yml'" in pr_trigger
+
+    binary_dir = tmp_path / "bin"
+    binary_dir.mkdir()
+    gh = binary_dir / "gh"
+    gh.write_text(
+        '#!/bin/sh\n'
+        'printf "%s\\n" "$*" >> "$ATTEST_LOG"\n'
+        'if [ -n "$FAIL_PREDICATE" ]; then\n'
+        '  case "$*" in *"$FAIL_PREDICATE"*) exit 1 ;; esac\n'
+        'fi\n'
+        'printf "{}\\n"\n'
+    )
+    gh.chmod(0o755)
+    release = tmp_path / "release"
+    release.mkdir()
+    log = tmp_path / "attestation-calls"
+    reached = tmp_path / "production-access"
+    script = workflow_shell_step(step_name).replace("/tmp/public-site-release", str(release))
+    result = subprocess.run(
+        ["bash", "-c", script + '\n touch "$PRODUCTION_ACCESS_MARKER"'],
+        env={
+            **os.environ,
+            "PATH": f"{binary_dir}{os.pathsep}{os.environ['PATH']}",
+            "GITHUB_REPOSITORY": "robertashworth1986-debug/lumen-core-public",
+            "RELEASE_COMMIT": "a" * 40,
+            "ATTEST_LOG": str(log),
+            "FAIL_PREDICATE": failed_predicate,
+            "PRODUCTION_ACCESS_MARKER": str(reached),
+        },
+        capture_output=True,
+        text=True,
+    )
+    assert (result.returncode == 0) is (not failed_predicate)
+    assert reached.exists() is (not failed_predicate)
+    calls = log.read_text().splitlines()
+    assert len(calls) == expected_calls
+    for call in calls:
+        assert f"--source-digest {'a' * 40}" in call
+        assert "--source-ref refs/heads/main" in call
+        assert "--signer-workflow robertashworth1986-debug/lumen-core-public/.github/workflows/public-site-supply-chain.yml" in call
+        assert "--cert-oidc-issuer https://token.actions.githubusercontent.com" in call
+        assert "--deny-self-hosted-runners" in call
+    assert "--predicate-type https://slsa.dev/provenance/v1" in calls[0]
+    if expected_calls == 2:
+        assert "--predicate-type https://cyclonedx.org/bom" in calls[1]
+
+
 def test_legacy_auto_deploy_is_replaced_by_read_only_exact_live_audit():
     module = load_module(PACKAGER_PATH, "package_public_site_release_audit_trigger")
     audit = LIVE_AUDIT_WORKFLOW.read_text(encoding="utf-8")
@@ -300,6 +436,16 @@ def test_live_verifier_maps_canonical_routes_and_assets_to_exact_paths():
     )
 
 
+@pytest.mark.parametrize("archive_name", ["js/capital_research_lab.js", "js/capital_math.mjs"])
+@pytest.mark.parametrize("content_type,allowed", [
+    ("text/javascript", True), ("application/javascript", True),
+    ("application/octet-stream", False), ("text/html", False),
+])
+def test_javascript_mime_check_applies_outside_cohort_directory(archive_name, content_type, allowed):
+    verifier = load_module(VERIFY_PATH, "verify_public_site_module_mime")
+    assert verifier.content_type_allowed(archive_name, content_type) is allowed
+
+
 def test_live_verifier_rejects_duplicate_json_keys(tmp_path):
     verifier = load_module(VERIFY_PATH, "verify_public_site_duplicate_keys")
     manifest = tmp_path / "manifest.json"
@@ -342,6 +488,189 @@ def test_live_verifier_rejects_unknown_manifest_row_fields(tmp_path):
             base_url="https://example.invalid",
             timeout=0.1,
         )
+
+
+def live_manifest(body=b"reviewed bytes", name="operator_home.html"):
+    return {
+        "archive_sha256": "b" * 64,
+        "file_count": 1,
+        "files": [{
+            "archive_name": name,
+            "bytes": len(body),
+            "git_blob_oid": "c" * 40,
+            "install_mode": "0644",
+            "repo_path": f"dashboard/{name}",
+            "sha256": hashlib.sha256(body).hexdigest(),
+        }],
+        "schema": "lumencore.public_site_release_manifest.v1",
+        "source_commit": "a" * 40,
+        "target_directory": "/opt/lumencore/dashboard",
+    }
+
+
+def verify_live_fixture(verifier, tmp_path, payload, **kwargs):
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps(payload), encoding="utf-8")
+    return verifier.verify(
+        manifest_path=manifest,
+        source_commit=payload["source_commit"],
+        base_url="https://lumen-core.ai",
+        timeout=kwargs.get("timeout", 1),
+    )
+
+
+class BoundedLiveResponse(io.BytesIO):
+    status = 200
+
+    def __init__(self, body):
+        super().__init__(body)
+        self.headers = Message()
+        self.headers["Content-Type"] = "text/html"
+        self.read_sizes = []
+
+    def read(self, size=-1):
+        assert size >= 0, "live responses must never be read without a bound"
+        self.read_sizes.append(size)
+        return super().read(size)
+
+
+@pytest.mark.parametrize("count", [0, False, 1001])
+def test_live_verifier_rejects_empty_or_invalid_membership_before_http(tmp_path, monkeypatch, count):
+    verifier = load_module(VERIFY_PATH, "verify_live_membership")
+    payload = live_manifest()
+    payload["file_count"] = count
+    payload["files"] = [] if count in (0, False) else payload["files"] * count
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="file rows"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+@pytest.mark.parametrize("name", [".", "./a.html", "a//b.html", "a/./b.html", "a/../b.html", "a\nb.html"])
+def test_live_verifier_validates_all_paths_before_any_http(tmp_path, monkeypatch, name):
+    verifier = load_module(VERIFY_PATH, "verify_live_paths")
+    payload = live_manifest()
+    payload["files"].extend(live_manifest(name=name)["files"])
+    payload["file_count"] = 2
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="invalid manifest row"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+def test_live_verifier_rejects_oversized_manifest_before_parsing(tmp_path):
+    verifier = load_module(VERIFY_PATH, "verify_live_document_bound")
+    manifest = tmp_path / "manifest.json"
+    manifest.write_bytes(b" " * (verifier.MAX_MANIFEST_BYTES + 1))
+    with pytest.raises(ValueError, match="bounded input size"):
+        verifier.load_manifest(manifest)
+
+
+def test_live_verifier_rejects_excessive_declared_body_before_http(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_file_bound")
+    payload = live_manifest()
+    payload["files"][0]["bytes"] = verifier.MAX_FILE_BYTES + 1
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="invalid manifest row"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+def test_live_verifier_rejects_excessive_total_before_http(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_total_bound")
+    payload = live_manifest()
+    payload["files"] = [live_manifest(name=f"{i}.html")["files"][0] for i in range(9)]
+    payload["file_count"] = len(payload["files"])
+    for row in payload["files"]:
+        row["bytes"] = verifier.MAX_FILE_BYTES
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="bounded total size"):
+        verify_live_fixture(verifier, tmp_path, payload)
+
+
+@pytest.mark.parametrize("timeout", [0, -1, float("inf"), float("nan")])
+def test_live_verifier_rejects_invalid_timeout(tmp_path, monkeypatch, timeout):
+    verifier = load_module(VERIFY_PATH, "verify_live_timeout")
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: pytest.fail("unexpected HTTP"))
+    with pytest.raises(ValueError, match="positive and finite"):
+        verify_live_fixture(verifier, tmp_path, live_manifest(), timeout=timeout)
+
+
+@pytest.mark.parametrize("body", [b"", b"reviewed bytes"])
+def test_live_verifier_accepts_exact_bytes_with_bounded_reads(tmp_path, monkeypatch, body):
+    verifier = load_module(VERIFY_PATH, "verify_live_exact_bytes")
+    response = BoundedLiveResponse(body)
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: response)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest(body))
+    assert result["release_verified"] is True
+    assert result["matched_file_count"] == 1
+    assert response.read_sizes == [len(body) + 1]
+
+
+def test_live_verifier_rejects_oversized_response_without_reading_it_all(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_oversized_response")
+    response = BoundedLiveResponse(b"reviewed bytes" + b"x" * 100_000)
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: response)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest())
+    assert result["release_verified"] is False
+    assert result["results"][0]["status"] == "ERROR"
+    assert result["results"][0]["detail"] == "response exceeds manifest byte count"
+    assert response.read_sizes == [len(b"reviewed bytes") + 1]
+
+
+@pytest.mark.parametrize(
+    ("content_type", "allowed"),
+    [
+        ("application/zip", True),
+        ("application/x-zip-compressed", True),
+        ("application/octet-stream", True),
+        ("text/html", False),
+        ("text/plain", False),
+        ("application/json", False),
+    ],
+)
+def test_frozen_eia_download_requires_zip_mime_with_exact_bytes(
+    tmp_path, monkeypatch, content_type, allowed
+):
+    verifier = load_module(VERIFY_PATH, "verify_frozen_eia_zip_mime")
+    body = b"PK\x03\x04reviewed ZIP fixture"
+    name = "downloads/eia-two-window-review-20260922.zip"
+    response = BoundedLiveResponse(body)
+    response.headers.replace_header("Content-Type", content_type)
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: response)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest(body, name))
+    row = result["results"][0]
+    assert row["actual_sha256"] == row["expected_sha256"]
+    assert row["bytes"] == len(body)
+    assert row["content_type_allowed"] is allowed
+    assert result["release_verified"] is allowed
+    assert result["matched_file_count"] == int(allowed)
+    assert row["url"] == (
+        f"https://lumen-core.ai/{name}?release={'a' * 40}"
+    )
+
+
+def test_live_verifier_rejects_correct_hash_with_wrong_declared_length(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_length_match")
+    body = b"reviewed bytes"
+    payload = live_manifest(body)
+    payload["files"][0]["bytes"] += 1
+    monkeypatch.setattr(verifier, "urlopen", lambda *a, **k: BoundedLiveResponse(body))
+    result = verify_live_fixture(verifier, tmp_path, payload)
+    assert result["release_verified"] is False
+    row = result["results"][0]
+    assert row["status"] == "MISMATCH"
+    assert row["actual_sha256"] == row["expected_sha256"]
+
+
+def test_live_verifier_retains_incomplete_http_failure(tmp_path, monkeypatch):
+    verifier = load_module(VERIFY_PATH, "verify_live_incomplete_response")
+
+    def interrupted(*args, **kwargs):
+        raise IncompleteRead(b"partial", 20)
+
+    monkeypatch.setattr(verifier, "urlopen", interrupted)
+    result = verify_live_fixture(verifier, tmp_path, live_manifest())
+    assert result["release_verified"] is False
+    assert result["results"][0]["status"] == "ERROR"
+    assert "IncompleteRead" in result["results"][0]["detail"]
 
 
 def require_posix_apply_test() -> str:
@@ -427,6 +756,49 @@ def test_posix_apply_installs_allowlist_and_preserves_operator_data(tmp_path):
         assert (rollback / "files" / name).read_bytes() == old_bodies[name]
 
 
+def test_posix_apply_creates_missing_download_directory_and_retains_rollback_state(tmp_path):
+    bash = require_posix_apply_test()
+    module, _repo, commit, committed, archive, manifest, _payload = build_package(tmp_path)
+    test_root = tmp_path / "remote"
+    target, old_bodies = make_remote_sandbox(test_root, module)
+    name = "downloads/eia-two-window-review-20260922.zip"
+    (target / name).unlink()
+    (target / "downloads").rmdir()
+    old_bodies.pop(name)
+    assert not (target / "downloads").exists()
+    env = dict(os.environ)
+    env.update(
+        PUBLIC_SITE_DEPLOY_TEST_MODE="1",
+        PUBLIC_SITE_DEPLOY_TEST_ROOT=str(test_root),
+    )
+    completed = subprocess.run(
+        apply_command(bash, archive, manifest, commit),
+        check=True,
+        text=True,
+        capture_output=True,
+        env=env,
+    )
+    assert "PUBLIC_SITE_DEPLOYMENT_OK" in completed.stdout
+    rollback_match = re.search(r"^PUBLIC_SITE_ROLLBACK_DIR=(.+)$", completed.stdout, re.M)
+    assert rollback_match is not None
+    rollback = Path(rollback_match.group(1))
+    assert stat.S_IMODE((target / "downloads").stat().st_mode) == 0o755
+    assert (target / name).read_bytes() == committed[f"dashboard/{name}"]
+    assert stat.S_IMODE((target / name).stat().st_mode) == 0o644
+    assert "downloads\tMISSING\t-\t-\t-" in (
+        rollback / "directory-state.tsv"
+    ).read_text().splitlines()
+    assert any(
+        row.startswith(f"{name}\tMISSING\t")
+        for row in (rollback / "pre-deploy.tsv").read_text().splitlines()
+    )
+    assert not (rollback / "files" / name).exists()
+    for previous_name, body in old_bodies.items():
+        assert (rollback / "files" / previous_name).read_bytes() == body
+    assert (target / "local_operator_notes.html").read_bytes() == b"preserve non-release page\n"
+    assert (target / "data" / "snapshot.json").read_bytes() == b"{}\n"
+
+
 def test_apply_rejects_hold_before_touching_target(tmp_path):
     bash = require_posix_apply_test()
     module, _repo, commit, _committed, archive, manifest, _payload = build_package(tmp_path)
@@ -478,3 +850,73 @@ def test_apply_rejects_duplicate_manifest_key_before_touching_target(tmp_path):
     assert not (test_root / "opt" / "lumencore" / "rollbacks").exists()
     for name, body in old_bodies.items():
         assert (target / name).read_bytes() == body
+
+
+@pytest.mark.parametrize("name,mime", [
+    ("index.html", "text/html"), ("style.css", "text/css"),
+    ("assets/concept.webp", "image/webp"), ("manifest.json", "application/json"),
+    ("observatory/geometry.mjs", "text/javascript"), ("observatory/geometry.worker.js", "application/javascript"),
+])
+def test_bounded_light_release_rejects_wrong_mime(name, mime):
+    verifier = load_module(VERIFY_PATH, "bounded_light_mime")
+    assert verifier.content_type_allowed("bounded-light/" + name, mime)
+    assert not verifier.content_type_allowed("bounded-light/" + name, "application/octet-stream")
+    if mime != "text/html":
+        assert not verifier.content_type_allowed("bounded-light/" + name, "text/html")
+
+
+def test_bounded_light_audit_uses_canonical_directory_route():
+    verifier = load_module(VERIFY_PATH, "bounded_light_route")
+    assert verifier.live_url("https://lumen-core.ai", "bounded-light/index.html", "a" * 40) == (
+        "https://lumen-core.ai/bounded-light/?release=" + "a" * 40
+    )
+    assert verifier.live_url("https://lumen-core.ai", "bounded-light/observatory/index.html", "a" * 40) == (
+        "https://lumen-core.ai/bounded-light/observatory/?release=" + "a" * 40
+    )
+
+
+@pytest.mark.parametrize("name,mime", [
+    ("index.html", "text/html"), ("portfolio.css", "text/css"),
+    ("assets/hopf-atlas.webp", "image/webp"), ("data/registry.json", "application/json"),
+    ("math-models.mjs", "text/javascript"), ("assets/cube.svg", "image/svg+xml"),
+    ("Public_Portfolio_Review_Brief_2026-10-04.pdf", "application/pdf"),
+    ("data/math-sources.md", "text/plain"),
+])
+def test_portfolio_release_rejects_wrong_mime(name, mime):
+    verifier = load_module(VERIFY_PATH, "portfolio_mime")
+    assert verifier.content_type_allowed("portfolio/" + name, mime)
+    if mime != "text/html":
+        assert not verifier.content_type_allowed("portfolio/" + name, "text/html")
+    if not name.endswith(".md"):
+        assert not verifier.content_type_allowed("portfolio/" + name, "application/octet-stream")
+
+
+def test_portfolio_audit_uses_canonical_directory_route():
+    verifier = load_module(VERIFY_PATH, "portfolio_route")
+    assert verifier.live_url("https://lumen-core.ai", "portfolio/index.html", "a" * 40) == (
+        "https://lumen-core.ai/portfolio/?release=" + "a" * 40
+    )
+
+
+def test_creator_rights_audit_uses_canonical_route_and_mime():
+    verifier = load_module(VERIFY_PATH, "creator_rights_route")
+    assert verifier.live_url("https://lumen-core.ai", "rights/index.html", "a" * 40) == (
+        "https://lumen-core.ai/rights/?release=" + "a" * 40
+    )
+    assert verifier.content_type_allowed("rights/artwork-register.json", "application/json")
+    assert not verifier.content_type_allowed("rights/artwork-register.json", "text/html")
+
+
+@pytest.mark.parametrize("name,mime", [
+    ("index.html", "text/html"), ("art.css", "text/css"),
+    ("art.js", "text/javascript"), ("media-manifest.json", "application/json"),
+])
+def test_art_release_uses_canonical_route_and_rejects_wrong_mime(name, mime):
+    verifier = load_module(VERIFY_PATH, "art_release")
+    assert verifier.live_url("https://lumen-core.ai", "art/index.html", "a" * 40) == (
+        "https://lumen-core.ai/art/?release=" + "a" * 40
+    )
+    assert verifier.content_type_allowed("art/" + name, mime)
+    assert not verifier.content_type_allowed("art/" + name, "application/octet-stream")
+    if mime != "text/html":
+        assert not verifier.content_type_allowed("art/" + name, "text/html")

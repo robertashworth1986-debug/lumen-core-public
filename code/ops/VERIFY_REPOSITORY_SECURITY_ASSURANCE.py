@@ -120,7 +120,8 @@ BRANCH_PROTECTION_FIELDS = {
     "required_pull_request_reviews_enforced",
     "decision",
 }
-CODEQL_SHA = "5595ccaf912efad79be6eef63a5619ff05969be3"
+CODEQL_VERSION = "4.37.8"
+CODEQL_SHA = "db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28"
 DEPENDENCY_REVIEW_SHA = "a1d282b36b6f3519aa1f3fc636f609c47dddb294"
 SETUP_NODE_SHA = "820762786026740c76f36085b0efc47a31fe5020"
 DASHBOARD_NODE_VERSION = "24.18.0"
@@ -135,7 +136,6 @@ DASHBOARD_EXPECTED_VERSIONS = {
     "animejs": "4.5.0",
     "echarts": "6.1.0",
     "echarts-gl": "2.1.0",
-    "form-data": "4.0.6",
     "postprocessing": "6.39.4",
     "three": "0.185.1",
 }
@@ -146,6 +146,12 @@ DASHBOARD_EXPECTED_PEERS = {
 DASHBOARD_ALLOWED_THREE_PEER_PACKAGES = {
     "node_modules/animejs",
     "node_modules/postprocessing",
+}
+DASHBOARD_REMOVED_PACKAGES = {
+    "@tensorflow/tfjs",
+    "argparse",
+    "sprintf-js",
+    "form-data",
 }
 DASHBOARD_COMPATIBILITY_DECISION = (
     "REMOVE_UNUSED_INCOMPATIBLE_MODEL_VIEWER_AND_ACCEPT_STRICT_THREE_0_185_1_GRAPH"
@@ -242,8 +248,8 @@ def verify_codeql_workflow(text: str) -> None:
         "javascript-typescript",
         "build-mode: none",
         "queries: security-extended",
-        f"github/codeql-action/init@{CODEQL_SHA}",
-        f"github/codeql-action/analyze@{CODEQL_SHA}",
+        f"github/codeql-action/init@{CODEQL_SHA} # v{CODEQL_VERSION}",
+        f"github/codeql-action/analyze@{CODEQL_SHA} # v{CODEQL_VERSION}",
         "persist-credentials: false",
     )
     for marker in required:
@@ -392,9 +398,17 @@ def verify_dashboard_dependencies(
     package: dict[str, Any], lock: dict[str, Any]
 ) -> dict[str, Any]:
     dependencies = package.get("dependencies")
-    overrides = package.get("overrides")
-    if not isinstance(dependencies, dict) or not isinstance(overrides, dict):
+    if not isinstance(dependencies, dict):
         raise SecurityAssuranceError("dashboard package dependency contract missing")
+    for scope in ("dependencies", "devDependencies", "optionalDependencies", "overrides"):
+        entries = package.get(scope, {})
+        if not isinstance(entries, dict):
+            raise SecurityAssuranceError(f"dashboard {scope} must be an object")
+        removed = sorted(DASHBOARD_REMOVED_PACKAGES.intersection(entries))
+        if removed:
+            raise SecurityAssuranceError(
+                f"removed dashboard dependency reintroduced in {scope}: {', '.join(removed)}"
+            )
     if "@google/model-viewer" in dependencies:
         raise SecurityAssuranceError(
             "unused incompatible @google/model-viewer dependency reintroduced"
@@ -402,8 +416,6 @@ def verify_dashboard_dependencies(
     for name, expected in DASHBOARD_EXPECTED_RANGES.items():
         if dependencies.get(name) != expected:
             raise SecurityAssuranceError(f"dashboard dependency range drift: {name}")
-    if overrides.get("form-data") != "4.0.6":
-        raise SecurityAssuranceError("form-data remediation override missing")
 
     packages = lock.get("packages")
     if (
@@ -433,6 +445,14 @@ def verify_dashboard_dependencies(
         raise SecurityAssuranceError(
             "unused incompatible @google/model-viewer lock entry reintroduced"
         )
+
+    for path in packages:
+        for name in DASHBOARD_REMOVED_PACKAGES:
+            suffix = f"node_modules/{name}"
+            if path == suffix or path.endswith(f"/{suffix}"):
+                raise SecurityAssuranceError(
+                    f"removed dashboard dependency lock entry reintroduced: {path}"
+                )
 
     three_peer_paths = {
         path
@@ -482,6 +502,7 @@ def verify_dashboard_dependencies(
         "compatibility_decision": DASHBOARD_COMPATIBILITY_DECISION,
         "install_policy": "STRICT_NPM_PEER_RESOLUTION_NO_FORCE_OR_LEGACY_BYPASS",
         "incompatible_model_viewer_absent": True,
+        "removed_unused_dependency_chain": sorted(DASHBOARD_REMOVED_PACKAGES),
         "animejs_three_adapter_smoke_required": True,
         "runtime_claim_boundary": (
             "DECLARED_NPM_GRAPH_VALIDATED_WITHOUT_CLAIMING_DEPLOYED_VISUAL_ASSET_REPLACEMENT"
@@ -715,6 +736,9 @@ def verify_register(
         "workflow_boundaries": {
             "codeql_languages": ["javascript-typescript", "python"],
             "codeql_queries": "security-extended",
+            "codeql_action_version": f"v{CODEQL_VERSION}",
+            "codeql_action_commit": CODEQL_SHA,
+            "codeql_action_immutable_pin": True,
             "dependency_failure_threshold": "high",
             "automatic_merge": False,
             "runtime_scan": False,

@@ -277,3 +277,11 @@ Only after that event may the state move from **EXTERNALLY EXECUTABLE** to **EXT
 ---
 
 **Operating principle:** bounded light speed — move quickly without outrunning evidence, rights, reversibility, or human authority.
+
+
+## October 4 portfolio and geometry review
+
+- [Expanded canonical geometry registry](config/geometry_championship_v1_registry.json): 26 candidate families, 11 lanes; no new performance promotion.
+- [Controlled transport screen](docs/GEOMETRY_TRANSPORT_SCREEN_2026-10-04.md): eight synthetic DC graphs, with six matched-terminal comparisons and two exploratory embeddings; negative outcomes retained.
+- [Public portfolio review room](https://lumen-core.ai/portfolio/) connects the visual, mathematical, engineering and evidence records.
+- [Current portfolio map](docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md) preserves historical denominators and independent-review gates.

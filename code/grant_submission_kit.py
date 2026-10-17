@@ -27,6 +27,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from grant_application_factory import (
+    BundleIntegrityError, bundle_lock, refresh_bundle_manifest, verified_bundle_files,
+)
+
 ROOT = Path(__file__).resolve().parent.parent
 GRANTS = ROOT / "out" / "grants"
 DATA = ROOT / "data"
@@ -451,6 +455,10 @@ def build_preflight(grant_id: str, run_dir: Path,
 
     blockers: list[str] = []
     warnings: list[str] = []
+    try:
+        verified_bundle_files(run_dir)
+    except (BundleIntegrityError, OSError, UnicodeError):
+        blockers.append("bundle integrity is unverified; regenerate a fresh draft")
 
     if state.get("state") not in ("approved", "submitted"):
         blockers.append(f"approval_state is '{state.get('state')}' — must be 'approved' before submission")
@@ -570,111 +578,114 @@ def build_preflight(grant_id: str, run_dir: Path,
 def write_submission_kit(grant_id: str, run_dir: Path,
                          preflight: dict[str, Any]) -> dict[str, Path]:
     """Write submission_packet.json + SUBMIT_HOWTO.md to the run dir."""
-    packet_p = run_dir / "submission_packet.json"
-    howto_p = run_dir / "SUBMIT_HOWTO.md"
-    packet_p.write_text(json.dumps(preflight, indent=2), encoding="utf-8")
+    with bundle_lock(run_dir):
+        previous = verified_bundle_files(run_dir)
+        packet_p = run_dir / "submission_packet.json"
+        howto_p = run_dir / "SUBMIT_HOWTO.md"
+        packet_p.write_text(json.dumps(preflight, indent=2), encoding="utf-8")
 
-    p = preflight
-    portal = p.get("portal", {})
-    deadline = p.get("deadline", {})
-    blockers = p.get("blockers", [])
-    warnings = p.get("warnings", [])
-    sf424 = p.get("sf424_map", {})
-    target_stage = p.get("target_stage", "full_proposal")
+        p = preflight
+        portal = p.get("portal", {})
+        deadline = p.get("deadline", {})
+        blockers = p.get("blockers", [])
+        warnings = p.get("warnings", [])
+        sf424 = p.get("sf424_map", {})
+        target_stage = p.get("target_stage", "full_proposal")
 
-    md: list[str] = []
-    md.append(f"# Submission Kit — {p.get('grant_id')}")
-    md.append("")
-    md.append(f"**Agency:** {p.get('agency')}  ")
-    md.append(f"**Program:** {p.get('program')}  ")
-    md.append(f"**Target stage:** `{target_stage}`  ")
-    md.append(f"**Ceiling:** ${p.get('ceiling_usd'):,}  " if p.get('ceiling_usd') else "")
-    md.append(f"**Approval state:** `{p.get('approval_state')}`  ")
-    if deadline.get("rolling"):
-        md.append(f"**Deadline:** rolling ({deadline.get('deadline')})  ")
-    elif deadline.get("days_remaining") is not None:
-        md.append(f"**Deadline:** {deadline.get('deadline')} "
-                  f"({deadline.get('days_remaining')} days, risk={deadline.get('risk')})  ")
-    md.append("")
-    md.append(f"**READY TO SUBMIT:** {'✅ YES' if p.get('ready') else '❌ NO'}")
-    md.append("")
-
-    if blockers:
-        md.append("## ⛔ Blockers (must resolve before submission)")
-        for b in blockers:
-            md.append(f"- {b}")
+        md: list[str] = []
+        md.append(f"# Submission Kit — {p.get('grant_id')}")
         md.append("")
-    if warnings:
-        md.append("## ⚠️ Warnings")
-        for w in warnings:
-            md.append(f"- {w}")
+        md.append(f"**Agency:** {p.get('agency')}  ")
+        md.append(f"**Program:** {p.get('program')}  ")
+        md.append(f"**Target stage:** `{target_stage}`  ")
+        md.append(f"**Ceiling:** ${p.get('ceiling_usd'):,}  " if p.get('ceiling_usd') else "")
+        md.append(f"**Approval state:** `{p.get('approval_state')}`  ")
+        if deadline.get("rolling"):
+            md.append(f"**Deadline:** rolling ({deadline.get('deadline')})  ")
+        elif deadline.get("days_remaining") is not None:
+            md.append(f"**Deadline:** {deadline.get('deadline')} "
+                      f"({deadline.get('days_remaining')} days, risk={deadline.get('risk')})  ")
+        md.append("")
+        md.append(f"**READY TO SUBMIT:** {'✅ YES' if p.get('ready') else '❌ NO'}")
         md.append("")
 
-    md.append("## 🎯 Submission Portal")
-    md.append(f"- **System:** {portal.get('submission_system')}")
-    md.append(f"- **Portal URL:** {portal.get('portal_url')}")
-    for k, v in portal.items():
-        if k.endswith("_url") and k != "portal_url":
-            md.append(f"- **{k.replace('_url','').upper()}:** {v}")
-    if portal.get("note"):
-        md.append(f"- **Note:** {portal.get('note')}")
-    md.append("")
-    md.append("### Required to submit")
-    if target_stage == "project_pitch":
-        md.append("- [ ] NSF Project Pitch content reviewed")
-        md.append("- [ ] NSF Seed Fund portal account accessible")
-        md.append("- [ ] Founder/PI performs final review and portal submission")
-    else:
-        for r in portal.get("requires", []):
-            md.append(f"- [ ] {r}")
-    md.append("")
+        if blockers:
+            md.append("## ⛔ Blockers (must resolve before submission)")
+            for b in blockers:
+                md.append(f"- {b}")
+            md.append("")
+        if warnings:
+            md.append("## ⚠️ Warnings")
+            for w in warnings:
+                md.append(f"- {w}")
+            md.append("")
 
-    md.append("## 📋 Step-by-step")
-    if target_stage == "project_pitch":
-        md.append("1. Sign in to the NSF Seed Fund Project Pitch portal.")
-        md.append("2. Review `PROJECT_PITCH.md` against the current portal character limits.")
-        md.append("3. Enter the four pitch sections and verify every factual claim.")
-        md.append("4. Founder/PI performs the final review and submits in the portal.")
-        md.append("5. Record the NSF case number and response when received.")
-        md.append("6. Do not start a full Research.gov proposal until NSF issues an invitation.")
-    else:
-        md.append("1. **Verify SAM.gov registration** is active (UEI, EIN, banking, NAICS).")
-        md.append("   - If not yet registered: https://sam.gov/content/entity-registration")
-        md.append("   - Allow up to 10 business days for activation.")
-        md.append("2. **Confirm the submission account** is linked to the UEI and AOR authority is active.")
-        md.append(f"3. **Open the opportunity** in the portal: {portal.get('portal_url')}")
-        md.append("4. **Create the portal application package.**")
-        md.append("5. **Upload the required attachments** from this run directory.")
-        md.append("6. **Fill the federal cover form** using the field map below.")
-        md.append("7. **AOR signs and submits** in the designated portal.")
-        md.append("8. **Record the external tracking number** returned.")
-        md.append("9. Mark submitted in Luma:")
-        md.append("   ```")
-        md.append(f"   POST /api/grants/{p.get('grant_id')}/submitted")
-        md.append("   {\"submitted_by\":\"<AOR name>\",\"external_tracking_id\":\"GRANT##########\"}")
-        md.append("   ```")
-    md.append("")
-
-    if target_stage != "project_pitch":
-        md.append("## 📑 SF-424 Field Map (copy-paste ready)")
+        md.append("## 🎯 Submission Portal")
+        md.append(f"- **System:** {portal.get('submission_system')}")
+        md.append(f"- **Portal URL:** {portal.get('portal_url')}")
+        for k, v in portal.items():
+            if k.endswith("_url") and k != "portal_url":
+                md.append(f"- **{k.replace('_url','').upper()}:** {v}")
+        if portal.get("note"):
+            md.append(f"- **Note:** {portal.get('note')}")
         md.append("")
-        md.append("| Form Field | Value |")
-        md.append("|---|---|")
-        for k, v in sf424.items():
-            vv = "" if v is None else str(v).replace("|", "\\|")
-            md.append(f"| {k} | {vv} |")
+        md.append("### Required to submit")
+        if target_stage == "project_pitch":
+            md.append("- [ ] NSF Project Pitch content reviewed")
+            md.append("- [ ] NSF Seed Fund portal account accessible")
+            md.append("- [ ] Founder/PI performs final review and portal submission")
+        else:
+            for r in portal.get("requires", []):
+                md.append(f"- [ ] {r}")
         md.append("")
 
-    if p.get("missing_fields"):
-        md.append("## ✏️ Fields needing your input (from `data/company_profile.json`)")
-        for f in p.get("missing_fields", []):
-            md.append(f"- `{f}`")
-        md.append("")
-        md.append("Edit `data/company_profile.json` and POST `/api/grants/regenerate` "
-                  "to refresh all packages with the new values.")
+        md.append("## 📋 Step-by-step")
+        if target_stage == "project_pitch":
+            md.append("1. Sign in to the NSF Seed Fund Project Pitch portal.")
+            md.append("2. Review `PROJECT_PITCH.md` against the current portal character limits.")
+            md.append("3. Enter the four pitch sections and verify every factual claim.")
+            md.append("4. Founder/PI performs the final review and submits in the portal.")
+            md.append("5. Record the NSF case number and response when received.")
+            md.append("6. Do not start a full Research.gov proposal until NSF issues an invitation.")
+        else:
+            md.append("1. **Verify SAM.gov registration** is active (UEI, EIN, banking, NAICS).")
+            md.append("   - If not yet registered: https://sam.gov/content/entity-registration")
+            md.append("   - Allow up to 10 business days for activation.")
+            md.append("2. **Confirm the submission account** is linked to the UEI and AOR authority is active.")
+            md.append(f"3. **Open the opportunity** in the portal: {portal.get('portal_url')}")
+            md.append("4. **Create the portal application package.**")
+            md.append("5. **Upload the required attachments** from this run directory.")
+            md.append("6. **Fill the federal cover form** using the field map below.")
+            md.append("7. **AOR signs and submits** in the designated portal.")
+            md.append("8. **Record the external tracking number** returned.")
+            md.append("9. Mark submitted in Luma:")
+            md.append("   ```")
+            md.append(f"   POST /api/grants/{p.get('grant_id')}/submitted")
+            md.append("   {\"submitted_by\":\"<AOR name>\",\"external_tracking_id\":\"GRANT##########\"}")
+            md.append("   ```")
         md.append("")
 
-    md.append("---")
-    md.append(f"_Generated {p.get('preflight_utc')} by `grant_submission_kit.py`._")
-    howto_p.write_text("\n".join(md), encoding="utf-8")
-    return {"packet": packet_p, "howto": howto_p}
+        if target_stage != "project_pitch":
+            md.append("## 📑 SF-424 Field Map (copy-paste ready)")
+            md.append("")
+            md.append("| Form Field | Value |")
+            md.append("|---|---|")
+            for k, v in sf424.items():
+                vv = "" if v is None else str(v).replace("|", "\\|")
+                md.append(f"| {k} | {vv} |")
+            md.append("")
+
+        if p.get("missing_fields"):
+            md.append("## ✏️ Fields needing your input (from `data/company_profile.json`)")
+            for f in p.get("missing_fields", []):
+                md.append(f"- `{f}`")
+            md.append("")
+            md.append("Edit `data/company_profile.json` and POST `/api/grants/regenerate` "
+                      "to refresh all packages with the new values.")
+            md.append("")
+
+        md.append("---")
+        md.append(f"_Generated {p.get('preflight_utc')} by `grant_submission_kit.py`._")
+        howto_p.write_text("\n".join(md), encoding="utf-8")
+        refresh_bundle_manifest(run_dir, previous, {"submission_packet.json", "SUBMIT_HOWTO.md"})
+        return {"packet": packet_p, "howto": howto_p}

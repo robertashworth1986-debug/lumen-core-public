@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 import re
@@ -39,6 +40,30 @@ BENCH_PATTERN = re.compile(
     r"BENCH packets=(\d+) elapsed_seconds=([0-9.]+) "
     r"packets_per_second=([0-9.]+) queued=(\d+)"
 )
+PINNED_ZIG_VERSION = "0.15.2"
+SANITIZER_FLAGS = [
+    "-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", "-O1", "-g",
+    "-fsanitize=address", "-fsanitize=undefined", "-fno-sanitize-recover=all",
+]
+SANITIZER_DIAGNOSTIC = re.compile(
+    r"runtime error:|AddressSanitizer:|UndefinedBehaviorSanitizer:", re.IGNORECASE
+)
+SANITIZER_CONTROLS = {
+    "address": (
+        "#include <stdlib.h>\n#include <stdint.h>\n"
+        "int main(int argc, char **argv) {\n"
+        "char *p = malloc(1); (void)argv; if (!p) return 2;\n"
+        # Prevent UBSan object-size inference from preempting the ASan check.
+        "volatile uintptr_t address = (uintptr_t)p; volatile char *access = (char *)address;\n"
+        "access[argc + 3] = 'x'; free(p); return 0; }\n",
+        "AddressSanitizer: heap-buffer-overflow",
+    ),
+    "undefined": (
+        "#include <limits.h>\nint main(int argc, char **argv) {\n"
+        "volatile int value = INT_MAX; (void)argv; return value + argc; }\n",
+        "runtime error: signed integer overflow",
+    ),
+}
 
 
 def now_utc() -> str:
@@ -61,28 +86,37 @@ def detect_zig_python() -> Path:
     for candidate in candidates:
         if not candidate.is_file():
             continue
-        result = subprocess.run(
-            [str(candidate), "-m", "ziglang", "version"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
+        try:
+            result = subprocess.run(
+                [str(candidate), "-m", "ziglang", "version"],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=10,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+        if result.returncode == 0 and result.stdout.strip() == PINNED_ZIG_VERSION:
             return candidate
     raise RuntimeError(
-        "No verified C toolchain found. Install the pinned workspace toolchain with "
+        f"No verified C toolchain found; exact Zig {PINNED_ZIG_VERSION} is required. "
+        "Install the pinned workspace toolchain with "
         "`.venv\\Scripts\\python.exe -m pip install ziglang==0.15.2`."
     )
 
 
-def run_checked(command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+def run_checked(
+    command: list[str], cwd: Path, *, env: dict[str, str] | None = None
+) -> subprocess.CompletedProcess[str]:
     result = subprocess.run(
         command,
         cwd=cwd,
         capture_output=True,
         text=True,
         check=False,
+        timeout=120,
+        env=env,
     )
     if result.returncode != 0:
         raise RuntimeError(
@@ -92,6 +126,85 @@ def run_checked(command: list[str], cwd: Path) -> subprocess.CompletedProcess[st
             f"stderr:\n{result.stderr}"
         )
     return result
+
+
+def detect_sanitizer_compiler(explicit: Path | None = None) -> Path:
+    configured = (
+        explicit or os.environ.get("LUMA_NIC_SANITIZER_CC")
+        or shutil.which("clang") or shutil.which("gcc")
+    )
+    if not configured:
+        raise RuntimeError("Sanitizer compiler unavailable; supply --sanitizer-cc")
+    try:
+        compiler = Path(shutil.which(str(configured)) or configured).resolve(strict=True)
+    except OSError as exc:
+        raise RuntimeError("Sanitizer compiler must be an executable file") from exc
+    if not compiler.is_file() or not os.access(compiler, os.X_OK):
+        raise RuntimeError("Sanitizer compiler must be an executable file")
+    return compiler
+
+
+def sanitizer_environment(compiler: Path) -> dict[str, str]:
+    return dict(
+        os.environ,
+        PATH=str(compiler.parent) + os.pathsep + os.environ.get("PATH", ""),
+        ASAN_OPTIONS="halt_on_error=1:abort_on_error=0",
+        UBSAN_OPTIONS="halt_on_error=1",
+    )
+
+
+def verify_sanitizer_toolchain(compiler: Path) -> dict[str, Any]:
+    """Require each sanitizer to diagnose its deliberate fault, not just a crash."""
+    environment = sanitizer_environment(compiler)
+    identity = sha256_file(compiler)
+    version = run_checked([str(compiler), "--version"], ROOT, env=environment)
+    controls = {}
+    with tempfile.TemporaryDirectory(prefix="lc_sanitizer_controls_") as temp_name:
+        for kind, (body, marker) in SANITIZER_CONTROLS.items():
+            source = Path(temp_name) / f"{kind}_control.c"
+            executable = Path(temp_name) / f"{kind}_control.exe"
+            source.write_text(body, encoding="utf-8", newline="\n")
+            compiled = run_checked(
+                [str(compiler), *SANITIZER_FLAGS, str(source), "-o", str(executable)],
+                ROOT, env=environment,
+            )
+            ran = subprocess.run(
+                [str(executable)], cwd=ROOT, env=environment,
+                capture_output=True, text=True, check=False, timeout=30,
+            )
+            detected = ran.returncode != 0 and marker in ran.stderr
+            controls[kind] = {
+                "source": body,
+                "source_sha256": sha256_file(source),
+                "executable_sha256": sha256_file(executable),
+                "compile_exit_code": compiled.returncode,
+                "compile_stdout": compiled.stdout,
+                "compile_stderr": compiled.stderr,
+                "test_exit_code": ran.returncode,
+                "test_stdout": ran.stdout,
+                "test_stderr": ran.stderr,
+                "expected_diagnostic": marker,
+                "detected": detected,
+            }
+            if not detected:
+                raise RuntimeError(
+                    f"sanitizer {kind} positive control did not detect its deliberate fault; "
+                    f"exit={ran.returncode}\n{ran.stderr}"
+                )
+    if sha256_file(compiler) != identity:
+        raise RuntimeError("sanitizer compiler changed during positive controls")
+    return {
+        "compiler_path": compiler.as_posix(),
+        "compiler_file_sha256": identity,
+        "compiler_version": version.stdout.strip(),
+        "flags": SANITIZER_FLAGS,
+        "runtime_options": {
+            name: environment.get(name, "")
+            for name in ("ASAN_OPTIONS", "UBSAN_OPTIONS", "LSAN_OPTIONS")
+        },
+        "positive_controls": controls,
+        "scope": "this separately identified compiler and observed sanitizer controls only",
+    }
 
 
 def parse_test_output(stdout: str) -> tuple[dict[str, int], dict[str, Any]]:
@@ -126,6 +239,7 @@ Generated: {receipt['generated_utc']}
 - The bounded reference implementation compiled as strict C11 with warnings treated as errors.
 - {tests['passed']} deterministic parser and policy tests passed; {tests['failed']} failed.
 - The same vector suite completed under AddressSanitizer and UndefinedBehaviorSanitizer.
+- Both sanitizers detected their deliberate-fault controls under the same flags before the vector run; the separately identified sanitizer compiler is recorded in the receipt.
 - The implementation is allocation-free and uses a fixed rule table and counters.
 - Source and protocol files are SHA-256 identified in the receipt and run manifest.
 
@@ -220,12 +334,16 @@ def build_evidence(
     out_root: Path,
     benchmark_packets: int,
     mirror_destinations: list[Path] | None = None,
+    sanitizer_cc: Path | None = None,
 ) -> dict[str, Any]:
     protocol = json.loads(SOURCES[-1].read_text(encoding="utf-8"))
     python_executable = detect_zig_python()
+    sanitizer_compiler = detect_sanitizer_compiler(sanitizer_cc)
     version_result = run_checked(
         [str(python_executable), "-m", "ziglang", "version"], ROOT
     )
+    if version_result.stdout.strip() != PINNED_ZIG_VERSION:
+        raise RuntimeError("C toolchain version changed after detection")
     compiler_result = run_checked(
         [str(python_executable), "-m", "ziglang", "cc", "--version"], ROOT
     )
@@ -233,6 +351,8 @@ def build_evidence(
     run_id = generated.strftime("run_%Y%m%dT%H%M%SZ")
     run_dir = out_root / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
+    sanitizer_toolchain = verify_sanitizer_toolchain(sanitizer_compiler)
+    sanitizer_env = sanitizer_environment(sanitizer_compiler)
 
     with tempfile.TemporaryDirectory(prefix="lc_nic_dpu_") as temp_name:
         executable = Path(temp_name) / "nic_dpu_packet_pipeline_test.exe"
@@ -258,31 +378,32 @@ def build_evidence(
             [str(executable), "--benchmark", str(benchmark_packets)], ROOT
         )
         sanitizer_command = [
-            str(python_executable),
-            "-m",
-            "ziglang",
-            "cc",
-            "-std=c11",
-            "-Wall",
-            "-Wextra",
-            "-Werror",
-            "-pedantic",
-            "-O1",
-            "-g",
-            "-fsanitize=address,undefined",
+            str(sanitizer_compiler),
+            *SANITIZER_FLAGS,
             str(SOURCES[1]),
             str(SOURCES[2]),
             "-o",
             str(sanitized_executable),
         ]
-        sanitizer_compile_result = run_checked(sanitizer_command, ROOT)
-        sanitizer_test_result = run_checked([str(sanitized_executable)], ROOT)
+        sanitizer_compile_result = run_checked(sanitizer_command, ROOT, env=sanitizer_env)
+        sanitizer_test_result = run_checked([str(sanitized_executable)], ROOT, env=sanitizer_env)
+        if SANITIZER_DIAGNOSTIC.search(
+            sanitizer_test_result.stdout + "\n" + sanitizer_test_result.stderr
+        ):
+            raise RuntimeError("sanitizer diagnostic prevents a successful evidence receipt")
 
     tests, benchmark = parse_test_output(test_result.stdout)
     if tests["passed"] < int(protocol["acceptance_gates"]["minimum_deterministic_tests"]):
         raise RuntimeError("C test count did not meet the frozen minimum")
     if tests["failed"] != 0 or benchmark["queued"] != benchmark["packets"]:
         raise RuntimeError("C verification output failed a frozen invariant")
+    sanitizer_summaries = re.findall(
+        r"^TESTS passed=(\d+) failed=(\d+)$", sanitizer_test_result.stdout, re.MULTILINE
+    )
+    if sanitizer_summaries != [(str(tests["passed"]), str(tests["failed"]))]:
+        raise RuntimeError("sanitizer test summary must match the deterministic vector suite")
+    if sha256_file(sanitizer_compiler) != sanitizer_toolchain["compiler_file_sha256"]:
+        raise RuntimeError("sanitizer compiler changed during pipeline verification")
 
     source_receipts = [
         {
@@ -323,9 +444,14 @@ def build_evidence(
             "tests": tests,
             "test_stdout": test_result.stdout,
             "sanitizers": {
-                "address_sanitizer": True,
-                "undefined_behavior_sanitizer": True,
+                "address_sanitizer": sanitizer_toolchain["positive_controls"]["address"]["detected"],
+                "undefined_behavior_sanitizer": sanitizer_toolchain["positive_controls"]["undefined"]["detected"],
+                "toolchain": sanitizer_toolchain,
+                "recover_on_error": False,
+                "diagnostic_scan_passed": True,
                 "compile_exit_code": sanitizer_compile_result.returncode,
+                "compile_stdout": sanitizer_compile_result.stdout,
+                "compile_stderr": sanitizer_compile_result.stderr,
                 "test_exit_code": sanitizer_test_result.returncode,
                 "test_stdout": sanitizer_test_result.stdout,
                 "test_stderr": sanitizer_test_result.stderr,
@@ -383,6 +509,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--benchmark-packets", type=int, default=250_000)
+    parser.add_argument("--sanitizer-cc", type=Path, help="Compiler whose ASan/UBSan positive controls must pass")
     parser.add_argument(
         "--mirror",
         action="store_true",
@@ -400,6 +527,7 @@ def main() -> int:
         args.out.resolve(),
         args.benchmark_packets,
         mirror_destinations=mirror_destinations,
+        sanitizer_cc=args.sanitizer_cc,
     )
     print(json.dumps(result, indent=2))
     return 0

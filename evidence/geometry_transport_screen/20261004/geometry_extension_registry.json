@@ -1,0 +1,216 @@
+{
+  "schema": "lumencore.geometry_extension_catalog.v1",
+  "date": "2026-10-04",
+  "status": "supplement_not_replacement_of_canonical_registry",
+  "legacy_registry": "config/geometry_championship_v1_registry.json",
+  "governing_protocol": "config/geometry_evaluation_protocol_v1.json",
+  "promotion_gate_passed": false,
+  "entries": [
+    {
+      "id": "tetrahedron",
+      "label": "Tetrahedron",
+      "existing_registry_relation": "proposed mathematical subfamily for packing_topology; not automatically added or promoted",
+      "model": "regular convex polyhedron",
+      "definition": {
+        "vertices": 4,
+        "edges": 6,
+        "faces": 4,
+        "face": "equilateral triangle",
+        "circumradius": 1
+      },
+      "implementation": "geometry_catalog.mjs:platonicSolid",
+      "evidence_status": "exact_geometry_generator_with_invariant_tests; no task performance finding",
+      "source_ids": [
+        "euclid13"
+      ]
+    },
+    {
+      "id": "cube",
+      "label": "Cube",
+      "existing_registry_relation": "proposed mathematical subfamily for packing_topology; not automatically added or promoted",
+      "model": "regular convex polyhedron",
+      "definition": {
+        "vertices": 8,
+        "edges": 12,
+        "faces": 6,
+        "face": "square",
+        "circumradius": 1
+      },
+      "implementation": "geometry_catalog.mjs:platonicSolid",
+      "evidence_status": "exact_geometry_generator_with_invariant_tests; no task performance finding",
+      "source_ids": [
+        "euclid13"
+      ]
+    },
+    {
+      "id": "octahedron",
+      "label": "Octahedron",
+      "existing_registry_relation": "proposed mathematical subfamily for packing_topology; not automatically added or promoted",
+      "model": "regular convex polyhedron",
+      "definition": {
+        "vertices": 6,
+        "edges": 12,
+        "faces": 8,
+        "face": "equilateral triangle",
+        "circumradius": 1
+      },
+      "implementation": "geometry_catalog.mjs:platonicSolid",
+      "evidence_status": "exact_geometry_generator_with_invariant_tests; no task performance finding",
+      "source_ids": [
+        "euclid13"
+      ]
+    },
+    {
+      "id": "dodecahedron",
+      "label": "Dodecahedron",
+      "existing_registry_relation": "proposed mathematical subfamily for packing_topology; not automatically added or promoted",
+      "model": "regular convex polyhedron",
+      "definition": {
+        "vertices": 20,
+        "edges": 30,
+        "faces": 12,
+        "face": "regular pentagon",
+        "circumradius": 1
+      },
+      "implementation": "geometry_catalog.mjs:platonicSolid",
+      "evidence_status": "exact_geometry_generator_with_invariant_tests; no task performance finding",
+      "source_ids": [
+        "euclid13"
+      ]
+    },
+    {
+      "id": "icosahedron",
+      "label": "Icosahedron",
+      "existing_registry_relation": "proposed mathematical subfamily for packing_topology; not automatically added or promoted",
+      "model": "regular convex polyhedron",
+      "definition": {
+        "vertices": 12,
+        "edges": 30,
+        "faces": 20,
+        "face": "equilateral triangle",
+        "circumradius": 1
+      },
+      "implementation": "geometry_catalog.mjs:platonicSolid",
+      "evidence_status": "exact_geometry_generator_with_invariant_tests; no task performance finding",
+      "source_ids": [
+        "euclid13"
+      ]
+    },
+    {
+      "id": "brachistochrone",
+      "label": "Brachistochrone cycloid",
+      "possible_user_alias": "Brockhistachrom (tentative phonetic interpretation)",
+      "existing_registry_relation": "already a zero_credit_candidate_label in geometry_evaluation_protocol_v1",
+      "model": "x=a(theta-sin(theta)), y=-a(1-cos(theta))",
+      "implementation": "geometry_catalog.mjs:cycloid",
+      "evidence_status": "exact_curve_generator; analytical identity tests only",
+      "appropriate_test": "travel time of frictionless point particle under constant gravity at matched endpoints; add friction/rolling inertia separately",
+      "source_ids": [
+        "cycloid"
+      ]
+    },
+    {
+      "id": "honeycomb_edge_network",
+      "label": "Honeycomb edge network",
+      "existing_registry_relation": "related to flower_of_life_hexagonal_packing but not identical; circle-packing centers form a triangular lattice, whereas honeycomb vertices have degree three in the interior",
+      "model": "regular hexagonal edge lattice, finite open-boundary patch",
+      "implementation": "transport_benchmark.py:build_graphs:honeycomb",
+      "evidence_status": "internal_synthetic_resistor_screening_only; exploratory terminal embedding",
+      "appropriate_test": "conductance, stiffness or pressure drop with domain-specific equal-material controls",
+      "source_ids": [
+        "honeycomb"
+      ]
+    },
+    {
+      "id": "phyllotactic_packing",
+      "label": "Sunflower / golden-angle phyllotaxis",
+      "existing_registry_relation": "already a zero_credit_candidate_label in geometry_evaluation_protocol_v1",
+      "model": "r_k=sqrt((k+0.5)/N), theta_k=k*pi*(3-sqrt(5))",
+      "implementation": "geometry_catalog.mjs:sunflower; transport_benchmark.py:sunflower_knn",
+      "evidence_status": "exact_point_generator plus exploratory synthetic graph; no optimality result",
+      "appropriate_test": "packing, sensor coverage or manufacturing constraints; graph topology must be specified separately",
+      "source_ids": [
+        "vogel"
+      ]
+    },
+    {
+      "id": "vascular_lung_branching",
+      "label": "Branching tree / Murray-radius illustration",
+      "possible_user_alias": "Tree of Life (ambiguous: artistic motif, evolutionary tree or branching transport can mean different things)",
+      "existing_registry_relation": "existing Geometry Championship family; preserve original readiness status",
+      "model": "binary branching graph with default r_parent^3 = r_child1^3+r_child2^3",
+      "implementation": "geometry_catalog.mjs:branchingTree",
+      "evidence_status": "cubic-radius algebra and topology verified; no fluid solver",
+      "appropriate_test": "specified fluid, viscosity, pressure/flow boundary data, Poiseuille validity, radius budget and stress limits",
+      "source_ids": [
+        "murray",
+        "leaf"
+      ]
+    },
+    {
+      "id": "mycelium_network",
+      "label": "Mycelium-inspired network",
+      "possible_user_alias": "my silly fungus (tentative phonetic interpretation)",
+      "existing_registry_relation": "existing family; historical financial-transform result remains separate and unchanged",
+      "model": "our demonstrator is an MST with greedy loop closures; not a model of fungal biology",
+      "implementation": "transport_benchmark.py:loop_augment",
+      "evidence_status": "internal_synthetic_resistor_screening_only; no legacy promotion",
+      "appropriate_test": "matched terminal routing demands, capacities and fault scenarios; compare against MST, shortest paths and redundant routing",
+      "source_ids": [
+        "signal"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "euclid13",
+      "title": "Euclid, Elements, Book XIII, Proposition 18",
+      "url": "https://aleph0.clarku.edu/~djoyce/elements/bookXIII/propXIII18.html",
+      "kind": "primary mathematical text, Clark University translation",
+      "supports": "Five regular convex Platonic solids. Not a claim that all matter consists of five shapes."
+    },
+    {
+      "id": "cycloid",
+      "title": "Putland, The cycloid as brachistochrone (2025)",
+      "url": "https://arxiv.org/html/2507.22548v2",
+      "kind": "author preprint",
+      "supports": "Frictionless fastest descent under uniform gravity from rest; not a light or communications routing theorem."
+    },
+    {
+      "id": "honeycomb",
+      "title": "Hales, The Honeycomb Conjecture (2001)",
+      "url": "https://arxiv.org/abs/math/9906042",
+      "kind": "author paper, published in Discrete & Computational Geometry",
+      "supports": "Regular hexagonal honeycomb minimizes perimeter for equal-area plane partitions; does not establish conductor, signal or hydraulic superiority."
+    },
+    {
+      "id": "vogel",
+      "title": "Vogel, A better way to construct the sunflower head (1979)",
+      "url": "https://doi.org/10.1016/0025-5564(79)90080-4",
+      "kind": "primary mathematical model paper; abstract retrieved, publisher full text access-limited",
+      "supports": "Sunflower phyllotaxis as mathematical point placement; our half-offset radius rule is a stated finite-sample variant."
+    },
+    {
+      "id": "murray",
+      "title": "Murray, The Physiological Principle of Minimum Work: I. The Vascular System and the Cost of Blood Volume (1926)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1084489/",
+      "kind": "primary paper",
+      "supports": "Minimum-work vascular modeling under flow and volume assumptions."
+    },
+    {
+      "id": "leaf",
+      "title": "Price, Knox and Brodribb, The Influence of Branch Order on Optimal Leaf Vein Geometries: Murray\u2019s Law and Area Preserving Branching (2013)",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0085420",
+      "kind": "primary experimental study",
+      "supports": "Cubic-radius Murray relation and branch-order-dependent biological limitations; not one universal Tree of Life equation."
+    },
+    {
+      "id": "signal",
+      "title": "Haus and Melcher, Electromagnetic Fields and Energy, Chapter 14",
+      "url": "https://ocw.mit.edu/courses/res-6-001-electromagnetic-fields-and-energy-spring-2008/pages/chapter-14/",
+      "kind": "authors\u2019 engineering textbook hosted by MIT",
+      "supports": "Signal modeling requires transmission-line dynamics, matching, impedance, reflections and dissipation beyond a DC resistor graph."
+    }
+  ],
+  "interpretation": "Geometries are useful candidate models, not a finite list of shapes from which all reality is scientifically known to be constructed. No single universal Tree of Life equation is asserted."
+}

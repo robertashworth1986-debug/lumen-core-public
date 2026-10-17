@@ -12,10 +12,20 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 - The requested release must be a full 40-character commit SHA.
 - The requested commit must be the same commit that contains the workflow being
   executed.
+- The workflow must be dispatched from `refs/heads/main`; a matching SHA on
+  an unmerged branch or tag cannot authorize production access.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (43 for
-  current named release commit `1ce7c35975a4011fa844e8b39ccbc950c8c0f398`).
+- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (246 for
+  the cohort, frozen EIA review, Bounded Light Speed concept collection, creator-rights
+  register and four-file art showcase). Artwork and three public previews linked
+  from `/art/` remain hosted at the canonical Wonder Studio origin; their external
+  bytes are outside this repository release's 246-file exact-byte guarantee.
+  Before the gallery can embed Studio media, the separately approved current-main
+  `repair-public-security-headers.yml` action must apply the exact Studio origin
+  in `img-src` and `media-src`. A static file release does not change Nginx policy.
+  Earlier 43-file, 119-file and 189-file releases retain their original
+  membership, reconstructed from their pinned literal allowlists as data.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
 - The manifest binds the source commit, Git blob IDs, byte counts, file hashes,
@@ -29,9 +39,23 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
 - Every installed file is re-hashed before the deployment can succeed.
 - Every canonical public URL is downloaded and compared byte-for-byte with the
   release manifest after installation.
+- The live audit validates every manifest row before requesting any URL and
+  refuses an empty release. Its bounded static scope allows at most 1,000 files,
+  a 1 MiB manifest, 64 MiB per file and 512 MiB of declared files in total.
+  Canonical paths and positive finite timeouts are required. Each response is
+  read only up to its declared byte count plus one; an oversized or interrupted
+  response remains an error. A match requires both the declared length and
+  SHA-256, as well as the existing HTTP and MIME checks. The incident classifier
+  independently checks the recorded length against the same manifest.
 - The separate public-site supply-chain workflow inventories every allowlisted
   release file and, on `main`, signs and verifies build-provenance and SBOM
   attestations for the release archive before any human deployment decision.
+- The deployment independently verifies both signed predicates against the
+  locally rebuilt archive, canonical repository, signing workflow, exact source
+  commit, main ref, GitHub OIDC issuer, and hosted-runner requirement before
+  installing an SSH key. Missing or invalid attestations stop the deployment;
+  an unsigned package cannot reach the VPS through this workflow. Verification
+  receipts are retained with the deployment artifacts.
 - Successful named deployments are added to an append-only receipt history;
   the repository verifier reconstructs every retained Git subject rather than
   allowing a newer receipt to replace an earlier one.
@@ -42,7 +66,9 @@ The allowlist covers the proof-first homepage, bounded engagement page,
 external-review page and machine-readable reviewer docket, public status page,
 bounded evidence page, shared styles/command fabric, crawl metadata and public
 mark, the ProofLock browser verifier with its protocol fixtures, and noindex
-HOLD stubs for previous operator and research dashboard URLs.
+HOLD stubs for previous operator and research dashboard URLs. The reviewed
+`downloads/eia-two-window-review-20260922.zip` is part of the same immutable
+release and must pass exact-byte and ZIP MIME verification before promotion.
 
 It deliberately excludes credentials, runtime logs, live order controls,
 private evidence, grant packets, identity documents, and mutable data feeds. The
@@ -51,8 +77,10 @@ only redirect stale public links back to the bounded validation path.
 
 ## Human release command
 
-Run the `Deploy exact public-site snapshot to VPS` workflow against the exact
-commit to be released. Enter that full commit SHA and select
+Wait for the `Public site supply-chain assurance` workflow to finish both build
+and signing jobs for the exact main commit to be released. Run the
+`Deploy exact public-site snapshot to VPS` workflow on `main`. Enter that full
+commit SHA and select
 `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` only after reviewing the commit and the
 production-environment approval gate.
 
