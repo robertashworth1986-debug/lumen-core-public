@@ -7,6 +7,31 @@
 
 ## One commercial sentence
 
+### October 17 draft integration review
+
+The founder requested inspection, safe merge and publication of outstanding
+repository work. The review inventoried all 24 open PRs at main
+`e706e91de133e039cc16ed25ec5021a293edbf2b`, including 16 drafts. Main was
+reproduced locally on CPython 3.11.9 with the 39-package institutional hash lock:
+1,914 tests and 343 subtests passed, with eight documented skips. This Debian
+cloud run is current-source verification, not the frozen scientific runtime
+or live trading evidence.
+
+The buyer-owned replay integration preserves declared timing as unverified
+custody and favorable numerical results as HOLD. Adversarial review found that
+a predictable temporary receipt filename could delete a frozen input or follow
+a pre-existing symlink. The repair uses an exclusively created temporary file,
+rejects output aliases to any input, and cleans only its own temporary file.
+Input-preservation and failed-replacement regression cases are retained.
+
+Source integration and website installation remain separate. The October 17
+11:29 UTC [scheduled audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39028831382)
+for e706e91 recorded 190 of 246 exact matches, five mismatches and 51 HTTP 404s.
+The manual exact-snapshot VPS workflow, signed archive checks and rollback
+capture remain the deployment path. No runtime, DNS, credential, financial
+authority or live-order gate is changed by this source review. Exact hosted
+checks and merge receipts must be recorded for the resulting commit.
+
 ### October 14 authorized merges and paper-readiness repairs
 
 The founder explicitly requested review and merge of compatible draft changes

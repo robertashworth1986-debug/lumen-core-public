@@ -4,6 +4,44 @@ This document records the current repository consolidation state after reviewing
 
 ## Canonical product spine
 
+### October 17, 2026 complete open-queue audit
+
+All 24 open PRs were checked against main `e706e91de133e039cc16ed25ec5021a293edbf2b`;
+16 were drafts. Eleven heads conflict with main. Historic green checks do not
+replace integration tests on current source.
+
+- #196: integrate the buyer-owned replay after repairing frozen-input output
+  aliasing and predictable temporary-file clobbering; preserve the HOLD and
+  unverified-custody boundaries.
+- #205: hold unchanged; expiry classification trusts `closed` without comparing
+  the declared deadline with the evaluation clock.
+- #206: hold unchanged; future prediction/settlement events can satisfy the
+  maturity thresholds, and output paths can overwrite source evidence.
+- #197/#198: hold unchanged; the 43-file August continuity assumptions do not
+  match the 246-file current release. Current-main tests reproduce the mismatch
+  and missing historical source paths.
+- #250: hold; direct Python requirements drift from the institutional hash lock.
+- #249: hold; upgraded action pins do not match the signed-supply-chain verifier
+  and multiple exact-pin assertions. Do not bypass those assertions.
+- #221: hold; dashboard dependency updates lack matching provenance/security
+  contract updates.
+- #215: hold; full-suite collection fails on an undeclared `openpyxl` dependency.
+  #216 is stacked on #215's research branch, not main, and requires integrated
+  dependency, historical-input and research-boundary review.
+- #252/#247: retain dated preflight/audit history pending reconciliation and real
+  deployment receipts; neither documentation draft proves a repair.
+- #220/#219/#208/#207/#204/#201/#211/#195/#194: hold unchanged for explicit
+  current-source conflict reconciliation. Preserve later authorization, ledger,
+  freshness, deployment and paper-accounting repairs; do not resolve by taking
+  an old branch wholesale. #211's strict observer checks are already ported.
+- #217: separate outreach-governance policy change; no actor permission or
+  approval policy is changed by this source integration.
+- #212/#213: commercial draft copy needs current pricing/platform and vendor
+  status checks before adopting its publication instructions. No social post,
+  Fiverr listing or outbound communication is authorized by a source merge.
+
+No branch history was deleted. Production and trading HOLD gates remain.
+
 ### October 14, 2026 authorized merge and continuation
 
 The founder requested review and merge of compatible drafts. PR #253 merged at
