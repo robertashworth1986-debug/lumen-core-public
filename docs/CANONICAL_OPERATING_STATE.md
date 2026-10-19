@@ -7,6 +7,32 @@
 
 ## One commercial sentence
 
+### October 19 founder-directed rebound research correction
+
+The founder requested improvement of the existing Live Orchestra/LumaTrader
+research lane. This bounded continuation supports outcome 2's technical
+validation and extends the existing intraday analyzer rather than introducing
+a new product. Historical candle low-to-next-high ranges and best in-sample
+hours are now explicitly separated from causal modeled trade results. The
+former bankroll-allocation blueprint is withdrawn from that research output.
+
+The new diagnostic selects time buckets from strictly matured training
+outcomes, tests them on later blocks, uses delayed modeled open-price entries
+and exits, and charges explicit two-sided fee/spread/slippage assumptions.
+Missing costs and malformed, gapped or ambiguous-time candles block scoring;
+forming candles do not enter the test. All symbols' adverse and blocked
+results are retained, together with input identities. Synthetic regression
+fixtures verify timing and cost semantics; they are not alpha evidence.
+
+One fixed six-coin public-data check at exchange time October 19 23:47:35 UTC
+produced no qualifying training time buckets under the stated cost scenario,
+so the selector placed zero modeled trades. All-dips mean after-cost returns
+were negative in that bounded check. This is not an all-market conclusion or
+independent validation. The existing readiness dossier records protocol,
+limitations and required prospective execution/account evidence. No exchange
+credentials, orders, deployed runtime, live authority or frozen experiments
+are changed by this source continuation.
+
 ### October 17 draft integration review
 
 The founder requested inspection, safe merge and publication of outstanding
