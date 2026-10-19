@@ -20,6 +20,68 @@ to receive regulated or confidential buyer data without additional controls.
 
 **Production decision: `HOLD`.**
 
+## Intraday rebound diagnostic — October 19
+
+Founder-directed improvement of the existing trading research lane supports
+outcome 2's bounded technical validation. The existing
+`code/ops/ANALYZE_INTRADAY_SPIKE_WINDOWS.py` now separates its historical
+low-to-next-high range rankings from a causal rolling train/test diagnostic.
+The legacy extrema and in-sample hours are descriptions, not executable
+entries, win probabilities or sizing instructions. The former allocation
+blueprint is replaced by an explicit research-only HOLD.
+
+The diagnostic fixes a close-based dip rule before scoring. It selects an hour
+or weekday/hour using only training trades whose exits matured strictly before
+the test block, waits at least one full bar after the signal becomes available,
+then uses later modeled open prices. Positions do not overlap or cross fold
+boundaries. Fees on both sides, a full bid/ask spread and additional per-side
+slippage are explicit scenarios; missing cost inputs block scoring. Invalid or
+gapped candles reject, timezone assumptions cannot stand in for explicit input
+timestamps, and incomplete candles are excluded. Complete per-symbol results,
+including adverse and blocked outcomes, remain in the JSON even when the
+historical top-N lists are truncated. Input-file SHA-256 identities are retained.
+
+Example offline invocation against operator-supplied UTC OHLC CSV files:
+
+```sh
+python code/ops/ANALYZE_INTRADAY_SPIKE_WINDOWS.py \
+  --data-root /path/to/hourly_csvs --out-root /path/to/research_output \
+  --fee-per-side-bps 80 --spread-bps 10 --slippage-per-side-bps 5 \
+  --train-bars 336 --test-bars 168 --lookback-bars 24 --hold-bars 4 \
+  --entry-delay-bars 1 --dip-threshold-pct 1 --min-training-trades 8
+```
+
+These are **example cost assumptions**, not verified account costs. Kraken's
+[published US spot schedule](https://www.kraken.com/en-us/features/fee-schedule)
+observed October 19 lists 0.80% Tier 1 taker fees per side. Actual account,
+pair, jurisdiction and tier must be checked separately. The
+[OHLC endpoint](https://docs.kraken.com/api-reference/market-data/get-ohlc-data)
+has bounded recent history and includes an incomplete final candle. Repeated
+hour-of-week testing needs substantially more history than a short recent pull.
+
+An initial public-data check retrieved BTC, ETH, SOL, ADA, XRP and DOGE hourly
+candles at exchange time 2026-10-19 23:47:35 UTC. Each supplied 720 closed bars
+and one excluded forming candle. With the exact example protocol above, each
+symbol had two complete test folds and no qualifying positive-mean training
+time bucket meeting the minimum count. The selector therefore made zero
+modeled trades. The all-dips comparator had negative mean after-cost returns
+for all six symbols. This is a bounded observation under one fixed scenario,
+not a universal result about these assets, proof of strategy improvement, or a
+reconciled performance claim. No thresholds were retuned after that result.
+
+Remaining requirements include historical order books, executable depth,
+partial fills, queue priority, adverse selection, measured latency/rate limits,
+calibrated uncertainty, cross-symbol selection control, fresh prospective
+evaluation and actual account reconciliation. Closed-trade drawdown is reported
+separately from unknown intratrade drawdown. Per-symbol reinvestment curves
+cannot be added together as a multi-asset bankroll result. Every outcome remains
+HOLD and cannot authorize live orders.
+
+Local verification on Python 3.12.14 passed 17 rebound/CLI regression tests
+and 30 existing order-safety tests. The latter used the five HTTP dependencies
+with hashes retained in the institutional lock. This was a focused source check,
+not a full repository run or reproduction of the frozen Python 3.11.9 runtime.
+
 ## Trading readiness checks — October 14
 
 The source repairs merged in PR #253 improve correctness and access controls;

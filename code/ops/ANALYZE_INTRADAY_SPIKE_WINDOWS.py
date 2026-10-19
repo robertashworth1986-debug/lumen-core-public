@@ -1,5 +1,15 @@
+"""Historical price-range study and causal, cost-scenario rebound diagnostics.
+
+The legacy low-to-next-high rankings are hindsight range descriptions. They are
+not executable trades, fitted probabilities, or instructions to allocate money.
+The separate walk-forward diagnostic uses closed-bar signals, delayed modeled
+open-price fills, train-only time-bucket selection and explicit two-sided costs.
+Neither calculation establishes order-book fills or eligibility for live orders.
+"""
+
 import argparse
 import csv
+import hashlib
 import json
 import math
 from collections import defaultdict
@@ -65,6 +75,7 @@ class Candle:
     high: float
     low: float
     close: float
+    timestamp_explicit: bool = True
 
 
 def utc_now_stamp() -> str:
@@ -156,7 +167,7 @@ def parse_symbol_from_file(path: Path) -> tuple[str, str]:
     return "", ""
 
 
-def load_candles(path: Path) -> list[Candle]:
+def load_candles(path: Path, *, strict: bool = False) -> list[Candle]:
     rows: list[Candle] = []
     with path.open("r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
@@ -170,23 +181,233 @@ def load_candles(path: Path) -> list[Candle]:
         l_col = fields.get("low")
         c_col = fields.get("close")
         if not (t_col and o_col and h_col and l_col and c_col):
+            if strict:
+                raise ValueError("OHLC CSV requires time, open, high, low and close columns")
             return rows
 
-        for row in reader:
+        for line_number, row in enumerate(reader, 2):
             try:
-                ts = parse_iso_dt(row.get(t_col, ""))
+                raw_time = str(row.get(t_col, "") or "").strip().replace("Z", "+00:00")
+                parsed_time = datetime.fromisoformat(raw_time)
+                timestamp_explicit = parsed_time.tzinfo is not None and parsed_time.utcoffset() is not None
+                ts = parse_iso_dt(raw_time)
                 o = safe_float(row.get(o_col, 0.0))
                 h = safe_float(row.get(h_col, 0.0))
                 l = safe_float(row.get(l_col, 0.0))
                 c = safe_float(row.get(c_col, 0.0))
-                if min(o, h, l, c) <= 0.0:
-                    continue
-                rows.append(Candle(ts=ts, open=o, high=h, low=l, close=c))
-            except Exception:
+                if min(o, h, l, c) <= 0.0 or not all(math.isfinite(v) for v in (o, h, l, c)):
+                    raise ValueError("invalid price")
+                rows.append(Candle(ts=ts, open=o, high=h, low=l, close=c,
+                                   timestamp_explicit=timestamp_explicit))
+            except Exception as exc:
+                if strict:
+                    raise ValueError(f"invalid OHLC CSV row at line {line_number}") from exc
                 continue
 
     rows.sort(key=lambda r: r.ts)
     return rows
+
+
+def _modeled_roundtrip(
+    entry_open: float, exit_open: float, fee_bps: float, spread_bps: float, slip_bps: float,
+) -> tuple[float, float]:
+    """Gross and net decimal returns, with fees paid in quote currency.
+
+Spread is the FULL assumed bid/ask spread, charged half on each side. Slippage
+is additional per-side displacement. Open prices and these displacements are
+model assumptions, not observed fills, queue priority, or measured market depth.
+"""
+    displacement = (spread_bps / 2.0 + slip_bps) / 10_000.0
+    entry_fill = entry_open * (1.0 + displacement)
+    exit_fill = exit_open * (1.0 - displacement)
+    fee = fee_bps / 10_000.0
+    gross = exit_open / entry_open - 1.0
+    net = (exit_fill / entry_fill) * ((1.0 - fee) / (1.0 + fee)) - 1.0
+    if not all(math.isfinite(value) for value in (gross, net)):
+        raise ValueError("modeled return exceeds finite numeric range")
+    return gross, net
+
+
+def evaluate_rebound_walkforward(
+    candles: list[Candle],
+    *,
+    fee_per_side_bps: float | None = None,
+    spread_bps: float | None = None,
+    slippage_per_side_bps: float | None = None,
+    train_bars: int = 336,
+    test_bars: int = 168,
+    lookback_bars: int = 24,
+    hold_bars: int = 4,
+    entry_delay_bars: int = 1,
+    dip_threshold_pct: float = 1.0,
+    min_training_trades: int = 8,
+    seasonality: str = "hour",
+    asof: datetime | None = None,
+) -> dict[str, Any]:
+    """Evaluate one frozen dip rule with rolling train/test time blocks.
+
+    A completed close below the maximum of PRIOR lookback closes is a signal.
+    Entry is modeled at open i+1+delay and exit at open entry+hold. At least one
+    full bar elapses after signal availability. Only outcomes strictly matured
+    before a fold are used to choose its hour/weekday-hour bucket. Each tested
+    strategy holds at most one position per symbol; folds never share positions.
+
+    This is a retrospective diagnostic over assumed fills. Cross-symbol/hyper-
+    parameter searches and repeated examinations still require fresh validation.
+    Counts, wins and historical returns never promote a strategy to live trading.
+    """
+    integer_parameters = (train_bars, test_bars, lookback_bars, hold_bars,
+                          entry_delay_bars, min_training_trades)
+    if any(type(value) is not int or value <= 0 for value in integer_parameters):
+        raise ValueError("bar counts, entry delay and minimum trades must be positive integers")
+    if (isinstance(dip_threshold_pct, bool)
+            or not isinstance(dip_threshold_pct, (int, float))
+            or not math.isfinite(dip_threshold_pct) or not 0 <= dip_threshold_pct < 100):
+        raise ValueError("dip threshold must be finite and within [0, 100)")
+    if seasonality not in {"hour", "weekday_hour"}:
+        raise ValueError("seasonality must be hour or weekday_hour")
+    for value in (fee_per_side_bps, spread_bps, slippage_per_side_bps):
+        if value is not None and (isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value) or not 0 <= value < 10_000):
+            raise ValueError("costs must be finite bps within [0, 10000)")
+    if (spread_bps is not None and slippage_per_side_bps is not None
+            and spread_bps / 2 + slippage_per_side_bps >= 10_000):
+        raise ValueError("spread plus slippage must leave a positive modeled exit price")
+    asof = datetime.now(timezone.utc) if asof is None else asof
+    if not isinstance(asof, datetime) or asof.tzinfo is None or asof.utcoffset() is None:
+        raise ValueError("asof must have an explicit timezone")
+    for index, candle in enumerate(candles):
+        if (not candle.timestamp_explicit or not isinstance(candle.ts, datetime) or candle.ts.tzinfo is None
+                or candle.ts.utcoffset() is None):
+            raise ValueError("candle timestamps must have an explicit timezone")
+        prices = (candle.open, candle.high, candle.low, candle.close)
+        if any(isinstance(value, bool) or not isinstance(value, (int, float))
+               or not math.isfinite(value) or value <= 0 for value in prices):
+            raise ValueError("candles require finite positive OHLC prices")
+        if candle.low > min(candle.open, candle.close) or candle.high < max(candle.open, candle.close):
+            raise ValueError("candle OHLC range is inconsistent")
+        if index and candle.ts <= candles[index - 1].ts:
+            raise ValueError("candle timestamps must be unique and increasing")
+    result: dict[str, Any] = {
+        "status": "insufficient_data", "promotion_status": "HOLD",
+        "allow_live_orders": False, "deployment_eligible": False,
+        "evidence_type": "retrospective_causal_ohlc_cost_scenario",
+        "asof_utc": asof.astimezone(timezone.utc).isoformat(),
+        "costs": {"fee_per_side_bps": fee_per_side_bps, "full_spread_bps": spread_bps,
+                  "slippage_per_side_bps": slippage_per_side_bps, "account_fee_tier_verified": False},
+        "protocol": {"train_bars": train_bars, "test_bars": test_bars,
+                     "lookback_bars": lookback_bars, "hold_bars": hold_bars,
+                     "entry_delay_bars": entry_delay_bars, "dip_threshold_pct": dip_threshold_pct,
+                     "min_training_trades": min_training_trades, "seasonality": seasonality,
+                     "timezone": "UTC", "partial_final_test_block": "excluded"},
+        "limitations": ["modeled_open_price_fills_not_verified_execution",
+                        "fixed_cost_scenarios_not_measured_order_book_depth_or_partial_fills",
+                        "cross_symbol_and_repeated_strategy_selection_require_fresh_validation",
+                        "no_latency_or_realized_account_profit_claim"],
+        "folds": [], "trades": [], "closed_bar_count": 0, "discarded_unclosed_bars": 0,
+    }
+    if len(candles) < 2:
+        result["reason"] = "at_least_two_bars_needed_to_infer_cadence"
+        return result
+    cadence = candles[1].ts - candles[0].ts
+    if any(candles[i].ts - candles[i - 1].ts != cadence for i in range(2, len(candles))):
+        raise ValueError("candle cadence must be regular; missing intervals cannot be compressed")
+    closed = [candle for candle in candles if candle.ts + cadence <= asof]
+    result["closed_bar_count"] = len(closed)
+    result["discarded_unclosed_bars"] = len(candles) - len(closed)
+    result["bar_interval_seconds"] = cadence.total_seconds()
+    if any(value is None for value in (fee_per_side_bps, spread_bps, slippage_per_side_bps)):
+        result.update(status="blocked_cost_inputs_missing", reason="supply_all_three_explicit_cost_assumptions")
+        return result
+    if len(closed) < train_bars + test_bars:
+        result["reason"] = "insufficient_closed_bars_for_one_complete_train_test_fold"
+        return result
+
+    events: list[dict[str, Any]] = []
+    for i in range(lookback_bars, len(closed)):
+        prior_high_close = max(c.close for c in closed[i - lookback_bars:i])
+        dip_pct = (1.0 - closed[i].close / prior_high_close) * 100.0
+        if dip_pct < dip_threshold_pct:
+            continue
+        entry = i + 1 + entry_delay_bars
+        exit_ = entry + hold_bars
+        if exit_ >= len(closed):
+            continue
+        signal_time = (closed[i].ts + cadence).astimezone(timezone.utc)
+        bucket = (f"{signal_time.weekday()}:{signal_time.hour:02d}" if seasonality == "weekday_hour"
+                  else f"{signal_time.hour:02d}")
+        gross, net = _modeled_roundtrip(closed[entry].open, closed[exit_].open,
+                                       fee_per_side_bps, spread_bps, slippage_per_side_bps)
+        events.append({"signal_index": i, "signal_available_utc": signal_time.isoformat(),
+                       "entry_index": entry, "exit_index": exit_, "bucket": bucket,
+                       "entry_utc": closed[entry].ts.isoformat(), "exit_utc": closed[exit_].ts.isoformat(),
+                       "entry_reference_open": closed[entry].open, "exit_reference_open": closed[exit_].open,
+                       "gross_return_pct": gross * 100.0, "net_return_pct": net * 100.0})
+
+    def nonoverlapping(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        accepted: list[dict[str, Any]] = []
+        previous_exit = -1
+        for event in candidates:
+            if event["entry_index"] <= previous_exit:
+                continue
+            accepted.append(event)
+            previous_exit = event["exit_index"]
+        return accepted
+
+    def metrics(trades: list[dict[str, Any]]) -> dict[str, Any]:
+        values = [trade["net_return_pct"] for trade in trades]
+        nav, peak, max_dd = 1.0, 1.0, 0.0
+        for value in values:
+            nav *= 1.0 + value / 100.0
+            peak = max(peak, nav)
+            max_dd = min(max_dd, nav / peak - 1.0)
+        if not math.isfinite(nav):
+            raise ValueError("modeled equity exceeds finite numeric range")
+        return {"trade_count": len(trades), "mean_net_return_pct": sum(values) / len(values) if values else None,
+                "net_win_rate_pct": sum(value > 0 for value in values) / len(values) * 100 if values else None,
+                "modeled_compounded_return_pct": (nav - 1.0) * 100,
+                "closed_trade_drawdown_pct": max_dd * 100,
+                "intratrade_mark_to_market_drawdown": None}
+
+    all_baseline_trades: list[dict[str, Any]] = []
+    for train_end in range(train_bars, len(closed) - test_bars + 1, test_bars):
+        train_start, test_end = train_end - train_bars, train_end + test_bars
+        groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for event in events:
+            if train_start + lookback_bars <= event["signal_index"] and event["exit_index"] < train_end:
+                groups[event["bucket"]].append(event)
+        eligible = []
+        for bucket, bucket_events in sorted(groups.items()):
+            accepted = nonoverlapping(bucket_events)
+            if len(accepted) >= min_training_trades:
+                mean_net = sum(event["net_return_pct"] for event in accepted) / len(accepted)
+                if mean_net > 0:
+                    eligible.append((mean_net, bucket, len(accepted)))
+        eligible.sort(key=lambda value: (-value[0], value[1]))
+        selected = eligible[0] if eligible else None
+        test_events = [event for event in events if train_end <= event["signal_index"]
+                       and event["exit_index"] < test_end]
+        baseline = nonoverlapping(test_events)
+        tested = nonoverlapping([event for event in test_events if selected and event["bucket"] == selected[1]])
+        fold_index = len(result["folds"])
+        result["trades"].extend({**event, "fold_index": fold_index} for event in tested)
+        all_baseline_trades.extend(baseline)
+        result["folds"].append({
+            "train_start_index": train_start, "train_end_index": train_end,
+            "test_start_index": train_end, "test_end_index": test_end,
+            "decision_asof_utc": closed[train_end].ts.isoformat(),
+            "selected_bucket": selected[1] if selected else None,
+            "training_mean_net_return_pct": selected[0] if selected else None,
+            "selected_training_trade_count": selected[2] if selected else 0,
+            "observed_training_bucket_count": len(groups), "positive_eligible_bucket_count": len(eligible),
+            "test": metrics(tested), "all_dips_baseline": metrics(baseline),
+        })
+    result.update(status="research_only_hold", reason="modeled_diagnostic_not_execution_or_alpha_validation",
+                  test=metrics(result["trades"]), all_dips_baseline=metrics(all_baseline_trades),
+                  cash_baseline_return_pct=0.0,
+                  equity_definition="per_symbol_full_cash_reinvestment_at_each_nonoverlapping_modeled_trade")
+    return result
 
 
 def summarize_symbol(
@@ -276,6 +497,10 @@ def summarize_symbol(
     return {
         "symbol": symbol,
         "quote": quote,
+        "evidence_type": "hindsight_low_to_next_high_range_description",
+        "executable_trade": False,
+        "allow_live_orders": False,
+        "ranking_warning": "extrema_and_best_hour_selected_in_sample_not_predictive_profit",
         "bars": len(candles),
         "first_ts_utc": candles[0].ts.isoformat(),
         "last_ts_utc": candles[-1].ts.isoformat(),
@@ -321,7 +546,7 @@ def write_csv(path: Path, rows: list[dict[str, Any]], columns: list[str]) -> Non
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Analyze intraday symbol spike windows and trap-adjusted swing opportunities.")
+    parser = argparse.ArgumentParser(description="Describe historical ranges and run causal cost-scenario rebound diagnostics; no orders.")
     parser.add_argument(
         "--data-root",
         action="append",
@@ -345,7 +570,26 @@ def main() -> int:
     parser.add_argument("--fee-roundtrip-pct", type=float, default=0.52, help="Roundtrip fee+slippage in percent.")
     parser.add_argument("--min-bars", type=int, default=72, help="Minimum candles required per symbol.")
     parser.add_argument("--top-n", type=int, default=12, help="Top-N symbols to surface in summary tables.")
+    parser.add_argument("--fee-per-side-bps", type=float, default=None,
+                        help="Explicit modeled fee per side; verify venue/account/pair tier separately.")
+    parser.add_argument("--spread-bps", type=float, default=None, help="Explicit FULL modeled bid/ask spread.")
+    parser.add_argument("--slippage-per-side-bps", type=float, default=None, help="Additional modeled slippage per side.")
+    parser.add_argument("--train-bars", type=int, default=336)
+    parser.add_argument("--test-bars", type=int, default=168)
+    parser.add_argument("--lookback-bars", type=int, default=24)
+    parser.add_argument("--hold-bars", type=int, default=4)
+    parser.add_argument("--entry-delay-bars", type=int, default=1)
+    parser.add_argument("--dip-threshold-pct", type=float, default=1.0)
+    parser.add_argument("--min-training-trades", type=int, default=8)
+    parser.add_argument("--seasonality", choices=("hour", "weekday_hour"), default="hour")
     args = parser.parse_args()
+    protocol = {name: getattr(args, name) for name in (
+        "fee_per_side_bps", "spread_bps", "slippage_per_side_bps", "train_bars", "test_bars",
+        "lookback_bars", "hold_bars", "entry_delay_bars", "dip_threshold_pct", "min_training_trades", "seasonality")}
+    try:
+        evaluate_rebound_walkforward([], **protocol)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     data_roots = [Path(p) for p in args.data_root] if args.data_root else [DEFAULT_DATA_ROOT]
     extra_file = Path(args.extra_file)
@@ -400,7 +644,12 @@ def main() -> int:
             skipped_files.append({"path": str(file_path), "reason": f"symbol_{symbol}_filtered"})
             continue
 
-        candles = load_candles(file_path)
+        try:
+            candles = load_candles(file_path, strict=True)
+        except ValueError as exc:
+            skipped_files.append({"path": str(file_path), "reason": str(exc),
+                                  "validation_status": "blocked_invalid_raw_input"})
+            continue
         if len(candles) < int(args.min_bars):
             skipped_files.append({"path": str(file_path), "reason": f"insufficient_bars_{len(candles)}"})
             continue
@@ -415,6 +664,14 @@ def main() -> int:
             skipped_files.append({"path": str(file_path), "reason": "summary_failed"})
             continue
         summary["source_file"] = str(file_path)
+        summary["source_sha256"] = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        try:
+            summary["walkforward_validation"] = evaluate_rebound_walkforward(candles, **protocol)
+        except ValueError as exc:
+            summary["walkforward_validation"] = {
+                "status": "blocked_invalid_data", "promotion_status": "HOLD",
+                "allow_live_orders": False, "deployment_eligible": False, "reason": str(exc),
+            }
         summaries.append(summary)
 
     # Keep one best source per symbol/quote pair (prefer longest history).
@@ -471,6 +728,8 @@ def main() -> int:
         hour_rows.append(
             {
                 "hour_utc": h,
+                "evidence_type": "hindsight_range_description_not_executable_profit",
+                "allow_live_orders": False,
                 "median_net_dip_to_next_high_pct": round(med, 6),
                 "positive_symbol_share_pct": round(win, 6),
                 "symbol_count": len(vals),
@@ -482,6 +741,10 @@ def main() -> int:
     metrics_columns = [
         "symbol",
         "quote",
+        "evidence_type",
+        "executable_trade",
+        "allow_live_orders",
+        "ranking_warning",
         "bars",
         "median_range_pct",
         "p95_range_pct",
@@ -512,6 +775,8 @@ def main() -> int:
         hour_rows,
         [
             "hour_utc",
+            "evidence_type",
+            "allow_live_orders",
             "median_net_dip_to_next_high_pct",
             "positive_symbol_share_pct",
             "symbol_count",
@@ -519,41 +784,15 @@ def main() -> int:
     )
 
     logic_blueprint = {
-        "mode_selector": {
-            "POWER_SPIKE": {
-                "entry_when": "p95_range_pct >= 2.0 AND best_buy_median_net_pct >= 0.8 AND trap_rate_pct <= 35",
-                "positioning": "single-symbol focus with strict stop and max loss budget",
-            },
-            "BASKET_SCALP": {
-                "entry_when": "best_buy_win_rate_pct >= 58 AND trap_rate_pct <= 30",
-                "positioning": "spread across 3-6 symbols by quick_gain_score",
-            },
-            "AVOID": {
-                "entry_when": "trap_rate_pct >= 45 OR best_buy_median_net_pct <= 0",
-                "positioning": "no new entries",
-            },
-        },
-        "risk_tiers": {
-            "balance_under_100": {
-                "max_risk_per_trade_pct": 1.0,
-                "max_concurrent_positions": 2,
-                "no_leverage": True,
-            },
-            "balance_100_to_2000": {
-                "max_risk_per_trade_pct": 0.8,
-                "max_concurrent_positions": 5,
-                "leverage": "low_or_none",
-            },
-            "balance_over_2000": {
-                "max_risk_per_trade_pct": 0.5,
-                "max_concurrent_positions": 8,
-                "leverage": "conditional_only_after_200_trades_and_positive_expectancy",
-            },
-        },
+        "status": "research_only_hold", "allow_live_orders": False,
+        "instruction": "No sizing or entry recommendation follows from hindsight extrema rankings.",
+        "next_evidence": "review train-only selection and later after-cost modeled outcomes, then collect prospective fills",
     }
 
     summary_payload = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "status": "research_only_hold", "allow_live_orders": False,
+        "claim_boundary": "Historical ranges and modeled walk-forward results are not execution or trading-alpha validation.",
         "scope": {
             "data_roots": [str(p) for p in data_roots],
             "extra_file": str(extra_file),
@@ -563,12 +802,15 @@ def main() -> int:
             "quote_whitelist": sorted(quote_whitelist),
             "include_stable_symbols": bool(args.include_stable_symbols),
             "fee_roundtrip_pct": float(args.fee_roundtrip_pct),
+            "fee_roundtrip_scope": "legacy_hindsight_description_only",
+            "walkforward_protocol": protocol,
             "min_bars": int(args.min_bars),
             "symbol_count": len(summaries),
         },
         "top_quick_gain_symbols": top_quick,
         "top_spike_symbols": top_spike,
         "top_balanced_symbols": top_balanced,
+        "symbols": summaries,
         "best_buy_hours_utc": hour_rows[:12],
         "logic_blueprint": logic_blueprint,
         "artifacts": {
@@ -588,14 +830,15 @@ def main() -> int:
     md_lines.append(f"Generated UTC: {summary_payload['generated_utc']}")
     md_lines.append(f"Symbols analyzed: {len(summaries)}")
     md_lines.append(f"Fee roundtrip assumption: {float(args.fee_roundtrip_pct):.3f}%")
+    md_lines.append("HOLD: legacy rankings assume hindsight low-to-next-high prices and select hours in-sample. They are not executable profit or entry instructions.")
     md_lines.append("")
-    md_lines.append("## Top Quick-Gain Symbols")
+    md_lines.append("## Largest Historical Low-to-Next-High Ranges (Hindsight)")
     for row in top_quick[:10]:
         md_lines.append(
             "- "
-            f"{row['symbol']} ({row['quote']}): buy@{row['best_buy_hour_utc']:02d} UTC, "
-            f"median net {row['best_buy_median_net_pct']:.3f}%, "
-            f"win {row['best_buy_win_rate_pct']:.1f}%, trap {row['trap_rate_pct']:.1f}%"
+            f"{row['symbol']} ({row['quote']}): in-sample hour {row['best_buy_hour_utc']:02d} UTC, "
+            f"median hypothetical range less legacy costs {row['best_buy_median_net_pct']:.3f}%, "
+            f"positive-range share {row['best_buy_win_rate_pct']:.1f}%, trap statistic {row['trap_rate_pct']:.1f}%"
         )
     md_lines.append("")
     md_lines.append("## Top Raw Spike Symbols")
@@ -606,28 +849,35 @@ def main() -> int:
             f"max range {row['max_range_pct']:.3f}%, trap {row['trap_rate_pct']:.1f}%"
         )
     md_lines.append("")
-    md_lines.append("## Best Buy Hours (UTC)")
+    md_lines.append("## Historical Range Hours (UTC; Not Buy Instructions)")
     for row in hour_rows[:10]:
         md_lines.append(
             "- "
-            f"{int(row['hour_utc']):02d}:00 UTC: median net {row['median_net_dip_to_next_high_pct']:.3f}%, "
+            f"{int(row['hour_utc']):02d}:00 UTC: median hypothetical range less legacy costs {row['median_net_dip_to_next_high_pct']:.3f}%, "
             f"positive symbols {row['positive_symbol_share_pct']:.1f}% over {row['symbol_count']} symbols"
         )
     md_lines.append("")
-    md_lines.append("## Practical Logic")
-    md_lines.append("- Use POWER_SPIKE mode only on symbols with high p95 range and controlled trap-rate.")
-    md_lines.append("- Use BASKET_SCALP mode for consistent compounding when win-rate is high and traps are low.")
-    md_lines.append("- Disable entries on trap-heavy symbols even if raw volatility looks attractive.")
+    md_lines.append("## Causal Rebound Walk-Forward Diagnostics")
+    md_lines.append("Hour/day buckets are selected from matured training trades only. Later trades use delayed modeled opens with explicit two-sided fees, full spread and slippage. All results remain HOLD.")
+    for row in summaries:
+        validation = row["walkforward_validation"]
+        test = validation.get("test", {})
+        md_lines.append(f"- {row['symbol']} ({row['quote']}): {validation['status']}; "
+                        f"modeled test trades {test.get('trade_count', 0)}; "
+                        f"modeled compounded return {test.get('modeled_compounded_return_pct', 'unknown')}%; "
+                        f"reason {validation.get('reason', '')}.")
+    md_lines.append("No order-book depth, queue priority, partial fills, exchange latency or reconciled account profit is established. Costs remain scenarios until checked against the actual account/pair fee tier and measured liquidity. Per-symbol reinvestment results cannot be summed into a multi-coin bankroll return.")
 
     (out_dir / "summary.md").write_text("\n".join(md_lines) + "\n", encoding="utf-8")
 
     print(
         json.dumps(
             {
-                "status": "ok",
+                "status": "research_only_hold",
+                "allow_live_orders": False,
                 "out_dir": str(out_dir),
                 "symbol_count": len(summaries),
-                "top_quick_symbol": top_quick[0]["symbol"] if top_quick else None,
+                "top_hindsight_range_symbol": top_quick[0]["symbol"] if top_quick else None,
             },
             indent=2,
         )
