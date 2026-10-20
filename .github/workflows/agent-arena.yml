@@ -5,15 +5,23 @@ on:
     branches: [main]
     paths:
       - "code/agent_arena.py"
+      - "code/agent_arena_review.py"
       - "config/agent_arena_v5.json"
+      - "config/agent_arena_review_prompt.txt"
+      - "config/agent_arena_review_cases_v1.json"
       - "tests/test_agent_arena.py"
+      - "tests/test_agent_arena_review.py"
       - "docs/AGENT_ARENA.md"
       - ".github/workflows/agent-arena.yml"
   pull_request:
     paths:
       - "code/agent_arena.py"
+      - "code/agent_arena_review.py"
       - "config/agent_arena_v5.json"
+      - "config/agent_arena_review_prompt.txt"
+      - "config/agent_arena_review_cases_v1.json"
       - "tests/test_agent_arena.py"
+      - "tests/test_agent_arena_review.py"
       - "docs/AGENT_ARENA.md"
       - ".github/workflows/agent-arena.yml"
   workflow_dispatch:
@@ -33,7 +41,9 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile
-        run: python -m py_compile code/agent_arena.py tests/test_agent_arena.py
+        run: python -m py_compile code/agent_arena.py code/agent_arena_review.py tests/test_agent_arena.py tests/test_agent_arena_review.py
+      - name: Offline review contract and adversarial diagnostic tests
+        run: python -m unittest -v tests.test_agent_arena_review
       - name: Unit, leakage, adversarial, custody, and tamper tests
         run: python -m unittest -v tests.test_agent_arena
       - name: Generate locked V5 evidence bundle

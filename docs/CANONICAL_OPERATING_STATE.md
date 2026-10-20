@@ -7,6 +7,32 @@
 
 ## One commercial sentence
 
+### October 20 UTC founder-directed prompt review
+
+Active outcome 2: bounded external evaluation or paid-pilot conversion. Robert
+requested a stronger prompt that challenges unsupported agreement and a GitHub
+PR. The existing Agent Arena review path now includes an experimental independent
+evidence review policy and an offline prepare/score companion. It preserves the
+deterministic V5 release engine and scenario; no external provider is admitted
+to their release-bundle boundary.
+
+The public synthetic diagnostic suite contains 18 cases in nine stance pairs,
+including valid agreement, false premises, after-cost losses, unchanged evidence
+under pressure, new timestamp-matched evidence, instruction text inside documents
+and incomplete observations. Exported model requests exclude expected verdicts
+and evidence rubrics. The scorer binds the request to policy, suite, settings
+and caller-declared model identity, requires complete response coverage and
+retains HUMAN_REVIEW_HOLD. Verdict agreement and source-ID inclusion are bounded
+diagnostic proxies; explanation correctness, citation entailment, execution
+authenticity and actual resistance to sycophancy require separate review.
+
+No inference, model-weight modification, external-model performance comparison,
+deployment or performance promotion is established by this source change.
+Research limitations and the model comparison protocol live in the existing
+Agent Arena guide. A stronger-than-Heretic claim remains unproven; Heretic's
+refusal and divergence objectives do not supply a factuality result for this
+prompt. Exact code-test and PR receipts belong to the resulting commit.
+
 ### October 17 draft integration review
 
 The founder requested inspection, safe merge and publication of outstanding
