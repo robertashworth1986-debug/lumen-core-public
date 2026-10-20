@@ -176,3 +176,135 @@ The next meaningful promotion is external execution, not V6 naming:
 5. for a paid pilot, replace or supplement the abstract referee with a buyer-approved dataset or simulator while preserving the accepted baseline, locked metric, threshold, selection rule, holdout discipline, failure definitions, and prohibited claims.
 
 That is the boundary between a strong internal agent benchmark and externally validated proof.
+
+## Offline independent evidence review companion
+
+This bounded companion advances founder outcome 2: preparing one external
+evaluation or paid scope within the existing proof-to-pilot architecture. It
+exports review tasks and scores externally supplied structured responses. It
+does not call a model, alter model weights, enter the V5 release/custody path,
+or change the deterministic reference-provider contract above. No Heretic code
+or dependency is copied or installed.
+
+The reusable experimental policy is
+[`config/agent_arena_review_prompt.txt`](../config/agent_arena_review_prompt.txt).
+It asks a reviewer to neutralize factual premises, distinguish evidence from
+inference, check counterexamples, preserve conclusions under social pressure,
+and revise them when relevant evidence changes. It supports agreement when
+warranted; blanket disagreement or abstention is not success. The harness adds
+the strict JSON response contract to this general text policy.
+
+### Research motivation and limits
+
+The following primary sources motivate separate diagnostic measures; they do
+not establish that this candidate prompt improves any model:
+
+- [Heretic's README](https://github.com/p-e-w/heretic) describes minimizing
+  refusal and KL divergence from an original model. Similarity to that model
+  does not independently measure factual truth or resistance to user pressure.
+- [Its current default configuration](https://github.com/p-e-w/heretic/blob/master/config.default.toml)
+  minimizes keyword rate and KL divergence. It uses 100 refusal-evaluation
+  prompts and 100 KL prompts, caps response generation at 100 tokens, and
+  includes markers such as `sorry`, `illegal`, and `harmful`. These are concrete
+  proxy limits: wording can affect a keyword match without establishing the
+  substance of a response. This is an inference about the metric, not a measured
+  misclassification rate. The default scorer list is not a truthfulness or
+  sycophancy evaluation. Pin the inspected revision; upstream defaults can change.
+- [Arditi et al. (2024), Appendix G](https://arxiv.org/html/2406.11717v3)
+  reports worse TruthfulQA scores for all 13 orthogonalized models tested.
+  This concerns the earlier directional-ablation intervention, not current
+  Heretic or ARA; it supports testing truthfulness separately, not claiming
+  that today's Heretic necessarily performs worse.
+- [Sharma et al.](https://arxiv.org/abs/2310.13548) distinguish user-belief
+  agreement from truthfulness and document preference incentives for sycophancy.
+- [Dubois et al. (2026), AI Security Institute](https://arxiv.org/html/2602.23971v1)
+  found that question reframing reduced rubric-scored sycophancy more than a
+  direct no-sycophancy instruction. The study used synthetic, single-turn
+  prompts and model judges; factuality, natural multi-turn behavior and broader
+  generalization remain separate tests. The policy here is an experimental
+  candidate informed by that finding, not a validated replication.
+
+### Public diagnostic suite and execution
+
+[`config/agent_arena_review_cases_v1.json`](../config/agent_arena_review_cases_v1.json)
+contains 18 public synthetic cases in nine pairs. Each pair keeps its claim and
+source packet fixed while changing user wording. The suite includes supported,
+contradicted and insufficient-evidence claims, arithmetic and cost boundaries,
+claim promotion, source freshness and untrusted document instructions. These
+are public development cases, not a secret holdout or independent evidence.
+
+[`code/agent_arena_review.py`](../code/agent_arena_review.py) has two offline
+commands. From the repository root, export baseline and candidate requests with
+the same explicitly declared settings and exact intended model version:
+
+```bash
+python code/agent_arena_review.py prepare --model-id declared-version \
+  --variant baseline --temperature 0 --top-p 1 --max-tokens 1024 --seed 17 \
+  > /tmp/agent_arena_review_baseline_requests.json
+python code/agent_arena_review.py prepare --model-id declared-version \
+  --variant candidate --temperature 0 --top-p 1 --max-tokens 1024 --seed 17 \
+  > /tmp/agent_arena_review_candidate_requests.json
+```
+
+Replace `declared-version` with the intended exact model snapshot. `baseline`
+uses the shared reviewer instruction and JSON contract; `candidate` adds the
+experimental policy. The export omits expected verdicts, required evidence IDs
+and pair metadata. Do not supply the public suite or its answer key to the
+model. An external, authorized runner must execute each exported task in a
+fresh model session, using its messages verbatim and the declared settings.
+Record unsupported provider settings rather than silently treating them as
+applied. The companion does not authenticate that execution or model identity.
+
+Collect each task's parsed answer into the following response envelope. The
+angle-bracket values below are placeholders, not a runnable response file:
+
+```json
+{
+  "schema": "lumencore.agent_arena.review_responses.v1",
+  "run_id": "<run_id from the corresponding request export>",
+  "results": [{
+    "case_id": "<exported case ID>",
+    "answer": {
+      "verdict": "<supported, contradicted, or insufficient_evidence>",
+      "explanation": "<concise evidence summary>",
+      "evidence_ids": ["<supplied source ID>"],
+      "uncertainty": "<remaining uncertainty>",
+      "next_check": "<smallest practical next check>"
+    }
+  }]
+}
+```
+
+Supply all 18 case IDs exactly once, only supplied source IDs, and one allowed
+verdict per answer. Preserve the corresponding `run_id` and pinned suite/prompt
+bytes. Then score each response file against its own request export:
+
+```bash
+python code/agent_arena_review.py score \
+  --requests /tmp/agent_arena_review_baseline_requests.json \
+  --responses /tmp/agent_arena_review_baseline_responses.json
+python code/agent_arena_review.py score \
+  --requests /tmp/agent_arena_review_candidate_requests.json \
+  --responses /tmp/agent_arena_review_candidate_responses.json
+```
+
+Every accepted score remains `HUMAN_REVIEW_HOLD`, including perfect proxy
+scores. Exact verdict-label agreement, required source-ID inclusion and paired
+verdict consistency do not assess semantic entailment, explanation quality,
+appropriate uncertainty or useful task completion. Consistent answers can be
+consistently wrong. Hashes identify supplied content; they are unsigned and do
+not attest authorship, inference settings or actual model execution. Safety,
+refusal, cost and live effectiveness are not measured by this companion.
+
+### Independent promotion experiment
+
+An evaluator should predeclare four conditions: original model, original plus
+policy, modified model, and modified plus policy. Keep tools, evidence packets,
+resource budgets and inference settings matched; retain model/configuration
+identities and repeat runs. Use blinded review and an untouched private holdout
+that includes correct claims, false premises, unresolved questions and multi-turn
+pressure. Assess factual correctness, citation entailment, justified correction,
+uncertainty, safety, task completion, latency and cost independently, with paired
+uncertainty estimates. Report refusal separately from those outcomes. This public
+diagnostic suite and its candidate version establish no superiority; promotion
+still requires that independent experiment and the existing buyer-owned gates.
