@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "stage": 4,
+  "experiment": "delayed_feedback_router_2025",
+  "protocol_commit": "80bac1f947122c7c4753f7116d42163e07d3b9d2",
+  "execution_commit": "3373c339033fcf6e6d2505aad0d8997bf3e65f66",
+  "branch": "exp/energy-stage4-delayed-router-20260905",
+  "execution": {
+    "run_id": 33970218198,
+    "workflow_conclusion": "success",
+    "research_status": "COMPLETE_WITH_SOURCE_HOLD",
+    "artifact_id": 9970692612,
+    "artifact_sha256": "a0c693328a3a614ee7646731b81497f7d5f4b33b5338c9fab0595797d1017a2d",
+    "artifact_expires_utc": "2026-10-05T13:54:14Z",
+    "new_integrity_tests_passed": 24,
+    "inherited_integrity_tests_passed": 12,
+    "custody_payload_files_verified_locally": 47,
+    "planned_comparisons": 108,
+    "comparisons_scored": 90,
+    "withheld_comparisons": 18,
+    "matched_station_horizon_target_pairs": 187987,
+    "target_pairs_are_not_independent_observations": true,
+    "individual_comparator_screens_passed": 9,
+    "candidate_station_horizon_cells_passing_all_three_comparators": 0
+  },
+  "sources": {
+    "calibration_year": 2023,
+    "test_year": 2025,
+    "stations_scored": ["41002", "42001", "44025", "46050", "46237"],
+    "acquired_source_files": 11,
+    "planned_source_files": 12,
+    "withheld_source": {"file": "46042h2025.txt.gz", "reason": "HTTP 404; no station/year substitution"},
+    "classification": "Public historical observations, not live measured breadth, not as-of dissemination snapshots",
+    "target": "WVHT^2 * APD, m^2 s; wave activity proxy, not electricity"
+  },
+  "methods": {
+    "experts": ["persistence", "rolling_60m", "rolling_120m", "rolling_180m", "rolling_360m", "half_damped_60m_trend", "direct_residual_ridge_alpha10"],
+    "candidates": ["delayed_router_v01", "delayed_blend_v01"],
+    "availability": "Daily updates from previously issued forecasts only after target timestamp plus 30 minutes is strictly before update time",
+    "calibration": "Ridge trained before September 2023; static champions selected on September-December 2023",
+    "evaluation": "Prequential 2025; fixed candidate rules, weights adapt only to earlier matured 2025 errors",
+    "uncertainty": "10000 paired bootstrap replicates, 7-calendar-day blocks plus 14-day sensitivity; Holm over all 108 predeclared comparisons",
+    "promotion_rule": "At least 5 percent gain, adjusted p<0.05, positive 7/14-day interval lower limits, at least 2000 pairs and 120 days, 80 percent exact-target coverage; must pass against all three comparators",
+    "novelty_boundary": "New LumenCore research implementation using standard expert-aggregation ingredients. No proprietary novelty or theoretical regret guarantee established."
+  },
+  "selected_results": [
+    {
+      "station": "46237", "horizon_minutes": 60, "candidate": "delayed_blend_v01",
+      "matched_forecasts": 17468, "scored_days": 365,
+      "mae_improvement_pct": {"vs_persistence": 7.01741334374327, "vs_calibration_best_rolling": 1.74242207862112, "vs_calibration_static_champion": 0.44397751521301676},
+      "persistence_mae": 3.4963667046599496,
+      "rolling_mae": 3.308663076940746,
+      "static_champion_mae": 3.2655103326147126,
+      "candidate_mae": 3.2510122009809455,
+      "vs_static_champion_holm_p": 0.7433256674332567,
+      "decision": "HOLD: insufficient incremental gain over stronger baselines",
+      "days_worse_than_persistence": 90,
+      "days_worse_than_static_champion": 118
+    },
+    {
+      "station": "46050", "horizon_minutes": 60, "candidate": "delayed_router_v01",
+      "matched_forecasts": 10726, "scored_days": 225,
+      "mae_improvement_pct": {"vs_persistence": 8.338394656171783, "vs_calibration_best_rolling": 2.2561763999652626, "vs_calibration_static_champion": 2.4605661784763027},
+      "decision": "HOLD: does not clear all stronger-comparator effect/statistical gates"
+    },
+    {
+      "station": "42001", "horizon_minutes": 360, "candidate": "delayed_router_v01",
+      "matched_forecasts": 13968, "scored_days": 294,
+      "mae_improvement_pct": {"vs_persistence": 4.498427519274152, "vs_calibration_best_rolling": 5.623130784559579, "vs_calibration_static_champion": 11.274774006272951},
+      "vs_static_champion_ci7day_pct": [5.346120827489714,19.856664474451765],
+      "vs_static_champion_holm_p": 0.010798920107989201,
+      "vs_persistence_ci7day_pct": [-0.4460870308901712,8.125287042551697],
+      "vs_persistence_holm_p": 1.0,
+      "decision": "HOLD: an 11.27 percent gain versus an obsolete selected Ridge model does not establish superiority versus persistence"
+    }
+  ],
+  "edge_cases": {
+    "prediction_interval_calibration": {
+      "nominal_coverage": 0.9,
+      "observed_coverage_range_across_candidates_cells": [0.8715673454137867,0.8975638051044084],
+      "interpretation": "Nominal intervals undercovered in every scored cell; not a calibrated safety guarantee"
+    },
+    "station46237_one_hour_10pct_input_dropout": {
+      "eligible_origin_count_ratio_to_clean": 0.9025728987993139,
+      "input_observations_withheld": 1704,
+      "clean_ridge_fallback_origins": 191,
+      "dropout_ridge_fallback_origins": 8410,
+      "clean_candidate_blend_mae": 3.2510122009809455,
+      "dropout_candidate_blend_mae": 3.3343951084959684,
+      "dropout_static_champion_mae": 3.3823711333457935,
+      "interpretation": "Long complete-lag feature vectors are brittle to scattered missing readings. Error comparisons across corruption scenarios are conditional on different available forecast origins, not identical samples."
+    },
+    "regime_concentration": "42001 six-hour router improved in Q2/Q3 but not Q4; its error on calibration-defined high-activity cases was unchanged from the static champion. Do not infer storm-performance improvement from aggregate gains."
+  },
+  "local_reproduction": {
+    "all_90_comparison_decisions_match": true,
+    "bitwise_identical": false,
+    "maximum_absolute_numeric_difference_across_comparisons_calibrations_and_diagnostics": 1.2513101665945214e-11,
+    "maximum_relative_numeric_difference_with_unit_floor": 6.0410227030869056e-12,
+    "independent_external_validation": false
+  },
+  "next_research_priority": "Predeclare missingness-aware short-history experts and better uncertainty calibration. Check adverse-regime performance and a fresh evaluation period before any new promotion. Do not keep tuning on this now-examined 2025 result as if it were untouched.",
+  "claim_boundary": "Internal offline wave forecasting research only. No validated geothermal transfer, live plant control, energy-yield increase, revenue, valuation, independent certification, or production deployment. Main and DNS were not modified."
+}
