@@ -251,7 +251,8 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
         "UMask=0027",
         "NoNewPrivileges=true",
         "PrivateTmp=true",
-        'install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0750 -- "$RUN_DIR"',
+        'install -d -o "$run_uid" -g "$run_gid" -m "$run_mode" -- "$RUN_DIR"',
+        'install_gateway_runtime_directory\nsystemctl daemon-reload',
         'systemctl daemon-reload',
         'effective gateway service identity is not lumencore:lumencore',
         'gateway singleton lock did not bind to the systemd main PID',
@@ -337,6 +338,8 @@ def _run_gateway_rollback_guard(
     dropin_directory_fault: str = "", dropin_directory_query_case: str = "",
     dropin_target_drift: str = "", dropin_target_boundary: str = "stop",
     dropin_forward_case: str = "", dropin_target_query_case: str = "",
+    run_target_drift: str = "", run_target_boundary: str = "stop",
+    run_forward_case: str = "", run_target_query_case: str = "",
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -433,6 +436,20 @@ elif kind == "manifest_changed":
 elif kind in {"uid_mismatch", "gid_mismatch", "remove_noop"}: pass
 else: raise ValueError("unsupported_dropin_directory_fault")
 Path("dropin-directory-fault-applied").write_text(kind)
+''', encoding="utf-8", newline="\n")
+        if run_target_drift:
+            (root / "run-target-drift.py").write_text('''from pathlib import Path
+import os
+p=Path("run"); kind=os.environ["RUN_TARGET_DRIFT"]
+if kind == "identity": p.rename("prior-run-identity"); p.mkdir()
+elif kind == "missing": p.rmdir()
+elif kind == "file": p.rmdir(); p.write_bytes(b"intervening file")
+elif kind == "mode": p.chmod(0o700)
+elif kind == "symlink": p.rename("outside-run"); p.symlink_to(Path("outside-run").resolve(), target_is_directory=True)
+elif kind == "children": (p/"new-child").mkdir(); (p/"new-child").rmdir()
+elif kind == "parent_mode": p.parent.chmod(0o777)
+else: raise ValueError("unsupported_runtime_directory_drift")
+Path("run-target-drift-applied").write_text(kind)
 ''', encoding="utf-8", newline="\n")
         if source_drift:
             # Controlled interleavings in disposable paths only. The production
@@ -576,10 +593,14 @@ RECOVERY_DROPIN_RESULT=NOT_CHECKED
 RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 DROPIN_WRITE_STATE=UNTOUCHED
 DROPIN_TARGET_VERSION=""
+RUN_WRITE_STATE=UNTOUCHED
+RUN_TARGET_VERSION=""
+RUN_CANDIDATE_METADATA="$("$TEST_PYTHON" -c 'import os;print(str(os.getuid() if hasattr(os,"getuid") else 0)+":"+str(os.getgid() if hasattr(os,"getgid") else 0)+":750")')"
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 python3() { "$TEST_PYTHON" "$@"; }
 FIXTURE_FORWARD=false
 FIXTURE_DROPIN_FORWARD=false
+FIXTURE_RUN_FORWARD=false
 RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
@@ -615,7 +636,7 @@ systemctl() {
   else
     printf 'SYSTEMCTL:%s\n' "$1" >> "$PWD/systemctl.calls"
     if [[ "$1" == stop ]]; then fixture_source_drift stop || return $?; fixture_target_drift stop || return $?; fi
-    if [[ "$1" == stop ]]; then fixture_dropin_target_drift stop || return $?; fi
+    if [[ "$1" == stop ]]; then fixture_dropin_target_drift stop || return $?; fixture_run_target_drift stop || return $?; fi
     if [[ "$1" == stop && -n "$DROP_BACKUP_AFTER_VERIFY" ]]; then
       command rm -- "$BACKUP_DIR/$DROP_BACKUP_AFTER_VERIFY"
     fi
@@ -680,6 +701,11 @@ fixture_dropin_target_drift() {
     "$TEST_PYTHON" "$PWD/dropin-target-drift.py" || return $?
   fi
 }
+fixture_run_target_drift() {
+  if [[ -n "$RUN_TARGET_DRIFT" && "$RUN_TARGET_BOUNDARY" == "$1" && ! -e "$PWD/run-target-drift-applied" ]]; then
+    "$TEST_PYTHON" "$PWD/run-target-drift.py" || return $?
+  fi
+}
 fixture_operation() {
   local command_name="$1" fixture_target=unknown
   case "$2" in
@@ -703,6 +729,7 @@ chmod() {
   elif [[ "${@: -1}" == "$SERVICE_DROP_IN_DIR" ]]; then
     "$TEST_PYTHON" -c 'import os,sys; os.chmod(sys.argv[2], int(sys.argv[1],8))' "$1" "$SERVICE_DROP_IN_DIR" || return $?
     fixture_dropin_directory_fault || return $?
+    fixture_run_target_drift before_run_restore || return $?
   fi
 }
 rm() {
@@ -723,7 +750,13 @@ rm() {
   if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_target_drift after_remove || return $?; fi
 }
 install() {
-  if [[ "$FIXTURE_DROPIN_FORWARD" == true ]]; then
+  if [[ "$FIXTURE_RUN_FORWARD" == true ]]; then
+    printf '%s\n' "${@: -1}" >> "$PWD/run-forward.calls"
+    command mkdir -p -- "${@: -1}" || return $?
+    if [[ "$RUN_FORWARD_CASE" == partial ]]; then return 31; fi
+    if [[ "$RUN_FORWARD_CASE" == wrong_type ]]; then command rmdir -- "${@: -1}"; printf 'wrong type' > "${@: -1}"; return 0; fi
+    command chmod 0750 -- "${@: -1}" || return $?
+  elif [[ "$FIXTURE_DROPIN_FORWARD" == true ]]; then
     printf '%s\n' "${@: -1}" >> "$PWD/dropin-forward.calls"
     if [[ "$DROPIN_FORWARD_CASE" == partial ]]; then printf 'partial hardening\n' > "${@: -1}"; return 31; fi
     if [[ "$DROPIN_FORWARD_CASE" == wrong_bytes ]]; then printf 'wrong candidate\n' > "${@: -1}"; return 0; fi
@@ -779,7 +812,7 @@ cp() {
   if [[ -n "$DROPIN_FAULT" && "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_fault || return $?; fi
   if [[ ( "$RESULT_FAULT" == copy_* || "$RESULT_FAULT" == manifest_changed || "$RESULT_FAULT" == backup_changed ) && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_copy || return $?; fixture_target_drift after_first_copy || return $?; fi
-  if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_dropin_target_drift after_first_copy || return $?; fi
+  if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_dropin_target_drift after_first_copy || return $?; fixture_run_target_drift after_first_copy || return $?; fi
 }
 cleanup() {
   if [[ -f "$PWD/systemctl.calls" ]]; then cat "$PWD/systemctl.calls"; fi
@@ -820,8 +853,19 @@ fi
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
         for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "recorded_target_version", "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent",
-                     "dropin_target_version", "capture_dropin_target_version", "install_gateway_dropin", "read_recovery_dropin_target_state", "require_recovery_dropin_absent"):
-            harness += _bash_function(script, name) + "\n"
+                     "dropin_target_version", "capture_dropin_target_version", "install_gateway_dropin", "read_recovery_dropin_target_state", "require_recovery_dropin_absent",
+                     "runtime_directory_target_version", "capture_runtime_directory_target_version", "install_gateway_runtime_directory", "read_recovery_runtime_directory_target_state"):
+            function = _bash_function(script, name)
+            if os.name != "posix" and name == "recorded_target_version":
+                # Windows cannot represent Unix directory mode0750. Substitute
+                # only that fixture comparison; real mode/link coverage is POSIX.
+                assert function.count("!= (uid, gid, permissions)") == 1
+                function = function.replace("!= (uid, gid, permissions)", "!= (uid, gid, stat.S_IMODE(before.st_mode))")
+            harness += function + "\n"
+        if run_target_boundary == "query":
+            harness += _bash_function(script, "read_recovery_runtime_directory_target_state").replace(
+                "read_recovery_runtime_directory_target_state() {", "actual_runtime_target_state() {", 1) + "\n"
+            harness += 'read_recovery_runtime_directory_target_state() { fixture_run_target_drift query || return $?; actual_runtime_target_state "$@"; }\n'
         if real_lock_case:
             harness += _bash_function(script, "remove_verified_dead_lock") + "\n"
             if real_lock_case == "live":
@@ -941,6 +985,13 @@ if [[ "$DROPIN_FORWARD_CASE" != untouched ]]; then
   install_gateway_dropin
   FIXTURE_DROPIN_FORWARD=false
 fi
+if [[ "$RUN_FORWARD_CASE" == capture_failed ]]; then capture_runtime_directory_target_version() { return 29; }; fi
+if [[ "$RUN_FORWARD_CASE" == invalid_candidate ]]; then RUN_CANDIDATE_METADATA=invalid; fi
+if [[ "$RUN_FORWARD_CASE" != untouched ]]; then
+  FIXTURE_RUN_FORWARD=true
+  install_gateway_runtime_directory
+  FIXTURE_RUN_FORWARD=false
+fi
 if [[ "$FORWARD_CASE" == stage_changed ]]; then printf 'changed staged candidate\n' > "$STAGE_DIR/entry.py"; fi
 FIXTURE_FORWARD=true
 for fixture_rel in "${BUNDLE_FILES[@]}"; do
@@ -958,6 +1009,13 @@ case "$FORWARD_CASE" in
   invalid_version) SOURCE_TARGET_VERSION[entry.py]=invalid ;;
   missing_candidate) unset 'SOURCE_CANDIDATE_SHA[entry.py]' ;;
 esac
+case "$RUN_FORWARD_CASE" in
+  unknown_state) RUN_WRITE_STATE=UNKNOWN ;;
+  invalid_state) RUN_WRITE_STATE=invalid ;;
+  missing_version) RUN_TARGET_VERSION="" ;;
+  invalid_version) RUN_TARGET_VERSION=invalid ;;
+  untouched_version) RUN_WRITE_STATE=UNTOUCHED ;;
+esac
 case "$DROPIN_FORWARD_CASE" in
   unknown_state) DROPIN_WRITE_STATE=UNKNOWN ;;
   invalid_state) DROPIN_WRITE_STATE=invalid ;;
@@ -968,6 +1026,25 @@ esac
 '''
         if recovery_case == "hardening_binding":
             harness += "HARDENING_SHA=" + "d" * 64 + "\n"
+        if run_target_query_case:
+            harness += _bash_function(script, "runtime_directory_target_version").replace(
+                "runtime_directory_target_version() {", "actual_runtime_directory_target_version() {", 1) + "\n"
+            harness += r'''
+runtime_directory_target_version() {
+  case "$RUN_TARGET_QUERY_CASE" in
+    failed) actual_runtime_directory_target_version; return 29 ;;
+    extra_line) actual_runtime_directory_target_version; printf 'extra\n' ;;
+    extra_newline) actual_runtime_directory_target_version; printf '\n' ;;
+    carriage_return) printf '%064d\r\n' 0 ;;
+    no_newline) printf '%064d' 0 ;;
+    empty) : ;;
+    extra_argument) actual_runtime_directory_target_version ignored ;;
+    invalid_mode) recorded_target_version runtime absent '' '' ;;
+    supplied_path) recorded_target_version runtime capture ../outside "$RUN_CANDIDATE_METADATA" ;;
+    *) return 99 ;;
+  esac
+}
+'''
         if dropin_target_query_case:
             harness += _bash_function(script, "dropin_target_version").replace(
                 "dropin_target_version() {", "actual_dropin_target_version() {", 1) + "\n"
@@ -1126,6 +1203,8 @@ record_recovery_evidence() {
             DROPIN_DIRECTORY_FAULT=dropin_directory_fault, DROPIN_DIRECTORY_QUERY_CASE=dropin_directory_query_case,
             DROPIN_TARGET_DRIFT=dropin_target_drift, DROPIN_TARGET_BOUNDARY=dropin_target_boundary,
             DROPIN_FORWARD_CASE=dropin_forward_case, DROPIN_TARGET_QUERY_CASE=dropin_target_query_case,
+            RUN_TARGET_DRIFT=run_target_drift, RUN_TARGET_BOUNDARY=run_target_boundary,
+            RUN_FORWARD_CASE=run_forward_case, RUN_TARGET_QUERY_CASE=run_target_query_case,
             DROP_BACKUP_AFTER_VERIFY=metadata_case.split(":", 1)[1] if metadata_case.startswith("missing:") else "",
         )
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
@@ -1193,6 +1272,8 @@ record_recovery_evidence() {
             evidence["dropin_target_drift_applied"] = (root / "dropin-target-drift-applied").exists()
             evidence["dropin_forward_calls"] = (root / "dropin-forward.calls").read_text().splitlines() if (root / "dropin-forward.calls").exists() else []
             evidence["dropin_result_receipt_exists"] = (root / "backup/dropin_result.json").exists()
+            evidence["run_forward_calls"] = (root / "run-forward.calls").read_text().splitlines() if (root / "run-forward.calls").exists() else []
+            evidence["run_target_drift_applied"] = (root / "run-target-drift-applied").exists()
             evidence["run_directory_exists"] = (root / "run").exists()
             evidence["runtime_directory_is_directory"] = (root / "run").is_dir()
             evidence["runtime_directory_is_symlink"] = (root / "run").is_symlink()
@@ -3065,3 +3146,146 @@ def test_gateway_recovery_workflow_requires_exact_main_commit_and_gate() -> None
     assert "WRONG_HARDENING_HASH_FAIL_CLOSED_OK" in workflow
     assert "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1" in workflow
     assert "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0" in workflow
+
+
+def _assert_runtime_directory_target_conflict(kind: str, *, boundary: str = "stop",
+                                               missing_before: bool = False, receipt_failure: bool = False) -> dict:
+    evidence: dict = {}
+    completed, source, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure" if receipt_failure else "runtime_directory_target_guard",
+        directory_case="missing_run" if missing_before else "", run_target_drift=kind,
+        run_target_boundary=boundary, evidence=evidence,
+    )
+    assert completed.returncode == 17, completed.stderr
+    assert evidence["run_target_drift_applied"] and len(evidence["run_forward_calls"]) == 1
+    assert evidence["backup_exists"] and source == b"previous source\n"
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert ":run_dir" not in evidence["operation_calls"]
+    assert "run_target_state failed" in completed.stderr
+    if kind == "identity": assert evidence["runtime_directory_is_directory"]
+    if kind == "file": assert evidence["run_directory_exists"] and not evidence["runtime_directory_is_directory"]
+    if receipt_failure:
+        assert "receipt persistence failed" in completed.stderr and evidence.get("rollback") is None
+    else:
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"]["operation"] == "run_target_state"
+        assert receipt["trigger_exit_code"] == 17 and receipt["partial_state_possible"]
+        assert receipt["runtime_directory_write_state"]["state"] == "INSTALLED"
+        assert receipt["runtime_directory_result_observation"] == "NOT_CHECKED"
+        assert not receipt["restoration_verified"] and not receipt["service_state_verified"]
+    return evidence
+
+
+def test_gateway_runtime_directory_target_guard_preserves_replaced_missing_or_wrong_type() -> None:
+    for kind in ("identity", "missing", "file"):
+        _assert_runtime_directory_target_conflict(kind)
+    _assert_runtime_directory_target_conflict("identity", missing_before=True)
+    _assert_runtime_directory_target_conflict("identity", boundary="after_first_copy")
+    _assert_runtime_directory_target_conflict("identity", boundary="before_run_restore")
+    _assert_runtime_directory_target_conflict("identity", boundary="query")
+    _assert_runtime_directory_target_conflict("identity", receipt_failure=True)
+
+
+@unittest.skipIf(os.name != "posix", "POSIX runtime-directory mode and symbolic-link guard")
+def test_gateway_runtime_directory_target_guard_rejects_modes_links_and_unsafe_parent() -> None:
+    for kind in ("mode", "symlink", "parent_mode"):
+        evidence = _assert_runtime_directory_target_conflict(kind, boundary="query" if kind == "parent_mode" else "stop")
+        if kind == "mode": assert evidence["runtime_directory_metadata"][2] == 0o700
+        if kind == "symlink": assert evidence["runtime_directory_is_symlink"]
+
+
+def test_gateway_runtime_directory_target_guard_actual_forward_valid_and_untouched() -> None:
+    for case in ("", "missing_run", "absent_run", "nonempty_run"):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_target_guard", directory_case=case, evidence=evidence,
+        )
+        assert completed.returncode == 17, completed.stderr
+        assert len(evidence["run_forward_calls"]) == 1
+        receipt = evidence["rollback"]
+        state = receipt["runtime_directory_write_state"]
+        assert state["state"] == "INSTALLED" and len(state["installed_version_sha256"]) == 64
+        assert state["candidate_metadata"].endswith(":750")
+        if case == "nonempty_run":
+            assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+            assert evidence["retained_unrelated_files"] == [b"preserve unrelated bytes\n"]
+        else:
+            assert evidence["service_calls"].endswith("SYSTEMCTL:start\n")
+            assert receipt["runtime_directory_result_observation"] == (
+                "MATCHED_PREPARED_PRESENT" if not case else "MATCHED_PREPARED_ABSENCE")
+    for case in ("", "missing_run"):
+        evidence = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_target_guard", directory_case=case,
+            run_forward_case="untouched", evidence=evidence,
+        )
+        assert completed.returncode == 17 and not evidence["run_forward_calls"]
+        assert ":run_dir" not in evidence["operation_calls"] and evidence["run_directory_exists"]
+        assert evidence["rollback"]["runtime_directory_result_observation"] == "UNCHECKED_UNTOUCHED"
+        assert evidence["rollback"]["runtime_directory_write_state"]["state"] == "UNTOUCHED"
+
+
+def test_gateway_runtime_directory_target_guard_partial_install_and_readback_failure() -> None:
+    for case, trigger in (("partial", 31), ("wrong_type", 1), ("capture_failed", 29)):
+        evidence: dict = {}
+        completed, source, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_target_guard", run_forward_case=case, evidence=evidence,
+        )
+        assert completed.returncode == trigger, (case, completed.stderr)
+        assert source == b"candidate source\n" and evidence["backup_exists"]
+        assert ":run_dir" not in evidence["operation_calls"]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        receipt = evidence["rollback"]
+        assert receipt["runtime_directory_write_state"]["state"] == "WRITE_PENDING"
+        assert receipt["runtime_directory_write_state"]["installed_version_sha256"] is None
+        assert receipt["failed_restoration_operation"] == dict(operation="run_target_state", target="run_directory", exit_code=14)
+
+
+def test_gateway_runtime_directory_target_guard_query_and_state_failures() -> None:
+    for query in ("failed", "extra_line", "extra_newline", "carriage_return", "no_newline",
+                  "empty", "extra_argument", "invalid_mode", "supplied_path"):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_target_guard", run_target_query_case=query, evidence=evidence,
+        )
+        assert completed.returncode == 17 and ":run_dir" not in evidence["operation_calls"], (query, completed.stderr)
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        failure = evidence["rollback"]["failed_restoration_operation"]
+        assert failure["operation"] == "run_target_state"
+        assert failure["exit_code"] == (29 if query == "failed" else 1 if query in {"invalid_mode", "supplied_path"} else 14)
+    for case in ("unknown_state", "invalid_state", "missing_version", "invalid_version", "untouched_version"):
+        evidence = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_target_guard", run_forward_case=case, evidence=evidence,
+        )
+        assert completed.returncode == 17 and ":run_dir" not in evidence["operation_calls"]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+        assert "run_target_state failed" in completed.stderr
+        if case in {"invalid_state", "invalid_version"}:
+            assert "receipt persistence failed" in completed.stderr and "rollback" not in evidence
+
+
+def test_gateway_runtime_directory_target_guard_allows_own_child_changes_and_pins_before_mutation() -> None:
+    evidence: dict = {}
+    completed, _, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="runtime_directory_target_guard", second_source=True,
+        run_target_drift="children", evidence=evidence,
+    )
+    assert completed.returncode == 17 and evidence["run_target_drift_applied"], completed.stderr
+    assert evidence["second_target"] == b"second previous\n"
+    assert evidence["service_calls"].endswith("SYSTEMCTL:start\n")
+    script = _repair_script()
+    assert script.index('RUN_CANDIDATE_METADATA="${service_uid}:$(id -g "$SERVICE_USER"):750"') < script.index(
+        'RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"')
+    install = _bash_function(script, "install_gateway_runtime_directory")
+    assert install.index("RUN_WRITE_STATE=WRITE_PENDING") < install.index("install -d")
+    assert install.index("capture_runtime_directory_target_version") < install.index("RUN_WRITE_STATE=INSTALLED")
+    rollback = _bash_function(script, "rollback")
+    assert rollback.index("run_target_state") < rollback.index("run_directory_state_read")

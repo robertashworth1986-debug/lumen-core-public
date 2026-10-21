@@ -201,8 +201,50 @@ the overlapping counts are not additive. Both runs bound unchanged helper and
 test hashes. Initial selected coverage retained one assertion failure: the fixture
 represents an unparsable collision receipt as null, rather than omitting its key.
 Only that assertion was corrected; original failure-code and evidence retention
-already worked. Final independent source review found no blocking issue; hosted
-Linux checks for this increment remain pending.
+already worked. Final independent source review found no blocking issue. Committed head
+4905be42 subsequently passed all 14 hosted checks: 128 Linux public-contract
+checks without skips and 2,124 full-suite tests with eight unrelated skips and
+350 passing subtests. Both jobs checked out merge ba2cd218, whose parents are
+fresh main 2d82be53 and that exact head. The provider still reports the older
+PR-base metadata; the actual tested merge parents take precedence for this claim.
+
+The next local increment protects only the fixed runtime directory before rollback
+changes its ownership/mode or removes it. Expected numeric service owner/group and
+mode0750 are pinned before forward runtime mutation. The actual directory install
+records untouched, write pending or installed state, with a stable directory and
+parent identity digest captured only after matching readback. Rollback checks that
+version before this object's first restoration operation. A changed, missing,
+replaced, linked, unknown or partially installed directory stops later recovery,
+preserves the original failure and remaining evidence, and prevents service restart.
+An untouched directory is skipped and explicitly unchecked. The existing narrow
+post-result query and nonempty-directory refusal remain in place.
+
+The motivating disposable baseline replaced an empty originally-missing runtime
+directory after recovery stop; the previous rollback removed that replacement and
+reached restart. It is a controlled interleaving, not a production incident. The
+guard binds type, device/inode, numeric owner/group, mode and stable safe parents.
+Child counts and directory timestamps are excluded because this invocation and
+the service can legitimately change lock/child entries. It does not certify
+contents, ACLs/xattrs, exclusive ownership or whole restoration. Windows fixtures
+substitute only the unavailable Unix-mode comparison; actual mode/link behavior
+requires hosted POSIX validation. Privileged install/readback and check-to-use
+races, prior partial source/drop-in/lock restoration, the other directory's
+ownership, overall filesystem deadlines and outer postcheck recovery remain
+unresolved. No backend deployment or merge is established by this draft.
+
+Final affected-path validation passed 10 local tests with 1 POSIX-only skip,
+including the actual RUN_DIR transitions, the amended install contract and adjacent
+source/drop-in controls. All three public-contract files also imported under
+Python without site packages (134 tests discovered; none executed by that import
+check). The initial five-file and three-file runs were stopped after the known
+obsolete direct-install marker failed: they remain interrupted, incomplete results,
+not successful suites. The focused log showed 42 pass, one fail and six skip markers;
+the dependency-free runner last reported 40 completed with one failure. The static
+assertion now requires the numeric pinned install and actual guarded forward call;
+no production guard was relaxed. The selected final run binds unchanged helper and
+test hashes; Bash syntax and diff checks passed. These overlapping local observations
+are not additive and do not replace exact-new-head hosted Linux validation, which
+remains pending for this revision.
 
 The preceding runtime-directory revision at `2e0fdcb8` passed all 14 hosted checks:
 114 Linux public-contract checks with no skips and 2,110 full-suite tests with eight

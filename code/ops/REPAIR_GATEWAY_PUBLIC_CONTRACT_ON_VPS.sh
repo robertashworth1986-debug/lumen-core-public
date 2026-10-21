@@ -50,6 +50,9 @@ RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 RECOVERY_DROPIN_DIRECTORY_RESULT=NOT_CHECKED
 DROPIN_WRITE_STATE=UNTOUCHED
 DROPIN_TARGET_VERSION=""
+RUN_WRITE_STATE=UNTOUCHED
+RUN_TARGET_VERSION=""
+RUN_CANDIDATE_METADATA=""
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 
 # This list is the recursively resolved local-Python import closure of the
@@ -384,6 +387,9 @@ getent group "$SERVICE_GROUP" >/dev/null || {
   echo "ERROR: required gateway service group does not exist" >&2
   exit 13
 }
+RUN_CANDIDATE_METADATA="${service_uid}:$(id -g "$SERVICE_USER"):750"
+[[ "$RUN_CANDIDATE_METADATA" =~ ^[0-9]+:[0-9]+:750$ ]] || exit 13
+
 [[ -x "$PYTHON_BIN" ]] || {
   echo "ERROR: gateway Python runtime is not executable" >&2
   exit 13
@@ -465,7 +471,8 @@ record_recovery_evidence() {
     "$SERVICE_DROP_IN" "${RECOVERY_DROPIN_RESULT:-NOT_CHECKED}" \
     "$RUN_DIR" "${RECOVERY_RUNTIME_DIRECTORY_RESULT:-NOT_CHECKED}" \
     "$SERVICE_DROP_IN_DIR" "${RECOVERY_DROPIN_DIRECTORY_RESULT:-NOT_CHECKED}" \
-    "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" "${BUNDLE_FILES[@]}" <<'PY'
+    "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" \
+    "${RUN_WRITE_STATE:-UNKNOWN}" "${RUN_TARGET_VERSION:-}" "${RUN_CANDIDATE_METADATA:-}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -485,7 +492,8 @@ dropin_target, dropin_result = sys.argv[17:19]
 runtime_directory_target, runtime_directory_result = sys.argv[19:21]
 dropin_directory_target, dropin_directory_result = sys.argv[21:23]
 dropin_write_state, dropin_target_version = sys.argv[23:25]
-relatives = sys.argv[25:]
+run_write_state, run_target_version, run_candidate_metadata = sys.argv[25:28]
+relatives = sys.argv[28:]
 query_kinds = {"source_state", "source_result"}
 if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
@@ -559,8 +567,17 @@ if kind in {"helper", "rollback", "rollback_refused"}:
     payload["dropin_write_state"] = dict(state=dropin_write_state, candidate_sha256=hardening,
                                         installed_version_sha256=dropin_target_version or None)
     payload["dropin_result_observation"] = dropin_result
-    if runtime_directory_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+    if runtime_directory_result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
         raise SystemExit("invalid_runtime_directory_result_observation")
+    if (run_write_state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+            or (run_target_version and not re.fullmatch(r"[0-9a-f]{64}", run_target_version))
+            or (run_candidate_metadata and not re.fullmatch(r"[0-9]+:[0-9]+:750", run_candidate_metadata))
+            or (runtime_directory_result == "UNCHECKED_UNTOUCHED" and run_write_state != "UNTOUCHED")
+            or (runtime_directory_result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                and run_write_state != "INSTALLED")):
+        raise SystemExit("invalid_runtime_directory_write_state_record")
+    payload["runtime_directory_write_state"] = dict(state=run_write_state,
+        candidate_metadata=run_candidate_metadata or None, installed_version_sha256=run_target_version or None)
     payload["runtime_directory_result_observation"] = runtime_directory_result
     if dropin_directory_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
         raise SystemExit("invalid_dropin_directory_result_observation")
@@ -968,6 +985,7 @@ if kind == "rollback":
         "dropin_directory_result": {"service_drop_in_directory"},
         "run_directory_state_read": {"run_directory"}, "run_metadata_read": {"run_directory"},
         "run_chown": {"run_directory"}, "run_chmod": {"run_directory"},
+        "run_target_state": {"run_directory"},
         "run_directory_remove": {"run_directory"}, "runtime_directory_result": {"run_directory"},
     }
     if restore_failure:
@@ -1009,7 +1027,7 @@ PY
 
 recorded_target_version() {
   [[ $# -eq 4 ]] || return 14
-  python3 - "$TARGET_ROOT" "$SERVICE_DROP_IN" "$1" "$2" "$3" "$4" "${BUNDLE_FILES[@]}" <<'PY'
+  python3 - "$TARGET_ROOT" "$SERVICE_DROP_IN" "$RUN_DIR" "$1" "$2" "$3" "$4" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -1018,9 +1036,9 @@ import stat
 import sys
 from pathlib import Path
 
-root, dropin = Path(sys.argv[1]), Path(sys.argv[2])
-object_kind, mode, relative, expected = sys.argv[3:7]
-allowlist = sys.argv[7:]
+root, dropin, runtime = map(Path, sys.argv[1:4])
+object_kind, mode, relative, expected = sys.argv[4:8]
+allowlist = sys.argv[8:]
 if object_kind == "dropin":
     # Apply pins this exact configuration path. The fixed-object wrapper accepts
     # no caller-selected path; sharing the reader does not expand source authority.
@@ -1028,12 +1046,17 @@ if object_kind == "dropin":
         raise SystemExit("invalid_dropin_version_query")
     root, relative = dropin.parent.parent, dropin.parent.name + "/" + dropin.name
     allowlist = [relative]
+elif object_kind == "runtime":
+    if relative or mode != "capture" or not runtime.is_absolute():
+        raise SystemExit("invalid_runtime_directory_version_query")
+    root, relative = runtime.parent, runtime.name
+    allowlist = [relative]
 elif object_kind != "source":
     raise SystemExit("invalid_target_object")
 if (mode not in {"capture", "absent"} or relative not in allowlist
         or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative)
         or any(part in {"", ".", ".."} for part in relative.split("/"))
-        or (mode == "capture" and not re.fullmatch(r"[0-9a-f]{64}", expected))
+        or (mode == "capture" and not re.fullmatch(r"[0-9]+:[0-9]+:750" if object_kind == "runtime" else r"[0-9a-f]{64}", expected))
         or (mode == "absent" and expected)):
     raise SystemExit("invalid_target_version_query")
 if not root.is_absolute() or root.resolve(strict=True) != root:
@@ -1052,8 +1075,8 @@ def parents():
         if parent == root or root in parent.parents:
             if os.name == "posix" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022):
                 raise SystemExit("unsafe_target_parent_permissions")
-        if object_kind == "dropin" or parent == root or root in parent.parents:
-            result.append([str(parent) if object_kind == "dropin" else str(parent.relative_to(root)), info.st_dev, info.st_ino,
+        if object_kind != "source" or parent == root or root in parent.parents:
+            result.append([str(parent) if object_kind != "source" else str(parent.relative_to(root)), info.st_dev, info.st_ino,
                            info.st_uid, info.st_gid, info.st_mode])
     return result
 
@@ -1073,6 +1096,28 @@ def identity(info):
             info.st_gid, info.st_size, info.st_mtime_ns, info.st_ctime_ns]
 
 before = path.lstat()
+if object_kind == "runtime":
+    if not stat.S_ISDIR(before.st_mode):
+        raise SystemExit("unsafe_runtime_directory_target")
+    uid, gid, permissions = (int(part, 8 if i == 2 else 10) for i, part in enumerate(expected.split(":")))
+    if (before.st_uid, before.st_gid, stat.S_IMODE(before.st_mode)) != (uid, gid, permissions):
+        raise SystemExit("runtime_directory_candidate_mismatch")
+    # Child/lock operations legitimately change directory timestamps and link
+    # counts. Bind stable ownership/type/identity, not contents or ACLs/xattrs.
+    def directory_identity(info):
+        return [info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid]
+    if os.name == "posix":
+        descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0))
+        try:
+            if directory_identity(os.fstat(descriptor)) != directory_identity(before):
+                raise SystemExit("runtime_directory_changed_during_read")
+        finally:
+            os.close(descriptor)
+    if directory_identity(path.lstat()) != directory_identity(before) or parents() != parent_version:
+        raise SystemExit("runtime_directory_changed_during_read")
+    version = dict(identity=directory_identity(before), parents=parent_version, candidate_metadata=expected)
+    sys.stdout.buffer.write(hashlib.sha256(json.dumps(version, sort_keys=True).encode()).hexdigest().encode() + b"\n")
+    raise SystemExit(0)
 if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
     raise SystemExit("unsafe_target_file")
 digest = hashlib.sha256()
@@ -1149,6 +1194,46 @@ require_recovery_dropin_absent() {
   [[ $# -eq 0 ]] || return 14
   response="$(dropin_target_version absent && printf '.')" || return $?
   [[ "$response" == $'absent\n.' ]] || return 14
+}
+
+runtime_directory_target_version() {
+  [[ $# -eq 0 ]] || return 14
+  recorded_target_version runtime capture '' "$RUN_CANDIDATE_METADATA"
+}
+
+capture_runtime_directory_target_version() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(runtime_directory_target_version && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_RUN_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_runtime_directory() {
+  [[ $# -eq 0 && "$RUN_WRITE_STATE" == UNTOUCHED
+    && "$RUN_CANDIDATE_METADATA" =~ ^[0-9]+:[0-9]+:750$ ]] || return 14
+  RUN_WRITE_STATE=WRITE_PENDING
+  local run_uid run_gid run_mode
+  IFS=: read -r run_uid run_gid run_mode <<< "$RUN_CANDIDATE_METADATA"
+  install -d -o "$run_uid" -g "$run_gid" -m "$run_mode" -- "$RUN_DIR" || return $?
+  capture_runtime_directory_target_version || return $?
+  RUN_TARGET_VERSION="$CAPTURED_RUN_TARGET_VERSION"
+  RUN_WRITE_STATE=INSTALLED
+}
+
+read_recovery_runtime_directory_target_state() {
+  [[ $# -eq 0 && "$RUN_CANDIDATE_METADATA" =~ ^[0-9]+:[0-9]+:750$ ]] || return 14
+  case "${RUN_WRITE_STATE:-UNKNOWN}" in
+    UNTOUCHED)
+      [[ -z "${RUN_TARGET_VERSION:-}" ]] || return 14
+      RECOVERY_RUN_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${RUN_TARGET_VERSION:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_runtime_directory_target_version || return $?
+      [[ "$CAPTURED_RUN_TARGET_VERSION" == "$RUN_TARGET_VERSION" ]] || return 14
+      RECOVERY_RUN_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
 }
 
 capture_source_target_version() {
@@ -1528,16 +1613,21 @@ rollback() {
 
     checked_restore_step dropin_directory_result service_drop_in_directory read_recovery_dropin_directory_result "$prior_drop_in_dir_state" || finish_rollback "$rc"
 
-    checked_restore_step run_directory_state_read run_directory read_recovery_state "$BACKUP_DIR/run-dir.state" || finish_rollback "$rc"
-    prior_run_dir_state="$RECOVERY_STATE"
-    if [[ "$prior_run_dir_state" == "present" ]]; then
-      checked_restore_step run_metadata_read run_directory read_recovery_metadata "$BACKUP_DIR/run-dir.metadata" || finish_rollback "$rc"
-      checked_restore_step run_chown run_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR" || finish_rollback "$rc"
-      checked_restore_step run_chmod run_directory chmod "$RECOVERY_MODE" "$RUN_DIR" || finish_rollback "$rc"
+    checked_restore_step run_target_state run_directory read_recovery_runtime_directory_target_state || finish_rollback "$rc"
+    if [[ "$RECOVERY_RUN_TARGET_STATE" == untouched ]]; then
+      RECOVERY_RUNTIME_DIRECTORY_RESULT=UNCHECKED_UNTOUCHED
     else
-      checked_restore_step run_directory_remove run_directory remove_recovery_directory "$RUN_DIR" || finish_rollback "$rc"
+      checked_restore_step run_directory_state_read run_directory read_recovery_state "$BACKUP_DIR/run-dir.state" || finish_rollback "$rc"
+      prior_run_dir_state="$RECOVERY_STATE"
+      if [[ "$prior_run_dir_state" == "present" ]]; then
+        checked_restore_step run_metadata_read run_directory read_recovery_metadata "$BACKUP_DIR/run-dir.metadata" || finish_rollback "$rc"
+        checked_restore_step run_chown run_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR" || finish_rollback "$rc"
+        checked_restore_step run_chmod run_directory chmod "$RECOVERY_MODE" "$RUN_DIR" || finish_rollback "$rc"
+      else
+        checked_restore_step run_directory_remove run_directory remove_recovery_directory "$RUN_DIR" || finish_rollback "$rc"
+      fi
+      checked_restore_step runtime_directory_result run_directory read_recovery_runtime_directory_result "$prior_run_dir_state" || finish_rollback "$rc"
     fi
-    checked_restore_step runtime_directory_result run_directory read_recovery_runtime_directory_result "$prior_run_dir_state" || finish_rollback "$rc"
 
     if ! bounded_recovery_systemctl daemon-reload; then
       finish_rollback "$rc"
@@ -1568,7 +1658,7 @@ install_gateway_dropin
   echo "ERROR: installed gateway service hardening SHA-256 mismatch" >&2
   rollback 17
 }
-install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0750 -- "$RUN_DIR"
+install_gateway_runtime_directory
 systemctl daemon-reload
 
 POST_APPLY_HASH_MATCHES=0
