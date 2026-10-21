@@ -169,6 +169,41 @@ disposable removal stub returned success without removing an empty originally
 absent directory; that controlled fault is not a native-command or production
 incident.
 
+The next local increment protects the fixed service drop-in before rollback
+overwrites it. Its actual forward file installation now records untouched, write
+pending, or installed state. The already approved hardening digest is pinned and
+checked against staging before runtime mutation; an installed version is captured
+only after successful installation and matching stable readback. The existing
+source version reader is shared through an explicit fixed-object dispatch, without
+allowing a caller-selected drop-in path or changing the source query interface.
+Before removing the drop-in, rollback compares its current bytes, regular
+single-link identity, ownership, mode, timestamps, extended attributes and stable
+parent identity with that recorded version. Unknown/partial writes and conflicts
+stop later file, directory and service recovery while preserving the target and
+original failure code. A reappearing target is refused before backup copy.
+Untouched drop-ins are skipped and explicitly unchecked, rather than certified.
+
+The motivating disposable case changed only the drop-in after recovery stop;
+the earlier helper overwrote that edit and reached service start, despite honestly
+retaining whole-restoration-unverified status. The regression executes actual
+forward transitions and recovery functions, with service/ownership operations
+stubbed and files confined to temporary fixtures. This is not a production incident.
+The new guard remains a point-in-time observation: an intervening privileged
+writer before installed-version capture can be adopted if approved bytes still
+match, and validation-to-use intervals are not atomic. Directory ownership,
+source-backup races, filesystem/total-recovery deadlines and outer postcheck
+recovery remain unresolved. No backend production repair or merge is authorized
+by these local results.
+
+This increment passed 136 focused local tests with 11 platform skips. The separate
+dependency-free runner passed 117 checks with the same 11 skips (128 discovered);
+the overlapping counts are not additive. Both runs bound unchanged helper and
+test hashes. Initial selected coverage retained one assertion failure: the fixture
+represents an unparsable collision receipt as null, rather than omitting its key.
+Only that assertion was corrected; original failure-code and evidence retention
+already worked. Final independent source review found no blocking issue; hosted
+Linux checks for this increment remain pending.
+
 The preceding runtime-directory revision at `2e0fdcb8` passed all 14 hosted checks:
 114 Linux public-contract checks with no skips and 2,110 full-suite tests with eight
 unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
@@ -176,7 +211,13 @@ descendant-termination and link/extended-attribute cases. The service drop-in
 directory increment passed seven selected local tests with one platform skip,
 then 129 focused local tests with ten platform skips. The dependency-free runner
 passed 110 checks with the same ten skips (120 discovered). Independent final
-review and exact-head hosted Linux validation of this increment remain pending. The
+review and exact-head hosted Linux validation of that increment subsequently passed:
+head `15c53f3c` has 14 successful checks, 120 Linux public-contract checks with no
+skips, and 2,116 full-suite tests with eight unrelated skips. Those checks tested
+merge base `50969f7f`; the freshly observed public main is now `2d82be53` and that
+new-main combination has not been established by those prior runs. Validation of
+the new fixed-drop-in target guard is recorded separately and does not inherit
+the prior head's CI success. The
 initial local strict-query failure in the earlier revision exposed platform newline
 translation; exact byte output corrected it without relaxing response parsing.
 Local subprocess cases execute actual rollback operations against disposable files,

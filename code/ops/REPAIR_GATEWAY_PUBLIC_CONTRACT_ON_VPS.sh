@@ -48,6 +48,8 @@ RECOVERY_RESTORE_TARGET=""
 RECOVERY_DROPIN_RESULT=NOT_CHECKED
 RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 RECOVERY_DROPIN_DIRECTORY_RESULT=NOT_CHECKED
+DROPIN_WRITE_STATE=UNTOUCHED
+DROPIN_TARGET_VERSION=""
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 
 # This list is the recursively resolved local-Python import closure of the
@@ -462,7 +464,8 @@ record_recovery_evidence() {
     "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "$TARGET_ROOT" \
     "$SERVICE_DROP_IN" "${RECOVERY_DROPIN_RESULT:-NOT_CHECKED}" \
     "$RUN_DIR" "${RECOVERY_RUNTIME_DIRECTORY_RESULT:-NOT_CHECKED}" \
-    "$SERVICE_DROP_IN_DIR" "${RECOVERY_DROPIN_DIRECTORY_RESULT:-NOT_CHECKED}" "${BUNDLE_FILES[@]}" <<'PY'
+    "$SERVICE_DROP_IN_DIR" "${RECOVERY_DROPIN_DIRECTORY_RESULT:-NOT_CHECKED}" \
+    "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -481,7 +484,8 @@ requested_source, source_states, target_root = sys.argv[14:17]
 dropin_target, dropin_result = sys.argv[17:19]
 runtime_directory_target, runtime_directory_result = sys.argv[19:21]
 dropin_directory_target, dropin_directory_result = sys.argv[21:23]
-relatives = sys.argv[23:]
+dropin_write_state, dropin_target_version = sys.argv[23:25]
+relatives = sys.argv[25:]
 query_kinds = {"source_state", "source_result"}
 if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
@@ -544,8 +548,16 @@ payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,
                trigger_exit_code=int(trigger_code), restoration_verified=False,
                external_verification="NOT_RECORDED_BY_HELPER")
 if kind in {"helper", "rollback", "rollback_refused"}:
-    if dropin_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+    if dropin_result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
         raise SystemExit("invalid_dropin_result_observation")
+    if (dropin_write_state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+            or (dropin_target_version and not re.fullmatch(r"[0-9a-f]{64}", dropin_target_version))
+            or (dropin_result == "UNCHECKED_UNTOUCHED" and dropin_write_state != "UNTOUCHED")
+            or (dropin_result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                and dropin_write_state != "INSTALLED")):
+        raise SystemExit("invalid_dropin_write_state_record")
+    payload["dropin_write_state"] = dict(state=dropin_write_state, candidate_sha256=hardening,
+                                        installed_version_sha256=dropin_target_version or None)
     payload["dropin_result_observation"] = dropin_result
     if runtime_directory_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
         raise SystemExit("invalid_runtime_directory_result_observation")
@@ -947,6 +959,7 @@ if kind == "rollback":
         "target_state": set(relatives), "target_absent": set(relatives),
         "source_remove": set(relatives), "source_copy": set(relatives), "source_result": set(relatives),
         "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"}, "dropin_result": {"service_drop_in"},
+        "dropin_target_state": {"service_drop_in"}, "dropin_target_absent": {"service_drop_in"},
         "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
         "dropin_directory_state_read": {"service_drop_in_directory"},
         "dropin_metadata_read": {"service_drop_in_directory"},
@@ -994,9 +1007,9 @@ print(hashlib.sha256(raw).hexdigest())
 PY
 }
 
-source_target_version() {
-  [[ $# -eq 3 ]] || return 14
-  python3 - "$TARGET_ROOT" "$1" "$2" "$3" "${BUNDLE_FILES[@]}" <<'PY'
+recorded_target_version() {
+  [[ $# -eq 4 ]] || return 14
+  python3 - "$TARGET_ROOT" "$SERVICE_DROP_IN" "$1" "$2" "$3" "$4" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -1005,8 +1018,18 @@ import stat
 import sys
 from pathlib import Path
 
-root, mode, relative, expected = Path(sys.argv[1]), *sys.argv[2:5]
-allowlist = sys.argv[5:]
+root, dropin = Path(sys.argv[1]), Path(sys.argv[2])
+object_kind, mode, relative, expected = sys.argv[3:7]
+allowlist = sys.argv[7:]
+if object_kind == "dropin":
+    # Apply pins this exact configuration path. The fixed-object wrapper accepts
+    # no caller-selected path; sharing the reader does not expand source authority.
+    if relative or not dropin.is_absolute():
+        raise SystemExit("invalid_dropin_version_query")
+    root, relative = dropin.parent.parent, dropin.parent.name + "/" + dropin.name
+    allowlist = [relative]
+elif object_kind != "source":
+    raise SystemExit("invalid_target_object")
 if (mode not in {"capture", "absent"} or relative not in allowlist
         or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative)
         or any(part in {"", ".", ".."} for part in relative.split("/"))
@@ -1029,7 +1052,8 @@ def parents():
         if parent == root or root in parent.parents:
             if os.name == "posix" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022):
                 raise SystemExit("unsafe_target_parent_permissions")
-            result.append([str(parent.relative_to(root)), info.st_dev, info.st_ino,
+        if object_kind == "dropin" or parent == root or root in parent.parents:
+            result.append([str(parent) if object_kind == "dropin" else str(parent.relative_to(root)), info.st_dev, info.st_ino,
                            info.st_uid, info.st_gid, info.st_mode])
     return result
 
@@ -1071,6 +1095,60 @@ version = dict(sha256=digest.hexdigest(), identity=identity(before), parents=par
                xattrs_sha256=hashlib.sha256(json.dumps(attributes).encode()).hexdigest())
 sys.stdout.buffer.write(hashlib.sha256(json.dumps(version, sort_keys=True).encode()).hexdigest().encode() + b"\n")
 PY
+}
+
+source_target_version() {
+  [[ $# -eq 3 ]] || return 14
+  recorded_target_version source "$@"
+}
+
+dropin_target_version() {
+  [[ $# -eq 1 ]] || return 14
+  case "$1" in
+    capture) recorded_target_version dropin capture '' "$HARDENING_SHA" ;;
+    absent) recorded_target_version dropin absent '' '' ;;
+    *) return 14 ;;
+  esac
+}
+
+capture_dropin_target_version() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(dropin_target_version capture && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_DROPIN_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_dropin() {
+  [[ $# -eq 0 && "$DROPIN_WRITE_STATE" == UNTOUCHED
+    && "$HARDENING_SHA" =~ ^[0-9a-f]{64}$ ]] || return 14
+  DROPIN_WRITE_STATE=WRITE_PENDING
+  install -o root -g root -m 0644 -- "$STAGE_DIR/20-lumencore-runtime-hardening.conf" "$SERVICE_DROP_IN" || return $?
+  capture_dropin_target_version || return $?
+  DROPIN_TARGET_VERSION="$CAPTURED_DROPIN_TARGET_VERSION"
+  DROPIN_WRITE_STATE=INSTALLED
+}
+
+read_recovery_dropin_target_state() {
+  [[ $# -eq 0 && "$HARDENING_SHA" =~ ^[0-9a-f]{64}$ ]] || return 14
+  case "${DROPIN_WRITE_STATE:-UNKNOWN}" in
+    UNTOUCHED)
+      [[ -z "${DROPIN_TARGET_VERSION:-}" ]] || return 14
+      RECOVERY_DROPIN_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${DROPIN_TARGET_VERSION:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_dropin_target_version || return $?
+      [[ "$CAPTURED_DROPIN_TARGET_VERSION" == "$DROPIN_TARGET_VERSION" ]] || return 14
+      RECOVERY_DROPIN_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
+}
+
+require_recovery_dropin_absent() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(dropin_target_version absent && printf '.')" || return $?
+  [[ "$response" == $'absent\n.' ]] || return 14
 }
 
 capture_source_target_version() {
@@ -1424,14 +1502,20 @@ rollback() {
       checked_restore_step source_result "$rel" read_recovery_source_result "$rel" "$RECOVERY_SOURCE_STATE" || finish_rollback "$rc"
     done
 
-    checked_restore_step dropin_remove service_drop_in rm -f -- "$SERVICE_DROP_IN" || finish_rollback "$rc"
-    checked_restore_step dropin_state_read service_drop_in read_recovery_state "$BACKUP_DIR/service-drop-in.state" || finish_rollback "$rc"
-    prior_drop_in_state="$RECOVERY_STATE"
-    if [[ "$prior_drop_in_state" == "present" ]]; then
-      checked_restore_step dropin_parent_create service_drop_in_directory install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
-      checked_restore_step dropin_copy service_drop_in cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
+    checked_restore_step dropin_target_state service_drop_in read_recovery_dropin_target_state || finish_rollback "$rc"
+    if [[ "$RECOVERY_DROPIN_TARGET_STATE" == untouched ]]; then
+      RECOVERY_DROPIN_RESULT=UNCHECKED_UNTOUCHED
+    else
+      checked_restore_step dropin_remove service_drop_in rm -f -- "$SERVICE_DROP_IN" || finish_rollback "$rc"
+      checked_restore_step dropin_state_read service_drop_in read_recovery_state "$BACKUP_DIR/service-drop-in.state" || finish_rollback "$rc"
+      prior_drop_in_state="$RECOVERY_STATE"
+      if [[ "$prior_drop_in_state" == "present" ]]; then
+        checked_restore_step dropin_parent_create service_drop_in_directory install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+        checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
+        checked_restore_step dropin_copy service_drop_in cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
+      fi
+      checked_restore_step dropin_result service_drop_in read_recovery_dropin_result "$prior_drop_in_state" || finish_rollback "$rc"
     fi
-    checked_restore_step dropin_result service_drop_in read_recovery_dropin_result "$prior_drop_in_state" || finish_rollback "$rc"
     checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state "$BACKUP_DIR/service-drop-in-dir.state" || finish_rollback "$rc"
     prior_drop_in_dir_state="$RECOVERY_STATE"
     if [[ "$prior_drop_in_dir_state" == "present" ]]; then
@@ -1479,8 +1563,7 @@ SERVICE_STOPPED=true
 remove_verified_dead_lock
 
 install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR"
-install -o root -g root -m 0644 -- \
-  "$STAGE_DIR/20-lumencore-runtime-hardening.conf" "$SERVICE_DROP_IN"
+install_gateway_dropin
 [[ "$(sha256sum "$SERVICE_DROP_IN" | awk '{print $1}')" == "$HARDENING_SHA" ]] || {
   echo "ERROR: installed gateway service hardening SHA-256 mismatch" >&2
   rollback 17
