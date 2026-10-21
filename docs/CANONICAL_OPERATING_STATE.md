@@ -118,13 +118,28 @@ and whole-restoration/service-unverified status, even when every source observat
 matches. Later edits, other restored objects and external workflow checks are not
 certified by these observations.
 
-The preceding target-state revision at `2bf1f109` passed all 14 hosted checks:
-94 Linux public-contract checks with no skips and 2,090 full-suite tests with eight
+The single service drop-in file now has a separate result check immediately after
+its removal or backup copy, before later directory metadata and service recovery.
+The fixed-object query accepts no source path, repeats pinned custody validation,
+and derives prior presence from the prepared inventory. A present result must
+match stable regular single-link bytes and preserved metadata; a missing-before
+result must actually be absent, including no dangling link. An already absent
+immediate parent is allowed only with safe existing ancestors and stable parent
+observations. Failure stops later recovery, preserves the original trigger and
+prior partial source observations, and leaves any receipt persistence failure
+visible. The private receipt labels this as a file-only observation. Directory
+metadata, effective service configuration and whole restoration remain unverified.
+The motivating disposable fault reports copy success without restoring the drop-in;
+it is not evidence of a native copy-command or production failure.
+
+The preceding source-result revision at `85b71fff` passed all 14 hosted checks:
+102 Linux public-contract checks with no skips and 2,098 full-suite tests with eight
 unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
-descendant-termination and link/extended-attribute cases. The source-result increment
-passed 114 focused local tests with seven platform skips; the dependency-free
-runner passed 95 checks with the same seven skips (102 discovered). Independent
-review and exact-head hosted Linux validation of this new increment remain pending. The
+descendant-termination and link/extended-attribute cases. The drop-in result
+increment passed 119 focused local tests with eight platform skips; the
+dependency-free runner passed 100 checks with the same eight skips (108 discovered).
+Independent review and exact-head hosted Linux validation of this new increment
+remain pending. The
 initial local strict-query failure in the earlier revision exposed platform newline
 translation; exact byte output corrected it without relaxing response parsing.
 Local subprocess cases execute actual rollback operations against disposable files,

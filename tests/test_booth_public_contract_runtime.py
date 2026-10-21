@@ -332,6 +332,7 @@ def _run_gateway_rollback_guard(
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
     result_fault: str = "", result_relative: str = "entry.py", result_query_case: str = "",
+    dropin_fault: str = "", dropin_query_case: str = "",
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -444,6 +445,31 @@ elif kind == "backup_changed": (Path("backup/existing") / relative).write_bytes(
 else: raise ValueError("unsupported_result_fault")
 Path("result-fault-applied").write_text(kind)
 ''', encoding="utf-8", newline="\n")
+        if dropin_fault:
+            (root / "dropin-fault.py").write_text('''from pathlib import Path
+import os
+kind = os.environ["DROPIN_FAULT"]
+p = Path("dropins/hardening.conf")
+if kind == "copy_bytes": p.write_bytes(b"wrong drop-in result\\n")
+elif kind == "copy_mtime":
+    current=p.stat(); os.utime(p, ns=(current.st_atime_ns, current.st_mtime_ns + 1000000000))
+elif kind == "copy_mode": p.chmod(0o400)
+elif kind == "copy_xattr": os.setxattr(p, "user.fixture", b"incorrect-dropin")
+elif kind == "copy_directory": p.unlink(); p.mkdir()
+elif kind == "copy_symlink":
+    q=Path("outside-dropin"); q.write_bytes(p.read_bytes()); p.unlink(); p.symlink_to(q.resolve())
+elif kind == "copy_hardlink": os.link(p, "outside-dropin")
+elif kind in {"copy_parent_link", "remove_parent_link"}:
+    q=Path("dropins"); q.rename("outside-dropin-directory"); q.symlink_to(Path("outside-dropin-directory").resolve(), target_is_directory=True)
+elif kind == "copy_parent_mode": p.parent.chmod(0o777)
+elif kind == "remove_symlink": p.symlink_to(Path("uncreated-dropin").resolve())
+elif kind == "remove_parent_file": p.parent.rmdir(); p.parent.write_bytes(b"not a directory")
+elif kind == "manifest_changed": Path("backup/prepared.json").write_bytes(b"changed preparation")
+elif kind == "backup_changed": Path("backup/service-drop-in.before").write_bytes(b"changed backup")
+elif kind == "state_changed": Path("backup/service-drop-in.state").write_bytes(b"missing\\n")
+else: raise ValueError("unsupported_dropin_fault")
+Path("dropin-fault-applied").write_text(kind)
+''', encoding="utf-8", newline="\n")
         harness = r'''
 set -Eeuo pipefail
 TARGET_ROOT="$PWD/target"
@@ -468,6 +494,7 @@ RECOVERY_RESTORE_ATTEMPTED=false
 RECOVERY_RESTORE_FAILURE=""
 RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
+RECOVERY_DROPIN_RESULT=NOT_CHECKED
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 python3() { "$TEST_PYTHON" "$@"; }
 FIXTURE_FORWARD=false
@@ -535,6 +562,9 @@ remove_verified_dead_lock() { printf 'lock\n' >> "$PWD/restore.calls"; }
 record_recovery_evidence() {
   if [[ "$1" == source_state ]]; then printf 'present\n'; fi
   if [[ "$1" == source_result ]]; then printf 'observed_present\n'; fi
+  if [[ "$1" == dropin_result ]]; then
+    if [[ -f "$BACKUP_DIR/service-drop-in.before" ]]; then printf 'dropin_present\n'; else printf 'dropin_absent\n'; fi
+  fi
 }
 fixture_source_drift() {
   if [[ -n "$SOURCE_DRIFT" && "$DRIFT_BOUNDARY" == "$1" && ! -e "$PWD/source-drift-applied" ]]; then
@@ -548,6 +578,9 @@ fixture_target_drift() {
 }
 fixture_result_fault() {
   if [[ -n "$RESULT_FAULT" ]]; then "$TEST_PYTHON" "$PWD/result-fault.py" || return $?; fi
+}
+fixture_dropin_fault() {
+  if [[ -n "$DROPIN_FAULT" ]]; then "$TEST_PYTHON" "$PWD/dropin-fault.py" || return $?; fi
 }
 fixture_operation() {
   local command_name="$1" fixture_target=unknown
@@ -571,7 +604,12 @@ rm() {
     printf no_op > "$PWD/result-fault-applied"
     return 0
   fi
+  if [[ "$DROPIN_FAULT" == remove_noop && "${@: -1}" == "$SERVICE_DROP_IN" ]]; then
+    printf no_op > "$PWD/dropin-fault-applied"
+    return 0
+  fi
   command rm "$@" || return $?
+  if [[ "$DROPIN_FAULT" == remove_* && "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_fault || return $?; fi
   if [[ "$RESULT_FAULT" == remove_symlink && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_remove || return $?; fixture_target_drift after_first_remove || return $?; fi
 }
@@ -611,7 +649,12 @@ cp() {
     printf no_op > "$PWD/result-fault-applied"
     return 0
   fi
+  if [[ "$DROPIN_FAULT" == copy_noop && "${@: -1}" == "$SERVICE_DROP_IN" ]]; then
+    printf no_op > "$PWD/dropin-fault-applied"
+    return 0
+  fi
   command cp "$@" || return $?
+  if [[ -n "$DROPIN_FAULT" && "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_fault || return $?; fi
   if [[ ( "$RESULT_FAULT" == copy_* || "$RESULT_FAULT" == manifest_changed || "$RESULT_FAULT" == backup_changed ) && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_copy || return $?; fixture_target_drift after_first_copy || return $?; fi
 }
@@ -650,7 +693,7 @@ fi
             harness += 'export PATH="/usr/bin:$PATH"\nRECOVERY_TIMEOUT_BIN="$(type -P timeout)"\n'
             harness += 'export PATH="$PWD/bin:$PATH"\n'
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
-        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_metadata", "remove_recovery_directory",
+        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_metadata", "remove_recovery_directory",
                      "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent"):
             harness += _bash_function(script, name) + "\n"
         if real_lock_case:
@@ -823,6 +866,28 @@ record_recovery_evidence() {
   esac
 }
 '''
+        if dropin_query_case:
+            harness += _bash_function(script, "record_recovery_evidence").replace(
+                "record_recovery_evidence() {", "actual_dropin_record_recovery_evidence() {", 1) + "\n"
+            harness += r'''
+record_recovery_evidence() {
+  if [[ "$1" != dropin_result ]]; then actual_dropin_record_recovery_evidence "$@"; return $?; fi
+  case "$DROPIN_QUERY_CASE" in
+    failed) printf 'dropin_present\n'; return 29 ;;
+    extra_line) printf 'dropin_present\nextra\n' ;;
+    extra_newline) printf 'dropin_present\n\n' ;;
+    carriage_return) printf 'dropin_present\r\n' ;;
+    no_newline) printf dropin_present ;;
+    empty) : ;;
+    contradictory) printf 'dropin_absent\n' ;;
+    invalid) printf 'verified\n' ;;
+    source_argument) actual_dropin_record_recovery_evidence dropin_result 0 entry.py ;;
+    empty_argument) actual_dropin_record_recovery_evidence dropin_result 0 '' ;;
+    extra_arguments) actual_dropin_record_recovery_evidence dropin_result 0 service_drop_in extra ;;
+    *) return 99 ;;
+  esac
+}
+'''
         harness += guard
         if recovery_case in {"later_gate_failure", "helper_write_failure", "manifest_changed", "backup_changed"}:
             outcome = script.split('if ! helper_receipt_sha="$(record_recovery_evidence helper 0)";', 1)[1]
@@ -846,6 +911,7 @@ record_recovery_evidence() {
             TARGET_QUERY_CASE=target_query_case,
             TARGET_RELATIVE=target_relative,
             RESULT_FAULT=result_fault, RESULT_RELATIVE=result_relative, RESULT_QUERY_CASE=result_query_case,
+            DROPIN_FAULT=dropin_fault, DROPIN_QUERY_CASE=dropin_query_case,
             DROP_BACKUP_AFTER_VERIFY=metadata_case.split(":", 1)[1] if metadata_case.startswith("missing:") else "",
         )
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
@@ -904,6 +970,13 @@ record_recovery_evidence() {
             evidence["dropin_directory_exists"] = (root / "dropins").exists()
             dropin_path = root / "dropins/hardening.conf"
             evidence["dropin_bytes"] = dropin_path.read_bytes() if dropin_path.is_file() else None
+            evidence["dropin_is_symlink"] = dropin_path.is_symlink()
+            evidence["dropin_is_directory"] = dropin_path.is_dir()
+            evidence["dropin_inode"] = dropin_path.stat().st_ino if dropin_path.is_file() else None
+            dropin_backup = root / "backup/service-drop-in.before"
+            evidence["dropin_backup_inode"] = dropin_backup.stat().st_ino if dropin_backup.is_file() else None
+            evidence["dropin_fault_applied"] = (root / "dropin-fault-applied").exists()
+            evidence["dropin_result_receipt_exists"] = (root / "backup/dropin_result.json").exists()
             evidence["run_directory_exists"] = (root / "run").exists()
             evidence["originally_missing_target_exists"] = (root / "target/absent.py").exists()
             evidence["originally_missing_target_is_symlink"] = (root / "target/absent.py").is_symlink()
@@ -1669,6 +1742,108 @@ def test_gateway_source_result_checks_preserve_receipt_and_prepared_evidence_fai
         assert "source_result failed" in completed.stderr and "receipt persistence failed" in completed.stderr
         assert "rollback" not in evidence and evidence["backup_exists"]
         assert "rm:second_source" not in evidence["operation_calls"]
+
+
+def _assert_dropin_result_fault_stops(fault: str, *, present: bool = True, receipt_failure: bool = False) -> dict:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure" if receipt_failure else "dropin_result",
+        prior_dropin=present, dropin_fault=fault, evidence=evidence,
+    )
+    assert completed.returncode == 17 and current == b"previous source\n", (fault, completed.stderr)
+    assert evidence["dropin_fault_applied"] and evidence["backup_exists"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert "restoration operation dropin_result failed" in completed.stderr
+    assert not evidence["dropin_result_receipt_exists"]
+    expected = ["rm:first_source", "cp:first_source", "rm:dropin"]
+    if present: expected += ["install:dropin_dir", "cp:dropin"]
+    assert evidence["operation_calls"].splitlines() == expected
+    if fault == "copy_noop": assert evidence["dropin_bytes"] is None
+    if fault == "copy_bytes": assert evidence["dropin_bytes"] == b"wrong drop-in result\n"
+    if fault == "remove_noop": assert evidence["dropin_bytes"] == b"candidate hardening\n"
+    if fault == "remove_symlink": assert evidence["dropin_is_symlink"]
+    if receipt_failure:
+        assert evidence["rollback"] is None and "receipt persistence failed" in completed.stderr
+    else:
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"]["operation"] == "dropin_result"
+        assert receipt["failed_restoration_operation"]["target"] == "service_drop_in"
+        assert receipt["failed_restoration_operation"]["exit_code"] != 0
+        assert receipt["dropin_result_observation"] == "FAILED"
+        assert receipt["source_write_states"][0]["restoration_result_observation"] == "MATCHED_PREPARED_PRESENT"
+        assert receipt["trigger_exit_code"] == 17 and receipt["partial_state_possible"]
+        assert receipt["restoration_verified"] is False and receipt["service_state_verified"] is False
+        assert not receipt["service_restart_attempted"]
+    return evidence
+
+
+def test_gateway_dropin_result_detects_copy_success_with_incorrect_file() -> None:
+    for fault in ("copy_noop", "copy_bytes", "copy_mtime", "copy_directory"):
+        _assert_dropin_result_fault_stops(fault)
+
+
+def test_gateway_dropin_result_requires_actual_missing_before_absence() -> None:
+    for fault in ("remove_noop", "remove_parent_file"):
+        _assert_dropin_result_fault_stops(fault, present=False)
+
+
+@unittest.skipIf(os.name != "posix", "Drop-in result links, mode, parent permissions and xattrs require POSIX")
+def test_gateway_dropin_result_rejects_links_metadata_and_unsafe_parents() -> None:
+    for fault in ("copy_symlink", "copy_hardlink", "copy_mode", "copy_xattr", "copy_parent_link", "copy_parent_mode"):
+        _assert_dropin_result_fault_stops(fault)
+    for fault in ("remove_symlink", "remove_parent_link"):
+        _assert_dropin_result_fault_stops(fault, present=False)
+
+
+def test_gateway_dropin_result_query_failures_and_malformed_output_stop_recovery() -> None:
+    for case in ("failed", "extra_line", "extra_newline", "carriage_return", "no_newline", "empty",
+                 "contradictory", "invalid", "source_argument", "empty_argument", "extra_arguments"):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_result", prior_dropin=True, dropin_query_case=case, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"previous source\n", (case, completed.stderr)
+        assert evidence["dropin_bytes"] == b"previous hardening\n"
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and not evidence["dropin_result_receipt_exists"]
+        assert evidence["operation_calls"].splitlines() == ["rm:first_source", "cp:first_source", "rm:dropin", "install:dropin_dir", "cp:dropin"]
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"] == dict(operation="dropin_result", target="service_drop_in", exit_code=29 if case == "failed" else 14)
+        assert receipt["dropin_result_observation"] == "FAILED" and receipt["partial_state_possible"]
+        assert receipt["restoration_verified"] is False and not receipt["service_restart_attempted"]
+
+
+def test_gateway_dropin_result_accepts_valid_copy_and_absence_with_or_without_parent() -> None:
+    for present, directory_case in ((True, ""), (False, ""), (False, "empty_dropin"), (False, "absent_dropin")):
+        evidence: dict = {}
+        completed, current, exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_result", prior_dropin=present, directory_case=directory_case, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+        assert exists is present and evidence["dropin_bytes"] == (b"previous hardening\n" if present else None)
+        if present: assert evidence["dropin_inode"] != evidence["dropin_backup_inode"]
+        receipt = evidence["rollback"]
+        assert receipt["dropin_result_observation"] == ("MATCHED_PREPARED_PRESENT" if present else "MATCHED_PREPARED_ABSENCE")
+        assert receipt["restoration_verified"] is False and receipt["service_state_verified"] is False
+        assert receipt["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+        assert evidence["service_calls"].endswith("SYSTEMCTL:start\n") and not evidence["dropin_result_receipt_exists"]
+
+
+def test_gateway_dropin_result_keeps_custody_and_receipt_failure_visible() -> None:
+    _assert_dropin_result_fault_stops("copy_noop", receipt_failure=True)
+    for fault in ("manifest_changed", "backup_changed", "state_changed"):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_result", prior_dropin=True, dropin_fault=fault, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+        assert evidence["dropin_bytes"] == b"previous hardening\n" and evidence["backup_exists"]
+        assert "dropin_result failed" in completed.stderr and "receipt persistence failed" in completed.stderr
+        assert "rollback" not in evidence and evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["operation_calls"].splitlines()[-1] == "cp:dropin"
 
 
 def test_gateway_state_parser_rejects_missing_or_noncanonical_values() -> None:

@@ -45,6 +45,7 @@ RECOVERY_RESTORE_ATTEMPTED=false
 RECOVERY_RESTORE_FAILURE=""
 RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
+RECOVERY_DROPIN_RESULT=NOT_CHECKED
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 
 # This list is the recursively resolved local-Python import closure of the
@@ -445,6 +446,7 @@ prepare_recovery_directory() {
 record_recovery_evidence() {
   local kind="$1" trigger_code="${2:-0}" requested_source="${3:-}"
   [[ $# -le 3 ]] || return 14
+  [[ "$kind" != dropin_result || $# -eq 2 ]] || return 14
   local source_states="" source_relative
   for source_relative in "${BUNDLE_FILES[@]}"; do
     source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}:${SOURCE_RESULT_STATES[$source_relative]:-NOT_CHECKED}"$'\n'
@@ -453,7 +455,8 @@ record_recovery_evidence() {
     "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
     "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
     "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
-    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "$TARGET_ROOT" "${BUNDLE_FILES[@]}" <<'PY'
+    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "$TARGET_ROOT" \
+    "$SERVICE_DROP_IN" "${RECOVERY_DROPIN_RESULT:-NOT_CHECKED}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -469,9 +472,10 @@ kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
 service_results, service_failure, restore_attempted = sys.argv[8:11]
 restore_failure, restore_exit_code, restore_target = sys.argv[11:14]
 requested_source, source_states, target_root = sys.argv[14:17]
-relatives = sys.argv[17:]
+dropin_target, dropin_result = sys.argv[17:19]
+relatives = sys.argv[19:]
 query_kinds = {"source_state", "source_result"}
-if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused"} | query_kinds:
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result"} | query_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
 if ((kind in query_kinds and requested_source not in relatives)
         or (kind not in query_kinds and requested_source)):
@@ -532,6 +536,9 @@ payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,
                trigger_exit_code=int(trigger_code), restoration_verified=False,
                external_verification="NOT_RECORDED_BY_HELPER")
 if kind in {"helper", "rollback", "rollback_refused"}:
+    if dropin_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        raise SystemExit("invalid_dropin_result_observation")
+    payload["dropin_result_observation"] = dropin_result
     states = []
     for row in source_states.splitlines():
         fields = row.split(":")
@@ -642,6 +649,52 @@ def observe_source_result(prepared):
         raise SystemExit("source_result_parent_changed")
     sys.stdout.buffer.write(result)
 
+def observe_dropin_result(prepared):
+    # This fixed configuration object is not a member of the Python source set.
+    # Apply mode already pins its exact production path; no query path is accepted.
+    path = Path(dropin_target)
+    if not path.is_absolute() or path.resolve(strict=False) != path:
+        raise SystemExit("unsafe_dropin_result_path")
+    safe_root = path.parent.parent
+
+    def parents():
+        observed = []
+        for parent in path.parents:
+            try:
+                info = parent.lstat()
+            except FileNotFoundError:
+                # A missing immediate service drop-in directory can be legitimate.
+                if parent != path.parent:
+                    raise SystemExit("unsafe_dropin_result_parent")
+                observed.append((str(parent), "missing"))
+                continue
+            if not stat.S_ISDIR(info.st_mode):
+                raise SystemExit("unsafe_dropin_result_parent")
+            if parent in {path.parent, safe_root} and os.name == "posix":
+                if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
+                    raise SystemExit("unsafe_dropin_result_parent_permissions")
+            observed.append((str(parent), info.st_dev, info.st_ino, info.st_uid, info.st_gid, info.st_mode))
+        return observed
+
+    before = parents()
+    expected = next((item for item in prepared["files"] if item["path"] == "service-drop-in.before"), None)
+    if expected is None:
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            result = b"dropin_absent\n"
+        else:
+            raise SystemExit("dropin_result_expected_absence")
+    else:
+        actual = inventory(path.name, root=path.parent)
+        # Copied inode/ctime need not match the backup; read stability still must.
+        if actual != dict(expected, path=path.name):
+            raise SystemExit("dropin_result_mismatch")
+        result = b"dropin_present\n"
+    if parents() != before:
+        raise SystemExit("dropin_result_parent_changed")
+    sys.stdout.buffer.write(result)
+
 if kind == "rollback_refused":
     # This receipt describes refusal only; it does not authenticate invalid input.
     payload.update(status="ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE", restore_attempted=False,
@@ -679,9 +732,16 @@ else:
     if kind == "source_result":
         observe_source_result(prepared)
         raise SystemExit(0)
+    if kind == "dropin_result":
+        observe_dropin_result(prepared)
+        raise SystemExit(0)
     if kind == "verify":
         print("RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION")
         raise SystemExit(0)
+    dropin_present = any(item["path"] == "service-drop-in.before" for item in prepared["files"])
+    if ((dropin_result == "MATCHED_PREPARED_PRESENT" and not dropin_present)
+            or (dropin_result == "MATCHED_PREPARED_ABSENCE" and dropin_present)):
+        raise SystemExit("dropin_result_inventory_mismatch")
     payload.update(manifest_sha256=expected_manifest,
                    status="HELPER_CHECKS_PASSED_EXTERNAL_VERIFICATION_PENDING" if kind == "helper"
                    else "ROLLBACK_ATTEMPTED_UNVERIFIED")
@@ -712,7 +772,7 @@ if kind == "rollback":
         "dead_lock": {"gateway_lock"}, "source_state": set(relatives),
         "target_state": set(relatives), "target_absent": set(relatives),
         "source_remove": set(relatives), "source_copy": set(relatives), "source_result": set(relatives),
-        "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"},
+        "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"}, "dropin_result": {"service_drop_in"},
         "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
         "dropin_directory_state_read": {"service_drop_in_directory"},
         "dropin_metadata_read": {"service_drop_in_directory"},
@@ -1084,6 +1144,22 @@ read_recovery_source_result() {
   esac
 }
 
+read_recovery_dropin_result() {
+  local expected="${1:-}" response
+  [[ $# -eq 1 && ( "$expected" == present || "$expected" == missing ) ]] || return 14
+  RECOVERY_DROPIN_RESULT=FAILED
+  response="$(record_recovery_evidence dropin_result 0 && printf '.')" || return $?
+  case "$response" in
+    $'dropin_present\n.')
+      [[ "$expected" == present ]] || return 14
+      RECOVERY_DROPIN_RESULT=MATCHED_PREPARED_PRESENT ;;
+    $'dropin_absent\n.')
+      [[ "$expected" == missing ]] || return 14
+      RECOVERY_DROPIN_RESULT=MATCHED_PREPARED_ABSENCE ;;
+    *) return 14 ;;
+  esac
+}
+
 read_recovery_metadata() {
   local metadata
   metadata="$(< "$1")" || return $?
@@ -1148,6 +1224,7 @@ rollback() {
       checked_restore_step dropin_parent_create service_drop_in_directory install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
       checked_restore_step dropin_copy service_drop_in cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
     fi
+    checked_restore_step dropin_result service_drop_in read_recovery_dropin_result "$prior_drop_in_state" || finish_rollback "$rc"
     checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state "$BACKUP_DIR/service-drop-in-dir.state" || finish_rollback "$rc"
     prior_drop_in_dir_state="$RECOVERY_STATE"
     if [[ "$prior_drop_in_dir_state" == "present" ]]; then
