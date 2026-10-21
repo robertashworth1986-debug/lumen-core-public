@@ -55,14 +55,27 @@ restoration was attempted; the original failure code and retained evidence remai
 Refusal leaves any earlier partial runtime change unresolved. This verification is
 a point-in-time check and cannot prevent a later concurrent edit.
 
-The focused local suite passed 78 tests with two POSIX-only skips; the direct
-standard-library runner passed 59 checks with the same two skips. Real Linux link
-and extended-attribute cases await hosted checks for this revision. Subprocess
-cases exercise actual rollback, directory guards and evidence writing against
-disposable files. No backend repair was dispatched or installed. This does not
-establish deployment readiness: restoration remains best effort, there is no
-verified restore API for a later public postcheck failure, and rollback still lacks
-bounded command timeouts and concurrent-state protection. File and top-directory synchronization does not prove
+The next local increment bounds only rollback's four service-control commands:
+stop, daemon-reload, reset-failed and conditional start. GNU timeout availability
+is checked before forward runtime mutation. Each command has a fixed 60-second
+limit and five-second forced-termination grace, with no retries. An unconfirmed
+stop prevents lock and file restoration; a later service-command failure stops
+the remaining service sequence. Private receipts retain the original failure code,
+attempted command outcomes and unverified service/restoration status. Exit codes
+that could come from either the launcher or command remain explicitly ambiguous.
+Terminating a systemctl client does not prove cancellation of its systemd job.
+
+The focused local suite passed 83 tests with three platform skips; the direct
+standard-library runner passed 64 checks with the same three skips (67 discovered).
+Actual GNU timeout process-group, ignored-TERM and descendant-termination cases,
+plus the existing link/extended-attribute cases, require hosted Linux validation
+of this increment. Local subprocess cases exercise actual rollback, directory
+guards and evidence writing against disposable files. No backend repair was
+dispatched or installed. This does not establish deployment readiness: restoration
+remains best effort, there is no verified restore API for a later public postcheck
+failure, and concurrent-state protection remains incomplete. File, metadata, lock,
+evidence and cleanup operations still lack comprehensive deadlines; the four
+service-command budgets are not a total rollback deadline. File and top-directory synchronization does not prove
 power-loss persistence of every nested backup entry. The existing six runtime holds
 require fresh evidence and separate backend action approval. Paper-only controls
 and all ledger/history bytes remain unchanged.

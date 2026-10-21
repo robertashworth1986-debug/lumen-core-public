@@ -6,9 +6,11 @@ import hashlib
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -322,6 +324,8 @@ def _run_gateway_rollback_guard(
     guard: str, *, predicate_passes: bool, copy_fails: bool = False,
     signal_during_copy: bool = False,
     recovery_case: str | None = None, evidence: dict | None = None,
+    service_failure: str = "", service_exit_code: int = 9,
+    service_was_active: bool = True, real_timeout_mode: str = "",
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -344,7 +348,7 @@ def _run_gateway_rollback_guard(
             "service-drop-in-dir.metadata": "1000 1000 755\n",
             "run-dir.state": "present\n",
             "run-dir.metadata": "1000 1000 750\n",
-            "service.state": "service_was_active=true\n",
+            "service.state": f"service_was_active={str(service_was_active).lower()}\n",
         }.items():
             (root / "backup" / name).write_text(value, encoding="utf-8")
         harness = r'''
@@ -365,6 +369,15 @@ HARDENING_SHA=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 SOURCE_COMMIT=0123456789abcdef0123456789abcdef01234567
 BUNDLE_SHA=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 RECOVERY_MANIFEST_SHA=""
+RECOVERY_SERVICE_RESULTS=""
+RECOVERY_SERVICE_FAILURE=""
+RECOVERY_RESTORE_ATTEMPTED=false
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
+  shift 3
+  "$@"
+}
 STAGE_DIR=""
 post_apply_source_sha=good
 post_apply_target_sha=wrong
@@ -393,6 +406,7 @@ systemctl() {
     [[ "$PREDICATE_PASSES" == true ]]
   else
     printf 'SYSTEMCTL:%s\n' "$1" >> "$PWD/systemctl.calls"
+    if [[ "$1" == "$SERVICE_FAILURE" ]]; then return "$SERVICE_EXIT_CODE"; fi
   fi
 }
 sha256sum() {
@@ -437,7 +451,38 @@ cleanup() {
 }
 trap cleanup EXIT
 '''
+        bounded = _bash_function(script, "bounded_recovery_systemctl")
+        if real_timeout_mode:
+            # Only the extracted disposable fixture gets a shorter fixed policy;
+            # production has no caller-controlled duration or environment escape.
+            assert bounded.count("--kill-after=5s 60s") == 1
+            bounded = bounded.replace("--kill-after=5s 60s", "--kill-after=0.2s 0.2s")
+            (root / "bin").mkdir()
+            fake = root / "bin/systemctl"
+            fake.write_text('''#!/bin/bash
+printf 'SYSTEMCTL:%s\\n' "$1" >> "$PWD/systemctl.calls"
+if [[ "$1" == "$SERVICE_FAILURE" ]]; then
+  record_fixture_process() {
+    local identity
+    IFS= read -r identity < "/proc/$BASHPID/stat"
+    printf '%s\\n' "$identity" > "$PWD/fixture-process-$BASHPID.stat"
+  }
+  record_fixture_process
+  if [[ "$REAL_TIMEOUT_MODE" == ignore_term* ]]; then trap '' TERM; fi
+  if [[ "$REAL_TIMEOUT_MODE" == ignore_term_descendant ]]; then
+    (trap '' TERM; record_fixture_process; while :; do :; done) &
+  fi
+  printf 'COMMAND_ENTERED\\n' >> "$PWD/command-entered"
+  while :; do :; done
+fi
+''', encoding="utf-8", newline="\n")
+            fake.chmod(0o755)
+            harness += 'export PATH="/usr/bin:$PATH"\nRECOVERY_TIMEOUT_BIN="$(type -P timeout)"\n'
+            harness += 'export PATH="$PWD/bin:$PATH"\n'
+        harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
         harness += rollback_source + "\n"
+        if not service_was_active:
+            harness += 'SERVICE_WAS_ACTIVE=false\n'
         if recovery_case:
             harness += _bash_function(script, "record_recovery_evidence") + "\n"
             harness += _bash_function(script, "cleanup") + "\n"
@@ -510,15 +555,46 @@ trap cleanup EXIT
             COPY_FAILS=str(copy_fails).lower(),
             SIGNAL_DURING_COPY=str(signal_during_copy).lower(),
             TEST_PYTHON=Path(sys.executable).as_posix(),
+            SERVICE_FAILURE=service_failure,
+            SERVICE_EXIT_CODE=str(service_exit_code),
+            REAL_TIMEOUT_MODE=real_timeout_mode,
         )
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
-        completed = subprocess.run(
-            [_gateway_rollback_test_bash(), "fixture.sh"],
-            cwd=root, env=env, capture_output=True, text=True, timeout=20,
-            check=False,
-        )
+        started = time.monotonic()
+        try:
+            completed = subprocess.run(
+                [_gateway_rollback_test_bash(), "fixture.sh"],
+                cwd=root, env=env, capture_output=True, text=True, timeout=20,
+                check=False,
+            )
+        finally:
+            # timeout owns a different process group from the harness. Even if
+            # the regression breaks its termination, kill only recorded fixture
+            # processes with the same kernel start identity, never a reused PID.
+            live_fixture_pids = []
+            identities = list(root.glob("fixture-process-*.stat")) if real_timeout_mode else []
+            for identity_path in identities:
+                original = identity_path.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    continue
+                fields = current[current.rfind(")") + 2:].split()
+                if fields[19] == original_fields[19] and fields[0] != "Z":
+                    live_fixture_pids.append(pid)
+                    try:
+                        os.kill(pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+            if evidence is not None:
+                evidence["live_fixture_processes_after_command"] = len(live_fixture_pids)
+                evidence["recorded_fixture_processes"] = len(identities)
         target = root / "target/entry.py"
         if evidence is not None:
+            evidence["elapsed_seconds"] = time.monotonic() - started
+            evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
             evidence["backup_exists"] = (root / "backup").is_dir()
@@ -568,6 +644,122 @@ def test_gateway_post_mutation_failures_restore_source_before_cleanup() -> None:
         assert dropin_exists
         assert "Rolling back" not in completed.stderr
         assert completed.stdout == "GUARD_PASSED\nCLEANUP\n"
+
+
+def test_gateway_recovery_service_failure_stops_sequence_and_keeps_original_code() -> None:
+    verbs = ["stop", "daemon-reload", "reset-failed", "start"]
+    for verb in verbs:
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="service_failure", service_failure=verb, evidence=evidence,
+        )
+        assert completed.returncode == 17, completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        expected = verbs[:verbs.index(verb) + 1]
+        assert evidence["service_calls"].splitlines() == ["SYSTEMCTL:" + item for item in expected]
+        receipt = evidence["rollback"]
+        assert receipt["trigger_exit_code"] == 17 and receipt["restoration_verified"] is False
+        assert receipt["service_state_verified"] is False
+        assert receipt["systemd_job_cancellation_verified"] is False
+        assert receipt["service_commands"][-1] == dict(
+            verb=verb, exit_code=9, outcome="COMMAND_FAILED", timeout_seconds=60, kill_after_seconds=5)
+        assert evidence["backup"] == b"previous source\n"
+        if verb == "stop":
+            assert current == b"candidate source\n" and dropin_exists
+            assert evidence["restore_calls"] == ""
+            assert receipt["status"] == "ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED"
+            assert receipt["restore_attempted"] is False
+        else:
+            assert current == b"previous source\n" and not dropin_exists
+            assert receipt["status"] == "ROLLBACK_INCOMPLETE_SERVICE_COMMAND_FAILED"
+            assert receipt["restore_attempted"] is True
+
+
+def test_gateway_recovery_stop_failure_receipt_failure_preserves_trigger_and_backup() -> None:
+    evidence: dict = {}
+    completed, current, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure", service_failure="stop", evidence=evidence,
+    )
+    assert completed.returncode == 17 and "receipt persistence failed" in completed.stderr
+    assert current == b"candidate source\n" and dropin_exists
+    assert evidence["restore_calls"] == "" and evidence["backup"] == b"previous source\n"
+    assert evidence["rollback"] is None
+
+
+def test_gateway_recovery_reserved_exit_codes_remain_ambiguous_in_receipt() -> None:
+    for code, outcome in ((124, "DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124"),
+                          (137, "FORCED_TERMINATION_OR_SIGKILL"),
+                          (125, "LAUNCHER_OR_COMMAND_FAILURE")):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="reserved_exit", service_failure="stop", service_exit_code=code, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"candidate source\n"
+        assert evidence["restore_calls"] == ""
+        assert evidence["rollback"]["service_commands"][-1]["outcome"] == outcome
+
+
+def test_gateway_recovery_keeps_originally_inactive_service_stopped() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="inactive_service", service_was_active=False, evidence=evidence,
+    )
+    assert completed.returncode == 17 and current == b"previous source\n"
+    assert evidence["service_calls"].splitlines() == [
+        "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed"]
+    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert all(item["outcome"] == "COMPLETED" for item in evidence["rollback"]["service_commands"])
+
+
+def test_gateway_recovery_timeout_preflight_is_required_before_mutation() -> None:
+    script = _repair_script()
+    function = _bash_function(script, "require_recovery_timeout")
+    with tempfile.TemporaryDirectory(prefix="gateway-timeout-preflight-") as directory:
+        root = Path(directory)
+        (root / "bin").mkdir()
+        harness = 'set -Eeuo pipefail\n' + function + '\nPATH="$PWD/bin"\nrequire_recovery_timeout\nprintf MUTATED\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        for fixture in (None, "unrelated timeout implementation", "timeout (GNU coreutils) fixture"):
+            if fixture:
+                executable = root / "bin/timeout"
+                executable.write_text("#!/bin/bash\nprintf '%s\\n' '" + fixture + "'\n", newline="\n")
+                executable.chmod(0o755)
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                       capture_output=True, text=True, timeout=10, check=False)
+            assert completed.returncode == (0 if fixture and fixture.startswith("timeout (GNU") else 10), completed.stderr
+            assert completed.stdout == ("MUTATED" if completed.returncode == 0 else "")
+    assert script.index('require_recovery_timeout || {') < script.index('systemctl stop "$SERVICE"\nSERVICE_STOPPED=true')
+    assert script.index('record_recovery_evidence verify "$rc"') < script.index('if ! bounded_recovery_systemctl stop;')
+
+
+@unittest.skipIf(sys.platform != "linux", "Real GNU timeout process-group signals require Linux CI")
+def test_gateway_hung_service_commands_and_ignored_term_are_bounded() -> None:
+    for verb, mode in (("stop", "hang"), ("stop", "ignore_term"),
+                       ("stop", "ignore_term_descendant"),
+                       ("daemon-reload", "ignore_term"), ("reset-failed", "hang"), ("start", "ignore_term")):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="timed_service", service_failure=verb, real_timeout_mode=mode, evidence=evidence,
+        )
+        assert completed.returncode == 17, completed.stderr
+        assert evidence["command_entered"] and evidence["elapsed_seconds"] < 5
+        assert evidence["live_fixture_processes_after_command"] == 0
+        assert evidence["recorded_fixture_processes"] == (2 if mode == "ignore_term_descendant" else 1)
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        commands = evidence["rollback"]["service_commands"]
+        assert commands[-1]["verb"] == verb and commands[-1]["exit_code"] in {124, 137}
+        assert commands[-1]["outcome"] in {"DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124", "FORCED_TERMINATION_OR_SIGKILL"}
+        assert evidence["rollback"]["trigger_exit_code"] == 17
+        assert evidence["backup"] == b"previous source\n"
+        if verb == "stop":
+            assert current == b"candidate source\n" and evidence["restore_calls"] == ""
+        else:
+            assert current == b"previous source\n"
 
 
 def test_gateway_rollback_failure_keeps_original_code_without_reentry() -> None:

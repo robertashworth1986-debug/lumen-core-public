@@ -38,6 +38,10 @@ BACKUP_DIR=""
 HARDENING_FILE=""
 RECOVERY_ROOT="/var/backups/lumencore-gateway-repair"
 RECOVERY_MANIFEST_SHA=""
+RECOVERY_TIMEOUT_BIN=""
+RECOVERY_SERVICE_RESULTS=""
+RECOVERY_SERVICE_FAILURE=""
+RECOVERY_RESTORE_ATTEMPTED=false
 
 # This list is the recursively resolved local-Python import closure of the
 # reviewed gateway entrypoint. Keep it explicit so a partial copy cannot be
@@ -305,6 +309,19 @@ for required_command in \
     exit 10
   }
 done
+require_recovery_timeout() {
+  # Resolve a real GNU executable before any forward runtime mutation. The
+  # recovery deadline is fixed code policy, never an environment override.
+  RECOVERY_TIMEOUT_BIN="$(type -P timeout)" || return 10
+  [[ -x "$RECOVERY_TIMEOUT_BIN" ]] || return 10
+  local version
+  version="$("$RECOVERY_TIMEOUT_BIN" --version)" || return 10
+  [[ "$version" == 'timeout (GNU coreutils)'* ]] || return 10
+}
+require_recovery_timeout || {
+  echo "ERROR: GNU timeout is required before gateway mutation" >&2
+  exit 10
+}
 [[ "$TARGET_ROOT" == "/opt/lumencore/code" \
   && "$STACK_ROOT" == "/opt/lumencore" \
   && "$PYTHON_BIN" == "/opt/lumencore/.venv/bin/python" \
@@ -424,7 +441,9 @@ prepare_recovery_directory() {
 record_recovery_evidence() {
   local kind="$1" trigger_code="${2:-0}"
   python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
-    "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" "${BUNDLE_FILES[@]}" <<'PY'
+    "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
+    "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
+    "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -437,7 +456,8 @@ from pathlib import Path
 
 directory = Path(sys.argv[1])
 kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
-relatives = sys.argv[8:]
+service_results, service_failure, restore_attempted = sys.argv[8:11]
+relatives = sys.argv[11:]
 if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused"}:
     raise SystemExit("invalid_recovery_receipt_kind")
 if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
@@ -581,6 +601,29 @@ else:
     payload.update(manifest_sha256=expected_manifest,
                    status="HELPER_CHECKS_PASSED_EXTERNAL_VERIFICATION_PENDING" if kind == "helper"
                    else "ROLLBACK_ATTEMPTED_UNVERIFIED")
+if kind == "rollback":
+    commands = []
+    for row in service_results.splitlines():
+        match = re.fullmatch(r"(stop|daemon-reload|reset-failed|start):([0-9]{1,3})", row)
+        if not match or int(match[2]) > 255:
+            raise SystemExit("invalid_recovery_service_result")
+        verb, code = match[1], int(match[2])
+        outcome = ("COMPLETED" if code == 0 else "DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124" if code == 124
+                   else "FORCED_TERMINATION_OR_SIGKILL" if code == 137
+                   else "LAUNCHER_OR_COMMAND_FAILURE" if code in {125, 126, 127} else "COMMAND_FAILED")
+        commands.append(dict(verb=verb, exit_code=code, outcome=outcome,
+                             timeout_seconds=60, kill_after_seconds=5))
+    order = ["stop", "daemon-reload", "reset-failed", "start"]
+    if ([item["verb"] for item in commands] != order[:len(commands)]
+            or len(commands) > 4 or restore_attempted not in {"true", "false"}
+            or any(item["exit_code"] != 0 for item in commands[:-1])
+            or service_failure != (commands[-1]["verb"] if commands and commands[-1]["exit_code"] else "")):
+        raise SystemExit("invalid_recovery_service_sequence")
+    payload.update(service_commands=commands, restore_attempted=restore_attempted == "true",
+                   service_state_verified=False, systemd_job_cancellation_verified=False)
+    if service_failure:
+        payload["status"] = ("ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED" if service_failure == "stop"
+                             else "ROLLBACK_INCOMPLETE_SERVICE_COMMAND_FAILED")
 raw = (json.dumps(payload, sort_keys=True, indent=2) + "\n").encode()
 destination = directory / (kind + ".json")
 fd, temporary = tempfile.mkstemp(prefix=".receipt-", dir=directory)
@@ -726,6 +769,35 @@ remove_verified_dead_lock() {
   echo "Removed verified dead-PID gateway singleton lock."
 }
 
+bounded_recovery_systemctl() {
+  local verb="${1:-}" command_rc=0
+  local -a arguments=()
+  [[ $# -eq 1 ]] || return 125
+  case "$verb" in
+    stop|reset-failed|start) arguments=("$SERVICE") ;;
+    daemon-reload) ;;
+    *) return 125 ;;
+  esac
+  # A separate process group lets timeout terminate its command, not this
+  # recovery shell. KILL is required when inherited/child TERM is ignored.
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    systemctl "$verb" "${arguments[@]}" >/dev/null 2>&1 || command_rc=$?
+  RECOVERY_SERVICE_RESULTS+="$verb:$command_rc"$'\n'
+  if [[ "$command_rc" -ne 0 ]]; then
+    RECOVERY_SERVICE_FAILURE="$verb"
+    echo "ERROR: recovery systemctl $verb failed (exit $command_rc); service state and manager job completion remain unverified" >&2
+  fi
+  return "$command_rc"
+}
+
+finish_rollback() {
+  local rc="$1"
+  if ! record_recovery_evidence rollback "$rc"; then
+    echo "ERROR: private rollback receipt persistence failed; retained backups require manual review" >&2
+  fi
+  exit "$rc"
+}
+
 rollback() {
   local rc="${1:-1}"
   # Recovery failures must not re-enter rollback or replace the triggering code.
@@ -743,7 +815,10 @@ rollback() {
       exit "$rc"
     fi
     echo "Rolling back the complete gateway dependency closure and service identity..." >&2
-    systemctl stop "$SERVICE" >/dev/null 2>&1 || true
+    if ! bounded_recovery_systemctl stop; then
+      finish_rollback "$rc"
+    fi
+    RECOVERY_RESTORE_ATTEMPTED=true
     remove_verified_dead_lock || true
     for rel in "${BUNDLE_FILES[@]}"; do
       target="$TARGET_ROOT/$rel"
@@ -781,17 +856,20 @@ rollback() {
       rmdir -- "$RUN_DIR" >/dev/null 2>&1 || true
     fi
 
-    systemctl daemon-reload >/dev/null 2>&1 || true
-    systemctl reset-failed "$SERVICE" >/dev/null 2>&1 || true
+    if ! bounded_recovery_systemctl daemon-reload; then
+      finish_rollback "$rc"
+    fi
+    if ! bounded_recovery_systemctl reset-failed; then
+      finish_rollback "$rc"
+    fi
     if [[ "$SERVICE_WAS_ACTIVE" == true ]]; then
-      systemctl start "$SERVICE" >/dev/null 2>&1 || true
+      if ! bounded_recovery_systemctl start; then
+        finish_rollback "$rc"
+      fi
     fi
     SERVICE_STOPPED=false
   fi
-  if ! record_recovery_evidence rollback "$rc"; then
-    echo "ERROR: private rollback receipt persistence failed; retained backups require manual review" >&2
-  fi
-  exit "$rc"
+  finish_rollback "$rc"
 }
 
 trap 'rc=$?; echo "ERROR: gateway closure repair stopped on line $LINENO" >&2; rollback "$rc"' ERR
