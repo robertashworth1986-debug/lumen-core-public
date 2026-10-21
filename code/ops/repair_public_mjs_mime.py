@@ -130,7 +130,95 @@ def parse(content, source):
     return block(0)[0]
 
 
-def discover(dump):
+def location_matches(args, uri):
+    """Match one top-level selector, without flattening nested Nginx rules."""
+    if len(args) == 1 and args[0].startswith("@"):
+        return False
+    if len(args) == 1 and args[0].startswith("/"):
+        return uri.startswith(args[0])
+    if len(args) == 2 and args[0] in {"=", "^~"}:
+        return uri == args[1] if args[0] == "=" else uri.startswith(args[1])
+    if len(args) == 2 and args[0] in {"~", "~*"}:
+        try:
+            return re.search(args[1], uri, re.I if args[0] == "~*" else 0) is not None
+        except re.error:
+            raise RepairError("unsupported_location_regex") from None
+    raise RepairError("unsupported_location_selector")
+
+
+def bounded_route_facts(http_nodes, server):
+    """Report only static-route decisions; unknown tokens are hash-only."""
+    public_uris = ["/" + path for path in EXPECTED]
+    safe_tokens = {"/", "/portfolio", "/portfolio/", "/bounded-light", "/bounded-light/",
+                   "/bounded-light/observatory/", "$uri", "$uri/", "=404", "@gateway_fallback",
+                   *public_uris}
+    # Exact public static suffix patterns are useful; arbitrary regex text is not.
+    safe_patterns = {r"\.mjs$", r"\.(js|mjs|css)$", r"\.(js|css)$"}
+    def token_fact(value):
+        if value in safe_tokens or value in safe_patterns:
+            return {"value": value}
+        return {"redacted": True, "sha256": digest(value.encode())}
+    def directives(nodes):
+        facts = []
+        for node in nodes:
+            kind, *args = node["args"]
+            if kind == "root":
+                facts.append({"kind": kind, "known_static_root": args == [STATIC_ROOT.as_posix()]})
+            elif kind == "try_files":
+                facts.append({"kind": kind, "tokens": [token_fact(value) for value in args[:8]], "token_count": len(args)})
+            elif kind in {"types", "proxy_pass", "fastcgi_pass", "uwsgi_pass", "scgi_pass", "grpc_pass",
+                          "alias", "rewrite", "return", "if", "error_page", "content_by_lua", "content_by_lua_block",
+                          "content_by_lua_file", "js_content", "perl", "empty_gif", "mp4", "flv"}:
+                facts.append({"kind": kind})
+            if len(facts) >= 24:
+                break
+        return facts
+    result = {"schema": "lumencore.public_mime_route_diagnostic.v1", "approved_uris": public_uris,
+              "http": directives(http_nodes), "public_tls_server": directives(server), "locations": [],
+              "truncated": False, "diagnostic_only": True}
+    def visit(nodes, parent=None, depth=0, ancestor_uris=None):
+        if ancestor_uris is None:
+            ancestor_uris = public_uris
+        for node in nodes:
+            if node["args"][0] != "location":
+                continue
+            if depth > 6 or len(result["locations"]) >= 64:
+                result["truncated"] = True
+                return
+            args = node["args"][1:]
+            kind = args[0] if len(args) == 2 and args[0] in {"=", "^~", "~", "~*"} else "named" if len(args) == 1 and args[0].startswith("@") else "prefix" if len(args) == 1 and args[0].startswith("/") else "unsupported"
+            row = {"id": len(result["locations"]), "parent_id": parent, "depth": depth,
+                   "selector_kind": kind, "selector": token_fact(args[-1]) if args else {"redacted": True},
+                   "directives": directives(node["children"] or []), "selector_matches_approved_uris": []}
+            source = node["source"]
+            if len(source) <= 256 and re.fullmatch(r"/etc/nginx/[A-Za-z0-9_./-]+", source) and ".." not in PurePosixPath(source).parts:
+                row["source_file"] = source
+            for uri in public_uris:
+                try:
+                    if location_matches(args, uri):
+                        row["selector_matches_approved_uris"].append(uri)
+                except RepairError:
+                    row["selector_unresolved"] = True
+            row["candidate_uris_with_ancestors"] = [uri for uri in row["selector_matches_approved_uris"] if uri in ancestor_uris]
+            result["locations"].append(row)
+            visit(node["children"] or [], row["id"], depth + 1, row["candidate_uris_with_ancestors"])
+    visit(server)
+    while len(json.dumps(result).encode()) > 65536 and result["locations"]:
+        result["locations"].pop()
+        result["truncated"] = True
+    return result
+
+
+def discover(dump, *, verified_static_sha256=None):
+    diagnostics = {}
+    try:
+        return discover_static_table(dump, diagnostics, verified_static_sha256 == EXPECTED)
+    except RepairError as error:
+        error.route_diagnostics = diagnostics
+        raise
+
+
+def discover_static_table(dump, diagnostics, static_files_verified=False):
     """Resolve only dump-listed includes and prove these three paths inherit it."""
     if len(dump.encode()) > 2_000_000:
         raise RepairError("configuration_size_limit")
@@ -193,10 +281,16 @@ def discover(dump):
     if len(servers) != 1:
         raise RepairError("ambiguous_public_tls_server")
     server = servers[0]
+    diagnostics.update(bounded_route_facts(http_nodes, server))
     locations = [x for x in server if x["args"][0] == "location"]
     for node in locations:
-        if node["children"] is None or any(x["args"][0] == "location" for x in node["children"]):
-            raise RepairError("unsupported_nested_location")
+        if node["children"] is None:
+            raise RepairError("unsupported_location_without_block")
+        if any(x["args"][0] == "location" for x in node["children"]):
+            # Nested selection has different regex precedence. Ignore an entire
+            # tree only if its parent cannot match any exact approved module URI.
+            if any(location_matches(node["args"][1:], "/" + relative) for relative in EXPECTED):
+                raise RepairError("unsupported_relevant_nested_location")
     for relative in EXPECTED:
         uri = "/" + relative
         exact, prefixes, regexes = [], [], []
@@ -239,8 +333,21 @@ def discover(dump):
             if any(x["args"][0] in forbidden for x in nodes):
                 raise RepairError("relevant_route_is_not_simple_static")
             for node in nodes:
-                if node["args"][0] == "try_files" and node["args"][1:] not in [["$uri", "=404"], ["$uri", "$uri/", "=404"]]:
-                    raise RepairError("unsupported_static_fallback")
+                if node["args"][0] == "try_files":
+                    args = node["args"][1:]
+                    if args in [["$uri", "=404"], ["$uri", "$uri/", "=404"]]:
+                        continue
+                    named_first_file = (len(args) in {2, 3} and args[0] == "$uri"
+                                        and (len(args) == 2 or args[1] == "$uri/")
+                                        and re.fullmatch(r"@[A-Za-z_][A-Za-z0-9_]*", args[-1]))
+                    named_targets = [location for location in locations if location["args"] == ["location", args[-1]]] if args else []
+                    if not named_first_file or len(named_targets) != 1:
+                        raise RepairError("unsupported_static_fallback")
+                    if not static_files_verified:
+                        raise RepairError("named_fallback_requires_verified_static_files")
+                    # execute verifies all immutable regular files before this
+                    # discovery and again before mutation. Their first $uri hit
+                    # stays in this context; the named fallback is not entered.
         if effective_types != target or root != [STATIC_ROOT.as_posix()]:
             raise RepairError("mime_inheritance_or_static_root_unproven")
     return Path(target)
@@ -426,7 +533,15 @@ def execute(mode, expected_sha256=None):
         result["initial_nginx_test"] = command([nginx, "-t"])
         initial_dump = command([nginx, "-T"], dump=True)
         result["initial_configuration_sha256"] = digest(initial_dump.encode())
-        target = discover(initial_dump)
+        result["static_files"] = verify_static()
+        try:
+            target = discover(initial_dump, verified_static_sha256={row["path"]: row["sha256"] for row in result["static_files"]})
+        except RepairError as error:
+            # This explicit phase precedes all target writes and reloads. Retain
+            # enough redacted route facts to explain a fail-closed inspection.
+            result.update(status="FAILED_STATE_REVIEW_REQUIRED", error_code=str(error),
+                          phase="STATIC_ROUTE_DISCOVERY", route_diagnostics=getattr(error, "route_diagnostics", {}))
+            return result
         raw, info = checked_file(target, CONFIG_ROOT, 1_000_000)
         if info.st_uid != 0 or stat.S_IMODE(info.st_mode) & 0o022:
             raise RepairError("unsafe_active_mime_owner_or_mode")
@@ -543,7 +658,9 @@ def explicit_rollback(rollback_id, original_sha256, candidate_sha256):
         if not isinstance(receipt, dict) or receipt.get("rollback_id") != rollback_id or receipt.get("original_sha256") != original_sha256 or receipt.get("candidate_sha256") != candidate_sha256:
             raise RepairError("rollback_receipt_binding_mismatch")
         nginx = nginx_binary()
-        target = discover(command([nginx, "-T"], dump=True))
+        result["static_files"] = verify_static()
+        target = discover(command([nginx, "-T"], dump=True),
+                          verified_static_sha256={row["path"]: row["sha256"] for row in result["static_files"]})
         if receipt.get("active_file") != str(target):
             raise RepairError("rollback_active_target_mismatch")
         original, original_info = checked_file(directory / "original.mime", ROLLBACK_ROOT)

@@ -68,6 +68,76 @@ def test_regex_precedence_catches_proxy_override():
         repair.discover(value)
 
 
+def test_nested_irrelevant_prefix_does_not_affect_approved_static_routes():
+    value = dump(locations=r"location /api/ { location ~ \.mjs$ { proxy_pass http://backend; } } location / { try_files $uri =404; }")
+    assert repair.discover(value) == Path("/etc/nginx/tables.types")
+
+
+@pytest.mark.parametrize("locations", [
+    r"location / { location /portfolio/ { types {} } }",
+    r"location /portfolio/ { location ~ \.mjs$ { proxy_pass http://backend; } }",
+    r"location ~ \.mjs$ { location ~ math { types {} } }",
+])
+def test_relevant_nested_location_retains_diagnostic_and_refuses(locations):
+    with pytest.raises(repair.RepairError, match="unsupported_relevant_nested_location") as failure:
+        repair.discover(dump(locations=locations))
+    facts = failure.value.route_diagnostics
+    assert facts["diagnostic_only"] is True
+    assert facts["locations"][1]["parent_id"] == facts["locations"][0]["id"]
+    assert facts["locations"][0]["candidate_uris_with_ancestors"]
+
+
+@pytest.mark.parametrize("first", ["$uri", "$uri $uri/"])
+def test_named_fallback_checks_existing_file_first(first):
+    value = dump(locations=f"location / {{ try_files {first} @gateway_fallback; }} location @gateway_fallback {{ proxy_pass http://backend; }}")
+    assert repair.discover(value, verified_static_sha256=dict(repair.EXPECTED)) == Path("/etc/nginx/tables.types")
+
+
+@pytest.mark.parametrize("proof", [None, {}, {"portfolio/math-models.mjs": "0" * 64}])
+def test_named_fallback_discovery_requires_all_exact_static_hashes(proof):
+    value = dump(locations="location / { try_files $uri @gateway_fallback; } location @gateway_fallback { proxy_pass http://backend; }")
+    with pytest.raises(repair.RepairError, match="named_fallback_requires_verified_static_files"):
+        repair.discover(value, verified_static_sha256=proof)
+
+
+@pytest.mark.parametrize("fallback", ["$uri /index.html", "$uri @missing", "$uri/ @gateway_fallback", "/other $uri @gateway_fallback", "$uri $uri/ $args @gateway_fallback"])
+def test_changed_uri_missing_name_or_non_file_first_fallback_refuses(fallback):
+    value = dump(locations=f"location / {{ try_files {fallback}; }} location @gateway_fallback {{ proxy_pass http://backend; }}")
+    with pytest.raises(repair.RepairError, match="unsupported_static_fallback"):
+        repair.discover(value)
+
+
+def test_route_diagnostics_redact_unknown_paths_headers_and_credentials():
+    value = dump(server_extra='proxy_set_header Authorization "Bearer private-secret-fixture";',
+                 locations='location / { location /private-secret-fixture { alias /private-secret-fixture; } try_files $uri @private-secret-fixture; }')
+    with pytest.raises(repair.RepairError) as failure:
+        repair.discover(value)
+    encoded = json.dumps(failure.value.route_diagnostics)
+    assert "private-secret-fixture" not in encoded
+    assert "Authorization" not in encoded
+    assert "Bearer" not in encoded
+    assert '"redacted": true' in encoded
+    assert '"kind": "alias"' in encoded
+
+
+def test_route_diagnostic_count_is_bounded():
+    nested = " ".join(f"location /private-{index} {{}}" for index in range(100))
+    with pytest.raises(repair.RepairError) as failure:
+        repair.discover(dump(locations="location / { " + nested + " }"))
+    assert len(failure.value.route_diagnostics["locations"]) == 64
+    assert failure.value.route_diagnostics["truncated"] is True
+
+
+def test_route_diagnostic_encoded_size_is_bounded_and_tokens_stay_redacted():
+    children = [{"args": ["try_files", *(["private-token-fixture"] * 8)], "children": None, "source": "/etc/nginx/public.conf"} for _ in range(24)]
+    server = [{"args": ["location", f"/private-{index}"], "children": children, "source": "/etc/nginx/public.conf"} for index in range(64)]
+    facts = repair.bounded_route_facts([], server)
+    encoded = json.dumps(facts)
+    assert len(encoded.encode()) <= 65536
+    assert facts["truncated"] is True
+    assert "private-token-fixture" not in encoded
+
+
 def test_missing_and_duplicate_dump_sections_rejected():
     with pytest.raises(repair.RepairError):
         repair.discover(dump().split("# configuration file /etc/nginx/tables.types:")[0])
@@ -126,7 +196,7 @@ def backend(tmp_path, monkeypatch):
     monkeypatch.setattr(repair, "require_root", lambda: None)
     monkeypatch.setattr(repair, "exclusive_lock", nullcontext)
     monkeypatch.setattr(repair, "nginx_binary", lambda: "/nginx")
-    monkeypatch.setattr(repair, "discover", lambda value: target)
+    monkeypatch.setattr(repair, "discover", lambda value, **kwargs: target)
     monkeypatch.setattr(repair, "checked_file", checked)
     monkeypatch.setattr(repair, "metadata", lambda *_: meta.copy())
     monkeypatch.setattr(repair, "create_rollback", lambda: directory)
@@ -134,7 +204,7 @@ def backend(tmp_path, monkeypatch):
     monkeypatch.setattr(repair, "install_bytes", install)
     monkeypatch.setattr(repair, "fsync_directory", lambda *_: None)
     monkeypatch.setattr(repair, "command", command)
-    monkeypatch.setattr(repair, "verify_static", lambda: [{"passed": True}])
+    monkeypatch.setattr(repair, "verify_static", lambda: [{"path": path, "sha256": sha, "expected_sha256": sha, "passed": True} for path, sha in repair.EXPECTED.items()])
     monkeypatch.setattr(repair, "probe", probe)
     monkeypatch.setattr(repair, "ROLLBACK_ROOT", backups)
     monkeypatch.setattr(repair.signal, "signal", lambda *_: None)
@@ -149,6 +219,34 @@ def test_inspect_has_no_install_or_reload(backend):
     assert result["status"] == "INSPECTED" and target.read_bytes() == RAW
     assert not any("reload" in row or "install" in row for row in calls)
     assert list(directory.iterdir()) == []
+
+
+def test_pre_mutation_discovery_refusal_keeps_facts_and_known_unchanged_state(backend, monkeypatch):
+    target, directory, calls, flags = backend
+    def refused(_dump, **kwargs):
+        error = repair.RepairError("unsupported_relevant_nested_location")
+        error.route_diagnostics = {"diagnostic_only": True, "locations": [{"id": 0, "parent_id": None}]}
+        raise error
+    monkeypatch.setattr(repair, "discover", refused)
+    result = repair.execute("inspect")
+    assert result["phase"] == "STATIC_ROUTE_DISCOVERY"
+    assert result["configuration_modified"] is False and result["service_reloaded"] is False
+    assert result["route_diagnostics"]["locations"]
+    assert not any("reload" in row or "install" in row for row in calls)
+    assert list(directory.iterdir()) == [] and target.read_bytes() == RAW
+
+
+def test_missing_immutable_file_prevents_discovery_or_any_install(backend, monkeypatch):
+    target, directory, calls, flags = backend
+    discoveries = []
+    monkeypatch.setattr(repair, "discover", lambda value, **kwargs: discoveries.append(value))
+    def missing():
+        raise repair.RepairError("static_release_hash_mismatch")
+    monkeypatch.setattr(repair, "verify_static", missing)
+    with pytest.raises(repair.RepairError, match="static_release_hash_mismatch"):
+        repair.execute("apply", repair.digest(RAW))
+    assert discoveries == [] and target.read_bytes() == RAW
+    assert not any("reload" in row or "install" in row for row in calls)
 
 
 def test_apply_requires_observed_original_hash(backend):
@@ -234,7 +332,7 @@ def test_explicit_rollback_requires_exact_receipt_hashes_and_active_file(backend
     elif mismatch == "backup":
         (directory / "original.mime").write_bytes(b"damaged backup")
     elif mismatch == "target":
-        monkeypatch.setattr(repair, "discover", lambda _: target.with_name("other.types"))
+        monkeypatch.setattr(repair, "discover", lambda _, **kwargs: target.with_name("other.types"))
     before = target.read_bytes()
     with pytest.raises(repair.RepairError):
         repair.explicit_rollback(runid, original, candidate)

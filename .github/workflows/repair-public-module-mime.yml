@@ -40,10 +40,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: lumencore-production-site
-  cancel-in-progress: false
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -86,6 +82,9 @@ jobs:
           [[ "$EXPECTED_MIME_SHA256" =~ ^[0-9a-f]{64}$ ]]
 
   repair:
+    concurrency:
+      group: lumencore-production-site
+      cancel-in-progress: false
     needs: [validate, authorize]
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest

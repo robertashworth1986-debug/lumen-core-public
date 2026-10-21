@@ -45,5 +45,7 @@ def test_production_is_manual_main_only_and_all_independent_failures_recover():
     assert "steps.full_gate.outcome != 'success' || steps.service_gate.outcome != 'success'" in repair
     assert "--expected-candidate-sha256 '$CANDIDATE_SHA256'" in repair
     assert 'timeout 420s python3 code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py' in repair
-    assert 'cancel-in-progress: false' in text
+    assert 'concurrency:' not in text.split('jobs:', 1)[0]
+    assert 'group: lumencore-production-site' in repair
+    assert 'cancel-in-progress: false' in repair
     assert 'path: out/public-module-mime/*.json' in text
