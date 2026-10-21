@@ -153,14 +153,30 @@ production incident. Initial local failures exposed Windows fixture CRLF bytes
 where production emits LF; fixture preparation now uses explicit LF, without
 relaxing the production parser. The failed run and diagnostic remain preserved.
 
-The preceding drop-in revision at `f615ca00` passed all 14 hosted checks:
-108 Linux public-contract checks with no skips and 2,104 full-suite tests with eight
+The service drop-in directory now has its own fixed result check after its existing
+metadata restoration or empty-directory removal, before any runtime-directory
+restoration or service restart. Its no-path query repeats pinned recovery-evidence
+validation and parses only captured state/metadata bytes matching the prepared
+inventory. It requires a stable actual directory with the recorded numeric owner,
+group and mode, or true absence including no dangling link, with safe parent
+observations. Wrong results and malformed queries stop later recovery through the
+existing first-failure path; the original trigger, earlier partial observations,
+retained backups and visible receipt persistence failures remain. Nonempty
+missing-before directories are still preserved and refused. The separate receipt
+observation does not certify contents, timestamps, ACLs, extended attributes,
+exclusive ownership, effective service state or whole restoration. The motivating
+disposable removal stub returned success without removing an empty originally
+absent directory; that controlled fault is not a native-command or production
+incident.
+
+The preceding runtime-directory revision at `2e0fdcb8` passed all 14 hosted checks:
+114 Linux public-contract checks with no skips and 2,110 full-suite tests with eight
 unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
-descendant-termination and link/extended-attribute cases. The runtime-directory
-increment passed seven selected local tests with one platform skip, then 124
-focused local tests with nine platform skips. The dependency-free runner passed
-105 checks with the same nine skips (114 discovered). Independent review and
-exact-head hosted Linux validation of this increment remain pending. The
+descendant-termination and link/extended-attribute cases. The service drop-in
+directory increment passed seven selected local tests with one platform skip,
+then 129 focused local tests with ten platform skips. The dependency-free runner
+passed 110 checks with the same ten skips (120 discovered). Independent final
+review and exact-head hosted Linux validation of this increment remain pending. The
 initial local strict-query failure in the earlier revision exposed platform newline
 translation; exact byte output corrected it without relaxing response parsing.
 Local subprocess cases execute actual rollback operations against disposable files,

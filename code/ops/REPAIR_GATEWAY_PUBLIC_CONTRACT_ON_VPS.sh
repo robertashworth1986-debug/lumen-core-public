@@ -47,6 +47,7 @@ RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
 RECOVERY_DROPIN_RESULT=NOT_CHECKED
 RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
+RECOVERY_DROPIN_DIRECTORY_RESULT=NOT_CHECKED
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 
 # This list is the recursively resolved local-Python import closure of the
@@ -449,6 +450,7 @@ record_recovery_evidence() {
   [[ $# -le 3 ]] || return 14
   [[ "$kind" != dropin_result || $# -eq 2 ]] || return 14
   [[ "$kind" != runtime_directory_result || $# -eq 2 ]] || return 14
+  [[ "$kind" != dropin_directory_result || $# -eq 2 ]] || return 14
   local source_states="" source_relative
   for source_relative in "${BUNDLE_FILES[@]}"; do
     source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}:${SOURCE_RESULT_STATES[$source_relative]:-NOT_CHECKED}"$'\n'
@@ -459,7 +461,8 @@ record_recovery_evidence() {
     "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
     "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "$TARGET_ROOT" \
     "$SERVICE_DROP_IN" "${RECOVERY_DROPIN_RESULT:-NOT_CHECKED}" \
-    "$RUN_DIR" "${RECOVERY_RUNTIME_DIRECTORY_RESULT:-NOT_CHECKED}" "${BUNDLE_FILES[@]}" <<'PY'
+    "$RUN_DIR" "${RECOVERY_RUNTIME_DIRECTORY_RESULT:-NOT_CHECKED}" \
+    "$SERVICE_DROP_IN_DIR" "${RECOVERY_DROPIN_DIRECTORY_RESULT:-NOT_CHECKED}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -477,9 +480,10 @@ restore_failure, restore_exit_code, restore_target = sys.argv[11:14]
 requested_source, source_states, target_root = sys.argv[14:17]
 dropin_target, dropin_result = sys.argv[17:19]
 runtime_directory_target, runtime_directory_result = sys.argv[19:21]
-relatives = sys.argv[21:]
+dropin_directory_target, dropin_directory_result = sys.argv[21:23]
+relatives = sys.argv[23:]
 query_kinds = {"source_state", "source_result"}
-if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result"} | query_kinds:
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
 if ((kind in query_kinds and requested_source not in relatives)
         or (kind not in query_kinds and requested_source)):
@@ -546,6 +550,9 @@ if kind in {"helper", "rollback", "rollback_refused"}:
     if runtime_directory_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
         raise SystemExit("invalid_runtime_directory_result_observation")
     payload["runtime_directory_result_observation"] = runtime_directory_result
+    if dropin_directory_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        raise SystemExit("invalid_dropin_directory_result_observation")
+    payload["dropin_directory_result_observation"] = dropin_directory_result
     states = []
     for row in source_states.splitlines():
         fields = row.split(":")
@@ -775,6 +782,79 @@ def observe_runtime_directory_result(prepared):
         raise SystemExit("runtime_directory_result_parent_changed")
     sys.stdout.buffer.write(result)
 
+def expected_dropin_directory(prepared):
+    # Parse exactly the captured bytes whose inventory matches the pinned entry.
+    def captured(name):
+        expected = next((item for item in prepared["files"] if item["path"] == name), None)
+        actual, raw = inventory(name, capture=True)
+        if expected is None or actual != expected:
+            raise SystemExit("dropin_directory_preparation_changed")
+        return raw
+    state = captured("service-drop-in-dir.state")
+    if state == b"missing\n":
+        if any(item["path"] == "service-drop-in-dir.metadata" for item in prepared["files"]):
+            raise SystemExit("dropin_directory_preparation_contradiction")
+        return None
+    if state != b"present\n":
+        raise SystemExit("invalid_dropin_directory_prepared_state")
+    match = re.fullmatch(rb"([0-9]+) ([0-9]+) ([0-7]{3,4})\n", captured("service-drop-in-dir.metadata"))
+    if not match:
+        raise SystemExit("invalid_dropin_directory_prepared_metadata")
+    return int(match[1]), int(match[2]), int(match[3], 8)
+
+def observe_dropin_directory_result(prepared):
+    # Fixed apply-mode object; this query accepts no caller-selected path.
+    expected = expected_dropin_directory(prepared)
+    path = Path(dropin_directory_target)
+    if not path.is_absolute() or path.resolve(strict=False) != path:
+        raise SystemExit("unsafe_dropin_directory_result_path")
+
+    def identity(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+                info.st_gid, info.st_mtime_ns, info.st_ctime_ns)
+
+    def parents():
+        observed = []
+        for parent in path.parents:
+            info = parent.lstat()
+            if not stat.S_ISDIR(info.st_mode):
+                raise SystemExit("unsafe_dropin_directory_result_parent")
+            if parent == path.parent and os.name == "posix":
+                if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
+                    raise SystemExit("unsafe_dropin_directory_result_parent_permissions")
+            observed.append((str(parent), info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid))
+        return observed
+
+    before = parents()
+    if expected is None:
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            result = b"dropin_directory_absent\n"
+        else:
+            raise SystemExit("dropin_directory_result_expected_absence")
+    else:
+        info = path.lstat()
+        if not stat.S_ISDIR(info.st_mode):
+            raise SystemExit("dropin_directory_result_not_directory")
+        if (info.st_uid, info.st_gid, stat.S_IMODE(info.st_mode)) != expected:
+            raise SystemExit("dropin_directory_result_metadata_mismatch")
+        # Keep identity stable during observation, without claiming equality to
+        # an old inode or restoration of contents, timestamps, ACLs or xattrs.
+        if os.name == "posix":
+            descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0))
+            try:
+                if identity(os.fstat(descriptor)) != identity(info) or identity(path.lstat()) != identity(info):
+                    raise SystemExit("dropin_directory_result_changed")
+            finally:
+                os.close(descriptor)
+        elif identity(path.lstat()) != identity(info):
+            raise SystemExit("dropin_directory_result_changed")
+        result = b"dropin_directory_present\n"
+    if parents() != before:
+        raise SystemExit("dropin_directory_result_parent_changed")
+    sys.stdout.buffer.write(result)
+
 if kind == "rollback_refused":
     # This receipt describes refusal only; it does not authenticate invalid input.
     payload.update(status="ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE", restore_attempted=False,
@@ -818,6 +898,9 @@ else:
     if kind == "runtime_directory_result":
         observe_runtime_directory_result(prepared)
         raise SystemExit(0)
+    if kind == "dropin_directory_result":
+        observe_dropin_directory_result(prepared)
+        raise SystemExit(0)
     if kind == "verify":
         print("RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION")
         raise SystemExit(0)
@@ -829,6 +912,10 @@ else:
         runtime_present = expected_runtime_directory(prepared) is not None
         if (runtime_directory_result == "MATCHED_PREPARED_PRESENT") != runtime_present:
             raise SystemExit("runtime_directory_result_inventory_mismatch")
+    if dropin_directory_result in {"MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        dropin_directory_present = expected_dropin_directory(prepared) is not None
+        if (dropin_directory_result == "MATCHED_PREPARED_PRESENT") != dropin_directory_present:
+            raise SystemExit("dropin_directory_result_inventory_mismatch")
     payload.update(manifest_sha256=expected_manifest,
                    status="HELPER_CHECKS_PASSED_EXTERNAL_VERIFICATION_PENDING" if kind == "helper"
                    else "ROLLBACK_ATTEMPTED_UNVERIFIED")
@@ -865,6 +952,7 @@ if kind == "rollback":
         "dropin_metadata_read": {"service_drop_in_directory"},
         "dropin_chown": {"service_drop_in_directory"}, "dropin_chmod": {"service_drop_in_directory"},
         "dropin_directory_remove": {"service_drop_in_directory"},
+        "dropin_directory_result": {"service_drop_in_directory"},
         "run_directory_state_read": {"run_directory"}, "run_metadata_read": {"run_directory"},
         "run_chown": {"run_directory"}, "run_chmod": {"run_directory"},
         "run_directory_remove": {"run_directory"}, "runtime_directory_result": {"run_directory"},
@@ -1272,6 +1360,22 @@ read_recovery_runtime_directory_result() {
   esac
 }
 
+read_recovery_dropin_directory_result() {
+  local expected="${1:-}" response
+  [[ $# -eq 1 && ( "$expected" == present || "$expected" == missing ) ]] || return 14
+  RECOVERY_DROPIN_DIRECTORY_RESULT=FAILED
+  response="$(record_recovery_evidence dropin_directory_result 0 && printf '.')" || return $?
+  case "$response" in
+    $'dropin_directory_present\n.')
+      [[ "$expected" == present ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_RESULT=MATCHED_PREPARED_PRESENT ;;
+    $'dropin_directory_absent\n.')
+      [[ "$expected" == missing ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_RESULT=MATCHED_PREPARED_ABSENCE ;;
+    *) return 14 ;;
+  esac
+}
+
 remove_recovery_directory() {
   # Missing is the intended state; nonempty, linked or inaccessible is not.
   if [[ ! -e "$1" && ! -L "$1" ]]; then return 0; fi
@@ -1337,6 +1441,8 @@ rollback() {
     else
       checked_restore_step dropin_directory_remove service_drop_in_directory remove_recovery_directory "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
     fi
+
+    checked_restore_step dropin_directory_result service_drop_in_directory read_recovery_dropin_directory_result "$prior_drop_in_dir_state" || finish_rollback "$rc"
 
     checked_restore_step run_directory_state_read run_directory read_recovery_state "$BACKUP_DIR/run-dir.state" || finish_rollback "$rc"
     prior_run_dir_state="$RECOVERY_STATE"
