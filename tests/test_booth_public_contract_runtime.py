@@ -333,6 +333,7 @@ def _run_gateway_rollback_guard(
     target_query_case: str = "", target_relative: str = "",
     result_fault: str = "", result_relative: str = "entry.py", result_query_case: str = "",
     dropin_fault: str = "", dropin_query_case: str = "",
+    runtime_directory_fault: str = "", runtime_directory_query_case: str = "",
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -349,15 +350,16 @@ def _run_gateway_rollback_guard(
         (root / "target/entry.py").write_bytes(b"candidate source\n")
         (root / "backup/existing/entry.py").write_bytes(b"previous source\n")
         (root / "dropins/hardening.conf").write_bytes(b"candidate hardening\n")
+        run_info = (root / "run").stat()
         for name, value in {
             "service-drop-in.state": "missing\n",
             "service-drop-in-dir.state": "present\n",
             "service-drop-in-dir.metadata": "1000 1000 755\n",
             "run-dir.state": "present\n",
-            "run-dir.metadata": "1000 1000 750\n",
+            "run-dir.metadata": f"{run_info.st_uid} {run_info.st_gid} {run_info.st_mode & 0o7777:o}\n",
             "service.state": f"service_was_active={str(service_was_active).lower()}\n",
         }.items():
-            (root / "backup" / name).write_text(value, encoding="utf-8")
+            (root / "backup" / name).write_text(value, encoding="utf-8", newline="\n")
         if second_source:
             (root / "target/second.py").write_bytes(b"second candidate\n")
             (root / "backup/existing/second.py").write_bytes(b"second previous\n")
@@ -367,7 +369,7 @@ def _run_gateway_rollback_guard(
         if directory_case:
             family = "service-drop-in-dir" if directory_case.endswith("dropin") else "run-dir"
             folder = root / ("dropins" if directory_case.endswith("dropin") else "run")
-            (root / f"backup/{family}.state").write_text("missing\n")
+            (root / f"backup/{family}.state").write_text("missing\n", newline="\n")
             (root / f"backup/{family}.metadata").unlink()
             if directory_case.startswith("nonempty"):
                 (folder / "unrelated-retained").write_bytes(b"preserve unrelated bytes\n")
@@ -378,6 +380,31 @@ def _run_gateway_rollback_guard(
         if metadata_case and not metadata_case.startswith("missing:"):
             filename, invalid = metadata_case.split(":", 1)
             (root / "backup" / filename).write_text(invalid + "\n")
+        if runtime_directory_fault in {"uid_mismatch", "gid_mismatch"}:
+            # Ownership calls are stubs. Bind a different numeric expectation
+            # to show a zero exit cannot substitute for matching actual metadata.
+            (root / "backup/run-dir.metadata").write_text(
+                f"{run_info.st_uid + (runtime_directory_fault == 'uid_mismatch')} "
+                f"{run_info.st_gid + (runtime_directory_fault == 'gid_mismatch')} {run_info.st_mode & 0o7777:o}\n", newline="\n")
+        if runtime_directory_fault:
+            (root / "runtime-directory-fault.py").write_text('''from pathlib import Path
+import os
+p = Path("run")
+kind = os.environ["RUNTIME_DIRECTORY_FAULT"]
+if kind == "file": p.rmdir(); p.write_bytes(b"not a directory")
+elif kind == "missing": p.rmdir()
+elif kind == "mode": p.chmod(0o700 if p.stat().st_mode & 0o7777 != 0o700 else 0o755)
+elif kind == "symlink": p.rename("outside-run"); p.symlink_to(Path("outside-run").resolve(), target_is_directory=True)
+elif kind == "dangling_symlink": p.symlink_to(Path("missing-run-target").resolve(), target_is_directory=True)
+elif kind == "parent_mode": p.parent.chmod(0o777)
+elif kind == "state_changed": Path("backup/run-dir.state").write_bytes(b"missing\\n")
+elif kind == "metadata_changed": Path("backup/run-dir.metadata").write_bytes(b"0 0 700\\n")
+elif kind == "manifest_changed":
+    q=Path("backup/prepared.json"); q.write_bytes(q.read_bytes()+b" ")
+elif kind in {"uid_mismatch", "gid_mismatch", "remove_noop"}: pass
+else: raise ValueError("unsupported_runtime_directory_fault")
+Path("runtime-directory-fault-applied").write_text(kind)
+''', encoding="utf-8", newline="\n")
         if source_drift:
             # Controlled interleavings in disposable paths only. The production
             # verifier and rollback body are extracted without modification.
@@ -495,6 +522,7 @@ RECOVERY_RESTORE_FAILURE=""
 RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
 RECOVERY_DROPIN_RESULT=NOT_CHECKED
+RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 python3() { "$TEST_PYTHON" "$@"; }
 FIXTURE_FORWARD=false
@@ -564,6 +592,8 @@ record_recovery_evidence() {
   if [[ "$1" == source_result ]]; then printf 'observed_present\n'; fi
   if [[ "$1" == dropin_result ]]; then
     if [[ -f "$BACKUP_DIR/service-drop-in.before" ]]; then printf 'dropin_present\n'; else printf 'dropin_absent\n'; fi
+  elif [[ "$1" == runtime_directory_result ]]; then
+    if [[ -f "$BACKUP_DIR/run-dir.metadata" ]]; then printf 'runtime_directory_present\n'; else printf 'runtime_directory_absent\n'; fi
   fi
 }
 fixture_source_drift() {
@@ -582,6 +612,9 @@ fixture_result_fault() {
 fixture_dropin_fault() {
   if [[ -n "$DROPIN_FAULT" ]]; then "$TEST_PYTHON" "$PWD/dropin-fault.py" || return $?; fi
 }
+fixture_runtime_directory_fault() {
+  if [[ -n "$RUNTIME_DIRECTORY_FAULT" ]]; then "$TEST_PYTHON" "$PWD/runtime-directory-fault.py" || return $?; fi
+}
 fixture_operation() {
   local command_name="$1" fixture_target=unknown
   case "$2" in
@@ -596,7 +629,14 @@ fixture_operation() {
   if [[ "$RESTORE_FAULT" == "$command_name:$fixture_target" ]]; then return 23; fi
 }
 chown() { printf 'chown\n' >> "$PWD/restore.calls"; fixture_operation chown "${@: -1}"; }
-chmod() { printf 'chmod\n' >> "$PWD/restore.calls"; fixture_operation chmod "${@: -1}"; }
+chmod() {
+  printf 'chmod\n' >> "$PWD/restore.calls"
+  fixture_operation chmod "${@: -1}" || return $?
+  if [[ "${@: -1}" == "$RUN_DIR" ]]; then
+    "$TEST_PYTHON" -c 'import os,sys; os.chmod(sys.argv[2], int(sys.argv[1],8))' "$1" "$RUN_DIR" || return $?
+    fixture_runtime_directory_fault || return $?
+  fi
+}
 rm() {
   printf 'rm\n' >> "$PWD/restore.calls"
   fixture_operation rm "${@: -1}" || return $?
@@ -632,7 +672,12 @@ install() {
     command mkdir -p -- "${@: -1}"
   fi
 }
-rmdir() { fixture_operation rmdir "${@: -1}" || return $?; command rmdir "$@"; }
+rmdir() {
+  fixture_operation rmdir "${@: -1}" || return $?
+  if [[ "$RUNTIME_DIRECTORY_FAULT" == remove_noop && "${@: -1}" == "$RUN_DIR" ]]; then fixture_runtime_directory_fault; return $?; fi
+  command rmdir "$@" || return $?
+  if [[ "$RUNTIME_DIRECTORY_FAULT" == dangling_symlink && "${@: -1}" == "$RUN_DIR" ]]; then fixture_runtime_directory_fault || return $?; fi
+}
 tr() { if [[ "$REAL_LOCK_CASE" == tr_failure ]]; then return 27; fi; command tr "$@"; }
 cp() {
   printf 'cp\n' >> "$PWD/restore.calls"
@@ -693,7 +738,7 @@ fi
             harness += 'export PATH="/usr/bin:$PATH"\nRECOVERY_TIMEOUT_BIN="$(type -P timeout)"\n'
             harness += 'export PATH="$PWD/bin:$PATH"\n'
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
-        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_metadata", "remove_recovery_directory",
+        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent"):
             harness += _bash_function(script, name) + "\n"
         if real_lock_case:
@@ -888,6 +933,28 @@ record_recovery_evidence() {
   esac
 }
 '''
+        if runtime_directory_query_case:
+            harness += _bash_function(script, "record_recovery_evidence").replace(
+                "record_recovery_evidence() {", "actual_runtime_record_recovery_evidence() {", 1) + "\n"
+            harness += r'''
+record_recovery_evidence() {
+  if [[ "$1" != runtime_directory_result ]]; then actual_runtime_record_recovery_evidence "$@"; return $?; fi
+  case "$RUNTIME_DIRECTORY_QUERY_CASE" in
+    failed) printf 'runtime_directory_present\n'; return 29 ;;
+    extra_line) printf 'runtime_directory_present\nextra\n' ;;
+    extra_newline) printf 'runtime_directory_present\n\n' ;;
+    carriage_return) printf 'runtime_directory_present\r\n' ;;
+    no_newline) printf runtime_directory_present ;;
+    empty) : ;;
+    contradictory) printf 'runtime_directory_absent\n' ;;
+    invalid) printf 'verified\n' ;;
+    source_argument) actual_runtime_record_recovery_evidence runtime_directory_result 0 entry.py ;;
+    empty_argument) actual_runtime_record_recovery_evidence runtime_directory_result 0 '' ;;
+    extra_arguments) actual_runtime_record_recovery_evidence runtime_directory_result 0 run_directory extra ;;
+    *) return 99 ;;
+  esac
+}
+'''
         harness += guard
         if recovery_case in {"later_gate_failure", "helper_write_failure", "manifest_changed", "backup_changed"}:
             outcome = script.split('if ! helper_receipt_sha="$(record_recovery_evidence helper 0)";', 1)[1]
@@ -912,6 +979,7 @@ record_recovery_evidence() {
             TARGET_RELATIVE=target_relative,
             RESULT_FAULT=result_fault, RESULT_RELATIVE=result_relative, RESULT_QUERY_CASE=result_query_case,
             DROPIN_FAULT=dropin_fault, DROPIN_QUERY_CASE=dropin_query_case,
+            RUNTIME_DIRECTORY_FAULT=runtime_directory_fault, RUNTIME_DIRECTORY_QUERY_CASE=runtime_directory_query_case,
             DROP_BACKUP_AFTER_VERIFY=metadata_case.split(":", 1)[1] if metadata_case.startswith("missing:") else "",
         )
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
@@ -978,6 +1046,14 @@ record_recovery_evidence() {
             evidence["dropin_fault_applied"] = (root / "dropin-fault-applied").exists()
             evidence["dropin_result_receipt_exists"] = (root / "backup/dropin_result.json").exists()
             evidence["run_directory_exists"] = (root / "run").exists()
+            evidence["runtime_directory_is_directory"] = (root / "run").is_dir()
+            evidence["runtime_directory_is_symlink"] = (root / "run").is_symlink()
+            evidence["runtime_directory_fault_applied"] = (root / "runtime-directory-fault-applied").exists()
+            evidence["runtime_directory_result_receipt_exists"] = (root / "backup/runtime_directory_result.json").exists()
+            if (root / "run").is_dir():
+                restored_run = (root / "run").stat()
+                evidence["runtime_directory_metadata"] = (restored_run.st_uid, restored_run.st_gid, restored_run.st_mode & 0o7777)
+            evidence["original_runtime_directory_metadata"] = (run_info.st_uid, run_info.st_gid, run_info.st_mode & 0o7777)
             evidence["originally_missing_target_exists"] = (root / "target/absent.py").exists()
             evidence["originally_missing_target_is_symlink"] = (root / "target/absent.py").is_symlink()
             missing_target = root / "target/absent.py"
@@ -2004,6 +2080,113 @@ def test_gateway_linked_recovery_paths_and_extended_metadata_cannot_restore() ->
     for kind in ("backup_symlink", "backup_parent_symlink", "manifest_symlink", "backup_xattr"):
         _assert_gateway_recovery_refused(kind)
     _assert_gateway_recovery_refused("custody_parent_symlink", receipt_expected=False)
+
+
+def _assert_runtime_directory_result_failure(fault: str, *, missing: bool = False, receipt_failure: bool = False) -> dict:
+    evidence = {}
+    completed, source, dropin = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure" if receipt_failure else "runtime_directory_result",
+        directory_case="empty_run" if missing else "", runtime_directory_fault=fault, evidence=evidence,
+    )
+    assert completed.returncode == 17 and source == b"previous source\n" and not dropin
+    assert evidence["runtime_directory_fault_applied"] and evidence["backup_exists"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert "restoration operation runtime_directory_result failed" in completed.stderr
+    assert evidence["operation_calls"].splitlines()[-1] == ("rmdir:run_dir" if missing else "chmod:run_dir")
+    assert not evidence["runtime_directory_result_receipt_exists"]
+    if receipt_failure:
+        assert "receipt persistence failed" in completed.stderr and evidence["rollback"] is None
+    else:
+        receipt = evidence["rollback"]
+        assert receipt["status"] == "ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED"
+        assert receipt["failed_restoration_operation"]["operation"] == "runtime_directory_result"
+        assert receipt["failed_restoration_operation"]["target"] == "run_directory"
+        assert receipt["runtime_directory_result_observation"] == "FAILED"
+        assert receipt["source_write_states"][0]["restoration_result_observation"] == "MATCHED_PREPARED_PRESENT"
+        assert receipt["dropin_result_observation"] == "MATCHED_PREPARED_ABSENCE"
+        assert receipt["trigger_exit_code"] == 17 and receipt["partial_state_possible"]
+        assert not receipt["restoration_verified"] and not receipt["service_state_verified"]
+        assert not receipt["service_restart_attempted"]
+    return evidence
+
+
+def test_gateway_runtime_directory_result_requires_actual_removal() -> None:
+    evidence = _assert_runtime_directory_result_failure("remove_noop", missing=True)
+    assert evidence["runtime_directory_is_directory"]
+
+
+def test_gateway_runtime_directory_result_requires_matching_type_and_numeric_metadata() -> None:
+    for fault in ("uid_mismatch", "gid_mismatch", "file", "missing"):
+        evidence = _assert_runtime_directory_result_failure(fault)
+        if fault == "file": assert evidence["run_directory_exists"] and not evidence["runtime_directory_is_directory"]
+        if fault == "missing": assert not evidence["run_directory_exists"]
+
+
+@unittest.skipIf(os.name != "posix", "Real directory permissions and links require Linux CI")
+def test_gateway_runtime_directory_result_rejects_mode_links_and_unsafe_parents() -> None:
+    for fault in ("mode", "symlink", "parent_mode"):
+        _assert_runtime_directory_result_failure(fault)
+    evidence = _assert_runtime_directory_result_failure("dangling_symlink", missing=True)
+    assert evidence["runtime_directory_is_symlink"] and not evidence["run_directory_exists"]
+
+
+def test_gateway_runtime_directory_result_rejects_failed_or_malformed_query() -> None:
+    for case in ("failed", "extra_line", "extra_newline", "carriage_return", "no_newline", "empty",
+                 "contradictory", "invalid", "source_argument", "empty_argument", "extra_arguments"):
+        evidence = {}
+        completed, source, dropin = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_result", runtime_directory_query_case=case, evidence=evidence,
+        )
+        assert completed.returncode == 17 and source == b"previous source\n" and not dropin, case
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"] == dict(
+            operation="runtime_directory_result", target="run_directory", exit_code=29 if case == "failed" else 14)
+        assert receipt["runtime_directory_result_observation"] == "FAILED" and receipt["partial_state_possible"]
+        assert not evidence["runtime_directory_result_receipt_exists"]
+
+
+def test_gateway_runtime_directory_result_accepts_metadata_and_true_absence_preserving_nonempty() -> None:
+    for directory_case in ("", "empty_run", "absent_run", "nonempty_run"):
+        evidence = {}
+        completed, source, dropin = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_result", directory_case=directory_case, evidence=evidence,
+        )
+        assert completed.returncode == 17 and source == b"previous source\n" and not dropin
+        receipt = evidence["rollback"]
+        if directory_case == "nonempty_run":
+            assert receipt["failed_restoration_operation"]["operation"] == "run_directory_remove"
+            assert receipt["runtime_directory_result_observation"] == "NOT_CHECKED"
+            assert evidence["retained_unrelated_files"] == [b"preserve unrelated bytes\n"]
+            assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+            continue
+        expected = "MATCHED_PREPARED_PRESENT" if not directory_case else "MATCHED_PREPARED_ABSENCE"
+        assert receipt["runtime_directory_result_observation"] == expected
+        if not directory_case:
+            assert evidence["runtime_directory_metadata"] == evidence["original_runtime_directory_metadata"]
+        else:
+            assert not evidence["run_directory_exists"] and not evidence["runtime_directory_is_symlink"]
+        assert evidence["service_calls"].endswith("SYSTEMCTL:start\n")
+        assert not receipt["restoration_verified"] and not receipt["service_state_verified"]
+        assert not evidence["runtime_directory_result_receipt_exists"]
+
+
+def test_gateway_runtime_directory_result_retains_custody_and_receipt_failure() -> None:
+    _assert_runtime_directory_result_failure("remove_noop", missing=True, receipt_failure=True)
+    for fault in ("state_changed", "metadata_changed", "manifest_changed"):
+        evidence = {}
+        completed, source, dropin = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="runtime_directory_result", runtime_directory_fault=fault, evidence=evidence,
+        )
+        assert completed.returncode == 17 and source == b"previous source\n" and not dropin
+        assert evidence["runtime_directory_fault_applied"] and evidence["backup_exists"]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert "runtime_directory_result failed" in completed.stderr and "receipt persistence failed" in completed.stderr
+        assert "rollback" not in evidence and not evidence["runtime_directory_result_receipt_exists"]
 
 
 def test_gateway_recovery_directory_requires_root_and_private_permissions() -> None:

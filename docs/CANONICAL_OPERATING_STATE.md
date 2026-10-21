@@ -132,14 +132,35 @@ metadata, effective service configuration and whole restoration remain unverifie
 The motivating disposable fault reports copy success without restoring the drop-in;
 it is not evidence of a native copy-command or production failure.
 
-The preceding source-result revision at `85b71fff` passed all 14 hosted checks:
-102 Linux public-contract checks with no skips and 2,098 full-suite tests with eight
+The next source-only increment adds a separate result check for the fixed runtime
+directory after its existing metadata restoration or empty-directory removal,
+before service reload/reset/start. It repeats pinned recovery-evidence validation
+and parses the exact captured state/metadata bytes that match the prepared
+inventory. A present result must be an actual stable directory with the recorded
+numeric owner, group and mode; a missing result must truly be absent, including
+no dangling link. Safe parent observations are included. Failed or malformed
+queries use the existing fail-stop receipt path, retain the original trigger and
+earlier partial source/drop-in observations, and prevent later service commands.
+Nonempty missing-before directories remain preserved with recovery stopped.
+
+The private receipt records this directory's narrow observation separately;
+restoration and service verification remain false. It does not certify directory
+contents, timestamps, extended attributes, ACLs, exclusive ownership, earlier
+inode identity or later state. The motivating disposable removal stub reported
+success while leaving an empty originally-missing directory, yet the prior helper
+reached restart. That is a controlled fault injection, not a native-command or
+production incident. Initial local failures exposed Windows fixture CRLF bytes
+where production emits LF; fixture preparation now uses explicit LF, without
+relaxing the production parser. The failed run and diagnostic remain preserved.
+
+The preceding drop-in revision at `f615ca00` passed all 14 hosted checks:
+108 Linux public-contract checks with no skips and 2,104 full-suite tests with eight
 unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
-descendant-termination and link/extended-attribute cases. The drop-in result
-increment passed 119 focused local tests with eight platform skips; the
-dependency-free runner passed 100 checks with the same eight skips (108 discovered).
-Independent review and exact-head hosted Linux validation of this new increment
-remain pending. The
+descendant-termination and link/extended-attribute cases. The runtime-directory
+increment passed seven selected local tests with one platform skip, then 124
+focused local tests with nine platform skips. The dependency-free runner passed
+105 checks with the same nine skips (114 discovered). Independent review and
+exact-head hosted Linux validation of this increment remain pending. The
 initial local strict-query failure in the earlier revision exposed platform newline
 translation; exact byte output corrected it without relaxing response parsing.
 Local subprocess cases execute actual rollback operations against disposable files,
