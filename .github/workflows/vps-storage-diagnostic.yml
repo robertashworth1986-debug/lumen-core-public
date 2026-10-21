@@ -6,6 +6,8 @@ on:
       - '.github/workflows/vps-storage-diagnostic.yml'
       - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
       - 'code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py'
+      - 'code/ops/INSPECT_PUBLIC_MIME_MAPPING.py'
+      - 'tests/test_inspect_public_mime_mapping.py'
       - 'tests/test_collect_vps_instability_evidence.py'
       - 'tests/test_assess_vps_runtime_diagnostic.py'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
@@ -15,6 +17,8 @@ on:
       - '.github/workflows/vps-storage-diagnostic.yml'
       - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
       - 'code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py'
+      - 'code/ops/INSPECT_PUBLIC_MIME_MAPPING.py'
+      - 'tests/test_inspect_public_mime_mapping.py'
       - 'tests/test_collect_vps_instability_evidence.py'
       - 'tests/test_assess_vps_runtime_diagnostic.py'
       - 'tests/test_vps_runtime_diagnostic_workflow.py'
@@ -49,6 +53,7 @@ jobs:
           python -m pytest -q
           tests/test_assess_vps_runtime_diagnostic.py
           tests/test_collect_vps_instability_evidence.py
+          tests/test_inspect_public_mime_mapping.py
           tests/test_vps_runtime_diagnostic_workflow.py
 
   diagnose:
@@ -98,6 +103,51 @@ jobs:
         with:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+
+      - name: Inspect active public MIME mapping without changing the server
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          INSPECTOR_SOURCE_COMMIT: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          # Execute reviewed source on stdin; retain only allowlisted evidence.
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes \
+            "opc@$VPS_HOST" 'sudo -n python3 -' \
+            < code/ops/INSPECT_PUBLIC_MIME_MAPPING.py \
+            > /tmp/lumencore-public-mime-inspection.json
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          path = Path('/tmp/lumencore-public-mime-inspection.json')
+          evidence = json.loads(path.read_text())
+          assert evidence['schema'] == 'lumencore.public_mime_inspection.v1'
+          assert evidence['status'] == 'INSPECTED_REVIEW_REQUIRED'
+          assert evidence['configuration_modified'] is False
+          assert evidence['service_reloaded'] is False
+          receipt = {
+              'schema': 'lumencore.public_mime_inspection_receipt.v1',
+              'source_commit': os.environ['INSPECTOR_SOURCE_COMMIT'],
+              'run_id': os.environ['RUN_ID'],
+              'run_attempt': os.environ['RUN_ATTEMPT'],
+              'inspection_sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+              'inspector_sha256': hashlib.sha256(Path('code/ops/INSPECT_PUBLIC_MIME_MAPPING.py').read_bytes()).hexdigest(),
+          }
+          Path('/tmp/lumencore-public-mime-inspection-receipt.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+          PY
+
+      - name: Retain bounded MIME inspection evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lumencore-public-mime-inspection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            /tmp/lumencore-public-mime-inspection.json
+            /tmp/lumencore-public-mime-inspection-receipt.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Capture runtime, gateway, and capacity evidence
         shell: bash

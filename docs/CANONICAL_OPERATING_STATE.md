@@ -7,6 +7,24 @@
 
 ## One commercial sentence
 
+### October 21 approved public module-type correction
+
+Founder-approved reviewer-surface repair advances outcome 2. The exact public
+release at `975dc8968b7dbc1c3a410e20a6a50584a3a9d05f` was installed by
+[run 39524266446](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39524266446).
+All 246 served bodies matched their release hashes. The final gate retained a
+failure at 243/246 because the three `.mjs` modules were returned as
+`application/octet-stream`; seven separate service contracts passed.
+
+The founder approved a separate correction limited to the active JavaScript MIME
+mapping, a configuration test and graceful reload, full verification and a scoped
+rollback. The existing read-only diagnostic now captures the active allowlisted
+MIME declarations and installed module hashes, without dumping the server config.
+Inspection is a prerequisite: the effective table and inheritance must be verified
+before applying the four-byte extension. No DNS, credential, route, trading or
+business authority is changed. Until successful repair receipts are appended,
+full release verification remains open. The earlier failed gate remains evidence.
+
 ### October 17 draft integration review
 
 The founder requested inspection, safe merge and publication of outstanding
