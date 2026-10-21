@@ -79,6 +79,28 @@ Every demo should have a fallback path that works without live paid APIs:
 
 The fallback should show the proof workflow even if live services are temporarily unavailable.
 
+### Cloudflare Pages continuity package
+
+The bounded 43-file public-site snapshot can be materialized as a Pages-compatible
+directory without reading uncommitted worktree bytes:
+
+```bash
+python code/deploy/build_cloudflare_pages_preview.py \
+  --source-commit "$(git rev-parse HEAD)" \
+  --output-dir /tmp/lumencore-cloudflare-pages \
+  --manifest /tmp/lumencore-cloudflare-pages-manifest.json
+```
+
+The builder adds byte-identical `index.html` and `evidence/index.html` routing
+aliases and records `deployment_state: NOT_DEPLOYED`. The corresponding GitHub
+workflow packages and smoke-tests a downloadable artifact only; it does not deploy,
+connect a Cloudflare account, change nameservers, or mutate DNS.
+
+Before any later production cutover, separately verify the intended Cloudflare
+account, inspect the current DNS zone, preserve the existing Zoho mail records
+(MX, SPF, DKIM, and DMARC), obtain exact approval for deployment and DNS changes,
+and verify the live domain after propagation.
+
 ---
 
 ## 5. API continuity report format
