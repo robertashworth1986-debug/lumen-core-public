@@ -186,7 +186,7 @@ def backend(tmp_path, monkeypatch):
             flags["fail_reload"] = False
             raise repair.RepairError("synthetic_reload_failure")
         return {"passed": True}
-    def probe(relative, expected, local, token):
+    def probe(relative, expected, local, token, **kwargs):
         calls.append(("probe", relative, local))
         if flags["probe_timeout"]:
             raise repair.RepairError("https_probe_total_deadline")
@@ -380,7 +380,7 @@ def test_internal_rollback_refuses_prior_metadata_only_edit(backend, monkeypatch
     def drifted(path, info):
         value = real_metadata(path, info)
         return {**value, "mode": 0o600} if path == target and drift else value
-    def failed_probe(*args):
+    def failed_probe(*args, **kwargs):
         drift.append(True)
         raise repair.RepairError("synthetic_probe_failure")
     monkeypatch.setattr(repair, "metadata", drifted)
@@ -448,3 +448,142 @@ def test_total_deadline_bounds_slow_trickle_equivalent_wait():
         with repair.total_deadline(0.03):
             time.sleep(1)
     assert time.monotonic() - start < 0.5
+
+
+def observation(relative, expected, local, *, mime="application/javascript", status=200, sha=None):
+    actual = expected if sha is None else sha
+    return {"path": relative, "route": "local_tls" if local else "public_https", "http_status": status,
+            "mime": mime, "sha256": actual, "expected_sha256": expected,
+            "passed": status == 200 and actual == expected and mime in repair.JS_TYPES}
+
+
+@pytest.fixture
+def settle_clock(monkeypatch):
+    state = {"now": 0.0, "sleeps": []}
+    monkeypatch.setattr(repair.time, "monotonic", lambda: state["now"])
+    def sleep(seconds):
+        state["sleeps"].append(seconds)
+        state["now"] += seconds
+    monkeypatch.setattr(repair.time, "sleep", sleep)
+    return state
+
+
+def test_old_mime_can_converge_without_losing_observations_or_six_final_checks(backend, settle_clock, monkeypatch):
+    target, directory, calls, flags = backend
+    seen, budgets, tokens = {}, [], []
+    def delayed(relative, expected, local, token, *, timeout_seconds):
+        key = (relative, local)
+        seen[key] = seen.get(key, 0) + 1
+        budgets.append(timeout_seconds)
+        tokens.append(token)
+        settle_clock["now"] += 0.1
+        return observation(relative, expected, local,
+                           mime="application/octet-stream" if seen[key] == 1 else "application/javascript")
+    monkeypatch.setattr(repair, "probe", delayed)
+    result = repair.execute("apply", repair.digest(RAW))
+    assert result["status"] == "REPAIRED_THREE_FILES_VERIFIED"
+    assert result["rollback"] == "NOT_NEEDED"
+    assert len(result["http_checks"]) == 6 and all(row["passed"] for row in result["http_checks"])
+    assert len(result["http_probe_attempts"]) == 12
+    assert sum(not row["passed"] for row in result["http_probe_attempts"]) == 6
+    assert budgets[:2] == pytest.approx([5.0, 4.65])
+    assert tokens[0] != tokens[1]
+    assert len(settle_clock["sleeps"]) == 6
+    assert json.loads((directory / "execution.json").read_text())["http_probe_attempts"] == result["http_probe_attempts"]
+
+
+def test_persistent_old_mime_stops_after_five_and_rolls_back_with_all_evidence(backend, settle_clock, monkeypatch):
+    target, directory, calls, flags = backend
+    monkeypatch.setattr(repair, "probe", lambda rel, sha, local, token, **kwargs:
+                        observation(rel, sha, local, mime="application/octet-stream"))
+    result = repair.execute("apply", repair.digest(RAW))
+    assert result["status"] == "FAILED"
+    assert result["rollback"] == "RESTORED_VALIDATED_RELOADED" and target.read_bytes() == RAW
+    assert len(result["http_probe_attempts"]) == 5
+    assert [row["attempt"] for row in result["http_probe_attempts"]] == [1, 2, 3, 4, 5]
+    assert all(not row["passed"] for row in result["http_probe_attempts"])
+    assert len(settle_clock["sleeps"]) == 4
+    assert json.loads((directory / "execution.json").read_text())["http_probe_attempts"] == result["http_probe_attempts"]
+
+
+@pytest.mark.parametrize("change", [{"status": 503}, {"sha": "0" * 64}, {"mime": "text/plain"}, {"mime": "unsupported"}])
+def test_other_http_failures_never_retry(backend, settle_clock, monkeypatch, change):
+    target, directory, calls, flags = backend
+    monkeypatch.setattr(repair, "probe", lambda rel, sha, local, token, **kwargs:
+                        observation(rel, sha, local, **{"mime": "application/octet-stream", **change}))
+    result = repair.execute("apply", repair.digest(RAW))
+    assert result["status"] == "FAILED" and result["rollback"] == "RESTORED_VALIDATED_RELOADED"
+    assert len(result["http_probe_attempts"]) == 1 and settle_clock["sleeps"] == []
+
+
+def test_transport_failure_is_not_retried_and_error_observation_is_retained(backend, settle_clock, monkeypatch):
+    target, directory, calls, flags = backend
+    def failed(*args, **kwargs):
+        raise repair.RepairError("https_probe_total_deadline")
+    monkeypatch.setattr(repair, "probe", failed)
+    result = repair.execute("apply", repair.digest(RAW))
+    assert result["error_code"] == "https_probe_total_deadline"
+    assert result["rollback"] == "RESTORED_VALIDATED_RELOADED"
+    assert len(result["http_probe_attempts"]) == 1 and settle_clock["sleeps"] == []
+    assert result["http_probe_attempts"][0]["error_code"] == "https_probe_total_deadline"
+    assert json.loads((directory / "execution.json").read_text())["http_probe_attempts"] == result["http_probe_attempts"]
+
+
+def test_near_elapsed_budget_does_not_sleep_or_start_another_probe(backend, settle_clock, monkeypatch):
+    def slow(rel, sha, local, token, *, timeout_seconds):
+        assert timeout_seconds == 5.0
+        settle_clock["now"] += 4.9
+        return observation(rel, sha, local, mime="application/octet-stream")
+    monkeypatch.setattr(repair, "probe", slow)
+    result = repair.execute("apply", repair.digest(RAW))
+    assert result["status"] == "FAILED" and result["rollback"] == "RESTORED_VALIDATED_RELOADED"
+    assert len(result["http_probe_attempts"]) == 1 and settle_clock["sleeps"] == []
+
+
+def test_success_returned_after_elapsed_deadline_is_not_accepted(backend, settle_clock, monkeypatch):
+    def late(rel, sha, local, token, **kwargs):
+        settle_clock["now"] += 5.1
+        return observation(rel, sha, local)
+    monkeypatch.setattr(repair, "probe", late)
+    result = repair.execute("apply", repair.digest(RAW))
+    assert result["error_code"] == "post_reload_settle_deadline"
+    assert result["rollback"] == "RESTORED_VALIDATED_RELOADED"
+    assert result["http_checks"] == [] and len(result["http_probe_attempts"]) == 1
+
+
+def test_probe_uses_fresh_closed_connections_and_bounds_setup(monkeypatch):
+    active, constructed, deadlines = [], [], []
+    body = b"synthetic immutable module"
+    from contextlib import contextmanager
+    @contextmanager
+    def deadline(seconds):
+        deadlines.append(seconds)
+        active.append(True)
+        try:
+            yield
+        finally:
+            active.pop()
+    def context():
+        assert active
+        return object()
+    class Connection:
+        def __init__(self, *args, **kwargs):
+            assert active
+            self.closed = False
+            constructed.append(self)
+        def request(self, method, path, **kwargs):
+            assert active
+            self.path = path
+        def getresponse(self):
+            assert active
+            return SimpleNamespace(status=200, read=lambda _limit: body, getheader=lambda *args: "application/javascript")
+        def close(self):
+            self.closed = True
+    monkeypatch.setattr(repair, "total_deadline", deadline)
+    monkeypatch.setattr(repair.ssl, "create_default_context", context)
+    monkeypatch.setattr(repair, "LocalTLS", Connection)
+    assert repair.probe("module.mjs", repair.digest(body), True, "first", timeout_seconds=5)["passed"]
+    assert repair.probe("module.mjs", repair.digest(body), True, "second", timeout_seconds=4.5)["passed"]
+    assert len(constructed) == 2 and all(item.closed for item in constructed)
+    assert constructed[0].path != constructed[1].path
+    assert deadlines == [5, 4.5]

@@ -28,6 +28,7 @@ import ssl
 import stat
 import subprocess
 import tempfile
+import time
 import uuid
 
 DOMAIN = "lumen-core.ai"
@@ -41,6 +42,9 @@ EXPECTED = {
     "portfolio/portfolio-model.mjs": "1952beb45c5526fe56a226ae256baccbaadf7f7781b864e7e73fec2396db11c8",
 }
 JS_TYPES = {"application/javascript", "text/javascript"}
+RELOAD_PROBE_MAX_ATTEMPTS = 5
+RELOAD_PROBE_MAX_SECONDS = 5.0
+RELOAD_PROBE_INTERVAL_SECONDS = 0.25
 
 
 class RepairError(ValueError):
@@ -458,10 +462,11 @@ def total_deadline(seconds):
         signal.signal(signal.SIGALRM, previous)
 
 
-def probe(relative, expected, local, token):
-    connection = (LocalTLS if local else http.client.HTTPSConnection)(DOMAIN, timeout=15, context=ssl.create_default_context())
+def probe(relative, expected, local, token, *, timeout_seconds=20):
+    connection = None
     try:
-        with total_deadline(20):
+        with total_deadline(timeout_seconds):
+            connection = (LocalTLS if local else http.client.HTTPSConnection)(DOMAIN, timeout=min(15, timeout_seconds), context=ssl.create_default_context())
             connection.request("GET", "/" + relative + "?mime_repair=" + token,
                                headers={"Accept-Encoding": "identity", "Cache-Control": "no-cache", "User-Agent": "LumenCore-Approved-MIME-Verification/1"})
             response = connection.getresponse()
@@ -473,7 +478,49 @@ def probe(relative, expected, local, token):
                     "sha256": actual, "expected_sha256": expected,
                     "passed": len(body) <= 4_000_000 and response.status == 200 and actual == expected and mime in JS_TYPES}
     finally:
-        connection.close()
+        if connection is not None:
+            connection.close()
+
+
+def probe_after_reload(relative, expected, local, token, attempts):
+    """Allow only the prior MIME value to settle; every call opens new TLS.
+
+    Each route has one five-second elapsed budget including probes and sleeps.
+    Passing the remaining budget into probe avoids nested SIGALRM timers.
+    Nginx reload starts new workers asynchronously; this does not establish that
+    any particular old-MIME observation was caused by a reload race.
+    """
+    started = time.monotonic()
+    last = None
+    for number in range(1, RELOAD_PROBE_MAX_ATTEMPTS + 1):
+        remaining = RELOAD_PROBE_MAX_SECONDS - (time.monotonic() - started)
+        if remaining <= 0:
+            raise RepairError("post_reload_settle_deadline")
+        try:
+            row = probe(relative, expected, local, token + "-" + str(number), timeout_seconds=remaining)
+        except BaseException as error:
+            attempts.append({"path": relative, "route": "local_tls" if local else "public_https",
+                             "attempt": number, "passed": False,
+                             "elapsed_seconds": round(time.monotonic() - started, 6),
+                             "error_code": str(error) if isinstance(error, RepairError) else type(error).__name__})
+            raise
+        elapsed = time.monotonic() - started
+        attempts.append({**row, "attempt": number, "elapsed_seconds": round(elapsed, 6)})
+        if elapsed >= RELOAD_PROBE_MAX_SECONDS:
+            raise RepairError("post_reload_settle_deadline")
+        if row["passed"]:
+            return row
+        last = row
+        retryable = (row.get("http_status") == 200 and row.get("sha256") == expected
+                     and row.get("expected_sha256") == expected
+                     and row.get("mime") == "application/octet-stream")
+        if not retryable or number == RELOAD_PROBE_MAX_ATTEMPTS:
+            return row
+        remaining = RELOAD_PROBE_MAX_SECONDS - (time.monotonic() - started)
+        if remaining <= RELOAD_PROBE_INTERVAL_SECONDS:
+            return row
+        time.sleep(RELOAD_PROBE_INTERVAL_SECONDS)
+    return last
 
 
 def verify_static():
@@ -580,10 +627,15 @@ def execute(mode, expected_sha256=None):
             command(["/usr/bin/systemctl", "is-active", "--quiet", "nginx"])
             result["static_files"] = verify_static()
             result["http_checks"] = []
+            result["http_probe_attempts"] = []
+            result["reload_probe_policy"] = {"max_attempts_per_route": RELOAD_PROBE_MAX_ATTEMPTS,
+                                           "max_seconds_per_route": RELOAD_PROBE_MAX_SECONDS,
+                                           "interval_seconds": RELOAD_PROBE_INTERVAL_SECONDS,
+                                           "retryable_mime": "application/octet-stream"}
             token = uuid.uuid4().hex
             for local in (True, False):
                 for relative, expected in EXPECTED.items():
-                    row = probe(relative, expected, local, token)
+                    row = probe_after_reload(relative, expected, local, token, result["http_probe_attempts"])
                     result["http_checks"].append(row)
                     if not row["passed"]:
                         raise RepairError("post_reload_http_verification_failed")
