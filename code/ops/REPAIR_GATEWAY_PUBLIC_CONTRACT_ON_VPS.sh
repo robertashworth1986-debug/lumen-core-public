@@ -36,6 +36,8 @@ REPAIR_COMPLETE=false
 STAGE_DIR=""
 BACKUP_DIR=""
 HARDENING_FILE=""
+RECOVERY_ROOT="/var/backups/lumencore-gateway-repair"
+RECOVERY_MANIFEST_SHA=""
 
 # This list is the recursively resolved local-Python import closure of the
 # reviewed gateway entrypoint. Keep it explicit so a partial copy cannot be
@@ -96,6 +98,9 @@ service configuration, runtime-directory metadata, and prior service state on
 failure unless identity, lock, source parity, all four public/local JSON
 contracts, every anonymous HTTP introspection boundary, and the anonymous
 WebSocket upgrade boundary pass.
+Private recovery files and hash-bound receipts remain under
+/var/backups/lumencore-gateway-repair after every exit, including helper success.
+Their presence does not establish verified restoration or external verification.
 EOF
 }
 
@@ -387,9 +392,154 @@ else
   }
 fi
 
+require_safe_recovery_directory() {
+  local directory="$1" private="${2:-false}" owner mode
+  [[ -d "$directory" && ! -L "$directory" ]] || return 13
+  owner="$(stat -c '%u' "$directory")"
+  mode="$(stat -c '%a' "$directory")"
+  [[ "$owner" == 0 && "$mode" =~ ^[0-7]{3,4}$ ]] || return 13
+  (( (8#$mode & 0022) == 0 )) || return 13
+  if [[ "$private" == true ]]; then
+    [[ "$(stat -c '%u:%g:%a' "$directory")" == "0:0:700" ]] || return 13
+  fi
+}
+
+prepare_recovery_directory() {
+  local directory
+  for directory in / /var /var/backups; do
+    require_safe_recovery_directory "$directory" || return 13
+  done
+  if [[ -e "$RECOVERY_ROOT" || -L "$RECOVERY_ROOT" ]]; then
+    require_safe_recovery_directory "$RECOVERY_ROOT" true || return 13
+  else
+    install -d -o root -g root -m 0700 -- "$RECOVERY_ROOT"
+  fi
+  [[ "$(realpath -e -- "$RECOVERY_ROOT")" == "$RECOVERY_ROOT" ]] || return 13
+  require_safe_recovery_directory "$RECOVERY_ROOT" true || return 13
+  BACKUP_DIR="$(mktemp -d "$RECOVERY_ROOT/recovery.XXXXXXXXXX")"
+  require_safe_recovery_directory "$BACKUP_DIR" true || return 13
+  printf 'Private gateway recovery directory: %s\n' "$BACKUP_DIR"
+}
+
+record_recovery_evidence() {
+  local kind="$1" trigger_code="${2:-0}"
+  python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
+    "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" "${BUNDLE_FILES[@]}" <<'PY'
+import hashlib
+import json
+import os
+import re
+import stat
+import sys
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+directory = Path(sys.argv[1])
+kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
+relatives = sys.argv[8:]
+if kind not in {"prepared", "helper", "rollback"}:
+    raise SystemExit("invalid_recovery_receipt_kind")
+if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
+    not re.fullmatch(r"[0-9a-f]{64}", value) for value in (bundle, hardening)
+):
+    raise SystemExit("invalid_recovery_source_binding")
+if not directory.is_dir() or directory.is_symlink():
+    raise SystemExit("unsafe_recovery_directory")
+
+def inventory(relative):
+    path = directory / relative
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+        raise SystemExit("unsafe_recovery_file")
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+        if os.name == "posix":
+            os.fsync(stream.fileno())
+    return dict(path=relative, sha256=digest.hexdigest(), bytes=info.st_size,
+                uid=info.st_uid, gid=info.st_gid, mode=format(stat.S_IMODE(info.st_mode), "04o"),
+                mtime_ns=info.st_mtime_ns)
+
+payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,
+               generated_utc=datetime.now(timezone.utc).isoformat(), source_commit=source,
+               bundle_sha256=bundle, hardening_sha256=hardening,
+               trigger_exit_code=int(trigger_code), restoration_verified=False,
+               external_verification="NOT_RECORDED_BY_HELPER")
+if kind == "prepared":
+    if len(set(relatives)) != len(relatives) or any(
+        not re.fullmatch(r"[A-Za-z0-9_/.-]+", item) or
+        any(part in {"", ".", ".."} for part in item.split("/")) for item in relatives
+    ):
+        raise SystemExit("invalid_recovery_file_allowlist")
+    missing_file = directory / "missing-before.txt"
+    missing = set(missing_file.read_text().splitlines()) if missing_file.exists() else set()
+    if not missing.issubset(relatives):
+        raise SystemExit("invalid_missing_file_inventory")
+    names = ["service-drop-in.state", "service-drop-in-dir.state", "run-dir.state", "service.state"]
+    for relative in relatives:
+        backup = directory / "existing" / relative
+        if relative in missing:
+            if backup.exists() or backup.is_symlink():
+                raise SystemExit("contradictory_missing_file_inventory")
+        else:
+            names.append("existing/" + relative)
+    if missing_file.exists():
+        names.append("missing-before.txt")
+    for state_name, snapshot in (
+        ("service-drop-in", "service-drop-in.before"),
+        ("service-drop-in-dir", "service-drop-in-dir.metadata"),
+        ("run-dir", "run-dir.metadata"),
+    ):
+        state = (directory / (state_name + ".state")).read_text().strip()
+        if state not in {"present", "missing"}:
+            raise SystemExit("invalid_recovery_state")
+        if state == "present":
+            names.append(snapshot)
+    payload.update(status="PREPARED_BEFORE_MUTATION", files=[inventory(name) for name in names],
+                   missing_source_files=sorted(missing))
+else:
+    manifest = directory / "prepared.json"
+    entry = inventory("prepared.json")
+    if entry["sha256"] != expected_manifest:
+        raise SystemExit("recovery_manifest_hash_mismatch")
+    prepared = json.loads(manifest.read_text())
+    if any(prepared.get(key) != payload[key] for key in
+           ("source_commit", "bundle_sha256", "hardening_sha256")):
+        raise SystemExit("recovery_manifest_binding_mismatch")
+    if any(inventory(item["path"]) != item for item in prepared["files"]):
+        raise SystemExit("recovery_backup_changed")
+    payload.update(manifest_sha256=expected_manifest,
+                   status="HELPER_CHECKS_PASSED_EXTERNAL_VERIFICATION_PENDING" if kind == "helper"
+                   else "ROLLBACK_ATTEMPTED_UNVERIFIED")
+raw = (json.dumps(payload, sort_keys=True, indent=2) + "\n").encode()
+destination = directory / (kind + ".json")
+fd, temporary = tempfile.mkstemp(prefix=".receipt-", dir=directory)
+try:
+    with os.fdopen(fd, "wb") as stream:
+        os.chmod(temporary, 0o600)
+        stream.write(raw)
+        stream.flush()
+        os.fsync(stream.fileno())
+    # Publish without replacing an earlier receipt or following an existing link.
+    os.link(temporary, destination)
+finally:
+    os.unlink(temporary)
+if destination.read_bytes() != raw:
+    raise SystemExit("recovery_receipt_readback_failed")
+if os.name == "posix":
+    directory_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
+print(hashlib.sha256(raw).hexdigest())
+PY
+}
+
 STAGE_DIR="$(mktemp -d /tmp/lumencore-gateway-stage.XXXXXX)"
-BACKUP_DIR="$(mktemp -d /tmp/lumencore-gateway-rollback.XXXXXX)"
-chmod 0700 "$STAGE_DIR" "$BACKUP_DIR"
+chmod 0700 "$STAGE_DIR"
 
 cleanup() {
   if [[ -n "$STAGE_DIR" ]]; then
@@ -401,16 +551,14 @@ cleanup() {
     STAGE_DIR=""
   fi
   if [[ -n "$BACKUP_DIR" ]]; then
-    [[ "$BACKUP_DIR" =~ ^/tmp/lumencore-gateway-rollback\.[A-Za-z0-9]+$ ]] || {
-      echo "ERROR: refusing unexpected gateway-rollback cleanup target" >&2
-      return 1
-    }
-    rm -rf -- "$BACKUP_DIR"
-    BACKUP_DIR=""
+    printf 'Private gateway recovery evidence retained: %s\n' "$BACKUP_DIR"
+    printf 'Prepared recovery manifest SHA-256: %s\n' "${RECOVERY_MANIFEST_SHA:-PREPARATION_INCOMPLETE}"
   fi
   cleanup_manifest
 }
 trap cleanup EXIT
+prepare_recovery_directory
+install -d -m 0700 -- "$BACKUP_DIR/existing"
 
 for rel in "${BUNDLE_FILES[@]}"; do
   source="$SOURCE_ROOT/$rel"
@@ -463,6 +611,10 @@ if systemctl is-active --quiet "$SERVICE"; then
   SERVICE_WAS_ACTIVE=true
 fi
 printf 'service_was_active=%s\n' "$SERVICE_WAS_ACTIVE" > "$BACKUP_DIR/service.state"
+
+# This private manifest and its readback must complete before service mutation.
+RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"
+[[ "$RECOVERY_MANIFEST_SHA" =~ ^[0-9a-f]{64}$ ]]
 
 # Import the staged entrypoint against an isolated writable stack root before
 # touching the running service. Target-root fallback supplies non-local assets,
@@ -558,6 +710,9 @@ rollback() {
       systemctl start "$SERVICE" >/dev/null 2>&1 || true
     fi
     SERVICE_STOPPED=false
+  fi
+  if ! record_recovery_evidence rollback "$rc"; then
+    echo "ERROR: private rollback receipt persistence failed; retained backups require manual review" >&2
   fi
   exit "$rc"
 }
@@ -868,6 +1023,10 @@ PUBLIC_OPERATOR_WEBSOCKET_STATUS="$(
   rollback 22
 }
 
+if ! helper_receipt_sha="$(record_recovery_evidence helper 0)"; then
+  echo "ERROR: private helper receipt persistence failed after mutation" >&2
+  rollback 23
+fi
 REPAIR_COMPLETE=true
 trap - ERR INT TERM
 echo "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK"
@@ -875,6 +1034,7 @@ echo "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK"
 echo "Source commit: $SOURCE_COMMIT"
 echo "Bundle SHA-256: $BUNDLE_SHA"
 echo "Service hardening SHA-256: $HARDENING_SHA"
+echo "Private helper outcome receipt SHA-256: $helper_receipt_sha"
 echo "Effective service identity: ${effective_user}:${effective_group}"
 echo "Effective restart/umask/no-new-privileges/private-tmp: ${effective_restart}/${effective_umask}/${effective_no_new_privileges}/${effective_private_tmp}"
 echo "Run directory identity: $(stat -c '%U:%G:%a' "$RUN_DIR")"

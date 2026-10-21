@@ -22,8 +22,11 @@ rollback. The existing read-only diagnostic now captures the active allowlisted
 MIME declarations and installed module hashes, without dumping the server config.
 Inspection is a prerequisite: the effective table and inheritance must be verified
 before applying the four-byte extension. No DNS, credential, route, trading or
-business authority is changed. Until successful repair receipts are appended,
-full release verification remains open. The earlier failed gate remains evidence.
+business authority is changed. The subsequent scoped repair completed in
+[run 39531993525](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39531993525):
+all 246 file checks, six module checks and seven service checks before and after
+the change passed. This closes the module-type release gate; the earlier failed
+gate remains historical evidence. It does not resolve the separate backend holds.
 
 ### October 21 local gateway recovery correction
 
@@ -35,12 +38,25 @@ termination signal cannot re-enter recovery or replace the original failure code
 Subprocess regression cases execute the actual guards and rollback function
 against disposable files, including failed restoration and TERM during recovery.
 
-The focused local suite passed 68 tests, including 26 new Bash subprocess cases.
-No backend repair was dispatched or installed. This does not establish deployment
-readiness: rollback backups are still temporary, restoration remains best effort,
-and the workflow's separate public postcheck runs after helper completion. The
-existing six runtime holds require fresh evidence and separate backend action
-approval. Paper-only controls and all ledger/history bytes remain unchanged.
+The same source-only correction now retains recovery files in a unique private
+directory under `/var/backups/lumencore-gateway-repair` after every exit. Existing
+unsafe directories are refused without repairing their permissions. A private,
+hash-bound manifest and its readback must finish before runtime mutation; immutable
+outcome receipts distinguish helper checks passed with external verification
+pending from rollback attempted without verified restoration. Receipt persistence
+failure remains a non-success outcome. A later workflow postcheck cannot remove
+these retained files through the helper's cleanup path.
+
+The focused local suite passed 75 tests; one real POSIX symlink case awaits Linux
+CI. Subprocess cases exercise the actual rollback, directory guards and evidence
+writer against disposable files. No backend repair was dispatched or installed.
+This does not establish deployment readiness: restoration remains best effort,
+there is no verified restore API for a later public postcheck failure, and rollback
+still lacks bounded command timeouts, backup verification before restoration and
+concurrent-state protection. File and top-directory synchronization does not prove
+power-loss persistence of every nested backup entry. The existing six runtime holds
+require fresh evidence and separate backend action approval. Paper-only controls
+and all ledger/history bytes remain unchanged.
 
 ### October 17 draft integration review
 

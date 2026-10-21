@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import copy
+import hashlib
 import json
 import os
 import re
@@ -9,6 +10,8 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -289,7 +292,8 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert "x-luma-operator-token" not in script.lower()
     assert "rm -rf -- \"$TARGET_ROOT\"" not in script
     assert '[[ "$STAGE_DIR" =~ ^/tmp/lumencore-gateway-stage\\.' in script
-    assert '[[ "$BACKUP_DIR" =~ ^/tmp/lumencore-gateway-rollback\\.' in script
+    assert 'RECOVERY_ROOT="/var/backups/lumencore-gateway-repair"' in script
+    assert 'rm -rf -- "$BACKUP_DIR"' not in script
     assert "systemctl restart" not in script
 
 
@@ -318,6 +322,7 @@ def _gateway_post_mutation_guards(script: str) -> list[str]:
 def _run_gateway_rollback_guard(
     guard: str, *, predicate_passes: bool, copy_fails: bool = False,
     signal_during_copy: bool = False,
+    recovery_case: str | None = None, evidence: dict | None = None,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -340,6 +345,7 @@ def _run_gateway_rollback_guard(
             "service-drop-in-dir.metadata": "1000 1000 755\n",
             "run-dir.state": "present\n",
             "run-dir.metadata": "1000 1000 750\n",
+            "service.state": "service_was_active=true\n",
         }.items():
             (root / "backup" / name).write_text(value, encoding="utf-8")
         harness = r'''
@@ -356,7 +362,11 @@ SERVICE_USER=lumencore
 SERVICE_GROUP=lumencore
 BUNDLE_FILES=(entry.py)
 rel=entry.py
-HARDENING_SHA=good
+HARDENING_SHA=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+SOURCE_COMMIT=0123456789abcdef0123456789abcdef01234567
+BUNDLE_SHA=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+RECOVERY_MANIFEST_SHA=""
+STAGE_DIR=""
 post_apply_source_sha=good
 post_apply_target_sha=wrong
 REPAIR_COMPLETE=false
@@ -388,7 +398,7 @@ systemctl() {
 }
 sha256sum() {
   if [[ "$PREDICATE_PASSES" == true || "$1" == "$SOURCE_ROOT/"* ]]; then
-    printf 'good  fixture\n'
+    printf '%s  fixture\n' "$HARDENING_SHA"
   else
     printf 'wrong  fixture\n'
   fi
@@ -405,6 +415,7 @@ stat() {
   fi
 }
 remove_verified_dead_lock() { :; }
+record_recovery_evidence() { :; }
 chown() { :; }
 chmod() { :; }
 cp() {
@@ -424,20 +435,61 @@ cleanup() {
 }
 trap cleanup EXIT
 '''
-        harness += rollback_source + "\n" + error_trap + "\n" + guard
-        harness += "\nprintf 'GUARD_PASSED\\n'\n"
+        harness += rollback_source + "\n"
+        if recovery_case:
+            harness += _bash_function(script, "record_recovery_evidence") + "\n"
+            harness += _bash_function(script, "cleanup") + "\n"
+            harness += 'cleanup_manifest() { :; }\npython3() { "$TEST_PYTHON" "$@"; }\n'
+            if recovery_case == "prepared_write_failure":
+                harness += 'printf collision > "$BACKUP_DIR/prepared.json"\n'
+            # This exact production sequence precedes service mutation and ERR
+            # rollback registration; preparation failure must leave runtime alone.
+            harness += 'RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"\n'
+            harness += '[[ "$RECOVERY_MANIFEST_SHA" =~ ^[0-9a-f]{64}$ ]]\n'
+            if recovery_case == "rollback_write_failure":
+                harness += 'printf collision > "$BACKUP_DIR/rollback.json"\n'
+            if recovery_case == "helper_write_failure":
+                harness += 'printf collision > "$BACKUP_DIR/helper.json"\n'
+            if recovery_case == "manifest_changed":
+                harness += 'printf changed >> "$BACKUP_DIR/prepared.json"\n'
+            if recovery_case == "backup_changed":
+                harness += 'printf changed >> "$BACKUP_DIR/existing/entry.py"\n'
+        harness += error_trap + "\n" + guard
+        if recovery_case in {"later_gate_failure", "helper_write_failure", "manifest_changed", "backup_changed"}:
+            outcome = script.split('if ! helper_receipt_sha="$(record_recovery_evidence helper 0)";', 1)[1]
+            outcome = 'if ! helper_receipt_sha="$(record_recovery_evidence helper 0)";' + outcome
+            outcome = outcome.split('\necho "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK"', 1)[0]
+            harness += "\n" + outcome + "\nexit 41\n"
+        else:
+            harness += "\nprintf 'GUARD_PASSED\\n'\n"
         env = dict(os.environ)
         env.update(
             PREDICATE_PASSES=str(predicate_passes).lower(),
             COPY_FAILS=str(copy_fails).lower(),
             SIGNAL_DURING_COPY=str(signal_during_copy).lower(),
+            TEST_PYTHON=Path(sys.executable).as_posix(),
         )
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
         completed = subprocess.run(
-            [_gateway_rollback_test_bash(), "-c", harness],
-            cwd=root, env=env, capture_output=True, text=True, timeout=10,
+            [_gateway_rollback_test_bash(), "fixture.sh"],
+            cwd=root, env=env, capture_output=True, text=True, timeout=20,
             check=False,
         )
         target = root / "target/entry.py"
+        if evidence is not None:
+            evidence["backup"] = (root / "backup/existing/entry.py").read_bytes()
+            evidence["backup_exists"] = (root / "backup").is_dir()
+            calls = root / "systemctl.calls"
+            evidence["service_calls"] = calls.read_text() if calls.exists() else ""
+            for kind in ("prepared", "helper", "rollback"):
+                path = root / "backup" / (kind + ".json")
+                if path.exists():
+                    evidence[kind + "_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+                    evidence[kind + "_mode"] = path.stat().st_mode & 0o777
+                    try:
+                        evidence[kind] = json.loads(path.read_text())
+                    except json.JSONDecodeError:
+                        evidence[kind] = None
         return (
             completed,
             target.read_bytes() if target.exists() else None,
@@ -500,6 +552,202 @@ def test_gateway_term_during_rollback_preserves_recovery_and_original_code() -> 
     assert completed.stdout.endswith("CLEANUP\n")
     assert restored == b"previous source\n"
     assert not dropin_exists
+
+
+def test_gateway_failed_restore_retains_private_backup_and_unverified_receipt() -> None:
+    evidence: dict = {}
+    completed, restored, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        copy_fails=True, recovery_case="failed_restore", evidence=evidence,
+    )
+    assert completed.returncode == 17, completed.stderr
+    assert restored is None and evidence["backup_exists"]
+    assert evidence["backup"] == b"previous source\n"
+    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert evidence["rollback"]["trigger_exit_code"] == 17
+    assert evidence["rollback"]["restoration_verified"] is False
+    assert evidence["rollback"]["manifest_sha256"] == evidence["prepared_sha256"]
+    stored = next(item for item in evidence["prepared"]["files"] if item["path"] == "existing/entry.py")
+    assert stored["sha256"] == hashlib.sha256(evidence["backup"]).hexdigest()
+    assert "previous source" not in json.dumps(evidence["prepared"])
+    assert "evidence retained" in completed.stdout
+    if os.name == "posix":
+        assert evidence["prepared_mode"] == evidence["rollback_mode"] == 0o600
+
+
+def test_gateway_later_gate_failure_cannot_remove_recovery_evidence() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=True,
+        recovery_case="later_gate_failure", evidence=evidence,
+    )
+    assert completed.returncode == 41, completed.stderr
+    assert current == b"candidate source\n" and evidence["backup_exists"]
+    assert evidence["backup"] == b"previous source\n"
+    assert evidence["helper"]["status"] == "HELPER_CHECKS_PASSED_EXTERNAL_VERIFICATION_PENDING"
+    assert evidence["helper"]["external_verification"] == "NOT_RECORDED_BY_HELPER"
+    assert evidence["helper"]["restoration_verified"] is False
+    assert evidence["helper"]["manifest_sha256"] == evidence["prepared_sha256"]
+    assert evidence["service_calls"] == ""
+    workflow = (ROOT / ".github/workflows/repair-gateway-dependency-closure.yml").read_text()
+    assert "/var/backups/lumencore-gateway-repair" not in workflow
+
+
+def test_gateway_manifest_write_failure_prevents_runtime_changes() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=True,
+        recovery_case="prepared_write_failure", evidence=evidence,
+    )
+    assert completed.returncode != 0
+    assert "FileExistsError" in completed.stderr
+    assert evidence["prepared"] is None
+    assert current == b"candidate source\n"
+    assert evidence["backup"] == b"previous source\n" and evidence["backup_exists"]
+    assert evidence["service_calls"] == "" and "helper" not in evidence
+    script = _repair_script()
+    assert script.index('RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"') < script.index(
+        'systemctl stop "$SERVICE"\nSERVICE_STOPPED=true'
+    )
+
+
+def test_gateway_after_change_receipt_failures_preserve_non_success_and_backups() -> None:
+    for kind, expected_code in (("helper_write_failure", 23), ("rollback_write_failure", 17)):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0],
+            predicate_passes=kind == "helper_write_failure", recovery_case=kind,
+            evidence=evidence,
+        )
+        assert completed.returncode == expected_code, completed.stderr
+        assert evidence["backup_exists"] and evidence["backup"] == b"previous source\n"
+        assert "receipt persistence failed" in completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+
+
+def test_gateway_changed_recovery_evidence_cannot_publish_helper_success() -> None:
+    for kind, error in (("manifest_changed", "recovery_manifest_hash_mismatch"),
+                        ("backup_changed", "recovery_backup_changed")):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=True,
+            recovery_case=kind, evidence=evidence,
+        )
+        assert completed.returncode == 23, completed.stderr
+        assert error in completed.stderr
+        assert "helper" not in evidence and "rollback" not in evidence
+        assert evidence["backup_exists"]
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        # This is deliberately not evidence of a verified restoration: the
+        # legacy best-effort rollback does not yet reject concurrent changes.
+        assert "private rollback receipt persistence failed" in completed.stderr
+
+
+def test_gateway_recovery_directory_requires_root_and_private_permissions() -> None:
+    function = _bash_function(_repair_script(), "require_safe_recovery_directory")
+    # The actual guard checks real fixture file types. Controlled stat responses
+    # make root ownership and mode refusals testable without elevated privileges.
+    cases = [
+        ("0", "755", "0", False, 0), ("1000", "755", "0", False, 13),
+        ("0", "777", "0", False, 13), ("0", "775", "0", False, 13),
+        ("0", "757", "0", False, 13), ("0", "invalid", "0", False, 13),
+        ("0", "700", "0", True, 0), ("0", "755", "0", True, 13),
+        ("0", "700", "1000", True, 13),
+    ]
+    with tempfile.TemporaryDirectory(prefix="gateway-recovery-directory-") as directory:
+        root = Path(directory)
+        (root / "fixture").mkdir()
+        (root / "file").write_text("fixture")
+        harness = r'''set -Eeuo pipefail
+stat() {
+  case "$2" in
+    '%u') printf '%s\n' "$FIXTURE_UID" ;;
+    '%a') printf '%s\n' "$FIXTURE_MODE" ;;
+    '%u:%g:%a') printf '%s:%s:%s\n' "$FIXTURE_UID" "$FIXTURE_GID" "$FIXTURE_MODE" ;;
+    *) return 99 ;;
+  esac
+}
+'''
+        harness += function + '\nrequire_safe_recovery_directory "$1" "$2"\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        for owner, mode, group, private, expected in cases:
+            env = dict(os.environ, FIXTURE_UID=owner, FIXTURE_MODE=mode, FIXTURE_GID=group)
+            completed = subprocess.run(
+                [_gateway_rollback_test_bash(), "fixture.sh", "fixture", str(private).lower()],
+                cwd=root, env=env, capture_output=True, text=True, timeout=10, check=False,
+            )
+            assert completed.returncode == expected, (owner, mode, group, private, completed.stderr)
+        for name in ("file", "missing"):
+            completed = subprocess.run(
+                [_gateway_rollback_test_bash(), "fixture.sh", name, "false"],
+                cwd=root, capture_output=True, text=True, timeout=10, check=False,
+            )
+            assert completed.returncode == 13, completed.stderr
+        if os.name == "posix":
+            (root / "linked").symlink_to(root / "fixture", target_is_directory=True)
+            completed = subprocess.run(
+                [_gateway_rollback_test_bash(), "fixture.sh", "linked", "false"],
+                cwd=root, capture_output=True, text=True, timeout=10, check=False,
+            )
+            assert completed.returncode == 13, completed.stderr
+
+
+def _run_gateway_unsafe_recovery_root(owner: str, mode: str, group: str, *, symlink: bool = False) -> None:
+    script = _repair_script()
+    function = _bash_function(script, "prepare_recovery_directory")
+    directory_guard = _bash_function(script, "require_safe_recovery_directory").replace(
+        "require_safe_recovery_directory()", "fixture_directory_guard()", 1
+    )
+    with tempfile.TemporaryDirectory(prefix="gateway-recovery-unsafe-root-") as directory:
+        root = Path(directory)
+        (root / "unsafe-root").mkdir()
+        (root / "unsafe-root/retained").write_bytes(b"do not modify")
+        if symlink:
+            (root / "linked-root").symlink_to(root / "unsafe-root", target_is_directory=True)
+        harness = r'''set -Eeuo pipefail
+RECOVERY_ROOT="$PWD/$FIXTURE_ROOT"
+stat() {
+  case "$2" in
+    '%u') printf '%s\n' "$FIXTURE_UID" ;;
+    '%a') printf '%s\n' "$FIXTURE_MODE" ;;
+    '%u:%g:%a') printf '%s:%s:%s\n' "$FIXTURE_UID" "$FIXTURE_GID" "$FIXTURE_MODE" ;;
+    *) return 99 ;;
+  esac
+}
+require_safe_recovery_directory() {
+  case "$1" in
+    /|/var|/var/backups) return 0 ;;
+    *) fixture_directory_guard "$@" ;;
+  esac
+}
+install() { printf 'UNEXPECTED_INSTALL\n'; return 99; }
+mktemp() { printf 'UNEXPECTED_MKTEMP\n'; return 99; }
+'''
+        harness += directory_guard + "\n" + function + '\nprepare_recovery_directory\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        env = dict(os.environ, FIXTURE_UID=owner, FIXTURE_MODE=mode, FIXTURE_GID=group,
+                   FIXTURE_ROOT="linked-root" if symlink else "unsafe-root")
+        completed = subprocess.run(
+            [_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+            env=env, capture_output=True, text=True, timeout=10, check=False,
+        )
+        assert completed.returncode == 13, completed.stderr
+        assert completed.stdout == ""
+        assert (root / "unsafe-root/retained").read_bytes() == b"do not modify"
+        assert sorted(path.name for path in (root / "unsafe-root").iterdir()) == ["retained"]
+
+
+def test_gateway_existing_unsafe_recovery_root_is_never_repaired() -> None:
+    # Execute both real functions. Only the fixed production ancestors are
+    # substituted; filesystem writes remain confined to the disposable fixture.
+    for owner, mode, group in (("1000", "700", "0"), ("0", "777", "0"),
+                               ("0", "755", "0"), ("0", "700", "1000")):
+        _run_gateway_unsafe_recovery_root(owner, mode, group)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="Real POSIX symlink refusal requires Linux CI")
+def test_gateway_symbolic_recovery_root_is_never_repaired() -> None:
+    _run_gateway_unsafe_recovery_root("0", "700", "0", symlink=True)
 
 
 def test_gateway_repair_http_boundary_probe_fails_closed() -> None:
