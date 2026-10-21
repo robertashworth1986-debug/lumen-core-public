@@ -59,5 +59,14 @@
     "apply.json containing unnecessary server recovery metadata",
     "duplicate full-live-verification.stdout.json",
     "package-receipt.json duplicating the retained manifest identity"
-  ]
+  ],
+  "fresh_read_only_recheck": {
+    "file": "fresh-live-verification.json",
+    "observed_at_utc": "2026-10-21T10:08:17.511296Z",
+    "expected_files": 246,
+    "matched_files": 246,
+    "sha256": "ed7e00d6eebf765d107290fd66cfa3c097b2e8ebe14da7aa409eefcca3394500",
+    "browser_interaction_test": false,
+    "deployment_performed": false
+  }
 }

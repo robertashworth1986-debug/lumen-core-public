@@ -29,6 +29,10 @@ All 246 public blobs are also unchanged at source
 `50969f7f01dd0719866f52d3b70da7b77114ac5c`. Coverage includes the 69 member
 profiles and their 69 matching toolkit downloads.
 
+A separate [read-only HTTP recheck](../evidence/public-site-deployments/observations/20261021T021708Z/fresh-live-verification.json)
+at `10:08:17 UTC` on October 21 again matched all 246 files. It performed no
+deployment, account change or workflow activation.
+
 The [earlier failed deployment gate](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39524266446)
 remains historical evidence: three module bodies matched, but their MIME types
 failed. The [October 7 audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37614701203)
