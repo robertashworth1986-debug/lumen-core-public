@@ -45,7 +45,7 @@ RECOVERY_RESTORE_ATTEMPTED=false
 RECOVERY_RESTORE_FAILURE=""
 RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
-declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=()
+declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 
 # This list is the recursively resolved local-Python import closure of the
 # reviewed gateway entrypoint. Keep it explicit so a partial copy cannot be
@@ -447,13 +447,13 @@ record_recovery_evidence() {
   [[ $# -le 3 ]] || return 14
   local source_states="" source_relative
   for source_relative in "${BUNDLE_FILES[@]}"; do
-    source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}"$'\n'
+    source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}:${SOURCE_RESULT_STATES[$source_relative]:-NOT_CHECKED}"$'\n'
   done
   python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
     "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
     "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
     "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
-    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "${BUNDLE_FILES[@]}" <<'PY'
+    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "$TARGET_ROOT" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -468,11 +468,13 @@ directory = Path(sys.argv[1])
 kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
 service_results, service_failure, restore_attempted = sys.argv[8:11]
 restore_failure, restore_exit_code, restore_target = sys.argv[11:14]
-requested_source, source_states, relatives = sys.argv[14], sys.argv[15], sys.argv[16:]
-if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "source_state"}:
+requested_source, source_states, target_root = sys.argv[14:17]
+relatives = sys.argv[17:]
+query_kinds = {"source_state", "source_result"}
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused"} | query_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
-if ((kind == "source_state" and requested_source not in relatives)
-        or (kind != "source_state" and requested_source)):
+if ((kind in query_kinds and requested_source not in relatives)
+        or (kind not in query_kinds and requested_source)):
     raise SystemExit("invalid_recovery_source_query")
 if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
     not re.fullmatch(r"[0-9a-f]{64}", value) for value in (bundle, hardening)
@@ -483,14 +485,14 @@ if (not directory.is_dir() or directory.is_symlink()
         or any(parent.is_symlink() for parent in directory.parents)):
     raise SystemExit("unsafe_recovery_directory")
 
-def inventory(relative, capture=False):
+def inventory(relative, capture=False, *, root=directory):
     if not isinstance(relative, str) or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative) or any(
         part in {"", ".", ".."} for part in relative.split("/")
     ):
         raise SystemExit("unsafe_recovery_inventory_path")
-    path = directory / relative
+    path = root / relative
     for parent in path.parents:
-        if parent == directory:
+        if parent == root:
             break
         if parent.is_symlink() or not parent.is_dir():
             raise SystemExit("unsafe_recovery_parent")
@@ -533,15 +535,20 @@ if kind in {"helper", "rollback", "rollback_refused"}:
     states = []
     for row in source_states.splitlines():
         fields = row.split(":")
-        if len(fields) != 4 or fields[0] not in relatives:
+        if len(fields) != 5 or fields[0] not in relatives:
             raise SystemExit("invalid_source_write_state_record")
-        relative, state, candidate, version = fields
+        relative, state, candidate, version, result = fields
         if (state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
                 or (candidate and not re.fullmatch(r"[0-9a-f]{64}", candidate))
-                or (version and not re.fullmatch(r"[0-9a-f]{64}", version))):
+                or (version and not re.fullmatch(r"[0-9a-f]{64}", version))
+                or result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED",
+                                  "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                or (result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"} and state != "INSTALLED")
+                or (result == "UNCHECKED_UNTOUCHED" and state != "UNTOUCHED")):
             raise SystemExit("invalid_source_write_state_record")
         states.append(dict(path=relative, state=state, candidate_sha256=candidate or None,
-                           installed_version_sha256=version or None))
+                           installed_version_sha256=version or None,
+                           restoration_result_observation=result))
     if [item["path"] for item in states] != relatives:
         raise SystemExit("invalid_source_write_state_inventory")
     payload["source_write_states"] = states
@@ -596,6 +603,45 @@ def require_exact_inventory(names):
             elif relative not in allowed_files:
                 raise SystemExit("unexpected_recovery_file")
 
+def observe_source_result(prepared):
+    root = Path(target_root)
+    if not root.is_absolute() or root.resolve(strict=True) != root:
+        raise SystemExit("unsafe_source_result_root")
+    path = root / requested_source
+
+    def parents():
+        observed = []
+        for parent in path.parents:
+            info = parent.lstat()
+            if not stat.S_ISDIR(info.st_mode):
+                raise SystemExit("unsafe_source_result_parent")
+            if parent == root or root in parent.parents:
+                if os.name == "posix" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022):
+                    raise SystemExit("unsafe_source_result_parent_permissions")
+                # Sibling changes alter directory timestamps, not its identity.
+                observed.append((str(parent), info.st_dev, info.st_ino, info.st_uid, info.st_gid, info.st_mode))
+        return observed
+
+    before = parents()
+    if requested_source in prepared["missing_source_files"]:
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            result = b"observed_absent\n"
+        else:
+            raise SystemExit("source_result_expected_absence")
+    else:
+        expected = next(item for item in prepared["files"] if item["path"] == "existing/" + requested_source)
+        actual = inventory(requested_source, root=root)
+        # A valid copy changes inode and ctime. Inventory checks their stability
+        # during this read, but compares only prepared bytes/preserved metadata.
+        if actual != dict(expected, path=requested_source):
+            raise SystemExit("source_result_mismatch")
+        result = b"observed_present\n"
+    if parents() != before:
+        raise SystemExit("source_result_parent_changed")
+    sys.stdout.buffer.write(result)
+
 if kind == "rollback_refused":
     # This receipt describes refusal only; it does not authenticate invalid input.
     payload.update(status="ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE", restore_attempted=False,
@@ -630,6 +676,9 @@ else:
         # inventory validation above must pass again before each source mutation.
         sys.stdout.buffer.write(b"missing\n" if requested_source in prepared["missing_source_files"] else b"present\n")
         raise SystemExit(0)
+    if kind == "source_result":
+        observe_source_result(prepared)
+        raise SystemExit(0)
     if kind == "verify":
         print("RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION")
         raise SystemExit(0)
@@ -662,7 +711,7 @@ if kind == "rollback":
     restoration_targets = {
         "dead_lock": {"gateway_lock"}, "source_state": set(relatives),
         "target_state": set(relatives), "target_absent": set(relatives),
-        "source_remove": set(relatives), "source_copy": set(relatives),
+        "source_remove": set(relatives), "source_copy": set(relatives), "source_result": set(relatives),
         "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"},
         "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
         "dropin_directory_state_read": {"service_drop_in_directory"},
@@ -1019,6 +1068,22 @@ read_recovery_source_state() {
   [[ -z "${2:-}" || "$RECOVERY_SOURCE_STATE" == "$2" ]] || return 14
 }
 
+read_recovery_source_result() {
+  local relative="${1:-}" expected="${2:-}" response
+  [[ $# -eq 2 && -n "$relative" && ( "$expected" == present || "$expected" == missing ) ]] || return 14
+  SOURCE_RESULT_STATES[$relative]=FAILED
+  response="$(record_recovery_evidence source_result 0 "$relative" && printf '.')" || return $?
+  case "$response" in
+    $'observed_present\n.')
+      [[ "$expected" == present ]] || return 14
+      SOURCE_RESULT_STATES[$relative]=MATCHED_PREPARED_PRESENT ;;
+    $'observed_absent\n.')
+      [[ "$expected" == missing ]] || return 14
+      SOURCE_RESULT_STATES[$relative]=MATCHED_PREPARED_ABSENCE ;;
+    *) return 14 ;;
+  esac
+}
+
 read_recovery_metadata() {
   local metadata
   metadata="$(< "$1")" || return $?
@@ -1061,7 +1126,10 @@ rollback() {
       backup="$BACKUP_DIR/existing/$rel"
       checked_restore_step source_state "$rel" read_recovery_source_state "$rel" || finish_rollback "$rc"
       checked_restore_step target_state "$rel" read_recovery_target_state "$rel" || finish_rollback "$rc"
-      if [[ "$RECOVERY_TARGET_STATE" == untouched ]]; then continue; fi
+      if [[ "$RECOVERY_TARGET_STATE" == untouched ]]; then
+        SOURCE_RESULT_STATES[$rel]=UNCHECKED_UNTOUCHED
+        continue
+      fi
       checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
       if [[ "$RECOVERY_SOURCE_STATE" == present ]]; then
         # Recheck before copy as well: a removal may already have happened, but
@@ -1070,6 +1138,7 @@ rollback() {
         checked_restore_step target_absent "$rel" require_recovery_target_absent "$rel" || finish_rollback "$rc"
         checked_restore_step source_copy "$rel" cp -a -- "$backup" "$target" || finish_rollback "$rc"
       fi
+      checked_restore_step source_result "$rel" read_recovery_source_result "$rel" "$RECOVERY_SOURCE_STATE" || finish_rollback "$rc"
     done
 
     checked_restore_step dropin_remove service_drop_in rm -f -- "$SERVICE_DROP_IN" || finish_rollback "$rc"

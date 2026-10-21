@@ -331,6 +331,7 @@ def _run_gateway_rollback_guard(
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
+    result_fault: str = "", result_relative: str = "entry.py", result_query_case: str = "",
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -420,6 +421,29 @@ elif kind == "xattr": os.setxattr(p, "user.fixture", b"changed")
 else: raise ValueError("unsupported_fixture_drift")
 Path("target-drift-applied").write_text(kind)
 ''', encoding="utf-8", newline="\n")
+        if result_fault:
+            (root / "result-fault.py").write_text('''from pathlib import Path
+import os
+kind, relative = os.environ["RESULT_FAULT"], os.environ["RESULT_RELATIVE"]
+assert relative in {"entry.py", "second.py", "absent.py"}
+p = Path("target") / relative
+if kind == "copy_bytes": p.write_bytes(b"wrong restoration bytes\\n")
+elif kind == "copy_mtime":
+    current=p.stat(); os.utime(p, ns=(current.st_atime_ns, current.st_mtime_ns + 1000000000))
+elif kind == "copy_mode": p.chmod(0o400)
+elif kind == "copy_xattr": os.setxattr(p, "user.fixture", b"incorrect-result")
+elif kind == "copy_directory": p.unlink(); p.mkdir()
+elif kind == "copy_symlink":
+    q=Path("outside-result"); q.write_bytes(p.read_bytes()); p.unlink(); p.symlink_to(q.resolve())
+elif kind == "copy_hardlink": os.link(p, "outside-result")
+elif kind == "copy_parent_link":
+    q=Path("target"); q.rename("outside-result-directory"); q.symlink_to(Path("outside-result-directory").resolve(), target_is_directory=True)
+elif kind == "remove_symlink": p.symlink_to(Path("uncreated-result").resolve())
+elif kind == "manifest_changed": Path("backup/prepared.json").write_bytes(b"changed preparation")
+elif kind == "backup_changed": (Path("backup/existing") / relative).write_bytes(b"changed backup")
+else: raise ValueError("unsupported_result_fault")
+Path("result-fault-applied").write_text(kind)
+''', encoding="utf-8", newline="\n")
         harness = r'''
 set -Eeuo pipefail
 TARGET_ROOT="$PWD/target"
@@ -444,7 +468,7 @@ RECOVERY_RESTORE_ATTEMPTED=false
 RECOVERY_RESTORE_FAILURE=""
 RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
-declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=()
+declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 python3() { "$TEST_PYTHON" "$@"; }
 FIXTURE_FORWARD=false
 RECOVERY_TIMEOUT_BIN=fixture_timeout
@@ -508,7 +532,10 @@ stat() {
 }
 require_safe_recovery_directory() { :; }
 remove_verified_dead_lock() { printf 'lock\n' >> "$PWD/restore.calls"; }
-record_recovery_evidence() { if [[ "$1" == source_state ]]; then printf 'present\n'; fi; }
+record_recovery_evidence() {
+  if [[ "$1" == source_state ]]; then printf 'present\n'; fi
+  if [[ "$1" == source_result ]]; then printf 'observed_present\n'; fi
+}
 fixture_source_drift() {
   if [[ -n "$SOURCE_DRIFT" && "$DRIFT_BOUNDARY" == "$1" && ! -e "$PWD/source-drift-applied" ]]; then
     "$TEST_PYTHON" "$PWD/source-drift.py" || return $?
@@ -518,6 +545,9 @@ fixture_target_drift() {
   if [[ -n "$TARGET_DRIFT" && "$TARGET_BOUNDARY" == "$1" && ! -e "$PWD/target-drift-applied" ]]; then
     "$TEST_PYTHON" "$PWD/target-drift.py" || return $?
   fi
+}
+fixture_result_fault() {
+  if [[ -n "$RESULT_FAULT" ]]; then "$TEST_PYTHON" "$PWD/result-fault.py" || return $?; fi
 }
 fixture_operation() {
   local command_name="$1" fixture_target=unknown
@@ -537,7 +567,12 @@ chmod() { printf 'chmod\n' >> "$PWD/restore.calls"; fixture_operation chmod "${@
 rm() {
   printf 'rm\n' >> "$PWD/restore.calls"
   fixture_operation rm "${@: -1}" || return $?
+  if [[ "$RESULT_FAULT" == remove_noop && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then
+    printf no_op > "$PWD/result-fault-applied"
+    return 0
+  fi
   command rm "$@" || return $?
+  if [[ "$RESULT_FAULT" == remove_symlink && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_remove || return $?; fixture_target_drift after_first_remove || return $?; fi
 }
 install() {
@@ -572,7 +607,12 @@ cp() {
     printf 'FIXTURE_COPY_FAILURE\n' >&2
     return 9
   fi
+  if [[ "$RESULT_FAULT" == copy_noop && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then
+    printf no_op > "$PWD/result-fault-applied"
+    return 0
+  fi
   command cp "$@" || return $?
+  if [[ ( "$RESULT_FAULT" == copy_* || "$RESULT_FAULT" == manifest_changed || "$RESULT_FAULT" == backup_changed ) && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_copy || return $?; fixture_target_drift after_first_copy || return $?; fi
 }
 cleanup() {
@@ -610,7 +650,7 @@ fi
             harness += 'export PATH="/usr/bin:$PATH"\nRECOVERY_TIMEOUT_BIN="$(type -P timeout)"\n'
             harness += 'export PATH="$PWD/bin:$PATH"\n'
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
-        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_metadata", "remove_recovery_directory",
+        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_metadata", "remove_recovery_directory",
                      "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent"):
             harness += _bash_function(script, name) + "\n"
         if real_lock_case:
@@ -760,6 +800,29 @@ source_target_version() {
   esac
 }
 '''
+        if result_query_case:
+            harness += _bash_function(script, "record_recovery_evidence").replace(
+                "record_recovery_evidence() {", "actual_result_record_recovery_evidence() {", 1) + "\n"
+            harness += r'''
+record_recovery_evidence() {
+  if [[ "$1" != source_result ]]; then actual_result_record_recovery_evidence "$@"; return $?; fi
+  case "$RESULT_QUERY_CASE" in
+    failed) printf 'observed_present\n'; return 29 ;;
+    extra_line) printf 'observed_present\nextra\n' ;;
+    extra_newline) printf 'observed_present\n\n' ;;
+    carriage_return) printf 'observed_present\r\n' ;;
+    no_newline) printf observed_present ;;
+    empty) : ;;
+    contradictory) printf 'observed_absent\n' ;;
+    invalid) printf 'verified\n' ;;
+    outside) actual_result_record_recovery_evidence source_result 0 ../outside.py ;;
+    unregistered) actual_result_record_recovery_evidence source_result 0 outside.py ;;
+    empty_path) actual_result_record_recovery_evidence source_result 0 '' ;;
+    extra_argument) actual_result_record_recovery_evidence source_result 0 entry.py extra ;;
+    *) return 99 ;;
+  esac
+}
+'''
         harness += guard
         if recovery_case in {"later_gate_failure", "helper_write_failure", "manifest_changed", "backup_changed"}:
             outcome = script.split('if ! helper_receipt_sha="$(record_recovery_evidence helper 0)";', 1)[1]
@@ -782,6 +845,7 @@ source_target_version() {
             TARGET_DRIFT=target_drift, TARGET_BOUNDARY=target_boundary, FORWARD_CASE=forward_case,
             TARGET_QUERY_CASE=target_query_case,
             TARGET_RELATIVE=target_relative,
+            RESULT_FAULT=result_fault, RESULT_RELATIVE=result_relative, RESULT_QUERY_CASE=result_query_case,
             DROP_BACKUP_AFTER_VERIFY=metadata_case.split(":", 1)[1] if metadata_case.startswith("missing:") else "",
         )
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
@@ -822,11 +886,15 @@ source_target_version() {
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
+            evidence["target_inode"] = target.stat().st_ino if target.is_file() else None
+            evidence["backup_inode"] = backup_path.stat().st_ino if backup_path.is_file() else None
             evidence["backup_exists"] = (root / "backup").is_dir()
             evidence["second_target"] = (root / "target/second.py").read_bytes() if (root / "target/second.py").is_file() else None
             evidence["target_drift_applied"] = (root / "target-drift-applied").exists()
             evidence["target_is_directory"] = target.is_dir()
             evidence["target_is_symlink"] = target.is_symlink()
+            evidence["result_fault_applied"] = (root / "result-fault-applied").exists()
+            evidence["source_result_receipt_exists"] = (root / "backup/source_result.json").exists()
             evidence["forward_calls"] = (root / "forward.calls").read_text().splitlines() if (root / "forward.calls").exists() else []
             evidence["second_backup"] = (root / "backup/existing/second.py").read_bytes() if (root / "backup/existing/second.py").is_file() else None
             evidence["source_drift_applied"] = (root / "source-drift-applied").exists()
@@ -838,6 +906,7 @@ source_target_version() {
             evidence["dropin_bytes"] = dropin_path.read_bytes() if dropin_path.is_file() else None
             evidence["run_directory_exists"] = (root / "run").exists()
             evidence["originally_missing_target_exists"] = (root / "target/absent.py").exists()
+            evidence["originally_missing_target_is_symlink"] = (root / "target/absent.py").is_symlink()
             missing_target = root / "target/absent.py"
             evidence["originally_missing_target_bytes"] = missing_target.read_bytes() if missing_target.is_file() else None
             evidence["outside_refusal_written"] = (root / "outside-backup/rollback_refused.json").exists()
@@ -1217,7 +1286,8 @@ def _assert_source_drift_stops_before_next_mutation(kind: str, boundary: str) ->
     assert completed.returncode == 17, (kind, boundary, completed.stderr)
     assert evidence["source_drift_applied"] and evidence["backup_exists"]
     assert "RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION" in completed.stdout
-    assert "restoration operation source_state failed" in completed.stderr
+    expected_operation = "source_result" if boundary == "after_first_copy" else "source_state"
+    assert f"restoration operation {expected_operation} failed" in completed.stderr
     assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and dropin_exists
     assert not evidence["source_state_receipt_exists"]
     # Corrupt evidence still prevents an ordinary receipt: do not weaken its
@@ -1475,6 +1545,130 @@ def test_gateway_unknown_state_or_malformed_version_query_stops_recovery() -> No
 
 def test_gateway_target_conflict_receipt_failure_preserves_trigger_and_files() -> None:
     _assert_target_drift_preserved("changed", receipt_failure=True)
+
+
+def _assert_source_result_fault_stops(fault: str, *, relative: str = "entry.py", receipt_failure: bool = False) -> dict:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure" if receipt_failure else "valid_missing" if relative == "absent.py" else "source_result",
+        result_fault=fault, result_relative=relative, second_source=relative != "absent.py", evidence=evidence,
+    )
+    assert completed.returncode == 17, (fault, completed.stderr)
+    assert evidence["result_fault_applied"] and evidence["backup_exists"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert "restoration operation source_result failed" in completed.stderr
+    assert not evidence["source_result_receipt_exists"]
+    if relative == "entry.py":
+        assert "rm:second_source" not in evidence["operation_calls"]
+        if fault == "copy_noop": assert current is None
+        if fault == "copy_bytes": assert current == b"wrong restoration bytes\n"
+        if fault == "copy_directory": assert evidence["target_is_directory"]
+    elif relative == "second.py":
+        assert current == b"previous source\n"
+        assert evidence["second_target"] is None if fault == "copy_noop" else evidence["second_target"] == b"wrong restoration bytes\n"
+    elif fault == "remove_noop":
+        assert evidence["originally_missing_target_bytes"] == b"candidate"
+    elif fault == "remove_symlink":
+        assert evidence["originally_missing_target_is_symlink"]
+    if receipt_failure:
+        assert evidence["rollback"] is None and "receipt persistence failed" in completed.stderr
+    else:
+        receipt = evidence["rollback"]
+        failure = receipt["failed_restoration_operation"]
+        assert failure["operation"] == "source_result" and failure["target"] == relative and failure["exit_code"] != 0
+        assert receipt["trigger_exit_code"] == 17 and receipt["restoration_verified"] is False
+        assert receipt["partial_state_possible"] and not receipt["service_restart_attempted"]
+        rows = {item["path"]: item["restoration_result_observation"] for item in receipt["source_write_states"]}
+        assert rows[relative] == "FAILED"
+        if relative != "entry.py": assert rows["entry.py"] == "MATCHED_PREPARED_PRESENT"
+        else: assert rows["second.py"] == "NOT_CHECKED"
+    return evidence
+
+
+def test_gateway_copy_success_requires_source_result_bytes_type_and_metadata() -> None:
+    for fault in ("copy_noop", "copy_bytes", "copy_mtime", "copy_directory"):
+        _assert_source_result_fault_stops(fault)
+
+
+def test_gateway_later_source_result_failure_preserves_prior_partial_observation() -> None:
+    _assert_source_result_fault_stops("copy_noop", relative="second.py")
+    _assert_source_result_fault_stops("copy_bytes", relative="second.py")
+
+
+def test_gateway_missing_source_result_requires_actual_absence_after_remove_success() -> None:
+    _assert_source_result_fault_stops("remove_noop", relative="absent.py")
+
+
+@unittest.skipIf(os.name != "posix", "Restored source links, mode and xattrs require POSIX")
+def test_gateway_source_result_links_metadata_and_parent_substitution_are_refused() -> None:
+    for fault in ("copy_symlink", "copy_hardlink", "copy_parent_link", "copy_mode", "copy_xattr"):
+        _assert_source_result_fault_stops(fault)
+    _assert_source_result_fault_stops("remove_symlink", relative="absent.py")
+
+
+def test_gateway_source_result_query_failure_or_malformed_output_stops_restart() -> None:
+    for case in ("failed", "extra_line", "extra_newline", "carriage_return", "no_newline", "empty", "contradictory", "invalid",
+                 "outside", "unregistered", "empty_path", "extra_argument"):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="source_result", result_query_case=case, second_source=True, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"previous source\n", (case, completed.stderr)
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["operation_calls"] == "rm:first_source\ncp:first_source\n"
+        assert evidence["second_target"] == b"second candidate\n" and not evidence["source_result_receipt_exists"]
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"]["operation"] == "source_result"
+        assert receipt["failed_restoration_operation"]["exit_code"] == (29 if case == "failed" else 1 if case in {"outside", "unregistered", "empty_path"} else 14)
+        assert receipt["source_write_states"][0]["restoration_result_observation"] == "FAILED"
+        assert receipt["partial_state_possible"] and receipt["restoration_verified"] is False
+
+
+def test_gateway_valid_source_results_compare_preserved_metadata_not_copied_identity() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="valid_missing", second_source=True, evidence=evidence,
+    )
+    assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+    assert evidence["target_inode"] != evidence["backup_inode"]
+    assert evidence["second_target"] == b"second previous\n" and not evidence["originally_missing_target_exists"]
+    assert evidence["service_calls"].endswith("SYSTEMCTL:start\n") and not evidence["source_result_receipt_exists"]
+    receipt = evidence["rollback"]
+    assert {item["path"]: item["restoration_result_observation"] for item in receipt["source_write_states"]} == {
+        "entry.py": "MATCHED_PREPARED_PRESENT", "second.py": "MATCHED_PREPARED_PRESENT", "absent.py": "MATCHED_PREPARED_ABSENCE"}
+    assert receipt["restoration_verified"] is False and receipt["service_state_verified"] is False
+    assert receipt["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+
+
+def test_gateway_untouched_sources_do_not_claim_observed_restoration_results() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="valid_missing", forward_case="untouched", result_query_case="failed", evidence=evidence,
+    )
+    assert completed.returncode == 17 and current == b"candidate source\n", completed.stderr
+    assert evidence["originally_missing_target_bytes"] == b"candidate"
+    assert evidence["service_calls"].endswith("SYSTEMCTL:start\n")
+    assert all(item["restoration_result_observation"] == "UNCHECKED_UNTOUCHED" for item in evidence["rollback"]["source_write_states"])
+    assert evidence["rollback"]["restoration_verified"] is False
+
+
+def test_gateway_source_result_checks_preserve_receipt_and_prepared_evidence_failures() -> None:
+    _assert_source_result_fault_stops("copy_noop", receipt_failure=True)
+    for fault in ("manifest_changed", "backup_changed"):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="source_result", result_fault=fault, second_source=True, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert "source_result failed" in completed.stderr and "receipt persistence failed" in completed.stderr
+        assert "rollback" not in evidence and evidence["backup_exists"]
+        assert "rm:second_source" not in evidence["operation_calls"]
 
 
 def test_gateway_state_parser_rejects_missing_or_noncanonical_values() -> None:

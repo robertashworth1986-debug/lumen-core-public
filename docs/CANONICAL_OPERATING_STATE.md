@@ -101,13 +101,30 @@ refused before backup copy. Private outcomes include per-source state and digest
 while retaining the original failure code, partial-state warning and receipt
 integrity checks. Earlier restored files can still leave partial state.
 
-The preceding source-intent revision at `79b85bf1` passed all 14 hosted checks:
-83 Linux public-contract checks with no skips and 2,079 full-suite tests with eight
+Source recovery now also checks the observed result after each installed source's
+removal and optional backup copy, before the next source or service sequence.
+The read-only result query repeats pinned custody validation, then checks stable
+regular single-link target bytes, ownership, mode, modification time and extended
+attributes against the prepared inventory, or confirms actual absence for a
+missing-before source. Copied inode and change time may differ from the backup;
+their stability during this read is still required. Parent identity and safe path
+checks are included. A command returning zero with an absent, incorrect or unsafe
+result stops later restoration and restart. This closes the controlled fixture
+case where a copy reported success without producing the required file; it is
+not evidence that the real copy utility or production runtime suffered that fault.
+Private receipts distinguish each matched observation, failed result query,
+unchecked untouched source and source not yet checked. They retain partial-state
+and whole-restoration/service-unverified status, even when every source observation
+matches. Later edits, other restored objects and external workflow checks are not
+certified by these observations.
+
+The preceding target-state revision at `2bf1f109` passed all 14 hosted checks:
+94 Linux public-contract checks with no skips and 2,090 full-suite tests with eight
 unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
-descendant-termination and existing link/extended-attribute cases. The new target
-guard passed 107 focused local tests with six platform skips; the dependency-free
-runner passed 88 checks with the same six skips (94 discovered). Final independent
-review and exact-head hosted Linux validation remain pending. The
+descendant-termination and link/extended-attribute cases. The source-result increment
+passed 114 focused local tests with seven platform skips; the dependency-free
+runner passed 95 checks with the same seven skips (102 discovered). Independent
+review and exact-head hosted Linux validation of this new increment remain pending. The
 initial local strict-query failure in the earlier revision exposed platform newline
 translation; exact byte output corrected it without relaxing response parsing.
 Local subprocess cases execute actual rollback operations against disposable files,
