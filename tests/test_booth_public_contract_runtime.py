@@ -3,9 +3,11 @@ from __future__ import annotations
 import ast
 import copy
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -289,6 +291,215 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert '[[ "$STAGE_DIR" =~ ^/tmp/lumencore-gateway-stage\\.' in script
     assert '[[ "$BACKUP_DIR" =~ ^/tmp/lumencore-gateway-rollback\\.' in script
     assert "systemctl restart" not in script
+
+
+def _gateway_rollback_test_bash() -> str:
+    if Path("/bin/bash").is_file():
+        return "/bin/bash"
+    # Git Bash can exercise these subprocess cases on Windows without WSL.
+    git_bash = Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe"
+    if git_bash.is_file():
+        return str(git_bash)
+    raise RuntimeError("Bash is required for gateway rollback regression tests")
+
+
+def _gateway_post_mutation_guards(script: str) -> list[str]:
+    segment = script.split('systemctl stop "$SERVICE"\nSERVICE_STOPPED=true', 1)[1]
+    segment = segment.split("\nprobe_json() {", 1)[0]
+    guards = re.findall(
+        r'(?m)^\s*(?:\[\[ [^\n]+ \]\]|systemctl is-active --quiet "\$SERVICE")'
+        r' \|\| \{\n[^\n]*\n[^\n]*\n[ \t]*\}',
+        segment,
+    )
+    assert len(guards) == 12, "Exercise every post-mutation failure guard"
+    return guards
+
+
+def _run_gateway_rollback_guard(
+    guard: str, *, predicate_passes: bool, copy_fails: bool = False,
+    signal_during_copy: bool = False,
+) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
+    script = _repair_script()
+    # Execute the actual guard and actual rollback body. Every filesystem target
+    # is a disposable fixture; systemd, ownership and runtime probes are stubs.
+    rollback_source = _bash_function(script, "rollback")
+    error_trap = next(
+        line for line in script.splitlines()
+        if line.startswith("trap 'rc=$?;") and line.endswith(" ERR")
+    )
+    with tempfile.TemporaryDirectory(prefix="gateway-rollback-test-") as directory:
+        root = Path(directory)
+        for relative in ("target", "backup/existing", "dropins", "run"):
+            (root / relative).mkdir(parents=True, exist_ok=True)
+        (root / "target/entry.py").write_bytes(b"candidate source\n")
+        (root / "backup/existing/entry.py").write_bytes(b"previous source\n")
+        (root / "dropins/hardening.conf").write_bytes(b"candidate hardening\n")
+        for name, value in {
+            "service-drop-in.state": "missing\n",
+            "service-drop-in-dir.state": "present\n",
+            "service-drop-in-dir.metadata": "1000 1000 755\n",
+            "run-dir.state": "present\n",
+            "run-dir.metadata": "1000 1000 750\n",
+        }.items():
+            (root / "backup" / name).write_text(value, encoding="utf-8")
+        harness = r'''
+set -Eeuo pipefail
+TARGET_ROOT="$PWD/target"
+SOURCE_ROOT="$PWD/source"
+BACKUP_DIR="$PWD/backup"
+SERVICE_DROP_IN_DIR="$PWD/dropins"
+SERVICE_DROP_IN="$SERVICE_DROP_IN_DIR/hardening.conf"
+RUN_DIR="$PWD/run"
+LOCK_FILE="$RUN_DIR/fixture.lock"
+SERVICE=fixture-gateway
+SERVICE_USER=lumencore
+SERVICE_GROUP=lumencore
+BUNDLE_FILES=(entry.py)
+rel=entry.py
+HARDENING_SHA=good
+post_apply_source_sha=good
+post_apply_target_sha=wrong
+REPAIR_COMPLETE=false
+SERVICE_WAS_ACTIVE=true
+SERVICE_STOPPED=false
+effective_user=wrong
+effective_group=wrong
+effective_restart=wrong
+effective_umask=wrong
+effective_no_new_privileges=wrong
+effective_private_tmp=wrong
+lock_ready=false
+if [[ "$PREDICATE_PASSES" == true ]]; then
+  post_apply_target_sha=good
+  effective_user=lumencore
+  effective_group=lumencore
+  effective_restart=on-failure
+  effective_umask=0027
+  effective_no_new_privileges=yes
+  effective_private_tmp=yes
+  lock_ready=true
+fi
+systemctl() {
+  if [[ "$1" == is-active ]]; then
+    [[ "$PREDICATE_PASSES" == true ]]
+  else
+    printf 'SYSTEMCTL:%s\n' "$1" >> "$PWD/systemctl.calls"
+  fi
+}
+sha256sum() {
+  if [[ "$PREDICATE_PASSES" == true || "$1" == "$SOURCE_ROOT/"* ]]; then
+    printf 'good  fixture\n'
+  else
+    printf 'wrong  fixture\n'
+  fi
+}
+stat() {
+  if [[ "$PREDICATE_PASSES" != true ]]; then
+    printf 'wrong\n'
+  elif [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then
+    printf 'root:root:644\n'
+  elif [[ "${@: -1}" == "$RUN_DIR" ]]; then
+    printf 'lumencore:lumencore:750\n'
+  else
+    printf 'lumencore:lumencore:640\n'
+  fi
+}
+remove_verified_dead_lock() { :; }
+chown() { :; }
+chmod() { :; }
+cp() {
+  if [[ "$SIGNAL_DURING_COPY" == true ]]; then
+    kill -TERM "$BASHPID"
+    printf 'FIXTURE_TERM_SENT\n' >&2
+  fi
+  if [[ "$COPY_FAILS" == true ]]; then
+    printf 'FIXTURE_COPY_FAILURE\n' >&2
+    return 9
+  fi
+  command cp "$@"
+}
+cleanup() {
+  if [[ -f "$PWD/systemctl.calls" ]]; then cat "$PWD/systemctl.calls"; fi
+  printf 'CLEANUP\n'
+}
+trap cleanup EXIT
+'''
+        harness += rollback_source + "\n" + error_trap + "\n" + guard
+        harness += "\nprintf 'GUARD_PASSED\\n'\n"
+        env = dict(os.environ)
+        env.update(
+            PREDICATE_PASSES=str(predicate_passes).lower(),
+            COPY_FAILS=str(copy_fails).lower(),
+            SIGNAL_DURING_COPY=str(signal_during_copy).lower(),
+        )
+        completed = subprocess.run(
+            [_gateway_rollback_test_bash(), "-c", harness],
+            cwd=root, env=env, capture_output=True, text=True, timeout=10,
+            check=False,
+        )
+        target = root / "target/entry.py"
+        return (
+            completed,
+            target.read_bytes() if target.exists() else None,
+            (root / "dropins/hardening.conf").exists(),
+        )
+
+
+def test_gateway_post_mutation_failures_restore_source_before_cleanup() -> None:
+    for guard in _gateway_post_mutation_guards(_repair_script()):
+        failure_code = re.search(r"(?:rollback|exit) (17|18)\n", guard)
+        assert failure_code is not None
+        completed, restored, dropin_exists = _run_gateway_rollback_guard(
+            guard, predicate_passes=False
+        )
+        assert completed.returncode == int(failure_code.group(1)), completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        assert restored == b"previous source\n", guard
+        assert not dropin_exists
+        assert completed.stdout.count("SYSTEMCTL:stop\n") == 1
+        assert completed.stdout.count("SYSTEMCTL:start\n") == 1
+        assert completed.stdout.endswith("CLEANUP\n")
+        assert "GUARD_PASSED" not in completed.stdout
+
+        completed, candidate, dropin_exists = _run_gateway_rollback_guard(
+            guard, predicate_passes=True
+        )
+        assert completed.returncode == 0, completed.stderr
+        assert candidate == b"candidate source\n"
+        assert dropin_exists
+        assert "Rolling back" not in completed.stderr
+        assert completed.stdout == "GUARD_PASSED\nCLEANUP\n"
+
+
+def test_gateway_rollback_failure_keeps_original_code_without_reentry() -> None:
+    guard = _gateway_post_mutation_guards(_repair_script())[0]
+    completed, restored, dropin_exists = _run_gateway_rollback_guard(
+        guard, predicate_passes=False, copy_fails=True
+    )
+    assert completed.returncode == 17, completed.stderr
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert completed.stderr.count("FIXTURE_COPY_FAILURE") == 1
+    assert completed.stdout.count("SYSTEMCTL:stop\n") == 1
+    assert completed.stdout.count("SYSTEMCTL:start\n") == 1
+    assert completed.stdout.endswith("CLEANUP\n")
+    # A failed restore remains a real failure, never a claim of recovery success.
+    assert restored is None
+    assert not dropin_exists
+
+
+def test_gateway_term_during_rollback_preserves_recovery_and_original_code() -> None:
+    guard = _gateway_post_mutation_guards(_repair_script())[0]
+    completed, restored, dropin_exists = _run_gateway_rollback_guard(
+        guard, predicate_passes=False, signal_during_copy=True
+    )
+    assert completed.returncode == 17, completed.stderr
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert completed.stderr.count("FIXTURE_TERM_SENT") == 1
+    assert completed.stdout.count("SYSTEMCTL:stop\n") == 1
+    assert completed.stdout.count("SYSTEMCTL:start\n") == 1
+    assert completed.stdout.endswith("CLEANUP\n")
+    assert restored == b"previous source\n"
+    assert not dropin_exists
 
 
 def test_gateway_repair_http_boundary_probe_fails_closed() -> None:

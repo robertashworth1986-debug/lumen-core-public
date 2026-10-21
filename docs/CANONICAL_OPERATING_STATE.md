@@ -25,6 +25,23 @@ before applying the four-byte extension. No DNS, credential, route, trading or
 business authority is changed. Until successful repair receipts are appended,
 full release verification remains open. The earlier failed gate remains evidence.
 
+### October 21 local gateway recovery correction
+
+This source-only follow-up advances outcome 2 by correcting a failure path in the
+existing gateway repair control. Twelve post-change checks now call rollback
+directly instead of exiting past the error handler. Rollback disables its error
+trap and ignores INT/TERM during recovery so a failed restoration or another
+termination signal cannot re-enter recovery or replace the original failure code.
+Subprocess regression cases execute the actual guards and rollback function
+against disposable files, including failed restoration and TERM during recovery.
+
+The focused local suite passed 68 tests, including 26 new Bash subprocess cases.
+No backend repair was dispatched or installed. This does not establish deployment
+readiness: rollback backups are still temporary, restoration remains best effort,
+and the workflow's separate public postcheck runs after helper completion. The
+existing six runtime holds require fresh evidence and separate backend action
+approval. Paper-only controls and all ledger/history bytes remain unchanged.
+
 ### October 17 draft integration review
 
 The founder requested inspection, safe merge and publication of outstanding

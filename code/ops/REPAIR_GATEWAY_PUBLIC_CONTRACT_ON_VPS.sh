@@ -508,6 +508,9 @@ remove_verified_dead_lock() {
 
 rollback() {
   local rc="${1:-1}"
+  # Recovery failures must not re-enter rollback or replace the triggering code.
+  trap - ERR
+  trap '' INT TERM
   set +e
   if [[ "$REPAIR_COMPLETE" != true ]]; then
     echo "Rolling back the complete gateway dependency closure and service identity..." >&2
@@ -571,7 +574,7 @@ install -o root -g root -m 0644 -- \
   "$STAGE_DIR/20-lumencore-runtime-hardening.conf" "$SERVICE_DROP_IN"
 [[ "$(sha256sum "$SERVICE_DROP_IN" | awk '{print $1}')" == "$HARDENING_SHA" ]] || {
   echo "ERROR: installed gateway service hardening SHA-256 mismatch" >&2
-  exit 17
+  rollback 17
 }
 install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0750 -- "$RUN_DIR"
 systemctl daemon-reload
@@ -585,7 +588,7 @@ for rel in "${BUNDLE_FILES[@]}"; do
   printf '%-64s  %-64s  %s\n' "$post_apply_source_sha" "$post_apply_target_sha" "$rel"
   [[ "$post_apply_source_sha" == "$post_apply_target_sha" ]] || {
     echo "ERROR: post-apply source/target SHA-256 mismatch: $rel" >&2
-    exit 17
+    rollback 17
   }
   POST_APPLY_HASH_MATCHES=$((POST_APPLY_HASH_MATCHES + 1))
 done
@@ -597,7 +600,7 @@ SERVICE_STOPPED=false
 
 systemctl is-active --quiet "$SERVICE" || {
   echo "ERROR: gateway service did not become active" >&2
-  exit 18
+  rollback 18
 }
 effective_user="$(systemctl show "$SERVICE" --property=User --value)"
 effective_group="$(systemctl show "$SERVICE" --property=Group --value)"
@@ -607,31 +610,31 @@ effective_no_new_privileges="$(systemctl show "$SERVICE" --property=NoNewPrivile
 effective_private_tmp="$(systemctl show "$SERVICE" --property=PrivateTmp --value)"
 [[ "$effective_user" == "$SERVICE_USER" && "$effective_group" == "$SERVICE_GROUP" ]] || {
   echo "ERROR: effective gateway service identity is not lumencore:lumencore" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_restart" == "on-failure" ]] || {
   echo "ERROR: effective gateway restart policy is not bounded to on-failure" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_umask" == "0027" ]] || {
   echo "ERROR: effective gateway umask is not 0027" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_no_new_privileges" == "yes" || "$effective_no_new_privileges" == "true" ]] || {
   echo "ERROR: effective gateway NoNewPrivileges control is not enabled" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_private_tmp" == "yes" || "$effective_private_tmp" == "true" ]] || {
   echo "ERROR: effective gateway PrivateTmp control is not enabled" >&2
-  exit 18
+  rollback 18
 }
 [[ "$(stat -c '%U:%G:%a' "$SERVICE_DROP_IN")" == "root:root:644" ]] || {
   echo "ERROR: gateway service hardening file ownership or mode is unsafe" >&2
-  exit 18
+  rollback 18
 }
 [[ "$(stat -c '%U:%G:%a' "$RUN_DIR")" == "${SERVICE_USER}:${SERVICE_GROUP}:750" ]] || {
   echo "ERROR: gateway run directory identity is not bounded" >&2
-  exit 18
+  rollback 18
 }
 
 lock_ready=false
@@ -648,11 +651,11 @@ for attempt in $(seq 1 12); do
 done
 [[ "$lock_ready" == true ]] || {
   echo "ERROR: gateway singleton lock did not bind to the systemd main PID" >&2
-  exit 18
+  rollback 18
 }
 [[ "$(stat -c '%U:%G:%a' "$LOCK_FILE")" == "${SERVICE_USER}:${SERVICE_GROUP}:640" ]] || {
   echo "ERROR: gateway singleton lock identity is not bounded" >&2
-  exit 18
+  rollback 18
 }
 
 probe_json() {
