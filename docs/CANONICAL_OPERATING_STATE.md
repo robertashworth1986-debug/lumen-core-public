@@ -86,21 +86,42 @@ file was restored or after target removal still leaves explicitly partial state;
 receipt integrity checks remain intact even when they prevent receipt persistence.
 Repeated validation over a bounded file set is not a wall-clock deadline.
 
-The focused local suite passed 97 tests with five platform skips; the direct
-standard-library runner passed 78 checks with the same five skips (83 discovered).
-The preceding fail-stop revision passed all 76 hosted Linux contract checks,
-including actual GNU timeout process-group, ignored-TERM, descendant-termination
-and existing link/extended-attribute cases. The new source-intent revision,
-including drift after earlier restoration, still requires exact-head hosted Linux
-validation. The initial local strict-query failure exposed platform newline
+The next source-only increment records actual forward installation progress for
+each source: untouched, write pending, or installed with a stable version digest.
+Candidate hashes come from the approved source manifest and are checked against
+staged files before runtime mutation. The installed version is recorded only after
+successful installation and matching candidate readback. Before source removal,
+rollback compares bytes, regular single-link identity, ownership, mode, timestamps,
+extended attributes and stable parent identity with that recorded version. Parent
+directory timestamps are excluded because this invocation changes sibling entries.
+An unknown state, incomplete write or changed target stops remaining restoration
+and service restart without removing that target. Untouched sources are skipped;
+their present state is not certified. A target that reappears after removal is
+refused before backup copy. Private outcomes include per-source state and digests,
+while retaining the original failure code, partial-state warning and receipt
+integrity checks. Earlier restored files can still leave partial state.
+
+The preceding source-intent revision at `79b85bf1` passed all 14 hosted checks:
+83 Linux public-contract checks with no skips and 2,079 full-suite tests with eight
+unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
+descendant-termination and existing link/extended-attribute cases. The new target
+guard passed 107 focused local tests with six platform skips; the dependency-free
+runner passed 88 checks with the same six skips (94 discovered). Final independent
+review and exact-head hosted Linux validation remain pending. The
+initial local strict-query failure in the earlier revision exposed platform newline
 translation; exact byte output corrected it without relaxing response parsing.
 Local subprocess cases execute actual rollback operations against disposable files,
 including failures before and after earlier files were restored. No backend repair was
 dispatched or installed. This does not establish deployment readiness: restoration
 remains best effort, there is no verified restore API for a later public postcheck
-failure, and concurrent-state protection remains incomplete. The source query does
-not protect targets from intervening edits or close the backup/target check-to-use
-interval; the reproduced target-only overwrite remains an unresolved hold.
+failure, and concurrent-state protection remains incomplete. The guard addresses
+the reproduced target-only edit observed before recovery removal; it cannot close
+the install/readback or backup/target validation-to-use intervals against a
+privileged writer. Forward target writes, service configuration and runtime-directory
+state are not covered by an atomic transaction. Parent replacement after removal
+and the last absence-check/copy interval remain unprotected; the absence query
+does not bind an atomic restoration to a directory handle. A version digest does not establish
+exclusive ownership, complete restoration or full concurrency protection.
 File, metadata, lock,
 evidence and cleanup operations still lack comprehensive deadlines; the four
 service-command budgets are not a total rollback deadline. File and top-directory synchronization does not prove

@@ -45,6 +45,7 @@ RECOVERY_RESTORE_ATTEMPTED=false
 RECOVERY_RESTORE_FAILURE=""
 RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
+declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=()
 
 # This list is the recursively resolved local-Python import closure of the
 # reviewed gateway entrypoint. Keep it explicit so a partial copy cannot be
@@ -444,11 +445,15 @@ prepare_recovery_directory() {
 record_recovery_evidence() {
   local kind="$1" trigger_code="${2:-0}" requested_source="${3:-}"
   [[ $# -le 3 ]] || return 14
+  local source_states="" source_relative
+  for source_relative in "${BUNDLE_FILES[@]}"; do
+    source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}"$'\n'
+  done
   python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
     "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
     "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
     "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
-    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "${BUNDLE_FILES[@]}" <<'PY'
+    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -463,7 +468,7 @@ directory = Path(sys.argv[1])
 kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
 service_results, service_failure, restore_attempted = sys.argv[8:11]
 restore_failure, restore_exit_code, restore_target = sys.argv[11:14]
-requested_source, relatives = sys.argv[14], sys.argv[15:]
+requested_source, source_states, relatives = sys.argv[14], sys.argv[15], sys.argv[16:]
 if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "source_state"}:
     raise SystemExit("invalid_recovery_receipt_kind")
 if ((kind == "source_state" and requested_source not in relatives)
@@ -524,6 +529,22 @@ payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,
                bundle_sha256=bundle, hardening_sha256=hardening,
                trigger_exit_code=int(trigger_code), restoration_verified=False,
                external_verification="NOT_RECORDED_BY_HELPER")
+if kind in {"helper", "rollback", "rollback_refused"}:
+    states = []
+    for row in source_states.splitlines():
+        fields = row.split(":")
+        if len(fields) != 4 or fields[0] not in relatives:
+            raise SystemExit("invalid_source_write_state_record")
+        relative, state, candidate, version = fields
+        if (state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+                or (candidate and not re.fullmatch(r"[0-9a-f]{64}", candidate))
+                or (version and not re.fullmatch(r"[0-9a-f]{64}", version))):
+            raise SystemExit("invalid_source_write_state_record")
+        states.append(dict(path=relative, state=state, candidate_sha256=candidate or None,
+                           installed_version_sha256=version or None))
+    if [item["path"] for item in states] != relatives:
+        raise SystemExit("invalid_source_write_state_inventory")
+    payload["source_write_states"] = states
 def expected_backup_inventory():
     if len(set(relatives)) != len(relatives) or any(
         not re.fullmatch(r"[A-Za-z0-9_/.-]+", item) or
@@ -640,6 +661,7 @@ if kind == "rollback":
                              else "ROLLBACK_INCOMPLETE_SERVICE_COMMAND_FAILED")
     restoration_targets = {
         "dead_lock": {"gateway_lock"}, "source_state": set(relatives),
+        "target_state": set(relatives), "target_absent": set(relatives),
         "source_remove": set(relatives), "source_copy": set(relatives),
         "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"},
         "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
@@ -688,6 +710,127 @@ print(hashlib.sha256(raw).hexdigest())
 PY
 }
 
+source_target_version() {
+  [[ $# -eq 3 ]] || return 14
+  python3 - "$TARGET_ROOT" "$1" "$2" "$3" "${BUNDLE_FILES[@]}" <<'PY'
+import hashlib
+import json
+import os
+import re
+import stat
+import sys
+from pathlib import Path
+
+root, mode, relative, expected = Path(sys.argv[1]), *sys.argv[2:5]
+allowlist = sys.argv[5:]
+if (mode not in {"capture", "absent"} or relative not in allowlist
+        or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative)
+        or any(part in {"", ".", ".."} for part in relative.split("/"))
+        or (mode == "capture" and not re.fullmatch(r"[0-9a-f]{64}", expected))
+        or (mode == "absent" and expected)):
+    raise SystemExit("invalid_target_version_query")
+if not root.is_absolute() or root.resolve(strict=True) != root:
+    raise SystemExit("unsafe_target_root")
+path = root / relative
+
+def parents():
+    result = []
+    for parent in path.parents:
+        info = parent.lstat()
+        if not stat.S_ISDIR(info.st_mode):
+            raise SystemExit("unsafe_target_parent")
+        # Apply already requires root. Fixture processes may run unprivileged;
+        # within-root parents must belong to this same caller and reject writes
+        # by other accounts. No permission repair is performed here.
+        if parent == root or root in parent.parents:
+            if os.name == "posix" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022):
+                raise SystemExit("unsafe_target_parent_permissions")
+            result.append([str(parent.relative_to(root)), info.st_dev, info.st_ino,
+                           info.st_uid, info.st_gid, info.st_mode])
+    return result
+
+parent_version = parents()
+if mode == "absent":
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        if parents() != parent_version:
+            raise SystemExit("target_parent_changed")
+        sys.stdout.buffer.write(b"absent\n")
+        raise SystemExit(0)
+    raise SystemExit("target_reappeared")
+
+def identity(info):
+    return [info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+            info.st_gid, info.st_size, info.st_mtime_ns, info.st_ctime_ns]
+
+before = path.lstat()
+if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+    raise SystemExit("unsafe_target_file")
+digest = hashlib.sha256()
+descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+with os.fdopen(descriptor, "rb") as stream:
+    if identity(os.fstat(stream.fileno())) != identity(before):
+        raise SystemExit("target_changed_during_read")
+    for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+        digest.update(chunk)
+    attributes = None
+    if os.name == "posix" and hasattr(os, "listxattr"):
+        attributes = [(name, os.getxattr(stream.fileno(), name).hex())
+                      for name in sorted(os.listxattr(stream.fileno()))]
+    if (identity(os.fstat(stream.fileno())) != identity(before)
+            or identity(path.lstat()) != identity(before) or parents() != parent_version):
+        raise SystemExit("target_changed_during_read")
+if digest.hexdigest() != expected:
+    raise SystemExit("target_candidate_mismatch")
+version = dict(sha256=digest.hexdigest(), identity=identity(before), parents=parent_version,
+               xattrs_sha256=hashlib.sha256(json.dumps(attributes).encode()).hexdigest())
+sys.stdout.buffer.write(hashlib.sha256(json.dumps(version, sort_keys=True).encode()).hexdigest().encode() + b"\n")
+PY
+}
+
+capture_source_target_version() {
+  local response
+  response="$(source_target_version capture "$1" "$2" && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_source() {
+  local relative="$1"
+  [[ $# -eq 1 && "${SOURCE_WRITE_STATES[$relative]:-}" == UNTOUCHED
+    && "${SOURCE_CANDIDATE_SHA[$relative]:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+  # Pending is set before the write. Any failed/partial install or readback
+  # remains unknown and must not authorize overwriting that target in recovery.
+  SOURCE_WRITE_STATES[$relative]=WRITE_PENDING
+  install -D -o root -g root -m 0644 -- "$STAGE_DIR/$relative" "$TARGET_ROOT/$relative" || return $?
+  capture_source_target_version "$relative" "${SOURCE_CANDIDATE_SHA[$relative]}" || return $?
+  SOURCE_TARGET_VERSION[$relative]="$CAPTURED_TARGET_VERSION"
+  SOURCE_WRITE_STATES[$relative]=INSTALLED
+}
+
+read_recovery_target_state() {
+  local relative="$1"
+  [[ $# -eq 1 && "${SOURCE_CANDIDATE_SHA[$relative]:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+  case "${SOURCE_WRITE_STATES[$relative]:-}" in
+    UNTOUCHED)
+      [[ -z "${SOURCE_TARGET_VERSION[$relative]:-}" ]] || return 14
+      RECOVERY_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${SOURCE_TARGET_VERSION[$relative]:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_source_target_version "$relative" "${SOURCE_CANDIDATE_SHA[$relative]:-}" || return $?
+      [[ "$CAPTURED_TARGET_VERSION" == "${SOURCE_TARGET_VERSION[$relative]}" ]] || return 14
+      RECOVERY_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
+}
+
+require_recovery_target_absent() {
+  local response
+  response="$(source_target_version absent "$1" '' && printf '.')" || return $?
+  [[ "$response" == $'absent\n.' ]] || return 14
+}
+
 STAGE_DIR="$(mktemp -d /tmp/lumencore-gateway-stage.XXXXXX)"
 chmod 0700 "$STAGE_DIR"
 
@@ -725,6 +868,10 @@ for rel in "${BUNDLE_FILES[@]}"; do
   }
   install -D -m 0644 -- "$source" "$staged"
   [[ "$(sha256sum "$staged" | awk '{print $1}')" == "$(sha256sum "$source" | awk '{print $1}')" ]]
+  SOURCE_WRITE_STATES[$rel]=UNTOUCHED
+  SOURCE_CANDIDATE_SHA[$rel]="$(awk -v relative="$rel" '$2 == relative { print $1 }' "$MANIFEST_FILE")"
+  [[ "${SOURCE_CANDIDATE_SHA[$rel]}" =~ ^[0-9a-f]{64}$ ]]
+  [[ "$(sha256sum "$staged" | awk '{print $1}')" == "${SOURCE_CANDIDATE_SHA[$rel]}" ]]
   if [[ -f "$target" ]]; then
     install -d -m 0700 -- "$(dirname -- "$BACKUP_DIR/existing/$rel")"
     cp -a -- "$target" "$BACKUP_DIR/existing/$rel"
@@ -913,11 +1060,14 @@ rollback() {
       target="$TARGET_ROOT/$rel"
       backup="$BACKUP_DIR/existing/$rel"
       checked_restore_step source_state "$rel" read_recovery_source_state "$rel" || finish_rollback "$rc"
+      checked_restore_step target_state "$rel" read_recovery_target_state "$rel" || finish_rollback "$rc"
+      if [[ "$RECOVERY_TARGET_STATE" == untouched ]]; then continue; fi
       checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
       if [[ "$RECOVERY_SOURCE_STATE" == present ]]; then
         # Recheck before copy as well: a removal may already have happened, but
         # changed recovery bytes must not be copied or followed by service start.
         checked_restore_step source_state "$rel" read_recovery_source_state "$rel" present || finish_rollback "$rc"
+        checked_restore_step target_absent "$rel" require_recovery_target_absent "$rel" || finish_rollback "$rc"
         checked_restore_step source_copy "$rel" cp -a -- "$backup" "$target" || finish_rollback "$rc"
       fi
     done
@@ -985,7 +1135,7 @@ systemctl daemon-reload
 POST_APPLY_HASH_MATCHES=0
 printf '%-64s  %-64s  %s\n' "POST_APPLY_SOURCE_SHA256" "POST_APPLY_TARGET_SHA256" "RELATIVE_PATH"
 for rel in "${BUNDLE_FILES[@]}"; do
-  install -D -o root -g root -m 0644 -- "$STAGE_DIR/$rel" "$TARGET_ROOT/$rel"
+  install_gateway_source "$rel"
   post_apply_source_sha="$(sha256sum "$SOURCE_ROOT/$rel" | awk '{print $1}')"
   post_apply_target_sha="$(sha256sum "$TARGET_ROOT/$rel" | awk '{print $1}')"
   printf '%-64s  %-64s  %s\n' "$post_apply_source_sha" "$post_apply_target_sha" "$rel"
