@@ -20,11 +20,22 @@ Robert Ashworth · Founder / Systems Architect
    each asset's implementation, evidence and next gate. Record reproducible
    findings with the command, environment, expected result and observed result.
 
-**Source and live delivery are separate checks.** The October 7, 2026
-[live audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37614701203)
-of source `e5487b6d` matched 192 of 246 expected files, with 3 mismatches and
-51 missing files. Start from this GitHub checkout; a reachable website does not
-establish current source parity. This dated observation is not a deployment fix.
+**Source and live delivery are separate checks.** The October 21, 2026
+[module-type repair and full live check](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39531993525)
+matched all 246 public files at `02:17:08 UTC`, including their expected MIME
+types. The [retained observation and source receipt](../evidence/public-site-deployments/observations/20261021T021708Z/)
+bind that result to static release `975dc8968b7dbc1c3a410e20a6a50584a3a9d05f`.
+All 246 public blobs are also unchanged at source
+`50969f7f01dd0719866f52d3b70da7b77114ac5c`. Coverage includes the 69 member
+profiles and their 69 matching toolkit downloads.
+
+The [earlier failed deployment gate](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39524266446)
+remains historical evidence: three module bodies matched, but their MIME types
+failed. The [October 7 audit](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/37614701203)
+also retains its 192/246 result. These dated HTTP checks establish static delivery,
+not continuous uptime, browser interaction, member adoption, backend readiness,
+independent scientific validation or customer value. Use the exact checkout for
+the technical review below.
 
 ## The 90-second overview
 

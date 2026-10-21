@@ -1,0 +1,63 @@
+{
+  "schema": "lumencore.public_site_observation_custody.v1",
+  "recorded_utc": "2026-10-21T10:06:00.711244+00:00",
+  "repository": "robertashworth1986-debug/lumen-core-public",
+  "workflow_run_id": 39531993525,
+  "workflow_url": "https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39531993525",
+  "workflow_commit": "50969f7f01dd0719866f52d3b70da7b77114ac5c",
+  "static_release_commit": "975dc8968b7dbc1c3a410e20a6a50584a3a9d05f",
+  "observed_live_at_utc": "2026-10-21T02:17:08.901331Z",
+  "artifact": {
+    "id": 12315957266,
+    "name": "public-module-mime-39531993525-1",
+    "sha256": "1245718821d74408b8e8057e6f77ac1ac7456ed241fd10517b45ba6551c5139a",
+    "downloaded_bytes_match_github_digest": true
+  },
+  "retained_source_files": [
+    {
+      "name": "full-live-verification.json",
+      "sha256": "f5a358acc71a4f4b3d33e2d60714540b337fd5376c099f325d0f45b7b4afe457",
+      "bytes": 128763
+    },
+    {
+      "name": "public-site-release-manifest.json",
+      "sha256": "5bfd4cae24d070d89b9f2f5f5333ceeccfefbda71be27b80ef54e85bee68349d",
+      "bytes": 83327
+    },
+    {
+      "name": "service-before.json",
+      "sha256": "8989e26d271df3c2ef0a5d1f340775f6249ab5845bcaa5dddad612506d312ebb",
+      "bytes": 2953
+    },
+    {
+      "name": "service-after.json",
+      "sha256": "edc9d80bebcc64da76eae9638c165c292c0e5982c4842cf03eab25d54649c7fa",
+      "bytes": 2953
+    }
+  ],
+  "current_main_static_blob_parity": {
+    "source_commit": "50969f7f01dd0719866f52d3b70da7b77114ac5c",
+    "matched": 246,
+    "expected": 246,
+    "member_profile_count": 69,
+    "member_download_count": 69,
+    "profile_and_download_slug_sets_equal": true
+  },
+  "previous_failed_gate": {
+    "run_id": 39524266446,
+    "expected": 246,
+    "matched_with_mime": 243,
+    "reason": "Three .mjs bodies matched but had application/octet-stream. The failed run is historical evidence, not relabeled successful."
+  },
+  "claim_boundaries": [
+    "Dated first-party HTTP byte and MIME observations, not continuous availability or a browser interaction test.",
+    "The 69 matching profiles and downloads do not establish owner receipt, installation, adoption, autonomous operation or measured value.",
+    "The independent GitHub runner is not an independent scientific evaluator; no energy savings, production certification, customer acceptance or revenue follows.",
+    "This observation does not authorize a later publication, runtime mutation, order or paid engagement."
+  ],
+  "excluded_from_public_artifact": [
+    "apply.json containing unnecessary server recovery metadata",
+    "duplicate full-live-verification.stdout.json",
+    "package-receipt.json duplicating the retained manifest identity"
+  ]
+}
