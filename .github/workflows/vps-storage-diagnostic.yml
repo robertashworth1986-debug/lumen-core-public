@@ -7,6 +7,8 @@ on:
       - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
       - 'code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py'
       - 'code/ops/INSPECT_PUBLIC_MIME_MAPPING.py'
+      - 'code/ops/repair_public_mjs_mime.py'
+      - 'tests/test_repair_public_mjs_mime.py'
       - 'tests/test_inspect_public_mime_mapping.py'
       - 'tests/test_collect_vps_instability_evidence.py'
       - 'tests/test_assess_vps_runtime_diagnostic.py'
@@ -18,6 +20,8 @@ on:
       - 'code/ops/ASSESS_VPS_RUNTIME_DIAGNOSTIC.py'
       - 'code/ops/COLLECT_VPS_INSTABILITY_EVIDENCE.py'
       - 'code/ops/INSPECT_PUBLIC_MIME_MAPPING.py'
+      - 'code/ops/repair_public_mjs_mime.py'
+      - 'tests/test_repair_public_mjs_mime.py'
       - 'tests/test_inspect_public_mime_mapping.py'
       - 'tests/test_collect_vps_instability_evidence.py'
       - 'tests/test_assess_vps_runtime_diagnostic.py'
@@ -54,6 +58,7 @@ jobs:
           tests/test_assess_vps_runtime_diagnostic.py
           tests/test_collect_vps_instability_evidence.py
           tests/test_inspect_public_mime_mapping.py
+          tests/test_repair_public_mjs_mime.py
           tests/test_vps_runtime_diagnostic_workflow.py
 
   diagnose:
@@ -99,6 +104,7 @@ jobs:
             --data-binary @/tmp/runtime-diagnostic-status.json
 
       - name: Install SSH key
+        id: ssh_identity
         uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
         with:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
@@ -147,6 +153,70 @@ jobs:
             /tmp/lumencore-public-mime-inspection.json
             /tmp/lumencore-public-mime-inspection-receipt.json
           if-no-files-found: error
+          retention-days: 30
+
+      - name: Prove the repair helper selects the active inherited MIME table
+        if: ${{ !cancelled() && steps.ssh_identity.outcome == 'success' }}
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          HELPER_SOURCE_COMMIT: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          helper_rc=0
+          timeout --signal=TERM --kill-after=10s 180s \
+            ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes \
+              -o ServerAliveInterval=15 -o ServerAliveCountMax=3 \
+              "opc@$VPS_HOST" 'sudo -n python3 - inspect' \
+              < code/ops/repair_public_mjs_mime.py \
+              > /tmp/lumencore-public-mime-helper-raw.json || helper_rc=$?
+          export HELPER_EXIT_CODE="$helper_rc"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          raw_path = Path('/tmp/lumencore-public-mime-helper-raw.json')
+          receipt = {
+              'schema': 'lumencore.public_mime_helper_inspection_receipt.v1',
+              'source_commit': os.environ['HELPER_SOURCE_COMMIT'],
+              'run_id': os.environ['RUN_ID'],
+              'run_attempt': os.environ['RUN_ATTEMPT'],
+              'helper_sha256': hashlib.sha256(Path('code/ops/repair_public_mjs_mime.py').read_bytes()).hexdigest(),
+              'invocation_exit_code': int(os.environ['HELPER_EXIT_CODE']),
+              'proof_passed': False,
+              'evidence': None,
+          }
+          try:
+              if raw_path.stat().st_size > 262144:
+                  raise ValueError('evidence_size_limit')
+              raw = raw_path.read_bytes()
+              evidence = json.loads(raw)
+              if not isinstance(evidence, dict) or evidence.get('status') not in ('INSPECTED', 'FAILED_STATE_REVIEW_REQUIRED'):
+                  raise ValueError('unexpected_evidence_schema')
+              receipt['evidence_sha256'] = hashlib.sha256(raw).hexdigest()
+              receipt['evidence'] = evidence
+              receipt['proof_passed'] = (
+                  receipt['invocation_exit_code'] == 0
+                  and evidence.get('schema') == 'lumencore.approved_public_mime_repair.v1'
+                  and evidence.get('mode') == 'inspect'
+                  and evidence.get('status') == 'INSPECTED'
+                  and evidence.get('configuration_modified') is False
+                  and evidence.get('service_reloaded') is False
+              )
+          except (OSError, ValueError, UnicodeError) as error:
+              receipt['evidence_error_type'] = type(error).__name__
+          Path('/tmp/lumencore-public-mime-helper-inspection.json').write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+          raise SystemExit(0 if receipt['proof_passed'] else 1)
+          PY
+
+      - name: Retain the repair helper inspection including refusal evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lumencore-public-mime-helper-inspection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/lumencore-public-mime-helper-inspection.json
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Capture runtime, gateway, and capacity evidence
