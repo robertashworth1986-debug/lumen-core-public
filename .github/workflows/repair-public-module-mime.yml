@@ -49,10 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
       - run: python -m pip install --disable-pip-version-check pytest==9.1.0
@@ -99,7 +99,7 @@ jobs:
       STATIC_RELEASE_COMMIT: 975dc8968b7dbc1c3a410e20a6a50584a3a9d05f
     steps:
       - name: Checkout exact reviewed repair source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.source_commit }}
           fetch-depth: 0
@@ -122,7 +122,7 @@ jobs:
           timeout 30s python3 code/ops/VERIFY_PUBLIC_MIME_SERVICE_CONTRACTS.py
           --output out/public-module-mime/service-before.json
       - name: Install existing SSH identity and pinned host trust
-        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
         with:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
@@ -185,7 +185,7 @@ jobs:
             | tee out/public-module-mime/rollback.json
       - name: Retain success or failure evidence without full server configuration
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: public-module-mime-${{ github.run_id }}-${{ github.run_attempt }}
           path: out/public-module-mime/*.json
