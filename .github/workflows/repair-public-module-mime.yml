@@ -1,0 +1,192 @@
+name: Repair approved public JavaScript module MIME mapping
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/repair-public-module-mime.yml'
+      - 'code/ops/repair_public_mjs_mime.py'
+      - 'code/ops/VERIFY_PUBLIC_MIME_SERVICE_CONTRACTS.py'
+      - 'tests/test_repair_public_mjs_mime.py'
+      - 'tests/test_public_mime_service_contracts.py'
+      - 'tests/test_public_module_mime_workflow.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-public-module-mime.yml'
+      - 'code/ops/repair_public_mjs_mime.py'
+      - 'code/ops/VERIFY_PUBLIC_MIME_SERVICE_CONTRACTS.py'
+      - 'tests/test_repair_public_mjs_mime.py'
+      - 'tests/test_public_mime_service_contracts.py'
+      - 'tests/test_public_module_mime_workflow.py'
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Exact current-main commit containing the reviewed repair
+        required: true
+        type: string
+      expected_mime_sha256:
+        description: SHA-256 of the active MIME table observed before approval
+        required: true
+        type: string
+      approval:
+        description: Explicit approved MIME-only production correction
+        required: true
+        type: choice
+        default: HOLD
+        options:
+          - HOLD
+          - APPLY_PUBLIC_MJS_MIME
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check pytest==9.1.0
+      - name: Verify transaction, service and workflow contracts
+        run: >-
+          python -m pytest -q
+          tests/test_repair_public_mjs_mime.py
+          tests/test_public_mime_service_contracts.py
+          tests/test_public_module_mime_workflow.py
+
+  authorize:
+    needs: validate
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require exact main source, observed target and explicit scope
+        env:
+          APPROVAL: ${{ inputs.approval }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          EXPECTED_MIME_SHA256: ${{ inputs.expected_mime_sha256 }}
+          WORKFLOW_SHA: ${{ github.sha }}
+          WORKFLOW_REF: ${{ github.ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$APPROVAL" == APPLY_PUBLIC_MJS_MIME ]]
+          [[ "$WORKFLOW_REF" == refs/heads/main ]]
+          [[ "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$SOURCE_COMMIT" == "$WORKFLOW_SHA" ]]
+          [[ "$EXPECTED_MIME_SHA256" =~ ^[0-9a-f]{64}$ ]]
+
+  repair:
+    concurrency:
+      group: lumencore-production-site
+      cancel-in-progress: false
+    needs: [validate, authorize]
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: production
+      url: https://lumen-core.ai/
+    env:
+      SOURCE_COMMIT: ${{ inputs.source_commit }}
+      EXPECTED_MIME_SHA256: ${{ inputs.expected_mime_sha256 }}
+      STATIC_RELEASE_COMMIT: 975dc8968b7dbc1c3a410e20a6a50584a3a9d05f
+    steps:
+      - name: Checkout exact reviewed repair source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Confirm current main and prepare immutable release manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          [[ "$(git rev-parse HEAD)" == "$SOURCE_COMMIT" ]]
+          [[ "$(git rev-parse origin/main)" == "$SOURCE_COMMIT" ]]
+          install -d -m 700 out/public-module-mime
+          python3 code/deploy/package_public_site_release.py \
+            --source-commit "$STATIC_RELEASE_COMMIT" \
+            --archive out/public-module-mime/public-site-release.tar \
+            --manifest out/public-module-mime/public-site-release-manifest.json \
+            > out/public-module-mime/package-receipt.json
+      - name: Verify seven service contracts before changing configuration
+        run: >-
+          timeout 30s python3 code/ops/VERIFY_PUBLIC_MIME_SERVICE_CONTRACTS.py
+          --output out/public-module-mime/service-before.json
+      - name: Install existing SSH identity and pinned host trust
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
+        with:
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.VPS_KNOWN_HOSTS }}
+      - name: Apply the approved mapping with bounded transactional verification
+        id: apply
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_MIME_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10 \
+            "opc@$VPS_HOST" "sudo -n python3 - apply --expected-sha256 '$EXPECTED_MIME_SHA256'" \
+            < code/ops/repair_public_mjs_mime.py \
+            | tee out/public-module-mime/apply.json
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          r = json.loads(Path('out/public-module-mime/apply.json').read_text())
+          assert r['status'] == 'REPAIRED_THREE_FILES_VERIFIED'
+          assert r['original_sha256'] == os.environ['EXPECTED_MIME_SHA256']
+          assert re.fullmatch(r'[a-f0-9]{64}', r['candidate_sha256'])
+          assert re.fullmatch(r'\d{8}T\d{6}Z-[a-f0-9]{32}', r['rollback_id'])
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('candidate_sha256=' + r['candidate_sha256'] + '\n')
+              f.write('rollback_id=' + r['rollback_id'] + '\n')
+          PY
+      - name: Verify every approved public file from the independent runner
+        id: full_gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 420s python3 code/ops/VERIFY_PUBLIC_SITE_LIVE_RELEASE.py \
+            --source-commit "$STATIC_RELEASE_COMMIT" \
+            --manifest out/public-module-mime/public-site-release-manifest.json \
+            --base-url https://lumen-core.ai --timeout 8 \
+            --output out/public-module-mime/full-live-verification.json \
+            > out/public-module-mime/full-live-verification.stdout.json
+      - name: Verify all seven service contracts after the reload
+        id: service_gate
+        if: ${{ always() && steps.apply.outcome == 'success' }}
+        run: >-
+          timeout 30s python3 code/ops/VERIFY_PUBLIC_MIME_SERVICE_CONTRACTS.py
+          --output out/public-module-mime/service-after.json
+      - name: Restore only this MIME table if either independent gate fails
+        if: ${{ always() && steps.apply.outcome == 'success' && (steps.full_gate.outcome != 'success' || steps.service_gate.outcome != 'success') }}
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          CANDIDATE_SHA256: ${{ steps.apply.outputs.candidate_sha256 }}
+          ROLLBACK_ID: ${{ steps.apply.outputs.rollback_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_MIME_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$CANDIDATE_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$ROLLBACK_ID" =~ ^[0-9]{8}T[0-9]{6}Z-[a-f0-9]{32}$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10 \
+            "opc@$VPS_HOST" "sudo -n python3 - rollback --rollback-id '$ROLLBACK_ID' --expected-sha256 '$EXPECTED_MIME_SHA256' --expected-candidate-sha256 '$CANDIDATE_SHA256'" \
+            < code/ops/repair_public_mjs_mime.py \
+            | tee out/public-module-mime/rollback.json
+      - name: Retain success or failure evidence without full server configuration
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: public-module-mime-${{ github.run_id }}-${{ github.run_attempt }}
+          path: out/public-module-mime/*.json
+          if-no-files-found: warn
+          retention-days: 30
