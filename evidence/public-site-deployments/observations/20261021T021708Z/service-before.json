@@ -1,0 +1,107 @@
+{
+  "schema": "lumencore.mime_repair_service_gate.v1",
+  "observed_at": "2026-10-21T02:15:52.054316+00:00",
+  "required": 7,
+  "passed": 7,
+  "results": [
+    {
+      "url": "https://lumen-core.ai/",
+      "http_status": 200,
+      "content_type": "text/html",
+      "body_sha256": "0fda517f1652c6d3afa74eac8b56522ef25500cd63a7e7be52eb8c5c40a58457",
+      "checks": {
+        "status": true,
+        "mime": true,
+        "redirect": true,
+        "body_bound": true,
+        "json": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://lumen-core.ai/nginx-health",
+      "http_status": 200,
+      "content_type": "application/json",
+      "body_sha256": "a5e1063137776934e519ecb9fee2b9eabc02339f84875334605b3b7a136cabed",
+      "checks": {
+        "status": true,
+        "mime": true,
+        "redirect": true,
+        "body_bound": true,
+        "json": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://lumen-core.ai/health",
+      "http_status": 200,
+      "content_type": "application/json",
+      "body_sha256": "5c062ac49cd7cae4ed61a448ccaaf669149db07a3851b730088d77879d1a5ba4",
+      "checks": {
+        "status": true,
+        "mime": true,
+        "redirect": true,
+        "body_bound": true,
+        "json": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://app.lumen-core.ai/",
+      "http_status": 302,
+      "content_type": "text/html",
+      "body_sha256": "84c1fdfe0e68e2ed14b46fd867e91688936072ad51471ea9fa0c7616480ab912",
+      "checks": {
+        "status": true,
+        "mime": true,
+        "redirect": true,
+        "body_bound": true,
+        "json": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://app.lumen-core.ai/health",
+      "http_status": 200,
+      "content_type": "application/json",
+      "body_sha256": "c8480c8f3cc61490dfc64870fc2953c9edb13462cb16b7c3f781412c2c38a625",
+      "checks": {
+        "status": true,
+        "mime": true,
+        "redirect": true,
+        "body_bound": true,
+        "json": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://research.lumen-core.ai/",
+      "http_status": 302,
+      "content_type": "text/html",
+      "body_sha256": "84c1fdfe0e68e2ed14b46fd867e91688936072ad51471ea9fa0c7616480ab912",
+      "checks": {
+        "status": true,
+        "mime": true,
+        "redirect": true,
+        "body_bound": true,
+        "json": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://research.lumen-core.ai/health",
+      "http_status": 200,
+      "content_type": "application/json",
+      "body_sha256": "4848e5755aa580bc72357facbf239d92611884978f9ddf1865b63b2d6d16006a",
+      "checks": {
+        "status": true,
+        "mime": true,
+        "redirect": true,
+        "body_bound": true,
+        "json": true
+      },
+      "passed": true
+    }
+  ],
+  "claim_boundary": "Seven bounded public observations; no continuous uptime or business outcome established."
+}

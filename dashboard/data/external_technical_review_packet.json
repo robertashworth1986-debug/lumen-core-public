@@ -137,8 +137,8 @@
     {
       "path": "docs/REVIEWER_START_HERE.md",
       "purpose": "Current-source reproduction route, dated repair scope and remaining gates.",
-      "bytes": 30109,
-      "sha256": "7035f56a1d6ff8ee02e4184f90b235ff795156c44b892b9b2a89aff36d63cd03",
+      "bytes": 31209,
+      "sha256": "36581b6a7ff09238bf77cca6a7c003676264cc9ebd5e578aa235bb3cd5eeed4e",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
