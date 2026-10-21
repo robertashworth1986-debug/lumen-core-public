@@ -257,8 +257,8 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
         'gateway singleton lock did not bind to the systemd main PID',
         'gateway singleton lock identity is not bounded',
         'cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN"',
-        'chown --no-dereference "$prior_drop_in_uid:$prior_drop_in_gid" "$SERVICE_DROP_IN_DIR"',
-        'chown --no-dereference "$prior_run_uid:$prior_run_gid" "$RUN_DIR"',
+        'chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR"',
+        'chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR"',
         'if [[ "$SERVICE_WAS_ACTIVE" == true ]]',
         "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK",
     ):
@@ -326,6 +326,8 @@ def _run_gateway_rollback_guard(
     recovery_case: str | None = None, evidence: dict | None = None,
     service_failure: str = "", service_exit_code: int = 9,
     service_was_active: bool = True, real_timeout_mode: str = "",
+    restore_fault: str = "", second_source: bool = False, prior_dropin: bool = False,
+    directory_case: str = "", metadata_case: str = "", real_lock_case: str = "",
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -351,6 +353,26 @@ def _run_gateway_rollback_guard(
             "service.state": f"service_was_active={str(service_was_active).lower()}\n",
         }.items():
             (root / "backup" / name).write_text(value, encoding="utf-8")
+        if second_source:
+            (root / "target/second.py").write_bytes(b"second candidate\n")
+            (root / "backup/existing/second.py").write_bytes(b"second previous\n")
+        if prior_dropin:
+            (root / "backup/service-drop-in.state").write_text("present\n")
+            (root / "backup/service-drop-in.before").write_bytes(b"previous hardening\n")
+        if directory_case:
+            family = "service-drop-in-dir" if directory_case.endswith("dropin") else "run-dir"
+            folder = root / ("dropins" if directory_case.endswith("dropin") else "run")
+            (root / f"backup/{family}.state").write_text("missing\n")
+            (root / f"backup/{family}.metadata").unlink()
+            if directory_case.startswith("nonempty"):
+                (folder / "unrelated-retained").write_bytes(b"preserve unrelated bytes\n")
+            if directory_case.startswith("absent"):
+                if (folder / "hardening.conf").exists():
+                    (folder / "hardening.conf").unlink()
+                folder.rmdir()
+        if metadata_case and not metadata_case.startswith("missing:"):
+            filename, invalid = metadata_case.split(":", 1)
+            (root / "backup" / filename).write_text(invalid + "\n")
         harness = r'''
 set -Eeuo pipefail
 TARGET_ROOT="$PWD/target"
@@ -372,6 +394,9 @@ RECOVERY_MANIFEST_SHA=""
 RECOVERY_SERVICE_RESULTS=""
 RECOVERY_SERVICE_FAILURE=""
 RECOVERY_RESTORE_ATTEMPTED=false
+RECOVERY_RESTORE_FAILURE=""
+RECOVERY_RESTORE_EXIT_CODE=0
+RECOVERY_RESTORE_TARGET=""
 RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
@@ -406,6 +431,9 @@ systemctl() {
     [[ "$PREDICATE_PASSES" == true ]]
   else
     printf 'SYSTEMCTL:%s\n' "$1" >> "$PWD/systemctl.calls"
+    if [[ "$1" == stop && -n "$DROP_BACKUP_AFTER_VERIFY" ]]; then
+      command rm -- "$BACKUP_DIR/$DROP_BACKUP_AFTER_VERIFY"
+    fi
     if [[ "$1" == "$SERVICE_FAILURE" ]]; then return "$SERVICE_EXIT_CODE"; fi
   fi
 }
@@ -430,11 +458,32 @@ stat() {
 require_safe_recovery_directory() { :; }
 remove_verified_dead_lock() { printf 'lock\n' >> "$PWD/restore.calls"; }
 record_recovery_evidence() { :; }
-chown() { printf 'chown\n' >> "$PWD/restore.calls"; }
-chmod() { printf 'chmod\n' >> "$PWD/restore.calls"; }
-rm() { printf 'rm\n' >> "$PWD/restore.calls"; command rm "$@"; }
+fixture_operation() {
+  local command_name="$1" fixture_target=unknown
+  case "$2" in
+    "$TARGET_ROOT/entry.py") fixture_target=first_source ;;
+    "$TARGET_ROOT/second.py") fixture_target=second_source ;;
+    "$SERVICE_DROP_IN") fixture_target=dropin ;;
+    "$SERVICE_DROP_IN_DIR") fixture_target=dropin_dir ;;
+    "$RUN_DIR") fixture_target=run_dir ;;
+    "$LOCK_FILE") fixture_target=lock ;;
+  esac
+  printf '%s:%s\n' "$command_name" "$fixture_target" >> "$PWD/operation.calls"
+  if [[ "$RESTORE_FAULT" == "$command_name:$fixture_target" ]]; then return 23; fi
+}
+chown() { printf 'chown\n' >> "$PWD/restore.calls"; fixture_operation chown "${@: -1}"; }
+chmod() { printf 'chmod\n' >> "$PWD/restore.calls"; fixture_operation chmod "${@: -1}"; }
+rm() {
+  printf 'rm\n' >> "$PWD/restore.calls"
+  fixture_operation rm "${@: -1}" || return $?
+  command rm "$@"
+}
+install() { fixture_operation install "${@: -1}" || return $?; command mkdir -p -- "${@: -1}"; }
+rmdir() { fixture_operation rmdir "${@: -1}" || return $?; command rmdir "$@"; }
+tr() { if [[ "$REAL_LOCK_CASE" == tr_failure ]]; then return 27; fi; command tr "$@"; }
 cp() {
   printf 'cp\n' >> "$PWD/restore.calls"
+  fixture_operation cp "${@: -1}" || return $?
   if [[ "$SIGNAL_DURING_COPY" == true ]]; then
     kill -TERM "$BASHPID"
     printf 'FIXTURE_TERM_SENT\n' >&2
@@ -480,7 +529,21 @@ fi
             harness += 'export PATH="/usr/bin:$PATH"\nRECOVERY_TIMEOUT_BIN="$(type -P timeout)"\n'
             harness += 'export PATH="$PWD/bin:$PATH"\n'
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
+        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_metadata", "remove_recovery_directory"):
+            harness += _bash_function(script, name) + "\n"
+        if real_lock_case:
+            harness += _bash_function(script, "remove_verified_dead_lock") + "\n"
+            if real_lock_case == "live":
+                harness += 'printf "%s\\n" "$BASHPID" > "$LOCK_FILE"\n'
+            elif real_lock_case == "invalid":
+                harness += 'printf "invalid\\n" > "$LOCK_FILE"\n'
+            elif real_lock_case == "symlink":
+                (root / "run/fixture.lock").symlink_to(root / "not-present")
+            elif real_lock_case != "absent":
+                harness += 'printf "999999999\\n" > "$LOCK_FILE"\n'
         harness += rollback_source + "\n"
+        if second_source:
+            harness += 'BUNDLE_FILES+=(second.py)\n'
         if not service_was_active:
             harness += 'SERVICE_WAS_ACTIVE=false\n'
         if recovery_case:
@@ -558,6 +621,8 @@ fi
             SERVICE_FAILURE=service_failure,
             SERVICE_EXIT_CODE=str(service_exit_code),
             REAL_TIMEOUT_MODE=real_timeout_mode,
+            RESTORE_FAULT=restore_fault, REAL_LOCK_CASE=real_lock_case,
+            DROP_BACKUP_AFTER_VERIFY=metadata_case.split(":", 1)[1] if metadata_case.startswith("missing:") else "",
         )
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
         started = time.monotonic()
@@ -598,12 +663,22 @@ fi
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
             evidence["backup_exists"] = (root / "backup").is_dir()
+            evidence["second_target"] = (root / "target/second.py").read_bytes() if (root / "target/second.py").exists() else None
+            evidence["second_backup"] = (root / "backup/existing/second.py").read_bytes() if (root / "backup/existing/second.py").exists() else None
+            evidence["retained_unrelated_files"] = [p.read_bytes() for p in root.glob("*/unrelated-retained")]
+            evidence["lock_exists"] = (root / "run/fixture.lock").exists()
+            evidence["dropin_directory_exists"] = (root / "dropins").exists()
+            dropin_path = root / "dropins/hardening.conf"
+            evidence["dropin_bytes"] = dropin_path.read_bytes() if dropin_path.is_file() else None
+            evidence["run_directory_exists"] = (root / "run").exists()
             evidence["originally_missing_target_exists"] = (root / "target/absent.py").exists()
             evidence["outside_refusal_written"] = (root / "outside-backup/rollback_refused.json").exists()
             calls = root / "systemctl.calls"
             evidence["service_calls"] = calls.read_text() if calls.exists() else ""
             calls = root / "restore.calls"
             evidence["restore_calls"] = calls.read_text() if calls.exists() else ""
+            calls = root / "operation.calls"
+            evidence["operation_calls"] = calls.read_text() if calls.exists() else ""
             for kind in ("prepared", "helper", "rollback", "rollback_refused"):
                 path = root / "backup" / (kind + ".json")
                 if path.exists():
@@ -771,11 +846,11 @@ def test_gateway_rollback_failure_keeps_original_code_without_reentry() -> None:
     assert completed.stderr.count("Rolling back the complete gateway") == 1
     assert completed.stderr.count("FIXTURE_COPY_FAILURE") == 1
     assert completed.stdout.count("SYSTEMCTL:stop\n") == 1
-    assert completed.stdout.count("SYSTEMCTL:start\n") == 1
+    assert completed.stdout.count("SYSTEMCTL:start\n") == 0
     assert completed.stdout.endswith("CLEANUP\n")
     # A failed restore remains a real failure, never a claim of recovery success.
     assert restored is None
-    assert not dropin_exists
+    assert dropin_exists
 
 
 def test_gateway_term_during_rollback_preserves_recovery_and_original_code() -> None:
@@ -802,7 +877,7 @@ def test_gateway_failed_restore_retains_private_backup_and_unverified_receipt() 
     assert completed.returncode == 17, completed.stderr
     assert restored is None and evidence["backup_exists"]
     assert evidence["backup"] == b"previous source\n"
-    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert evidence["rollback"]["status"] == "ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED"
     assert evidence["rollback"]["trigger_exit_code"] == 17
     assert evidence["rollback"]["restoration_verified"] is False
     assert evidence["rollback"]["manifest_sha256"] == evidence["prepared_sha256"]
@@ -812,6 +887,190 @@ def test_gateway_failed_restore_retains_private_backup_and_unverified_receipt() 
     assert "evidence retained" in completed.stdout
     if os.name == "posix":
         assert evidence["prepared_mode"] == evidence["rollback_mode"] == 0o600
+
+
+def test_gateway_restoration_faults_stop_before_all_later_operations() -> None:
+    cases = [
+        ("rm:first_source", "source_remove", {}),
+        ("cp:first_source", "source_copy", {}),
+        ("rm:second_source", "source_remove", {"second_source": True}),
+        ("cp:second_source", "source_copy", {"second_source": True}),
+        ("rm:dropin", "dropin_remove", {}),
+        ("install:dropin_dir", "dropin_parent_create", {"prior_dropin": True}),
+        ("cp:dropin", "dropin_copy", {"prior_dropin": True}),
+        ("chown:dropin_dir", "dropin_chown", {}),
+        ("chmod:dropin_dir", "dropin_chmod", {}),
+        ("chown:run_dir", "run_chown", {}),
+        ("chmod:run_dir", "run_chmod", {}),
+        ("rmdir:dropin_dir", "dropin_directory_remove", {"directory_case": "empty_dropin"}),
+        ("rmdir:run_dir", "run_directory_remove", {"directory_case": "empty_run"}),
+    ]
+    for fault, operation, options in cases:
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="restoration_fault", restore_fault=fault, evidence=evidence, **options,
+        )
+        assert completed.returncode == 17, (fault, completed.stderr)
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        assert evidence["operation_calls"].splitlines()[-1] == fault, (fault, evidence)
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n", (fault, evidence)
+        receipt = evidence["rollback"]
+        assert receipt["status"] == "ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED"
+        assert receipt["failed_restoration_operation"]["operation"] == operation
+        assert receipt["failed_restoration_operation"]["exit_code"] == 23
+        assert receipt["trigger_exit_code"] == 17 and receipt["restoration_verified"] is False
+        assert receipt["partial_state_possible"] is True and receipt["further_restoration_stopped"] is True
+        assert receipt["service_restart_attempted"] is False
+        assert evidence["backup"] == b"previous source\n"
+        if fault == "rm:first_source":
+            assert current == b"candidate source\n" and dropin_exists
+        if fault == "cp:first_source":
+            assert current is None and dropin_exists
+        if "second_source" in fault:
+            assert current == b"previous source\n" and dropin_exists
+            assert evidence["second_backup"] == b"second previous\n"
+            assert evidence["second_target"] == (b"second candidate\n" if fault.startswith("rm:") else None)
+
+
+def test_gateway_inner_lock_errors_cannot_be_hidden_by_successful_echo() -> None:
+    for lock_case, fault, expected_code in (
+        ("dead", "rm:lock", 23), ("tr_failure", "", 27), ("invalid", "", 14), ("live", "", 14),
+    ):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="inner_lock_failure", real_lock_case=lock_case, restore_fault=fault, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"candidate source\n" and dropin_exists
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["operation_calls"] == ("rm:lock\n" if fault else "")
+        assert "Removed verified dead-PID" not in completed.stdout
+        assert evidence["lock_exists"]
+        assert evidence["rollback"]["failed_restoration_operation"] == dict(
+            operation="dead_lock", target="gateway_lock", exit_code=expected_code)
+
+
+def test_gateway_valid_or_absent_lock_and_prior_dropin_restore_normally() -> None:
+    for lock_case in ("dead", "absent"):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="valid_lock", real_lock_case=lock_case, prior_dropin=True, evidence=evidence,
+        )
+        assert completed.returncode == 17 and current == b"previous source\n" and dropin_exists
+        assert evidence["dropin_bytes"] == b"previous hardening\n"
+        assert not evidence["lock_exists"]
+        assert evidence["service_calls"].splitlines() == [
+            "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed", "SYSTEMCTL:start"]
+        assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+        assert "failed_restoration_operation" not in evidence["rollback"]
+
+
+@unittest.skipIf(os.name != "posix", "Real dangling lock symlink refusal requires Linux CI")
+def test_gateway_dangling_lock_link_cannot_be_mistaken_for_absence() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="linked_lock", real_lock_case="symlink", evidence=evidence,
+    )
+    assert completed.returncode == 17 and current == b"candidate source\n"
+    assert evidence["operation_calls"] == "" and evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert evidence["rollback"]["failed_restoration_operation"]["exit_code"] == 14
+
+
+def test_gateway_missing_before_directories_preserve_nonempty_and_allow_absence() -> None:
+    for family in ("dropin", "run"):
+        for case in ("nonempty", "empty", "absent"):
+            evidence: dict = {}
+            completed, current, _ = _run_gateway_rollback_guard(
+                _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+                recovery_case="directory_restore", directory_case=case + "_" + family, evidence=evidence,
+            )
+            assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+            if case == "nonempty":
+                assert evidence["retained_unrelated_files"] == [b"preserve unrelated bytes\n"]
+                assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+                assert evidence["operation_calls"].splitlines()[-1] == "rmdir:" + ("dropin_dir" if family == "dropin" else "run_dir")
+                assert evidence["rollback"]["status"] == "ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED"
+            else:
+                assert not evidence["dropin_directory_exists" if family == "dropin" else "run_directory_exists"]
+                assert evidence["service_calls"].endswith("SYSTEMCTL:start\n")
+                assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+
+
+def test_gateway_malformed_metadata_stops_restoration_without_starting_service() -> None:
+    for filename, operation in (("service-drop-in-dir.metadata", "dropin_metadata_read"),
+                                ("run-dir.metadata", "run_metadata_read")):
+        for malformed in ("1000 bad 755", "1000 1000 999", "1000 1000 755 extra", "1000 1000 755\n0 0 700"):
+            evidence: dict = {}
+            completed, current, _ = _run_gateway_rollback_guard(
+                _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+                recovery_case="bad_metadata", metadata_case=filename + ":" + malformed, evidence=evidence,
+            )
+            assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+            assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+            assert evidence["rollback"]["failed_restoration_operation"]["operation"] == operation
+            assert evidence["rollback"]["failed_restoration_operation"]["exit_code"] == 14
+            expected = ["rm:first_source", "cp:first_source", "rm:dropin"]
+            if operation == "run_metadata_read":
+                expected += ["chown:dropin_dir", "chmod:dropin_dir"]
+            assert evidence["operation_calls"].splitlines() == expected
+
+
+def test_gateway_missing_required_reads_stop_and_do_not_weaken_receipt_validation() -> None:
+    for filename, operation in (
+        ("service-drop-in.state", "dropin_state_read"),
+        ("service-drop-in-dir.state", "dropin_directory_state_read"),
+        ("run-dir.state", "run_directory_state_read"),
+        ("service-drop-in-dir.metadata", "dropin_metadata_read"),
+        ("run-dir.metadata", "run_metadata_read"),
+    ):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="missing_after_verification", metadata_case="missing:" + filename, evidence=evidence,
+        )
+        assert completed.returncode == 17, completed.stderr
+        assert "restoration operation " + operation + " failed" in completed.stderr
+        assert "receipt persistence failed" in completed.stderr
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert "rollback" not in evidence and evidence["backup"] == b"previous source\n"
+        expected = ["rm:first_source", "cp:first_source", "rm:dropin"]
+        if filename.startswith("run-dir"):
+            expected += ["chown:dropin_dir", "chmod:dropin_dir"]
+        assert evidence["operation_calls"].splitlines() == expected
+
+
+def test_gateway_state_parser_rejects_missing_or_noncanonical_values() -> None:
+    function = _bash_function(_repair_script(), "read_recovery_state")
+    with tempfile.TemporaryDirectory(prefix="gateway-state-read-") as directory:
+        root = Path(directory)
+        (root / "fixture.sh").write_text('set -Eeuo pipefail\n' + function + '\nread_recovery_state "$1"\nprintf READ_OK\n', newline="\n")
+        for value, expected in (("present\n", 0), ("missing\n", 0), ("unexpected\n", 14),
+                                ("present\nmissing\n", 14), ("\n", 14), (None, 1)):
+            state = root / "state"
+            if value is None:
+                state.unlink()
+            else:
+                state.write_text(value, newline="\n")
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh", "state"], cwd=root,
+                                       capture_output=True, text=True, timeout=10, check=False)
+            assert completed.returncode == expected, completed.stderr
+            assert completed.stdout == ("READ_OK" if expected == 0 else "")
+
+
+def test_gateway_restoration_receipt_failure_and_second_signal_keep_trigger_code() -> None:
+    evidence: dict = {}
+    completed, current, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure", copy_fails=True, signal_during_copy=True, evidence=evidence,
+    )
+    assert completed.returncode == 17 and current is None and dropin_exists
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert "FIXTURE_TERM_SENT" in completed.stderr and "receipt persistence failed" in completed.stderr
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup"] == b"previous source\n"
+    assert evidence["rollback"] is None
 
 
 def test_gateway_later_gate_failure_cannot_remove_recovery_evidence() -> None:

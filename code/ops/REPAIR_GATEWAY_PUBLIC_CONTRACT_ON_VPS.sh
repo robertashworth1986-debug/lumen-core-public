@@ -42,6 +42,9 @@ RECOVERY_TIMEOUT_BIN=""
 RECOVERY_SERVICE_RESULTS=""
 RECOVERY_SERVICE_FAILURE=""
 RECOVERY_RESTORE_ATTEMPTED=false
+RECOVERY_RESTORE_FAILURE=""
+RECOVERY_RESTORE_EXIT_CODE=0
+RECOVERY_RESTORE_TARGET=""
 
 # This list is the recursively resolved local-Python import closure of the
 # reviewed gateway entrypoint. Keep it explicit so a partial copy cannot be
@@ -443,7 +446,8 @@ record_recovery_evidence() {
   python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
     "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
     "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
-    "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${BUNDLE_FILES[@]}" <<'PY'
+    "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
+    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -457,7 +461,8 @@ from pathlib import Path
 directory = Path(sys.argv[1])
 kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
 service_results, service_failure, restore_attempted = sys.argv[8:11]
-relatives = sys.argv[11:]
+restore_failure, restore_exit_code, restore_target = sys.argv[11:14]
+relatives = sys.argv[14:]
 if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused"}:
     raise SystemExit("invalid_recovery_receipt_kind")
 if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
@@ -624,6 +629,30 @@ if kind == "rollback":
     if service_failure:
         payload["status"] = ("ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED" if service_failure == "stop"
                              else "ROLLBACK_INCOMPLETE_SERVICE_COMMAND_FAILED")
+    restoration_targets = {
+        "dead_lock": {"gateway_lock"}, "source_remove": set(relatives), "source_copy": set(relatives),
+        "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"},
+        "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
+        "dropin_directory_state_read": {"service_drop_in_directory"},
+        "dropin_metadata_read": {"service_drop_in_directory"},
+        "dropin_chown": {"service_drop_in_directory"}, "dropin_chmod": {"service_drop_in_directory"},
+        "dropin_directory_remove": {"service_drop_in_directory"},
+        "run_directory_state_read": {"run_directory"}, "run_metadata_read": {"run_directory"},
+        "run_chown": {"run_directory"}, "run_chmod": {"run_directory"},
+        "run_directory_remove": {"run_directory"},
+    }
+    if restore_failure:
+        if (restore_failure not in restoration_targets or restore_target not in restoration_targets[restore_failure]
+                or not re.fullmatch(r"[0-9]{1,3}", restore_exit_code) or not 1 <= int(restore_exit_code) <= 255
+                or restore_attempted != "true" or service_failure
+                or [(item["verb"], item["exit_code"]) for item in commands] != [("stop", 0)]):
+            raise SystemExit("invalid_restoration_failure_record")
+        payload.update(status="ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED", partial_state_possible=True,
+                       further_restoration_stopped=True, service_restart_attempted=False,
+                       failed_restoration_operation=dict(operation=restore_failure, target=restore_target,
+                                                         exit_code=int(restore_exit_code)))
+    elif restore_exit_code != "0" or restore_target:
+        raise SystemExit("unexpected_restoration_failure_fields")
 raw = (json.dumps(payload, sort_keys=True, indent=2) + "\n").encode()
 destination = directory / (kind + ".json")
 fd, temporary = tempfile.mkstemp(prefix=".receipt-", dir=directory)
@@ -748,7 +777,7 @@ assert decision.mode == "blocked_live_order"
 PY
 
 remove_verified_dead_lock() {
-  if [[ ! -e "$LOCK_FILE" ]]; then
+  if [[ ! -e "$LOCK_FILE" && ! -L "$LOCK_FILE" ]]; then
     return 0
   fi
   [[ -f "$LOCK_FILE" && ! -L "$LOCK_FILE" ]] || {
@@ -756,7 +785,7 @@ remove_verified_dead_lock() {
     return 14
   }
   local lock_pid
-  lock_pid="$(tr -d '[:space:]' < "$LOCK_FILE")"
+  lock_pid="$(tr -d '[:space:]' < "$LOCK_FILE")" || return $?
   [[ "$lock_pid" =~ ^[1-9][0-9]*$ ]] || {
     echo "ERROR: singleton lock PID is not a positive integer" >&2
     return 14
@@ -765,7 +794,7 @@ remove_verified_dead_lock() {
     echo "ERROR: singleton lock owner is still alive; refusing removal" >&2
     return 14
   fi
-  rm -f -- "$LOCK_FILE"
+  rm -f -- "$LOCK_FILE" || return $?
   echo "Removed verified dead-PID gateway singleton lock."
 }
 
@@ -798,6 +827,43 @@ finish_rollback() {
   exit "$rc"
 }
 
+checked_restore_step() {
+  local operation="$1" target_id="$2" operation_rc=0
+  shift 2
+  "$@" || operation_rc=$?
+  if [[ "$operation_rc" -ne 0 ]]; then
+    # Calls below use fixed operation IDs and bounded target identifiers. Keep
+    # the first failure, never raw output, separately from the triggering rc.
+    if [[ -z "$RECOVERY_RESTORE_FAILURE" ]]; then
+      RECOVERY_RESTORE_FAILURE="$operation"
+      RECOVERY_RESTORE_TARGET="$target_id"
+      RECOVERY_RESTORE_EXIT_CODE="$operation_rc"
+    fi
+    echo "ERROR: restoration operation $operation failed (exit $operation_rc); partial state requires review" >&2
+  fi
+  return "$operation_rc"
+}
+
+read_recovery_state() {
+  RECOVERY_STATE="$(< "$1")" || return $?
+  [[ "$RECOVERY_STATE" == present || "$RECOVERY_STATE" == missing ]] || return 14
+}
+
+read_recovery_metadata() {
+  local metadata
+  metadata="$(< "$1")" || return $?
+  [[ "$metadata" =~ ^([0-9]+)[[:blank:]]+([0-9]+)[[:blank:]]+([0-7]{3,4})$ ]] || return 14
+  RECOVERY_UID="${BASH_REMATCH[1]}"
+  RECOVERY_GID="${BASH_REMATCH[2]}"
+  RECOVERY_MODE="${BASH_REMATCH[3]}"
+}
+
+remove_recovery_directory() {
+  # Missing is the intended state; nonempty, linked or inaccessible is not.
+  if [[ ! -e "$1" && ! -L "$1" ]]; then return 0; fi
+  rmdir -- "$1" || return $?
+}
+
 rollback() {
   local rc="${1:-1}"
   # Recovery failures must not re-enter rollback or replace the triggering code.
@@ -819,41 +885,43 @@ rollback() {
       finish_rollback "$rc"
     fi
     RECOVERY_RESTORE_ATTEMPTED=true
-    remove_verified_dead_lock || true
+    checked_restore_step dead_lock gateway_lock remove_verified_dead_lock || finish_rollback "$rc"
     for rel in "${BUNDLE_FILES[@]}"; do
       target="$TARGET_ROOT/$rel"
       backup="$BACKUP_DIR/existing/$rel"
       if [[ -f "$backup" ]]; then
-        rm -f -- "$target"
-        cp -a -- "$backup" "$target"
+        checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
+        checked_restore_step source_copy "$rel" cp -a -- "$backup" "$target" || finish_rollback "$rc"
       else
-        rm -f -- "$target"
+        checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
       fi
     done
 
-    rm -f -- "$SERVICE_DROP_IN"
-    prior_drop_in_state="$(< "$BACKUP_DIR/service-drop-in.state")"
+    checked_restore_step dropin_remove service_drop_in rm -f -- "$SERVICE_DROP_IN" || finish_rollback "$rc"
+    checked_restore_step dropin_state_read service_drop_in read_recovery_state "$BACKUP_DIR/service-drop-in.state" || finish_rollback "$rc"
+    prior_drop_in_state="$RECOVERY_STATE"
     if [[ "$prior_drop_in_state" == "present" ]]; then
-      install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR"
-      cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN"
+      checked_restore_step dropin_parent_create service_drop_in_directory install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+      checked_restore_step dropin_copy service_drop_in cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
     fi
-    prior_drop_in_dir_state="$(< "$BACKUP_DIR/service-drop-in-dir.state")"
+    checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state "$BACKUP_DIR/service-drop-in-dir.state" || finish_rollback "$rc"
+    prior_drop_in_dir_state="$RECOVERY_STATE"
     if [[ "$prior_drop_in_dir_state" == "present" ]]; then
-      read -r prior_drop_in_uid prior_drop_in_gid prior_drop_in_mode < \
-        "$BACKUP_DIR/service-drop-in-dir.metadata"
-      chown --no-dereference "$prior_drop_in_uid:$prior_drop_in_gid" "$SERVICE_DROP_IN_DIR"
-      chmod "$prior_drop_in_mode" "$SERVICE_DROP_IN_DIR"
+      checked_restore_step dropin_metadata_read service_drop_in_directory read_recovery_metadata "$BACKUP_DIR/service-drop-in-dir.metadata" || finish_rollback "$rc"
+      checked_restore_step dropin_chown service_drop_in_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+      checked_restore_step dropin_chmod service_drop_in_directory chmod "$RECOVERY_MODE" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
     else
-      rmdir -- "$SERVICE_DROP_IN_DIR" >/dev/null 2>&1 || true
+      checked_restore_step dropin_directory_remove service_drop_in_directory remove_recovery_directory "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
     fi
 
-    prior_run_dir_state="$(< "$BACKUP_DIR/run-dir.state")"
+    checked_restore_step run_directory_state_read run_directory read_recovery_state "$BACKUP_DIR/run-dir.state" || finish_rollback "$rc"
+    prior_run_dir_state="$RECOVERY_STATE"
     if [[ "$prior_run_dir_state" == "present" ]]; then
-      read -r prior_run_uid prior_run_gid prior_run_mode < "$BACKUP_DIR/run-dir.metadata"
-      chown --no-dereference "$prior_run_uid:$prior_run_gid" "$RUN_DIR"
-      chmod "$prior_run_mode" "$RUN_DIR"
+      checked_restore_step run_metadata_read run_directory read_recovery_metadata "$BACKUP_DIR/run-dir.metadata" || finish_rollback "$rc"
+      checked_restore_step run_chown run_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR" || finish_rollback "$rc"
+      checked_restore_step run_chmod run_directory chmod "$RECOVERY_MODE" "$RUN_DIR" || finish_rollback "$rc"
     else
-      rmdir -- "$RUN_DIR" >/dev/null 2>&1 || true
+      checked_restore_step run_directory_remove run_directory remove_recovery_directory "$RUN_DIR" || finish_rollback "$rc"
     fi
 
     if ! bounded_recovery_systemctl daemon-reload; then

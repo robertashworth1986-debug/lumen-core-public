@@ -65,12 +65,24 @@ attempted command outcomes and unverified service/restoration status. Exit codes
 that could come from either the launcher or command remain explicitly ambiguous.
 Terminating a systemctl client does not prove cancellation of its systemd job.
 
-The focused local suite passed 83 tests with three platform skips; the direct
-standard-library runner passed 64 checks with the same three skips (67 discovered).
-Actual GNU timeout process-group, ignored-TERM and descendant-termination cases,
-plus the existing link/extended-attribute cases, require hosted Linux validation
-of this increment. Local subprocess cases exercise actual rollback, directory
-guards and evidence writing against disposable files. No backend repair was
+The next local increment checks each rollback lock, file, metadata and directory
+operation explicitly. The first failure stops all later restoration work and the
+service reload/reset/start sequence. Lock-content read and inner removal failures
+cannot be hidden by a later successful message. Missing-before directories are
+removed only when empty; unrelated contents are retained. The private failure
+receipt names an allowlisted operation and target, records its exit code separately
+from the original trigger code, and marks partial state and unverified restoration.
+If changed backup evidence prevents receipt persistence, that failure stays visible
+and the original nonzero result and remaining recovery files are preserved.
+
+The focused local suite passed 91 tests with four platform skips; the direct
+standard-library runner passed 72 checks with the same four skips (76 discovered).
+The preceding service-limit revision passed all 67 hosted Linux contract checks,
+including actual GNU timeout process-group, ignored-TERM, descendant-termination
+and existing link/extended-attribute cases. The new fail-stop revision, including
+its dangling-lock refusal case, still requires exact-head hosted Linux validation.
+Local subprocess cases execute actual rollback operations against disposable files,
+including failures before and after earlier files were restored. No backend repair was
 dispatched or installed. This does not establish deployment readiness: restoration
 remains best effort, there is no verified restore API for a later public postcheck
 failure, and concurrent-state protection remains incomplete. File, metadata, lock,
