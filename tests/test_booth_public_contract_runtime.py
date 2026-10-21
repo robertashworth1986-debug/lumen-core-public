@@ -9,9 +9,8 @@ import re
 import subprocess
 import sys
 import tempfile
+import unittest
 from pathlib import Path
-
-import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -745,7 +744,7 @@ def test_gateway_existing_unsafe_recovery_root_is_never_repaired() -> None:
         _run_gateway_unsafe_recovery_root(owner, mode, group)
 
 
-@pytest.mark.skipif(os.name != "posix", reason="Real POSIX symlink refusal requires Linux CI")
+@unittest.skipIf(os.name != "posix", "Real POSIX symlink refusal requires Linux CI")
 def test_gateway_symbolic_recovery_root_is_never_repaired() -> None:
     _run_gateway_unsafe_recovery_root("0", "700", "0", symlink=True)
 
