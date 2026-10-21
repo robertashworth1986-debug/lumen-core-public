@@ -46,7 +46,7 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_institutional_readiness.py' -v
 
       - name: Upload bounded readiness receipt
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: institutional-readiness-${{ github.sha }}
           path: out/institutional-readiness/receipt.json
@@ -116,7 +116,7 @@ jobs:
 
       - name: Upload commit-bound Windows paper runner receipt
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: windows-paper-runner-${{ github.sha }}
           path: out/institutional-readiness/windows-paper-runner-${{ github.sha }}.xml
@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload commit-bound native verification receipt
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: native-c-verification-${{ github.sha }}
           path: out/institutional-readiness/native-c-${{ github.sha }}.xml
@@ -220,7 +220,7 @@ jobs:
 
       - name: Upload commit-bound JUnit receipt
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: institutional-full-suite-${{ github.sha }}
           path: out/institutional-readiness/full-suite-${{ github.sha }}.xml

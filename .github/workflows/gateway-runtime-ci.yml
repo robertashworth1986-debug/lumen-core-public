@@ -46,7 +46,7 @@ jobs:
           python -m pip install --require-hashes --only-binary=:all: -r requirements-windows-paper-runner-py311.lock
       - name: Exercise actual POSIX or Windows lock implementation
         run: python -m pytest -q -rs tests/test_gateway_lifetime_lock.py --junitxml=out/gateway-runtime/native-lock.xml
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: gateway-native-lock-${{ matrix.os }}-${{ github.sha }}
@@ -76,7 +76,7 @@ jobs:
         run: |
           set -euo pipefail
           "$RUNNER_TEMP/gateway-minimal/bin/python" code/ops/VERIFY_GATEWAY_MINIMAL_RUNTIME.py --smoke --output out/gateway-runtime/minimal-profile.json
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: gateway-minimal-profile-${{ github.sha }}
