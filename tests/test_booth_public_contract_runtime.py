@@ -413,11 +413,14 @@ stat() {
     printf 'lumencore:lumencore:640\n'
   fi
 }
-remove_verified_dead_lock() { :; }
+require_safe_recovery_directory() { :; }
+remove_verified_dead_lock() { printf 'lock\n' >> "$PWD/restore.calls"; }
 record_recovery_evidence() { :; }
-chown() { :; }
-chmod() { :; }
+chown() { printf 'chown\n' >> "$PWD/restore.calls"; }
+chmod() { printf 'chmod\n' >> "$PWD/restore.calls"; }
+rm() { printf 'rm\n' >> "$PWD/restore.calls"; command rm "$@"; }
 cp() {
+  printf 'cp\n' >> "$PWD/restore.calls"
   if [[ "$SIGNAL_DURING_COPY" == true ]]; then
     kill -TERM "$BASHPID"
     printf 'FIXTURE_TERM_SENT\n' >&2
@@ -441,6 +444,8 @@ trap cleanup EXIT
             harness += 'cleanup_manifest() { :; }\npython3() { "$TEST_PYTHON" "$@"; }\n'
             if recovery_case == "prepared_write_failure":
                 harness += 'printf collision > "$BACKUP_DIR/prepared.json"\n'
+            if recovery_case == "valid_missing":
+                harness += 'BUNDLE_FILES+=(absent.py)\nprintf candidate > "$TARGET_ROOT/absent.py"\nprintf "absent.py\\n" > "$BACKUP_DIR/missing-before.txt"\n'
             # This exact production sequence precedes service mutation and ERR
             # rollback registration; preparation failure must leave runtime alone.
             harness += 'RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"\n'
@@ -453,6 +458,44 @@ trap cleanup EXIT
                 harness += 'printf changed >> "$BACKUP_DIR/prepared.json"\n'
             if recovery_case == "backup_changed":
                 harness += 'printf changed >> "$BACKUP_DIR/existing/entry.py"\n'
+            mutations = {
+                "backup_missing": 'Path("backup/existing/entry.py").unlink()',
+                "backup_metadata": 'p=Path("backup/existing/entry.py"); t=p.stat().st_mtime_ns; os.utime(p, ns=(t,t+1000000000))',
+                "backup_symlink": 'p=Path("backup/existing/entry.py"); p.unlink(); p.symlink_to(Path("target/entry.py").resolve())',
+                "backup_parent_symlink": 'p=Path("backup/existing"); p.rename("outside"); p.symlink_to(Path("outside").resolve(), target_is_directory=True)',
+                "backup_hardlink": 'p=Path("backup/existing/entry.py"); os.link(p,"outside-hardlink")',
+                "backup_extra": 'Path("backup/existing/unexpected.py").write_text("unexpected")',
+                "backup_extra_directory": 'Path("backup/existing/unexpected").mkdir()',
+                "manifest_missing": 'Path("backup/prepared.json").unlink()',
+                "manifest_symlink": 'p=Path("backup/prepared.json"); p.rename("outside-manifest.json"); p.symlink_to(Path("outside-manifest.json").resolve())',
+                "missing_contradiction": 'Path("backup/missing-before.txt").write_text("entry.py\\n")',
+                "missing_duplicate": 'Path("backup/missing-before.txt").write_text("entry.py\\nentry.py\\n")',
+                "missing_unexpected": 'Path("backup/missing-before.txt").write_text("outside.py\\n")',
+                "backup_xattr": 'os.setxattr("backup/existing/entry.py", "user.fixture", b"changed")',
+                "custody_parent_symlink": 'p=Path("backup"); p.rename("outside-backup"); p.symlink_to(Path("outside-backup").resolve(), target_is_directory=True)',
+            }
+            if recovery_case in mutations:
+                mutation = "from pathlib import Path; import os; " + mutations[recovery_case]
+                harness += "python3 -c '" + mutation.replace("'", "'\"'\"'") + "'\n"
+            if recovery_case in {"source_binding", "bundle_binding", "hardening_binding"}:
+                variable = {"source_binding": "SOURCE_COMMIT", "bundle_binding": "BUNDLE_SHA", "hardening_binding": "HARDENING_SHA"}[recovery_case]
+                harness += variable + "=" + ("d" * (40 if variable == "SOURCE_COMMIT" else 64)) + "\n"
+            if recovery_case == "refusal_write_failure":
+                harness += 'printf collision > "$BACKUP_DIR/rollback_refused.json"\nprintf changed >> "$BACKUP_DIR/existing/entry.py"\n'
+            malformed = {
+                "inventory_omitted": 'd["files"].pop()',
+                "inventory_extra": 'd["files"].append(dict(d["files"][0], path="unexpected.py"))',
+                "manifest_schema": 'd["schema"]="unexpected_schema"',
+                "manifest_kind": 'd["kind"]="helper"',
+                "manifest_status": 'd["status"]="UNKNOWN"',
+            }
+            if recovery_case in malformed:
+                # Bind deliberately malformed preparation to test schema/coverage,
+                # separately from ordinary byte tampering with an unchanged hash.
+                mutation = ('from pathlib import Path; import hashlib,json; p=Path("backup/prepared.json"); '
+                            'd=json.loads(p.read_text()); ' + malformed[recovery_case] +
+                            '; p.write_text(json.dumps(d)); print(hashlib.sha256(p.read_bytes()).hexdigest())')
+                harness += "RECOVERY_MANIFEST_SHA=\"$(python3 -c '" + mutation.replace("'", "'\"'\"'") + "')\"\n"
         harness += error_trap + "\n" + guard
         if recovery_case in {"later_gate_failure", "helper_write_failure", "manifest_changed", "backup_changed"}:
             outcome = script.split('if ! helper_receipt_sha="$(record_recovery_evidence helper 0)";', 1)[1]
@@ -476,11 +519,16 @@ trap cleanup EXIT
         )
         target = root / "target/entry.py"
         if evidence is not None:
-            evidence["backup"] = (root / "backup/existing/entry.py").read_bytes()
+            backup_path = root / "backup/existing/entry.py"
+            evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
             evidence["backup_exists"] = (root / "backup").is_dir()
+            evidence["originally_missing_target_exists"] = (root / "target/absent.py").exists()
+            evidence["outside_refusal_written"] = (root / "outside-backup/rollback_refused.json").exists()
             calls = root / "systemctl.calls"
             evidence["service_calls"] = calls.read_text() if calls.exists() else ""
-            for kind in ("prepared", "helper", "rollback"):
+            calls = root / "restore.calls"
+            evidence["restore_calls"] = calls.read_text() if calls.exists() else ""
+            for kind in ("prepared", "helper", "rollback", "rollback_refused"):
                 path = root / "backup" / (kind + ".json")
                 if path.exists():
                     evidence[kind + "_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -636,10 +684,71 @@ def test_gateway_changed_recovery_evidence_cannot_publish_helper_success() -> No
         assert error in completed.stderr
         assert "helper" not in evidence and "rollback" not in evidence
         assert evidence["backup_exists"]
-        assert completed.stderr.count("Rolling back the complete gateway") == 1
-        # This is deliberately not evidence of a verified restoration: the
-        # legacy best-effort rollback does not yet reject concurrent changes.
-        assert "private rollback receipt persistence failed" in completed.stderr
+        assert "Rolling back the complete gateway" not in completed.stderr
+        assert evidence["service_calls"] == evidence["restore_calls"] == ""
+        assert evidence["rollback_refused"]["status"] == "ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE"
+        assert evidence["rollback_refused"]["restore_attempted"] is False
+
+
+def _assert_gateway_recovery_refused(kind: str, *, receipt_expected: bool = True) -> None:
+    evidence: dict = {}
+    completed, current, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case=kind, evidence=evidence,
+    )
+    assert completed.returncode == 17, (kind, completed.stderr)
+    assert current == b"candidate source\n" and dropin_exists, kind
+    assert evidence["service_calls"] == evidence["restore_calls"] == "", kind
+    assert evidence["backup_exists"] and "rollback" not in evidence, kind
+    assert "ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE" in completed.stderr, kind
+    assert "Rolling back the complete gateway" not in completed.stderr, kind
+    if receipt_expected:
+        refusal = evidence["rollback_refused"]
+        assert refusal["status"] == "ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE"
+        assert refusal["restore_attempted"] is False
+        assert refusal["recovery_evidence_verified"] is False
+        assert refusal["restoration_verified"] is False
+        assert refusal["trigger_exit_code"] == 17
+        assert "manifest_sha256" not in refusal
+    else:
+        assert "private rollback refusal receipt unavailable" in completed.stderr
+        assert not evidence["outside_refusal_written"]
+
+
+def test_gateway_invalid_recovery_is_refused_before_any_restore_command() -> None:
+    for kind in ("backup_changed", "backup_missing", "backup_metadata", "backup_hardlink",
+                 "backup_extra", "backup_extra_directory", "manifest_changed", "manifest_missing",
+                 "missing_contradiction", "missing_duplicate", "missing_unexpected",
+                 "source_binding", "bundle_binding", "hardening_binding",
+                 "inventory_omitted", "inventory_extra", "manifest_schema", "manifest_kind", "manifest_status"):
+        _assert_gateway_recovery_refused(kind)
+
+
+def test_gateway_refusal_receipt_failure_keeps_original_code_and_does_not_restore() -> None:
+    _assert_gateway_recovery_refused("refusal_write_failure", receipt_expected=False)
+
+
+def test_gateway_valid_recovery_restores_present_and_removes_originally_missing_file() -> None:
+    evidence: dict = {}
+    completed, restored, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="valid_missing", evidence=evidence,
+    )
+    assert completed.returncode == 17, completed.stderr
+    assert restored == b"previous source\n" and not dropin_exists
+    assert not evidence["originally_missing_target_exists"]
+    assert evidence["prepared"]["missing_source_files"] == ["absent.py"]
+    assert evidence["service_calls"].count("SYSTEMCTL:stop") == 1
+    assert evidence["restore_calls"].count("cp\n") == 1
+    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert "RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION" in completed.stdout
+
+
+@unittest.skipIf(os.name != "posix", "Real symlink and xattr refusal requires Linux CI")
+def test_gateway_linked_recovery_paths_and_extended_metadata_cannot_restore() -> None:
+    for kind in ("backup_symlink", "backup_parent_symlink", "manifest_symlink", "backup_xattr"):
+        _assert_gateway_recovery_refused(kind)
+    _assert_gateway_recovery_refused("custody_parent_symlink", receipt_expected=False)
 
 
 def test_gateway_recovery_directory_requires_root_and_private_permissions() -> None:

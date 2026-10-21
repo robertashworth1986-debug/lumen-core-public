@@ -438,44 +438,73 @@ from pathlib import Path
 directory = Path(sys.argv[1])
 kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
 relatives = sys.argv[8:]
-if kind not in {"prepared", "helper", "rollback"}:
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused"}:
     raise SystemExit("invalid_recovery_receipt_kind")
 if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
     not re.fullmatch(r"[0-9a-f]{64}", value) for value in (bundle, hardening)
 ):
     raise SystemExit("invalid_recovery_source_binding")
-if not directory.is_dir() or directory.is_symlink():
+if (not directory.is_dir() or directory.is_symlink()
+        or directory.resolve(strict=True) != directory.absolute()
+        or any(parent.is_symlink() for parent in directory.parents)):
     raise SystemExit("unsafe_recovery_directory")
 
-def inventory(relative):
+def inventory(relative, capture=False):
+    if not isinstance(relative, str) or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative) or any(
+        part in {"", ".", ".."} for part in relative.split("/")
+    ):
+        raise SystemExit("unsafe_recovery_inventory_path")
     path = directory / relative
+    for parent in path.parents:
+        if parent == directory:
+            break
+        if parent.is_symlink() or not parent.is_dir():
+            raise SystemExit("unsafe_recovery_parent")
     info = path.lstat()
     if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
         raise SystemExit("unsafe_recovery_file")
+    def identity(value):
+        return (value.st_dev, value.st_ino, value.st_mode, value.st_nlink,
+                value.st_uid, value.st_gid, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
     digest = hashlib.sha256()
-    with path.open("rb") as stream:
+    chunks = []
+    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    with os.fdopen(descriptor, "rb") as stream:
+        if identity(os.fstat(stream.fileno())) != identity(info):
+            raise SystemExit("recovery_file_changed_during_read")
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
+            if capture:
+                chunks.append(chunk)
+        xattrs_sha256 = None
+        if os.name == "posix" and hasattr(os, "listxattr"):
+            attributes = [(name, os.getxattr(stream.fileno(), name).hex())
+                          for name in sorted(os.listxattr(stream.fileno()))]
+            xattrs_sha256 = hashlib.sha256(json.dumps(attributes).encode()).hexdigest()
         if os.name == "posix":
             os.fsync(stream.fileno())
-    return dict(path=relative, sha256=digest.hexdigest(), bytes=info.st_size,
-                uid=info.st_uid, gid=info.st_gid, mode=format(stat.S_IMODE(info.st_mode), "04o"),
-                mtime_ns=info.st_mtime_ns)
+        if identity(os.fstat(stream.fileno())) != identity(info) or identity(path.lstat()) != identity(info):
+            raise SystemExit("recovery_file_changed_during_read")
+    entry = dict(path=relative, sha256=digest.hexdigest(), bytes=info.st_size,
+                 uid=info.st_uid, gid=info.st_gid, mode=format(stat.S_IMODE(info.st_mode), "04o"),
+                 mtime_ns=info.st_mtime_ns, xattrs_sha256=xattrs_sha256)
+    return (entry, b"".join(chunks)) if capture else entry
 
 payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,
                generated_utc=datetime.now(timezone.utc).isoformat(), source_commit=source,
                bundle_sha256=bundle, hardening_sha256=hardening,
                trigger_exit_code=int(trigger_code), restoration_verified=False,
                external_verification="NOT_RECORDED_BY_HELPER")
-if kind == "prepared":
+def expected_backup_inventory():
     if len(set(relatives)) != len(relatives) or any(
         not re.fullmatch(r"[A-Za-z0-9_/.-]+", item) or
         any(part in {"", ".", ".."} for part in item.split("/")) for item in relatives
     ):
         raise SystemExit("invalid_recovery_file_allowlist")
     missing_file = directory / "missing-before.txt"
-    missing = set(missing_file.read_text().splitlines()) if missing_file.exists() else set()
-    if not missing.issubset(relatives):
+    missing_rows = inventory("missing-before.txt", capture=True)[1].decode().splitlines() if missing_file.exists() else []
+    missing = set(missing_rows)
+    if len(missing) != len(missing_rows) or not missing.issubset(relatives):
         raise SystemExit("invalid_missing_file_inventory")
     names = ["service-drop-in.state", "service-drop-in-dir.state", "run-dir.state", "service.state"]
     for relative in relatives:
@@ -492,24 +521,63 @@ if kind == "prepared":
         ("service-drop-in-dir", "service-drop-in-dir.metadata"),
         ("run-dir", "run-dir.metadata"),
     ):
-        state = (directory / (state_name + ".state")).read_text().strip()
+        state = inventory(state_name + ".state", capture=True)[1].decode().strip()
         if state not in {"present", "missing"}:
             raise SystemExit("invalid_recovery_state")
         if state == "present":
             names.append(snapshot)
+    return names, missing
+
+def require_exact_inventory(names):
+    allowed_files = set(names) | {"prepared.json", "helper.json", "rollback.json", "rollback_refused.json"}
+    allowed_dirs = {"existing"}
+    for name in names:
+        allowed_dirs.update(str(parent).replace(os.sep, "/") for parent in Path(name).parents if str(parent) != ".")
+    for current, directories, files in os.walk(directory, followlinks=False):
+        for name in directories + files:
+            path = Path(current) / name
+            relative = path.relative_to(directory).as_posix()
+            info = path.lstat()
+            if stat.S_ISDIR(info.st_mode):
+                if relative not in allowed_dirs:
+                    raise SystemExit("unexpected_recovery_directory")
+            elif not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+                raise SystemExit("unsafe_recovery_file")
+            elif relative not in allowed_files:
+                raise SystemExit("unexpected_recovery_file")
+
+if kind == "rollback_refused":
+    # This receipt describes refusal only; it does not authenticate invalid input.
+    payload.update(status="ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE", restore_attempted=False,
+                   expected_manifest_sha256=expected_manifest, recovery_evidence_verified=False)
+elif kind == "prepared":
+    names, missing = expected_backup_inventory()
+    require_exact_inventory(names)
     payload.update(status="PREPARED_BEFORE_MUTATION", files=[inventory(name) for name in names],
                    missing_source_files=sorted(missing))
 else:
-    manifest = directory / "prepared.json"
-    entry = inventory("prepared.json")
+    entry, manifest_raw = inventory("prepared.json", capture=True)
     if entry["sha256"] != expected_manifest:
         raise SystemExit("recovery_manifest_hash_mismatch")
-    prepared = json.loads(manifest.read_text())
+    prepared = json.loads(manifest_raw)
+    if (prepared.get("schema") != payload["schema"] or prepared.get("kind") != "prepared"
+            or prepared.get("status") != "PREPARED_BEFORE_MUTATION"):
+        raise SystemExit("invalid_prepared_manifest")
     if any(prepared.get(key) != payload[key] for key in
            ("source_commit", "bundle_sha256", "hardening_sha256")):
         raise SystemExit("recovery_manifest_binding_mismatch")
+    names, missing = expected_backup_inventory()
+    entries = prepared.get("files", [])
+    if (not isinstance(entries, list) or len(entries) != len(names)
+            or sorted(item["path"] for item in entries) != sorted(names)
+            or prepared.get("missing_source_files") != sorted(missing)):
+        raise SystemExit("recovery_inventory_mismatch")
+    require_exact_inventory(names)
     if any(inventory(item["path"]) != item for item in prepared["files"]):
         raise SystemExit("recovery_backup_changed")
+    if kind == "verify":
+        print("RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION")
+        raise SystemExit(0)
     payload.update(manifest_sha256=expected_manifest,
                    status="HELPER_CHECKS_PASSED_EXTERNAL_VERIFICATION_PENDING" if kind == "helper"
                    else "ROLLBACK_ATTEMPTED_UNVERIFIED")
@@ -665,6 +733,15 @@ rollback() {
   trap '' INT TERM
   set +e
   if [[ "$REPAIR_COMPLETE" != true ]]; then
+    # Validate before the first service, lock or target-file mutation. This is a
+    # point-in-time check, not protection against a subsequent concurrent edit.
+    if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence verify "$rc"; then
+      echo "ERROR: ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE; no restoration attempted; original failure retained" >&2
+      if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence rollback_refused "$rc"; then
+        echo "ERROR: private rollback refusal receipt unavailable; retained evidence requires manual review" >&2
+      fi
+      exit "$rc"
+    fi
     echo "Rolling back the complete gateway dependency closure and service identity..." >&2
     systemctl stop "$SERVICE" >/dev/null 2>&1 || true
     remove_verified_dead_lock || true

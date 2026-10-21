@@ -47,13 +47,22 @@ pending from rollback attempted without verified restoration. Receipt persistenc
 failure remains a non-success outcome. A later workflow postcheck cannot remove
 these retained files through the helper's cleanup path.
 
-The focused local suite passed 75 tests; one real POSIX symlink case awaits Linux
-CI. Subprocess cases exercise the actual rollback, directory guards and evidence
-writer against disposable files. No backend repair was dispatched or installed.
-This does not establish deployment readiness: restoration remains best effort,
-there is no verified restore API for a later public postcheck failure, and rollback
-still lacks bounded command timeouts, backup verification before restoration and
-concurrent-state protection. File and top-directory synchronization does not prove
+Before the first restoration command, rollback now verifies the prepared manifest
+and its source bindings, exact present/missing inventory, file hashes and recorded
+metadata. Unsafe links, altered files and unexpected inventory cause refusal before
+service, lock or installed-file changes. A private refusal receipt states that no
+restoration was attempted; the original failure code and retained evidence remain.
+Refusal leaves any earlier partial runtime change unresolved. This verification is
+a point-in-time check and cannot prevent a later concurrent edit.
+
+The focused local suite passed 78 tests with two POSIX-only skips; the direct
+standard-library runner passed 59 checks with the same two skips. Real Linux link
+and extended-attribute cases await hosted checks for this revision. Subprocess
+cases exercise actual rollback, directory guards and evidence writing against
+disposable files. No backend repair was dispatched or installed. This does not
+establish deployment readiness: restoration remains best effort, there is no
+verified restore API for a later public postcheck failure, and rollback still lacks
+bounded command timeouts and concurrent-state protection. File and top-directory synchronization does not prove
 power-loss persistence of every nested backup entry. The existing six runtime holds
 require fresh evidence and separate backend action approval. Paper-only controls
 and all ledger/history bytes remain unchanged.
