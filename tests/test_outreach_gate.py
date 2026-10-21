@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -32,6 +36,17 @@ class OutreachGateTests(unittest.TestCase):
         ids = [c["outreach_id"] for c in self.registry["campaigns"]]
         self.assertEqual(len(ids), len(set(ids)))
 
+    def test_current_operating_contract_and_ci_allow_approved_codex_execution(self) -> None:
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        workflow = (ROOT / ".github/workflows/outreach-governance.yml").read_text(
+            encoding="utf-8")
+        self.assertIn("not restricted to drafts because of its agent name", agents)
+        self.assertIn("same outreach preflight required of ChatGPT / Luma", agents)
+        self.assertIn("does not enable live orders", agents)
+        self.assertIn("not restricted to drafts because of its agent name", workflow)
+        self.assertNotIn("draft-only for all external communication", agents)
+        self.assertNotIn("draft-only for all external communication", workflow)
+
     def test_dla_campaign_identity_is_stable(self) -> None:
         campaign = MODULE.campaign_by_key(
             self.registry,
@@ -44,7 +59,7 @@ class OutreachGateTests(unittest.TestCase):
                 "dla-missionweave-dla26bz03-nv011",
             )
 
-    def test_codex_can_draft_but_cannot_send(self) -> None:
+    def test_codex_can_draft_but_waiting_campaign_still_blocks_send(self) -> None:
         draft = MODULE.evaluate(
             self.registry,
             "evtit-productization-review",
@@ -63,7 +78,129 @@ class OutreachGateTests(unittest.TestCase):
             gmail_preflight_complete=True,
         )
         self.assertFalse(send["allowed"])
-        self.assertIn("Codex is draft-only", send["reason"])
+        self.assertIn("wait for a substantive inbound reply", send["reason"])
+
+    def ready_registry(self) -> dict:
+        registry = copy.deepcopy(self.registry)
+        registry["campaigns"] = [{
+            "campaign_key": "test-approved-outreach",
+            "organization": "Test recipient",
+            "status": "ready_for_first_outbound",
+            "thread_mode": "new_thread_allowed",
+            "outbound_sequence": 0,
+            "duplicate_detected": False,
+            "duplicate_count": 0,
+            "inbound_since_last_outbound": False,
+            "next_allowed_action": "review_exact_message",
+            "outreach_id": "LC-TEST-APPROVED-001",
+            "notes": "Synthetic test fixture; not a real recipient or approval.",
+        }]
+        return registry
+
+    def evaluate_ready(self, registry=None, **options) -> dict:
+        defaults = dict(actor="codex", action="send", mode="new",
+                        explicit_approval=True, gmail_preflight_complete=True)
+        defaults.update(options)
+        return MODULE.evaluate(registry or self.ready_registry(),
+                               "test-approved-outreach", **defaults)
+
+    def test_approved_codex_send_has_same_eligibility_as_chatgpt(self) -> None:
+        for actor in ("codex", "chatgpt", "human"):
+            with self.subTest(actor=actor):
+                result = self.evaluate_ready(actor=actor)
+                self.assertTrue(result["allowed"])
+                self.assertIn("send exactly one message", result["required_steps"])
+
+    def test_all_actors_require_actual_boolean_approval_and_preflight(self) -> None:
+        for actor in ("codex", "chatgpt", "human"):
+            for value in (False, None, "yes", "false", 1):
+                with self.subTest(actor=actor, value=value):
+                    self.assertFalse(self.evaluate_ready(
+                        actor=actor, explicit_approval=value)["allowed"])
+                    self.assertFalse(self.evaluate_ready(
+                        actor=actor, gmail_preflight_complete=value)["allowed"])
+
+    def test_legacy_private_registry_can_keep_codex_disabled(self) -> None:
+        registry = self.ready_registry()
+        registry["policy"]["codex_send_allowed"] = False
+        registry["policy"].pop("codex_send_requires_explicit_action_time_approval")
+        result = self.evaluate_ready(registry)
+        self.assertFalse(result["allowed"])
+        self.assertIn("disabled in this controlling registry", result["reason"])
+        self.assertTrue(self.evaluate_ready(registry, actor="chatgpt")["allowed"])
+
+    def test_codex_enablement_cannot_disable_approval_or_preflight(self) -> None:
+        fields = ("codex_send_requires_explicit_action_time_approval",
+                  "chatgpt_send_requires_explicit_action_time_approval",
+                  "gmail_sent_preflight_required", "draft_only_by_default")
+        for field in fields:
+            for value in (False, None, "true", 1):
+                with self.subTest(field=field, value=value):
+                    registry = self.ready_registry()
+                    registry["policy"][field] = value
+                    with self.assertRaises(MODULE.RegistryError):
+                        self.evaluate_ready(registry)
+        registry = self.ready_registry()
+        registry["policy"].pop("codex_send_requires_explicit_action_time_approval")
+        with self.assertRaises(MODULE.RegistryError):
+            MODULE.validate_registry(registry)
+
+    def test_codex_permission_must_be_a_boolean(self) -> None:
+        for value in (None, "true", "false", 1, 0):
+            with self.subTest(value=value):
+                registry = self.ready_registry()
+                registry["policy"]["codex_send_allowed"] = value
+                with self.assertRaises(MODULE.RegistryError):
+                    MODULE.validate_registry(registry)
+
+    def test_codex_approval_does_not_override_campaign_or_thread_holds(self) -> None:
+        for status in ("closed", "blocked", "waiting_for_reply",
+                       "receipt_confirmed_waiting", "action_required_draft_ready"):
+            with self.subTest(status=status):
+                registry = self.ready_registry()
+                registry["campaigns"][0]["status"] = status
+                self.assertFalse(self.evaluate_ready(registry)["allowed"])
+        registry = self.ready_registry()
+        registry["campaigns"][0]["thread_mode"] = "existing_thread_only"
+        self.assertFalse(self.evaluate_ready(registry)["allowed"])
+        registry = self.ready_registry()
+        registry["campaigns"][0].update(duplicate_detected=True, duplicate_count=1)
+        self.assertFalse(self.evaluate_ready(registry)["allowed"])
+
+    def test_codex_can_send_approved_requested_reply_in_existing_thread(self) -> None:
+        registry = self.ready_registry()
+        registry["campaigns"][0].update(status="action_required_draft_ready",
+                                      thread_mode="existing_thread_only",
+                                      outbound_sequence=1,
+                                      inbound_since_last_outbound=True)
+        self.assertTrue(self.evaluate_ready(registry, mode="reply")["allowed"])
+
+    def test_unknown_campaign_and_financial_actions_are_not_enabled(self) -> None:
+        with self.assertRaises(MODULE.RegistryError):
+            MODULE.evaluate(self.ready_registry(), "unregistered", actor="codex",
+                            action="send", mode="new", explicit_approval=True,
+                            gmail_preflight_complete=True)
+        for action in ("trade", "transfer", "pay", "submit", "sign"):
+            with self.subTest(action=action), self.assertRaises(MODULE.RegistryError):
+                self.evaluate_ready(action=action)
+
+    def test_cli_approved_codex_eligibility_passes_without_sending(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "private_registry.json"
+            path.write_text(json.dumps(self.ready_registry()), encoding="utf-8")
+            command = [sys.executable, str(ROOT / "code/ops/outreach_gate.py"),
+                       "--registry", str(path), "check", "--campaign",
+                       "test-approved-outreach", "--actor", "codex", "--action",
+                       "send", "--mode", "new", "--gmail-preflight-complete"]
+            blocked = subprocess.run(command, capture_output=True, text=True, check=False)
+            self.assertEqual(blocked.returncode, 2, blocked.stderr)
+            self.assertFalse(json.loads(blocked.stdout)["allowed"])
+            allowed = subprocess.run(command + ["--explicit-approval"],
+                                     capture_output=True, text=True, check=False)
+            self.assertEqual(allowed.returncode, 0, allowed.stderr)
+            self.assertTrue(json.loads(allowed.stdout)["allowed"])
+            self.assertEqual(json.loads(path.read_text(encoding="utf-8")),
+                             self.ready_registry())
 
     def test_existing_thread_campaign_rejects_new_message(self) -> None:
         result = MODULE.evaluate(
@@ -177,7 +314,7 @@ class OutreachGateTests(unittest.TestCase):
             gmail_preflight_complete=True,
         )
         self.assertFalse(send["allowed"])
-        self.assertIn("Codex is draft-only", send["reason"])
+        self.assertIn("waiting_for_reply", send["reason"])
 
         human_send = MODULE.evaluate(
             self.registry,
