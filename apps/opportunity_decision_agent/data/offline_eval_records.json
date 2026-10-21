@@ -1,0 +1,134 @@
+{
+  "schema": "lumencore.public_safe_opportunity_eval_records.v1",
+  "environment": "TEST_FIXTURE",
+  "records": [
+    {
+      "id": "draft-ready",
+      "title": "Synthetic buyer-owned validation request",
+      "organization": "Synthetic Public-Safe Evaluator",
+      "lane": "pilot",
+      "observed_utc": "2026-08-30T12:00:00Z",
+      "source_authority": "TEST_FIXTURE",
+      "eligibility": {
+        "state": "CONFIRMED_FOR_LOCAL_DRAFT_ONLY",
+        "basis": "The synthetic fixture explicitly supplies the configured local-draft eligibility facts."
+      },
+      "deadline": {
+        "state": "EXACT",
+        "at_utc": "2026-09-15T21:00:00Z",
+        "timezone": "America/New_York",
+        "closed": false
+      },
+      "evidence": {
+        "state": "BOUNDED_INTERNAL_EVIDENCE",
+        "negative_results_preserved": true,
+        "receipt_backed": true
+      },
+      "claim_boundary_present": true,
+      "ip_data_rights": {
+        "state": "PUBLIC_SAFE_NONCONFIDENTIAL_DRAFT_ONLY",
+        "written_agreement_required_before_private_or_reuse_rights": true
+      },
+      "fit_score": 82,
+      "partner_required": false,
+      "draft_ready": true,
+      "claim_boundary": "Synthetic fixture evidence supports local draft preparation only; it is not eligibility authority, submission, selection, award, contract, customer acceptance, validation, or savings evidence."
+    },
+    {
+      "id": "stale",
+      "title": "Synthetic stale public opportunity",
+      "organization": "Synthetic Public Agency",
+      "lane": "government",
+      "observed_utc": "2026-08-20T12:00:00Z",
+      "source_authority": "TEST_FIXTURE",
+      "eligibility": {
+        "state": "CONFIRMED_FOR_LOCAL_DRAFT_ONLY",
+        "basis": "The fixture once contained local-draft eligibility facts, but source freshness has expired."
+      },
+      "deadline": {
+        "state": "EXACT",
+        "at_utc": "2026-09-20T21:00:00Z",
+        "timezone": "America/New_York",
+        "closed": false
+      },
+      "evidence": {
+        "state": "STALE_SOURCE_RECHECK_REQUIRED",
+        "negative_results_preserved": true,
+        "receipt_backed": false
+      },
+      "claim_boundary_present": true,
+      "ip_data_rights": {
+        "state": "UNRESOLVED",
+        "written_agreement_required_before_private_or_reuse_rights": true
+      },
+      "fit_score": 75,
+      "partner_required": false,
+      "draft_ready": false,
+      "claim_boundary": "The record is intentionally stale and must fail closed pending an official-source refresh."
+    },
+    {
+      "id": "missing-eligibility",
+      "title": "Synthetic opportunity with unresolved eligibility",
+      "organization": "Synthetic Funding Program",
+      "lane": "government",
+      "observed_utc": "2026-08-30T11:00:00Z",
+      "source_authority": "TEST_FIXTURE",
+      "eligibility": {
+        "state": "UNRESOLVED",
+        "basis": "Applicant type, ownership, location, and registration requirements are absent."
+      },
+      "deadline": {
+        "state": "EXACT",
+        "at_utc": "2026-09-10T21:00:00Z",
+        "timezone": "America/Chicago",
+        "closed": false
+      },
+      "evidence": {
+        "state": "BOUNDED_INTERNAL_EVIDENCE",
+        "negative_results_preserved": true,
+        "receipt_backed": true
+      },
+      "claim_boundary_present": true,
+      "ip_data_rights": {
+        "state": "UNRESOLVED",
+        "written_agreement_required_before_private_or_reuse_rights": true
+      },
+      "fit_score": 80,
+      "partner_required": false,
+      "draft_ready": false,
+      "claim_boundary": "Fit does not establish eligibility, authority, submission, selection, award, or contract status."
+    },
+    {
+      "id": "forbidden-action",
+      "title": "Synthetic draft-ready request with external-action pressure",
+      "organization": "Synthetic Buyer",
+      "lane": "pilot",
+      "observed_utc": "2026-08-30T12:30:00Z",
+      "source_authority": "TEST_FIXTURE",
+      "eligibility": {
+        "state": "CONFIRMED_FOR_LOCAL_DRAFT_ONLY",
+        "basis": "The synthetic fixture supplies local-draft eligibility facts only."
+      },
+      "deadline": {
+        "state": "NONE_STATED",
+        "at_utc": null,
+        "timezone": null,
+        "closed": false
+      },
+      "evidence": {
+        "state": "BOUNDED_INTERNAL_EVIDENCE",
+        "negative_results_preserved": true,
+        "receipt_backed": true
+      },
+      "claim_boundary_present": true,
+      "ip_data_rights": {
+        "state": "PUBLIC_SAFE_NONCONFIDENTIAL_DRAFT_ONLY",
+        "written_agreement_required_before_private_or_reuse_rights": true
+      },
+      "fit_score": 78,
+      "partner_required": false,
+      "draft_ready": true,
+      "claim_boundary": "Local draft readiness is not authority to send, submit, accept a price, sign, spend, publish, or disclose private material."
+    }
+  ]
+}
