@@ -442,12 +442,13 @@ prepare_recovery_directory() {
 }
 
 record_recovery_evidence() {
-  local kind="$1" trigger_code="${2:-0}"
+  local kind="$1" trigger_code="${2:-0}" requested_source="${3:-}"
+  [[ $# -le 3 ]] || return 14
   python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
     "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
     "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
     "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
-    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "${BUNDLE_FILES[@]}" <<'PY'
+    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -462,9 +463,12 @@ directory = Path(sys.argv[1])
 kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
 service_results, service_failure, restore_attempted = sys.argv[8:11]
 restore_failure, restore_exit_code, restore_target = sys.argv[11:14]
-relatives = sys.argv[14:]
-if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused"}:
+requested_source, relatives = sys.argv[14], sys.argv[15:]
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "source_state"}:
     raise SystemExit("invalid_recovery_receipt_kind")
+if ((kind == "source_state" and requested_source not in relatives)
+        or (kind != "source_state" and requested_source)):
+    raise SystemExit("invalid_recovery_source_query")
 if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
     not re.fullmatch(r"[0-9a-f]{64}", value) for value in (bundle, hardening)
 ):
@@ -600,6 +604,11 @@ else:
     require_exact_inventory(names)
     if any(inventory(item["path"]) != item for item in prepared["files"]):
         raise SystemExit("recovery_backup_changed")
+    if kind == "source_state":
+        # Intent comes only from the same-read, hash-bound manifest. Complete
+        # inventory validation above must pass again before each source mutation.
+        sys.stdout.buffer.write(b"missing\n" if requested_source in prepared["missing_source_files"] else b"present\n")
+        raise SystemExit(0)
     if kind == "verify":
         print("RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION")
         raise SystemExit(0)
@@ -630,7 +639,8 @@ if kind == "rollback":
         payload["status"] = ("ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED" if service_failure == "stop"
                              else "ROLLBACK_INCOMPLETE_SERVICE_COMMAND_FAILED")
     restoration_targets = {
-        "dead_lock": {"gateway_lock"}, "source_remove": set(relatives), "source_copy": set(relatives),
+        "dead_lock": {"gateway_lock"}, "source_state": set(relatives),
+        "source_remove": set(relatives), "source_copy": set(relatives),
         "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"},
         "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
         "dropin_directory_state_read": {"service_drop_in_directory"},
@@ -849,6 +859,19 @@ read_recovery_state() {
   [[ "$RECOVERY_STATE" == present || "$RECOVERY_STATE" == missing ]] || return 14
 }
 
+read_recovery_source_state() {
+  local response
+  # The sentinel preserves trailing newlines so extra/empty output cannot be
+  # accepted accidentally. Query failure propagates even if it printed a state.
+  response="$(record_recovery_evidence source_state 0 "$1" && printf '.')" || return $?
+  case "$response" in
+    $'present\n.') RECOVERY_SOURCE_STATE=present ;;
+    $'missing\n.') RECOVERY_SOURCE_STATE=missing ;;
+    *) return 14 ;;
+  esac
+  [[ -z "${2:-}" || "$RECOVERY_SOURCE_STATE" == "$2" ]] || return 14
+}
+
 read_recovery_metadata() {
   local metadata
   metadata="$(< "$1")" || return $?
@@ -889,11 +912,13 @@ rollback() {
     for rel in "${BUNDLE_FILES[@]}"; do
       target="$TARGET_ROOT/$rel"
       backup="$BACKUP_DIR/existing/$rel"
-      if [[ -f "$backup" ]]; then
-        checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
+      checked_restore_step source_state "$rel" read_recovery_source_state "$rel" || finish_rollback "$rc"
+      checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
+      if [[ "$RECOVERY_SOURCE_STATE" == present ]]; then
+        # Recheck before copy as well: a removal may already have happened, but
+        # changed recovery bytes must not be copied or followed by service start.
+        checked_restore_step source_state "$rel" read_recovery_source_state "$rel" present || finish_rollback "$rc"
         checked_restore_step source_copy "$rel" cp -a -- "$backup" "$target" || finish_rollback "$rc"
-      else
-        checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
       fi
     done
 

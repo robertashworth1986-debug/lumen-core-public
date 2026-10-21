@@ -75,17 +75,33 @@ from the original trigger code, and marks partial state and unverified restorati
 If changed backup evidence prevents receipt persistence, that failure stays visible
 and the original nonzero result and remaining recovery files are preserved.
 
-The focused local suite passed 91 tests with four platform skips; the direct
-standard-library runner passed 72 checks with the same four skips (76 discovered).
-The preceding service-limit revision passed all 67 hosted Linux contract checks,
+Source restoration intent now comes from the pinned preparation manifest's
+present/missing inventory, with a read-only source-state query before target
+removal and again before copying an originally present source. Each query repeats
+the full source/schema/inventory/hash/metadata validation and accepts only an
+allowlisted relative path with exact response bytes. A vanished backup cannot be
+reinterpreted as an originally absent source, and altered or newly introduced
+backup data stops later restoration and service restart. A change after an earlier
+file was restored or after target removal still leaves explicitly partial state;
+receipt integrity checks remain intact even when they prevent receipt persistence.
+Repeated validation over a bounded file set is not a wall-clock deadline.
+
+The focused local suite passed 97 tests with five platform skips; the direct
+standard-library runner passed 78 checks with the same five skips (83 discovered).
+The preceding fail-stop revision passed all 76 hosted Linux contract checks,
 including actual GNU timeout process-group, ignored-TERM, descendant-termination
-and existing link/extended-attribute cases. The new fail-stop revision, including
-its dangling-lock refusal case, still requires exact-head hosted Linux validation.
+and existing link/extended-attribute cases. The new source-intent revision,
+including drift after earlier restoration, still requires exact-head hosted Linux
+validation. The initial local strict-query failure exposed platform newline
+translation; exact byte output corrected it without relaxing response parsing.
 Local subprocess cases execute actual rollback operations against disposable files,
 including failures before and after earlier files were restored. No backend repair was
 dispatched or installed. This does not establish deployment readiness: restoration
 remains best effort, there is no verified restore API for a later public postcheck
-failure, and concurrent-state protection remains incomplete. File, metadata, lock,
+failure, and concurrent-state protection remains incomplete. The source query does
+not protect targets from intervening edits or close the backup/target check-to-use
+interval; the reproduced target-only overwrite remains an unresolved hold.
+File, metadata, lock,
 evidence and cleanup operations still lack comprehensive deadlines; the four
 service-command budgets are not a total rollback deadline. File and top-directory synchronization does not prove
 power-loss persistence of every nested backup entry. The existing six runtime holds
