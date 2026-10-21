@@ -1,11 +1,43 @@
 # LumenCore Canonical Operating State
 
-**State date:** 2026-10-14 UTC
+**State date:** 2026-10-21 UTC
 **Owner:** Robert Ashworth  
 **Canonical product:** Proof-to-pilot AI infrastructure validation architecture  
 **Work-in-progress limit:** Three founder outcomes
 
 ## One commercial sentence
+
+### October 21 founder-requested Mission Control review view
+
+Outcome 2 remains one bounded external evaluation or paid scope. The founder
+requested a working Mission Control to show during a mentor meeting, including
+the earlier rolling baseline and dollar display. The recovered research layout
+is restored as a read-only review view; the retired public
+`mission_control.html` redirect remains distinct from the protected operator
+console. No broker, private API, live worker or order authority is activated.
+
+The legacy display could substitute Sharpe 4.2772, improvement 458.2% and
+$35,116/hour when source metrics were missing. Those fallback figures are not
+evidence of performance or money. Missing and invalid values must remain
+unavailable, reported historical numbers must retain their status, and listed
+hashes or order identifiers must not imply independent verification.
+
+The frozen September 21 forecast packets permit a narrower comparison: original
+January 1–July 12 mean absolute forecast error is 15,979.086850308855 MWh versus
+17,874.171755209874 for direct LightGBM; the later July 13–September 8 window is
+16,107.043528292354 versus 19,765.54376351574. These are approximately 10.60% and
+18.51% lower error in historical comparisons. Both promotion decisions remain
+HOLD. Neither comparison establishes prospective accuracy, operational savings,
+trading returns, money collected or a continuously operating live feed.
+
+The owner-private meeting view is published separately from the operator
+runtime. Its five workspace tabs, source search, evidence details, presentation
+layout and two historical baseline windows were checked in Chromium at desktop,
+tablet and phone widths. Malformed or incomplete snapshots leave unknown counts
+and clear partial records. The source checks passed 58 targeted tests; these
+checks establish display behavior and existing public boundaries, not financial
+performance or completed external review. The canonical public redirect is
+unchanged.
 
 ### October 14 authorized merges and paper-readiness repairs
 

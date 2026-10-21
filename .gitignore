@@ -35,6 +35,7 @@ luma_live_keys.env
 dashboard/*.html
 !dashboard/social_pro_dashboard.html
 !dashboard/mission_control.html
+!dashboard/mission_control_review.html
 !dashboard/quant_lab.html
 !dashboard/kraken_execution_dashboard.html
 !dashboard/grants.html

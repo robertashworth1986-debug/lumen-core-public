@@ -599,7 +599,8 @@
     if (el) { el.textContent = v; }
   }
   function num(v, d) {
-    return (v === null || v === undefined || isNaN(+v)) ? 'n/a' : (+v).toFixed(d);
+    var n = _firstNum(v);
+    return n === null ? 'n/a' : n.toFixed(d);
   }
   function addClass(id, cls) {
     var el = document.getElementById(id); if (el) { el.classList.add(cls); }
@@ -650,9 +651,17 @@
   function _firstNum() {
     for (var i = 0; i < arguments.length; i++) {
       var v = arguments[i];
-      if (v === null || v === undefined) { continue; }
+      if (typeof v !== 'number' && typeof v !== 'string') { continue; }
+      if (typeof v === 'string' && !/^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(v.trim())) { continue; }
       var n = Number(v);
-      if (!isNaN(n)) { return n; }
+      if (Number.isFinite(n)) { return n; }
+    }
+    return null;
+  }
+
+  function _firstText() {
+    for (var i = 0; i < arguments.length; i++) {
+      if (typeof arguments[i] === 'string' && arguments[i].trim()) { return arguments[i].trim(); }
     }
     return null;
   }
@@ -684,8 +693,9 @@
       if (!line) { continue; }
       try {
         var obj = JSON.parse(line);
-        if (obj && (obj.txid || obj.order_id || (obj.context && obj.context.txid))) {
-          return obj.txid || obj.order_id || obj.context.txid;
+        var reference = obj && _firstText(obj.txid, obj.order_id, obj.context && obj.context.txid);
+        if (reference) {
+          return reference;
         }
       } catch (_) {}
       var m = line.match(/\b[A-Z0-9]{6,}-[A-Z0-9]{4,}-[A-Z0-9]{3,}\b/);
@@ -811,37 +821,36 @@
       _pickPath(cross, ['best_strategy_sharpe', 'top_sharpe', 'metrics.sharpe', 'optimization.best_sharpe']),
       _pickPath(investor, ['performance.sharpe', 'sharpe'])
     );
-    if (sharpe === null) { sharpe = 4.2772; }
 
     var improvement = _firstNum(
       _pickPath(snapEvidenceDerived, ['stacker_router_delta_pct']),
       _pickPath(cross, ['improvement_pct', 'optimization_improvement_pct', 'summary.improvement_pct']),
       _pickPath(investor, ['performance.improvement_pct'])
     );
-    if (improvement === null) { improvement = 458.2; }
 
     var rollingHourly = _firstNum(
       _pickPath(cross, ['rolling_opportunity_per_hour', 'total_rolling', 'opportunity_per_hour']),
       _pickPath(investor, ['opportunity.rolling_per_hour'])
     );
-    if (rollingHourly === null) { rollingHourly = 35116; }
+    var txid = _firstText(_lastTxidFromEventsText(eventsText), _pickPath(investor, ['proof.last_txid', 'last_txid']));
 
-    var txid = _lastTxidFromEventsText(eventsText) || _pickPath(investor, ['proof.last_txid', 'last_txid']) || 'awaiting';
+    var walkForward = _firstText(_pickPath(snapEdge, ['verdict']), _pickPath(seed, ['status', 'validation_status', 'summary.status']));
+    var reportedPass = _pickPath(seed, ['walk_forward_ok', 'passed']);
+    if (walkForward === null && typeof reportedPass === 'boolean') { walkForward = reportedPass ? 'PASS' : 'FAIL'; }
 
-    var walkForward = _pickPath(snapEdge, ['verdict']) || _pickPath(seed, ['status', 'validation_status', 'summary.status']) || (_pickPath(seed, ['walk_forward_ok', 'passed']) ? 'PASS' : 'IN REVIEW');
-
-    var hbUtc = _pickPath(hb, ['generated_utc', 'timestamp', 'heartbeat_utc']) || _pickPath(fed, ['generated_utc', 'timestamp']) || 'n/a';
+    var hbUtc = _firstText(_pickPath(hb, ['generated_utc', 'timestamp', 'heartbeat_utc']), _pickPath(fed, ['generated_utc', 'timestamp']));
     var chainCount = _firstNum(
       _pickPath(chain, ['artifact_count', 'count', 'hash_count']),
       (chain && Array.isArray(chain.files) ? chain.files.length : null)
     );
 
-    var reliability = 'heartbeat ' + String(hbUtc).slice(0, 19).replace('T', ' ');
-    var chainMsg = chainCount !== null ? (String(chainCount) + ' hashes verified') : 'hash verification ready';
+    var reliability = hbUtc === null ? 'n/a — freshness unverified' : 'reported heartbeat ' + hbUtc.slice(0, 19).replace('T', ' ') + ' | freshness unverified';
+    var listedCount = chainCount !== null && Number.isInteger(chainCount) && chainCount >= 0 ? chainCount : null;
+    var chainMsg = listedCount === null ? 'hash listings n/a — unverified' : String(listedCount) + ' hashes listed | unverified';
 
-    var evidenceRunUtc = _pickPath(snapEvidence, ['run_utc']);
+    var evidenceRunUtc = _firstText(_pickPath(snapEvidence, ['run_utc']));
     if (evidenceRunUtc) {
-      reliability = 'evidence run ' + String(evidenceRunUtc) + ' | ' + reliability;
+      reliability = 'reported evidence run ' + evidenceRunUtc + ' | ' + reliability;
     }
 
     var evidenceWarnings = _pickPath(snapEvidence, ['warnings']);
@@ -853,23 +862,29 @@
     var routerWinRate = _firstNum(_pickPath(snapEvidenceDerived, ['router_win_rate_pct']), null);
     var stackerWinRate = _firstNum(_pickPath(snapEvidenceDerived, ['stacker_router_win_rate_pct']), null);
 
-    var opportunity = packageUsage !== null ? (Number(packageUsage).toFixed(1) + '% pkg usage') : ('$' + Number(rollingHourly).toLocaleString() + '/hr');
+    var opportunity = 'n/a — unverified';
+    if (packageUsage !== null) {
+      opportunity = 'reported ' + packageUsage.toFixed(1) + '% pkg usage | unverified';
+    } else if (rollingHourly !== null) {
+      opportunity = 'estimated $' + rollingHourly.toLocaleString() + '/hr | unverified';
+    }
     if (routerWinRate !== null && stackerWinRate !== null) {
-      opportunity = 'router ' + Number(routerWinRate).toFixed(1) + '% | stacker ' + Number(stackerWinRate).toFixed(1) + '%';
+      opportunity = 'reported router ' + routerWinRate.toFixed(1) + '% | stacker ' + stackerWinRate.toFixed(1) + '% (historical, unverified)';
     }
 
-    var improvementNum = Number(improvement);
-    var improvementSign = improvementNum >= 0 ? '+' : '';
+    var improvementSign = improvement !== null && improvement > 0 ? '+' : '';
+    var closedTrades = _firstNum(snap && snap.paper && snap.paper.closed_trades);
+    if (closedTrades !== null && (!Number.isInteger(closedTrades) || closedTrades < 0)) { closedTrades = null; }
 
     return {
-      txid: String(txid),
-      sharpe: Number(sharpe).toFixed(3),
-      improvement: improvementSign + improvementNum.toFixed(1) + '%',
-      walkForward: String(walkForward),
+      txid: txid === null ? 'n/a — execution unverified' : 'reported ' + txid + ' | execution unverified',
+      sharpe: sharpe === null ? 'n/a — unverified' : 'reported ' + sharpe.toFixed(3) + ' (historical, unverified)',
+      improvement: improvement === null ? 'n/a — unverified' : 'reported ' + improvementSign + improvement.toFixed(1) + '% | baseline unverified',
+      walkForward: walkForward === null ? 'n/a — unverified' : 'reported ' + walkForward + ' | unverified',
       reliability: reliability,
       opportunity: opportunity,
       chain: chainMsg,
-      closedTrades: (snap && snap.paper && snap.paper.closed_trades !== undefined) ? String(snap.paper.closed_trades) : 'n/a'
+      closedTrades: closedTrades === null ? 'n/a — unverified' : 'reported ' + closedTrades + ' | unverified'
     };
   }
 
@@ -893,18 +908,18 @@
     c.className += ' luma-helmier';
     c.innerHTML = [
       '<div class="luma-helmier-head">',
-      '  <div class="luma-helmier-title">Helmier Reviewer Questions — Live Answers</div>',
-      '  <span class="luma-badge gold">Investor Proof</span>',
+      '  <div class="luma-helmier-title">Reviewer Questions — Source Reports</div>',
+      '  <span class="luma-badge gold">Evidence Review</span>',
       '</div>',
       '<div class="luma-helmier-grid">',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Did it execute live?</div><div class="luma-helmier-a gold" id="' + containerId + '-txid">loading…</div></div>',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Sharpe quality</div><div class="luma-helmier-a" id="' + containerId + '-sharpe">loading…</div></div>',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Improvement vs baseline</div><div class="luma-helmier-a green" id="' + containerId + '-improvement">loading…</div></div>',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Walk-forward validation</div><div class="luma-helmier-a" id="' + containerId + '-walk">loading…</div></div>',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Infrastructure reliability</div><div class="luma-helmier-a" id="' + containerId + '-reliability">loading…</div></div>',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Measured opportunity</div><div class="luma-helmier-a gold" id="' + containerId + '-opportunity">loading…</div></div>',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Chain of custody</div><div class="luma-helmier-a" id="' + containerId + '-chain">loading…</div></div>',
-      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Closed trades snapshot</div><div class="luma-helmier-a" id="' + containerId + '-closed">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Reported order/reference ID</div><div class="luma-helmier-a" id="' + containerId + '-txid">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Reported historical Sharpe</div><div class="luma-helmier-a" id="' + containerId + '-sharpe">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Reported change (baseline unverified)</div><div class="luma-helmier-a" id="' + containerId + '-improvement">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Reported validation status</div><div class="luma-helmier-a" id="' + containerId + '-walk">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Reported timestamps (freshness unverified)</div><div class="luma-helmier-a" id="' + containerId + '-reliability">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Reported / estimated opportunity</div><div class="luma-helmier-a" id="' + containerId + '-opportunity">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Hash listings (not verified)</div><div class="luma-helmier-a" id="' + containerId + '-chain">loading…</div></div>',
+      '  <div class="luma-helmier-item"><div class="luma-helmier-q">Reported closed-trade count</div><div class="luma-helmier-a" id="' + containerId + '-closed">loading…</div></div>',
       '</div>'
     ].join('');
 
