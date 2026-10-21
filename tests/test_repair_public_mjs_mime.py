@@ -395,12 +395,12 @@ def test_internal_rollback_refuses_prior_metadata_only_edit(backend, monkeypatch
 def test_atomic_installer_preserves_mode_times_and_bytes(tmp_path):
     path = tmp_path / "table"
     path.write_bytes(RAW)
-    os.chmod(path, 0o640)
+    os.chmod(path, 0o600)
     before = path.stat()
     meta = repair.metadata(path, before)
     repair.install_bytes(path, repair.propose(RAW)[0], meta)
     after = path.stat()
-    assert stat.S_IMODE(after.st_mode) == 0o640
+    assert stat.S_IMODE(after.st_mode) == 0o600
     assert after.st_mtime_ns == before.st_mtime_ns
     assert path.read_bytes() == repair.propose(RAW)[0]
     assert not list(tmp_path.glob(".*.mime-repair-*"))
