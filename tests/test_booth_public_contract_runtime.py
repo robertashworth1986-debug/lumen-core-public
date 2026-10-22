@@ -258,13 +258,17 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
         'effective gateway service identity is not lumencore:lumencore',
         'gateway singleton lock did not bind to the systemd main PID',
         'gateway singleton lock identity is not bounded',
-        'cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN"',
+        'checked_restore_step dropin_copy service_drop_in bounded_recovery_copy "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"',
         'chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR"',
         'chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR"',
         'if [[ "$SERVICE_WAS_ACTIVE" == true ]]',
         "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK",
     ):
         assert marker in script
+    copy_wrapper = _bash_function(script, "bounded_recovery_copy")
+    assert '[[ $# -eq 2 ]] || return 125' in copy_wrapper
+    assert '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s' in copy_wrapper
+    assert 'cp -a -- "$1" "$2"' in copy_wrapper
     assert "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK" in script
     for path in ("/metrics", "/openapi.json", "/docs", "/redoc"):
         assert f'  "{path}"' in script

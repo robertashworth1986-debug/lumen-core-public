@@ -353,6 +353,19 @@ packages, discovering 149 tests and executing none during that import check.
 Bash syntax and diff checks passed; exact-new-head hosted validation is still
 required. No merge or production operation is established by this draft.
 
+Initial hosted head `285e6c0a` failed the public-contract job before the new copy
+cases: the older deployment-contract assertion still required the previous direct
+drop-in copy spelling. That assertion now requires the exact bounded call with the
+fixed backup/target arguments, plus the wrapper's two-argument guard, fixed timeout
+policy and `cp -a --` ordering. The runtime helper is unchanged by this test-only
+correction. Initial failed CI evidence remains preserved; the previous selected
+local results did not cover this static contract. The full hosted suite retained
+the same single assertion failure, 2,144 passes, eight unrelated skips and 350
+subtests. After the test-only correction, the exact static contract plus the four
+new copy tests passed locally (five passes, no failures or skips); these overlap
+the initial selected results and are not additive. Corrected-head hosted CI
+remains pending, and the failed first head is not relabeled as successful.
+
 Only copy invocation duration is addressed. Source/target queries, filesystem
 removal and metadata operations, receipt writes, cleanup and aggregate recovery
 duration remain unbounded. Uninterruptible kernel I/O or scheduling can prevent
