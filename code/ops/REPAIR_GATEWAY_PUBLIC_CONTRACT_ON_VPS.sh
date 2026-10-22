@@ -1507,7 +1507,7 @@ read_gateway_lock_pid() {
   [[ $# -eq 0 ]] || return 14
   # Keep original file bytes out of shell substitution until their grammar is
   # validated. Never collapse internal whitespace or discard NUL bytes.
-  "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
 import os
 import re
 import stat

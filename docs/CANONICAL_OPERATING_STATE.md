@@ -30,6 +30,32 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 22 lock-PID reader increment wraps only the
+`read_gateway_lock_pid` Python launch with the existing validated GNU timeout
+policy: TERM after 60 seconds, then forced termination after five more seconds.
+Its original-byte parser, fixed lock-path argument, grammar and version checks
+are unchanged. Failed subprocess output can still exist, but cleanup propagates
+the exact nonzero status before owner probing or removal. Post-start identity
+verification retains its existing rollback-18 mapping and never adopts a failed
+PID capture. Rollback retains the original trigger and first failed operation,
+stops subsequent restoration/restart and preserves uncertain receipt completion.
+No retry or status reinterpretation was added.
+
+Disposable fixtures distinguish the PID and presence readers by their exact
+stdin bodies because their launch arguments match. Existing presence-stage
+injections remain separate. Focused cases cover partial output with nonzero
+status, both caller contracts, rollback and terminal-receipt failure. Native
+Linux-only controls run an extracted PID reader with a fake interpreter; they
+never run real cleanup, probes, service or recovery commands. Local skips do not
+establish Linux signal behavior, and prior-head CI does not validate this change.
+
+This bounds one subprocess, not the owner probe, systemd MainPID query, other
+forward commands or aggregate recovery duration. Exit 124 or 137 does not prove
+a unique timeout cause. Uninterruptible I/O, privileged concurrent writers, PID
+reuse/check-to-use races, complete restoration and recovery after outer
+postchecks remain unresolved. Independent review and exact-head hosted evidence
+are separate gates; no merge, deployment or production-readiness claim follows.
+
 The October 22 lock-presence reader increment wraps only the
 `read_gateway_lock_presence` Python launch in the existing preflight-checked GNU
 timeout policy: TERM after 60 seconds, then forced termination after five more
@@ -46,9 +72,9 @@ status, both observation stages and terminal receipt failure. Native Linux-only
 fixtures exercise a successful fake reader and hung/ignored-TERM termination
 using only the extracted reader, not real recovery commands. Windows skips do
 not establish native signal behavior. Status 124 or 137 remains ambiguous with
-the command returning that value or another SIGKILL. This bounds one subprocess,
-not lock-PID readers, owner probes, all forward commands, aggregate recovery or
-uninterruptible kernel I/O. Privileged-writer races, complete restoration and
+the command returning that value or another SIGKILL. That increment bounded the presence subprocess only; the PID boundary is
+described above. Owner probes, all forward commands, aggregate recovery and
+uninterruptible kernel I/O remain outside those two bounds. Privileged-writer races, complete restoration and
 recovery after outer postchecks remain unresolved. Local and hosted results are
 separate evidence; no deployment or new-head hosted result is asserted here.
 
