@@ -10,6 +10,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import textwrap
 import time
 import unittest
 from pathlib import Path
@@ -307,6 +308,174 @@ def _gateway_rollback_test_bash() -> str:
     if git_bash.is_file():
         return str(git_bash)
     raise RuntimeError("Bash is required for gateway rollback regression tests")
+
+
+def _gateway_external_postcheck_step() -> str:
+    workflow = (ROOT / ".github/workflows/repair-gateway-dependency-closure.yml").read_text(encoding="utf-8")
+    section = workflow.split("      - name: Verify public gateway contracts after repair\n", 1)[1]
+    section = section.split("      - name: Remove local private unlock staging\n", 1)[0]
+    return textwrap.dedent(section.split("        run: |\n", 1)[1])
+
+
+def _run_gateway_external_postcheck(case: str) -> dict:
+    """Execute the actual workflow body with inert curl/jq responses; never use network/SSH.
+
+    jq is stubbed only to select a contract failure; these are workflow control-flow
+    and receipt tests, not an integration test of jq or HTTP server behavior.
+    """
+    with tempfile.TemporaryDirectory(prefix="gateway-postcheck-") as temporary:
+        root = Path(temporary)
+        receipts = root / "receipts"
+        receipts.mkdir()
+        temporary_files = root / "temporary-files"
+        temporary_files.mkdir()
+        helper_text = "\n".join((
+            "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK", "Source commit: " + "a" * 40,
+            "Bundle SHA-256: " + "b" * 64, "Service hardening SHA-256: " + "c" * 64,
+            "Private helper outcome receipt SHA-256: " + "d" * 64, "",
+        ))
+        helper = receipts / "gateway-repair-receipt.txt"
+        helper.write_bytes(helper_text.encode())
+        if case == "bad_helper_binding":
+            helper.write_bytes(helper_text.replace("Source commit: " + "a" * 40, "Source commit: " + "e" * 40).encode())
+        if case == "start_collision":
+            (receipts / "public-verification-started.json").mkdir()
+        if case in {"terminal_collision_failure", "terminal_collision_success"}:
+            (receipts / "public-verification-outcome.json").mkdir()
+        body = _gateway_external_postcheck_step()
+        assert "ssh " not in body and "sudo " not in body and "systemctl " not in body
+        body = body.replace("/tmp/gateway-repair", receipts.as_posix())
+        body = body.replace("${{ steps.package.outputs.bundle_sha }}", "b" * 64)
+        body = body.replace("${{ steps.package.outputs.hardening_sha }}", "c" * 64)
+        if case == "early_success_exit":
+            body = body.replace("start_stage health_request\n", "exit 0\nstart_stage health_request\n", 1)
+        stubs = r'''
+python3() { "$FIXTURE_PYTHON" "$@"; }
+jq() {
+  if [[ "$FIXTURE_CASE" == contract_failure && "$POSTCHECK_STAGE" == status_contract ]]; then return 1; fi
+  return 0
+}
+curl() {
+  local output='' headers='' format='' url='' argument
+  while [[ "$#" -gt 0 ]]; do
+    argument="$1"; shift
+    case "$argument" in
+      -o|--output) output="$1"; shift ;;
+      --dump-header) headers="$1"; shift ;;
+      -w|--write-out) format="$1"; shift ;;
+      --header|--max-time) shift ;;
+      https://*) url="$argument" ;;
+    esac
+  done
+  printf '%s\n' "$POSTCHECK_STAGE" >> "$FIXTURE_CALLS"
+  printf '%s' 'SANITIZED_BODY_MUST_NOT_APPEAR_IN_RECEIPTS' > "$output"
+  if [[ -n "$headers" ]]; then
+    printf 'www-authenticate: Bearer\ncache-control: no-store\npragma: no-cache\n' > "$headers"
+  fi
+  if [[ "$POSTCHECK_STAGE" == health_request ]]; then
+    case "$FIXTURE_CASE" in
+      first_failure|terminal_collision_failure) return 22 ;;
+      interrupted) kill -TERM "$$"; return 143 ;;
+      helper_changed) printf '%s\n' 'unexpected helper output' >> "$FIXTURE_HELPER" ;;
+    esac
+  fi
+  case "$POSTCHECK_STAGE" in
+    health_request|status_request) printf 200 ;;
+    websocket) printf 403 ;;
+    docs) if [[ "$FIXTURE_CASE" == later_failure ]]; then printf '200\tapplication/json'; else printf '401\tapplication/json'; fi ;;
+    *) printf '401\tapplication/json' ;;
+  esac
+}
+'''
+        script = root / "actual-postcheck.sh"
+        script.write_bytes((stubs + "\n" + body).encode())
+        env = dict(os.environ, FIXTURE_CASE=case, FIXTURE_PYTHON=sys.executable,
+                   FIXTURE_CALLS=(root / "calls").as_posix(), FIXTURE_HELPER=helper.as_posix(),
+                   TMPDIR=temporary_files.as_posix(), RELEASE_COMMIT="a" * 40,
+                   BUNDLE_SHA="b" * 64, HARDENING_SHA="c" * 64,
+                   GITHUB_RUN_ID="12345", GITHUB_RUN_ATTEMPT="2")
+        result = subprocess.run([_gateway_rollback_test_bash(), script.as_posix()], cwd=root,
+                                env=env, text=True, capture_output=True, timeout=20)
+        records = {}
+        for kind, filename in (("started", "public-verification-started.json"),
+                               ("terminal", "public-verification-outcome.json")):
+            path = receipts / filename
+            if path.is_file():
+                raw = path.read_bytes()
+                assert b"SANITIZED_BODY_MUST_NOT_APPEAR_IN_RECEIPTS" not in raw
+                records[kind] = json.loads(raw)
+                records[kind + "_sha256"] = hashlib.sha256(raw).hexdigest()
+        calls = root / "calls"
+        return dict(rc=result.returncode, stdout=result.stdout, stderr=result.stderr,
+                    records=records, calls=calls.read_text().splitlines() if calls.exists() else [],
+                    remaining_temporary_files=list(temporary_files.iterdir()),
+                    legacy_receipt=(receipts / "public-verification-receipt.txt").is_file())
+
+
+def test_gateway_external_postcheck_first_and_later_failures_preserve_stage_and_status() -> None:
+    for case, code, stage, calls, completed in (
+        ("first_failure", 22, "health_request", 1, []),
+        ("contract_failure", 1, "status_contract", 2, ["health_request", "status_request", "health_contract"]),
+        ("later_failure", 1, "docs", 5, ["health_request", "status_request", "health_contract", "status_contract", "metrics", "openapi_json"]),
+    ):
+        result = _run_gateway_external_postcheck(case)
+        assert result["rc"] == code, result
+        terminal = result["records"]["terminal"]
+        assert terminal["original_exit_code"] == code and terminal["stage"] == stage
+        assert terminal["stage_began"] and not terminal["stage_completed"]
+        assert terminal["completed_stages"] == completed and len(result["calls"]) == calls
+        assert terminal["status"] == "EXTERNAL_VERIFICATION_FAILED"
+        assert not terminal["restoration_attempted"] and not terminal["restoration_verified"]
+        assert not result["remaining_temporary_files"] and not result["legacy_receipt"]
+
+
+def test_gateway_external_postcheck_success_binds_run_helper_and_complete_stages() -> None:
+    result = _run_gateway_external_postcheck("success")
+    assert result["rc"] == 0, result
+    start, terminal = result["records"]["started"], result["records"]["terminal"]
+    assert start["status"] == "EXTERNAL_VERIFICATION_STARTED_UNKNOWN"
+    assert terminal["status"] == "EXTERNAL_CHECKS_PASSED"
+    assert terminal["started_receipt_sha256"] == result["records"]["started_sha256"]
+    assert terminal["binding"] == start["binding"]
+    assert terminal["binding"]["RELEASE_COMMIT"] == "a" * 40
+    assert terminal["binding"]["BUNDLE_SHA"] == "b" * 64
+    assert terminal["binding"]["HARDENING_SHA"] == "c" * 64
+    assert terminal["binding"]["GITHUB_RUN_ID"] == "12345"
+    assert terminal["binding"]["GITHUB_RUN_ATTEMPT"] == "2"
+    assert terminal["binding"]["helper_outcome_reported_sha256"] == "d" * 64
+    assert len(terminal["completed_stages"]) == 10 and len(result["calls"]) == 7
+    assert terminal["stage"] == "complete" and terminal["original_exit_code"] == 0
+    assert not any(terminal[key] for key in ("interrupted", "restoration_attempted", "restoration_verified", "service_state_verified", "production_readiness_verified"))
+    assert result["legacy_receipt"] and not result["remaining_temporary_files"]
+
+
+def test_gateway_external_postcheck_persistence_failure_never_becomes_success() -> None:
+    for case, code in (("terminal_collision_failure", 22), ("terminal_collision_success", 97), ("helper_changed", 97)):
+        result = _run_gateway_external_postcheck(case)
+        assert result["rc"] == code, result
+        assert "started" in result["records"] and "terminal" not in result["records"]
+        assert "outcome persistence failed" in result["stderr"]
+        assert not result["remaining_temporary_files"]
+
+
+def test_gateway_external_postcheck_invalid_start_refuses_all_probes() -> None:
+    for case in ("bad_helper_binding", "start_collision"):
+        result = _run_gateway_external_postcheck(case)
+        assert result["rc"] == 96, result
+        assert result["calls"] == [] and result["records"] == {}
+        assert not result["legacy_receipt"]
+
+
+def test_gateway_external_postcheck_interruption_and_incomplete_zero_exit_remain_unknown() -> None:
+    for case, code, status in (("interrupted", 143, "UNKNOWN_INTERRUPTED_EXTERNAL_VERIFICATION"),
+                               ("early_success_exit", 97, "UNKNOWN_INCOMPLETE_EXTERNAL_VERIFICATION")):
+        result = _run_gateway_external_postcheck(case)
+        assert result["rc"] == code, result
+        terminal = result["records"]["terminal"]
+        assert terminal["status"] == status and not terminal["restoration_attempted"]
+        assert terminal["original_exit_code"] == (143 if case == "interrupted" else 0)
+        assert terminal["interrupted"] == (case == "interrupted")
+        assert not result["legacy_receipt"] and not result["remaining_temporary_files"]
 
 
 def _gateway_post_mutation_guards(script: str) -> list[str]:

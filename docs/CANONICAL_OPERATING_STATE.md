@@ -287,9 +287,43 @@ one platform skip and one fixture assertion failure: a deliberately unreadable
 rollback receipt is represented by a null entry, not a missing key. The assertion
 was corrected; the original failure, original exit status and no-restart evidence
 remain preserved. No production guard was relaxed and no broad overlapping suite
-was repeated. Independent review and exact-new-head hosted validation remain
-pending for this increment; the prior head's fourteen green checks do not apply
-to these uncommitted changes.
+was repeated. Independent review and hosted validation subsequently passed at
+`6ba9e37d`: fourteen checks, 140 Linux public-contract checks with no skips, and
+2,136 repository tests with eight unrelated skips and 350 subtests. The tested
+merge used public main `2d82be53` and that exact draft head; the provider's older
+PR-base field was retained as a metadata discrepancy. Those historical results
+do not validate the following workflow edit.
+
+The next outcome-2 increment records runner-side evidence when the existing
+external postcheck starts and terminates. It binds the release, bundle, hardening,
+run and attempt identifiers to the retained helper stdout and its reported private
+outcome hash; it does not independently read the private helper receipt. The
+started record means the external result is unknown. A terminal record identifies
+the active request or assertion stage, whether it began/completed, the completed
+stage prefix and original exit status. Existing public contract probes, exact-main
+gate and authorization controls are unchanged. Both records join the existing
+always-upload artifact list; raw response bodies and credentials are excluded.
+
+First/later probe or assertion failures retain their original nonzero status even
+if outcome persistence fails. Successful checks followed by failed persistence
+instead fail the step. Signals produce an interrupted/unknown result when the
+exit handler can run; abrupt runner loss may leave only the started record or no
+record, so absence never proves success. Ordinary failed workflow logs remain
+evidence too. These records neither invoke restoration nor establish service
+state, production readiness or whole recovery. Later recovery still needs a
+separately reviewed interface and action-time authorization; overall filesystem
+deadlines, privileged races and artifact upload/durability limits remain open.
+
+Eight selected local tests passed, including actual extracted workflow execution
+with inert HTTP/JSON stubs for first/later failure, full success, interrupted and
+incomplete exits, invalid helper binding and receipt-persistence failures, plus
+adjacent retained-backup and unchanged-gate controls. The stubs test workflow
+control flow and evidence behavior, not live HTTP responses or JSON-tool
+integration. There was no production action and no baseline reproduction rerun.
+The three dependency-free public-contract modules imported with 145 tests
+discovered and none executed; extracted-step Bash syntax and diff checks passed.
+Exact-new-head hosted validation and independent review remain pending for this
+workflow-only behavior change.
 
 The preceding runtime-directory revision at `2e0fdcb8` passed all 14 hosted checks:
 114 Linux public-contract checks with no skips and 2,110 full-suite tests with eight
