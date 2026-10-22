@@ -237,7 +237,8 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert 'systemctl start "$SERVICE"' in script
     assert "Rolling back the complete gateway dependency closure" in script
     assert "/opt/lumencore/code" in script
-    assert "singleton lock owner is still alive; refusing removal" in script
+    assert "singleton lock owner absence was not confirmed; refusing removal" in script
+    assert 'require_absent_lock_owner "$lock_pid" || {' in script
     assert "Removed verified dead-PID gateway singleton lock" in script
     assert "POST_APPLY_SOURCE_SHA256" in script
     assert "POST_APPLY_TARGET_SHA256" in script
@@ -492,6 +493,36 @@ def _gateway_post_mutation_guards(script: str) -> list[str]:
     )
     assert len(guards) == 12, "Exercise every post-mutation failure guard"
     return guards
+
+
+def _write_lock_probe_runtime(root: Path) -> None:
+    # Execute the production stdin body, replacing only os.kill. Never call
+    # native Windows os.kill (even signal zero can have different semantics).
+    (root / "lock-probe-runtime.py").write_text(r'''
+import errno
+import os
+import sys
+from pathlib import Path
+
+source = sys.stdin.read()
+mode = os.environ.get("LOCK_PROBE_CASE", "dead")
+def fixture_probe(pid, number):
+    assert number == 0
+    with Path("lock-probe.calls").open("a") as stream:
+        stream.write(f"{pid}:{number}\n")
+    if mode == "live": return None
+    if mode == "dead": raise ProcessLookupError(errno.ESRCH, "fixture")
+    if mode == "permission": raise PermissionError(errno.EPERM, "fixture")
+    if mode == "invalid": raise OSError(errno.EINVAL, "fixture")
+    if mode == "unknown": raise OSError(errno.EIO, "fixture")
+    if mode == "unclassified_lookup": raise ProcessLookupError("fixture without errno")
+    if mode == "overflow": raise OverflowError("fixture")
+    if mode == "value": raise ValueError("fixture")
+    raise RuntimeError("unexpected fixture probe error")
+os.kill = fixture_probe
+sys.argv = sys.argv[1:]
+exec(compile(source, "<actual-lock-owner-probe>", "exec"), {"__name__": "__main__"})
+''', encoding="utf-8", newline="\n")
 
 
 def _run_gateway_rollback_guard(
@@ -1103,11 +1134,22 @@ read_recovery_state() {
                 "read_recovery_runtime_directory_target_state() {", "actual_runtime_target_state() {", 1) + "\n"
             harness += 'read_recovery_runtime_directory_target_state() { fixture_run_target_drift query || return $?; actual_runtime_target_state "$@"; }\n'
         if real_lock_case:
+            _write_lock_probe_runtime(root)
+            harness += _bash_function(script, "require_absent_lock_owner") + "\n"
+            harness += r'''
+PYTHON_BIN=fixture_lock_python
+fixture_lock_python() {
+  if [[ "$LOCK_PROBE_CASE" == launcher_failure ]]; then return 29; fi
+  "$TEST_PYTHON" "$PWD/lock-probe-runtime.py" "$@"
+}
+'''
             harness += _bash_function(script, "remove_verified_dead_lock") + "\n"
             if real_lock_case == "live":
                 harness += 'printf "%s\\n" "$BASHPID" > "$LOCK_FILE"\n'
             elif real_lock_case == "invalid":
                 harness += 'printf "invalid\\n" > "$LOCK_FILE"\n'
+            elif real_lock_case == "invalid_range":
+                harness += 'printf "2147483648\\n" > "$LOCK_FILE"\n'
             elif real_lock_case == "symlink":
                 (root / "run/fixture.lock").symlink_to(root / "not-present")
             elif real_lock_case != "absent":
@@ -1462,6 +1504,9 @@ record_recovery_evidence() {
             SERVICE_EXIT_CODE=str(service_exit_code),
             REAL_TIMEOUT_MODE=real_timeout_mode,
             RESTORE_FAULT=restore_fault, REAL_LOCK_CASE=real_lock_case,
+            LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
+                "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
+                "unexpected", "launcher_failure"} else "dead",
             SOURCE_DRIFT=source_drift, DRIFT_BOUNDARY=drift_boundary, SOURCE_QUERY_CASE=source_query_case,
             TARGET_DRIFT=target_drift, TARGET_BOUNDARY=target_boundary, FORWARD_CASE=forward_case,
             TARGET_QUERY_CASE=target_query_case,
@@ -1937,6 +1982,79 @@ def test_gateway_restoration_faults_stop_before_all_later_operations() -> None:
             assert current == b"previous source\n" and dropin_exists
             assert evidence["second_backup"] == b"second previous\n"
             assert evidence["second_target"] == (b"second candidate\n" if fault.startswith("rm:") else None)
+
+
+def test_gateway_lock_owner_probe_requires_explicit_esrch_and_bounded_pid() -> None:
+    function = _bash_function(_repair_script(), "require_absent_lock_owner")
+    with tempfile.TemporaryDirectory(prefix="gateway-lock-probe-test-") as directory:
+        root = Path(directory)
+        _write_lock_probe_runtime(root)
+        harness = r'''
+set -Eeuo pipefail
+PYTHON_BIN=fixture_lock_python
+fixture_lock_python() {
+  if [[ "$LOCK_PROBE_CASE" == launcher_failure ]]; then return 29; fi
+  "$TEST_PYTHON" "$PWD/lock-probe-runtime.py" "$@"
+}
+''' + function + '\nrequire_absent_lock_owner "$@"\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        cases = [(mode, ["123"], rc, True) for mode, rc in (
+            ("dead", 0), ("live", 14), ("permission", 14), ("invalid", 14),
+            ("unknown", 14), ("unclassified_lookup", 14), ("overflow", 14),
+            ("value", 14), ("unexpected", 1),
+        )]
+        cases += [("dead", [value], 14, False) for value in (
+            "0", "-1", "+1", "01", "2147483648", "99999999999", "1 2", "", "١",
+        )]
+        cases += [("dead", [], 14, False), ("dead", ["123", "extra"], 14, False),
+                  ("dead", ["2147483647"], 0, True), ("launcher_failure", ["123"], 29, False)]
+        for mode, arguments, expected, probed in cases:
+            calls = root / "lock-probe.calls"
+            if calls.exists(): calls.unlink()
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh", *arguments],
+                cwd=root, env=dict(os.environ, TEST_PYTHON=Path(sys.executable).as_posix(), LOCK_PROBE_CASE=mode),
+                capture_output=True, text=True, timeout=10, check=False)
+            assert completed.returncode == expected, (mode, arguments, completed.stderr)
+            assert calls.exists() == probed, (mode, arguments)
+            if probed: assert calls.read_text() == f"{arguments[0]}:0\n"
+        # Native Windows/MSYS argv transport strips the trailing newline in
+        # this otherwise-invalid direct input. Exercise the actual Python body
+        # without that shell transport; production tr already strips whitespace.
+        if calls.exists(): calls.unlink()
+        body = function.split("<<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+        completed = subprocess.run([sys.executable, "lock-probe-runtime.py", "-", "1\n"],
+            input=body, cwd=root, env=dict(os.environ, LOCK_PROBE_CASE="dead"),
+            capture_output=True, text=True, timeout=10, check=False)
+        assert completed.returncode == 14 and not calls.exists(), completed.stderr
+
+
+def test_gateway_lock_probe_refusal_stops_actual_rollback_before_restoration() -> None:
+    for mode, expected in (("permission", 14), ("unknown", 14), ("invalid_range", 14),
+                           ("unclassified_lookup", 14), ("launcher_failure", 29)):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="lock_probe_refusal", real_lock_case=mode, evidence=evidence)
+        assert completed.returncode == 17 and current == b"candidate source\n" and dropin_exists
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["operation_calls"] == ""
+        assert evidence["lock_exists"] and evidence["backup"] == b"previous source\n"
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"] == dict(operation="dead_lock", target="gateway_lock", exit_code=expected)
+        assert receipt["trigger_exit_code"] == 17 and receipt["service_restart_attempted"] is False
+        assert receipt["restoration_verified"] is False and receipt["further_restoration_stopped"] is True
+        assert "Removed verified dead-PID" not in completed.stdout
+
+
+def test_gateway_lock_probe_refusal_preserves_trigger_when_receipt_write_fails() -> None:
+    evidence: dict = {}
+    completed, current, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure", real_lock_case="permission", evidence=evidence)
+    assert completed.returncode == 17 and current == b"candidate source\n" and dropin_exists
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["operation_calls"] == ""
+    assert evidence["lock_exists"] and evidence["backup"] == b"previous source\n"
+    assert "private rollback receipt persistence failed" in completed.stderr
+    assert "Removed verified dead-PID" not in completed.stdout
 
 
 def test_gateway_inner_lock_errors_cannot_be_hidden_by_successful_echo() -> None:

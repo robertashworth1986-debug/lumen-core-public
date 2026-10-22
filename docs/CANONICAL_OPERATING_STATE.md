@@ -350,8 +350,8 @@ not demonstrate real copy elapsed-time or signal behavior. Four new tests and
 six selected adjacent/preflight controls passed in two bounded local invocations,
 with no failures or skips. Three public-contract modules imported without site
 packages, discovering 149 tests and executing none during that import check.
-Bash syntax and diff checks passed; exact-new-head hosted validation is still
-required. No merge or production operation is established by this draft.
+Bash syntax and diff checks passed. Exact-head validation of the subsequent
+correction is recorded below; no merge or production operation is established.
 
 Initial hosted head `285e6c0a` failed the public-contract job before the new copy
 cases: the older deployment-contract assertion still required the previous direct
@@ -363,8 +363,44 @@ local results did not cover this static contract. The full hosted suite retained
 the same single assertion failure, 2,144 passes, eight unrelated skips and 350
 subtests. After the test-only correction, the exact static contract plus the four
 new copy tests passed locally (five passes, no failures or skips); these overlap
-the initial selected results and are not additive. Corrected-head hosted CI
-remains pending, and the failed first head is not relabeled as successful.
+the initial selected results and are not additive. Corrected head `f207a725`
+subsequently passed all fifteen checks, 149 Linux public-contract checks without
+skips, and 2,145 repository tests with eight unrelated skips and 350 subtests.
+The tested merge used public main `2d82be53` and that exact head. The failed first
+head remains preserved; these completed results do not validate later edits.
+
+The current outcome-2 draft narrows singleton-lock cleanup to an explicit process
+absence observation. A Python signal-zero probe authorizes removal only when its
+error number is ESRCH. A live process, permission denial, invalid or out-of-range
+PID, other probe errors and interpreter failures refuse removal. ASCII decimal
+syntax and a ten-digit bound are checked before conversion; the positive signed-32-bit
+range is checked before any probe. The fixed lock path and existing read, link and removal checks remain in
+place. The shell requires the interpreter's successful classification, retains
+its nonzero status otherwise, and uses the existing first-failure rollback path:
+no later restore/service work follows refusal, the original trigger status is
+preserved separately, and lock, target and recovery evidence remain available.
+
+Deterministic fixtures execute the actual embedded classifier and extracted
+rollback while replacing only its process probe. They exercise explicit ESRCH,
+live/permission/invalid/unknown classifications, argument bounds, interpreter
+failure, refusal with receipt-write failure, valid/absent locks and adjacent
+restoration controls. No native Windows process signal or hanging fixture runs.
+The first selected invocation retained four passes, two failures and one POSIX
+skip: an old error-message assertion and a trailing-newline argument crossing
+the Windows/MSYS fixture boundary. The static assertion now requires the new
+message and exact classifier call; the newline case executes the same embedded
+Python body directly and verifies rejection before probing. The final bounded
+selection passed six tests with one POSIX-only skip. The two invocations overlap
+and are not additive. The three dependency-free public-contract modules imported
+with 152 tests discovered and none executed. Bash syntax and diff checks passed;
+independent review and exact-new-head hosted CI remain pending.
+
+ESRCH is only a point-in-time absence observation. This does not establish that a
+lock was historically owned by that PID, eliminate PID reuse or lock replacement
+between checking and deletion, or verify complete recovery. Permission failures
+may be uncommon under the production root identity; this corrects classification,
+not a demonstrated production incident. Existing aggregate deadlines, privileged
+writer races, partial-restoration and external-postcheck recovery limits remain.
 
 Only copy invocation duration is addressed. Source/target queries, filesystem
 removal and metadata operations, receipt writes, cleanup and aggregate recovery

@@ -1450,6 +1450,31 @@ assert decision.allowed is False
 assert decision.mode == "blocked_live_order"
 PY
 
+require_absent_lock_owner() {
+  [[ $# -eq 1 ]] || return 14
+  # A failed signal-zero probe is not proof of absence. Authorize removal only
+  # for explicit ESRCH; permission, range and unknown errors must fail closed.
+  "$PYTHON_BIN" - "$1" <<'PY'
+import errno
+import os
+import re
+import sys
+
+if len(sys.argv) != 2 or re.fullmatch(r"[1-9][0-9]{0,9}", sys.argv[1]) is None:
+    raise SystemExit(14)
+pid = int(sys.argv[1])
+if pid > 2147483647:
+    raise SystemExit(14)
+try:
+    os.kill(pid, 0)
+except OSError as exc:
+    raise SystemExit(0 if exc.errno == errno.ESRCH else 14)
+except (OverflowError, ValueError):
+    raise SystemExit(14)
+raise SystemExit(14)
+PY
+}
+
 remove_verified_dead_lock() {
   if [[ ! -e "$LOCK_FILE" && ! -L "$LOCK_FILE" ]]; then
     return 0
@@ -1464,10 +1489,11 @@ remove_verified_dead_lock() {
     echo "ERROR: singleton lock PID is not a positive integer" >&2
     return 14
   }
-  if kill -0 "$lock_pid" 2>/dev/null; then
-    echo "ERROR: singleton lock owner is still alive; refusing removal" >&2
-    return 14
-  fi
+  require_absent_lock_owner "$lock_pid" || {
+    local probe_rc=$?
+    echo "ERROR: singleton lock owner absence was not confirmed; refusing removal" >&2
+    return "$probe_rc"
+  }
   rm -f -- "$LOCK_FILE" || return $?
   echo "Removed verified dead-PID gateway singleton lock."
 }
