@@ -402,6 +402,45 @@ may be uncommon under the production root identity; this corrects classification
 not a demonstrated production incident. Existing aggregate deadlines, privileged
 writer races, partial-restoration and external-postcheck recovery limits remain.
 
+The resulting head `ce968a07` subsequently passed all fifteen hosted checks:
+152 Linux public-contract checks without skips and 2,148 repository tests with
+eight unrelated skips and 350 subtests. Those completed results belong to that
+head and do not validate the following local increment.
+
+The next outcome-2 increment replaces both lock-file whitespace-normalization
+reads with one no-argument reader of the fixed approved lock path. It reads at
+most thirteen binary bytes and accepts only a positive ASCII decimal PID of at
+most ten digits and signed-32-bit range, optionally followed by exactly one LF
+or CRLF. Original internal whitespace, extra lines, NUL, Unicode, signs, leading
+zeros, oversized records and invalid ranges are refused before a process probe
+or removal. The reader requires a regular file and checks stable file identity,
+size and timestamps across its bounded read; available no-follow/nonblocking
+open flags prevent following a final symlink or waiting on a substituted FIFO.
+Only validated canonical decimal output reaches the shell. Cleanup preserves
+reader/classifier failure status through the existing fail-stop path. The actual
+post-start identity check uses the same reader and calls rollback with its
+existing failure code on a read/grammar error. ESRCH-only removal authorization,
+recovery evidence and original-trigger preservation remain unchanged.
+
+Ten selected local tests passed with one POSIX-only symlink case skipped in one
+executable invocation. Actual extracted cleanup and post-start code consume exact
+file bytes; process probes, systemd, polling delays and rollback side effects in
+those small fixtures are inert. Separate actual-rollback fixtures establish that
+malformed bytes stop later restoration/restart and preserve the original trigger,
+including receipt-write failure. Existing ESRCH, valid/absent-lock, read/removal
+failure and deployment contracts were included. The three dependency-free modules
+imported with 157 tests discovered and none executed; syntax and diff checks
+passed. The previous optional inert diagnostic remains a failed, unqualified
+attempt and was not rerun. Independent review and exact-new-head hosted validation
+remain pending; no merge or production operation occurred.
+
+This grammar check is not atomic ownership protection. A service can be observed
+mid-write and safely refused, and PID reuse, parent/lock replacement and the
+read/probe/removal intervals remain races. The bounded byte count is not a total
+I/O or recovery deadline. Earlier partial restoration, privileged writers, whole
+restoration/service verification and later external-postcheck recovery remain
+unresolved.
+
 Only copy invocation duration is addressed. Source/target queries, filesystem
 removal and metadata operations, receipt writes, cleanup and aggregate recovery
 duration remain unbounded. Uninterruptible kernel I/O or scheduling can prevent

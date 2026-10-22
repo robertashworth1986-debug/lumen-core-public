@@ -239,6 +239,12 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert "/opt/lumencore/code" in script
     assert "singleton lock owner absence was not confirmed; refusing removal" in script
     assert 'require_absent_lock_owner "$lock_pid" || {' in script
+    assert script.count('lock_pid="$(read_gateway_lock_pid)"') == 2
+    assert "tr -d '[:space:]'" not in script
+    lock_reader = _bash_function(script, "read_gateway_lock_pid")
+    assert '[[ $# -eq 0 ]] || return 14' in lock_reader
+    assert '"$PYTHON_BIN" - "$LOCK_FILE"' in lock_reader
+    assert 'stream.read(13)' in lock_reader
     assert "Removed verified dead-PID gateway singleton lock" in script
     assert "POST_APPLY_SOURCE_SHA256" in script
     assert "POST_APPLY_TARGET_SHA256" in script
@@ -520,9 +526,115 @@ def fixture_probe(pid, number):
     if mode == "value": raise ValueError("fixture")
     raise RuntimeError("unexpected fixture probe error")
 os.kill = fixture_probe
+if os.environ.get("LOCK_READ_CASE") == "permission":
+    def denied_open(*args, **kwargs): raise PermissionError(errno.EACCES, "fixture")
+    os.open = denied_open
 sys.argv = sys.argv[1:]
 exec(compile(source, "<actual-lock-owner-probe>", "exec"), {"__name__": "__main__"})
 ''', encoding="utf-8", newline="\n")
+
+
+def _run_gateway_lock_file_case(raw: bytes, caller: str, *, main_pid: str = "12",
+                                probe_case: str = "dead", read_case: str = "",
+                                file_kind: str = "regular", extra_argument: bool = False) -> dict:
+    script = _repair_script()
+    with tempfile.TemporaryDirectory(prefix="gateway-lock-bytes-test-") as directory:
+        root = Path(directory)
+        lock = root / "fixture.lock"
+        if file_kind == "regular": lock.write_bytes(raw)
+        elif file_kind == "directory": lock.mkdir()
+        elif file_kind in {"symlink", "dangling"}:
+            outside = root / "outside.lock"
+            if file_kind == "symlink": outside.write_bytes(raw)
+            lock.symlink_to(outside)
+        elif file_kind != "missing": raise AssertionError(file_kind)
+        _write_lock_probe_runtime(root)
+        harness = r'''
+set -Eeuo pipefail
+LOCK_FILE="$PWD/fixture.lock"
+SERVICE=fixture
+PYTHON_BIN=fixture_lock_python
+fixture_lock_python() {
+  if [[ "$LOCK_READ_CASE" == launcher_failure ]]; then return 29; fi
+  "$TEST_PYTHON" "$PWD/lock-probe-runtime.py" "$@"
+}
+systemctl() { printf '%s\n' "$MAIN_PID"; }
+sleep() { printf 'sleep\n' >> "$PWD/sleep.calls"; }
+rollback() { printf '%s\n' "$1" >> "$PWD/rollback.calls"; exit "$1"; }
+rm() { printf 'remove\n' >> "$PWD/remove.calls"; command rm "$@"; }
+'''
+        for name in ("read_gateway_lock_pid", "require_absent_lock_owner", "remove_verified_dead_lock"):
+            harness += _bash_function(script, name) + "\n"
+        if caller == "cleanup": harness += "remove_verified_dead_lock\n"
+        elif caller == "reader": harness += "read_gateway_lock_pid" + (" ignored" if extra_argument else "") + "\n"
+        elif caller == "identity":
+            # Execute the actual post-start polling and failure guard, replacing
+            # only systemd, sleep and rollback side effects with bounded stubs.
+            identity = script.split("\nlock_ready=false\n", 1)[1]
+            identity = identity.split('[[ "$(stat -c \'%U:%G:%a\' "$LOCK_FILE")"', 1)[0]
+            harness += "lock_ready=false\n" + identity
+        else: raise AssertionError(caller)
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+            env=dict(os.environ, TEST_PYTHON=Path(sys.executable).as_posix(), MAIN_PID=main_pid,
+                     LOCK_PROBE_CASE=probe_case, LOCK_READ_CASE=read_case),
+            capture_output=True, text=True, timeout=10, check=False)
+        result = {"completed": completed, "exists": lock.exists() or lock.is_symlink()}
+        for name in ("lock-probe", "sleep", "rollback", "remove"):
+            path = root / (name + ".calls")
+            result[name] = path.read_text() if path.exists() else ""
+        return result
+
+
+def test_gateway_lock_file_grammar_refuses_malformed_original_bytes_at_both_callers() -> None:
+    malformed = (b"1 2", b"1\t2", b"1\n2", b"12\n\n", b"12\r", b"12\r\r\n",
+                 b" 12", b"12 ", b"12\x00", b"1\x002", b"", b"\n", b"0", b"01",
+                 b"-12", b"+12", b"2147483648", b"9" * 13, b"12" + b" " * 65536,
+                 "１２".encode("utf-8"), "١٢".encode("utf-8"), b"\xef\xbb\xbf12")
+    for raw in malformed:
+        for caller, expected in (("cleanup", 14), ("identity", 18)):
+            result = _run_gateway_lock_file_case(raw, caller)
+            assert result["completed"].returncode == expected, (raw[:30], caller, result)
+            assert result["exists"] and result["lock-probe"] == result["remove"] == result["sleep"] == ""
+            assert result["rollback"] == ("18\n" if caller == "identity" else "")
+
+
+def test_gateway_lock_file_valid_grammar_and_identity_mismatch_controls() -> None:
+    for raw in (b"12", b"12\n", b"12\r\n", b"2147483647\r\n"):
+        expected = raw.rstrip(b"\r\n").decode("ascii")
+        cleanup = _run_gateway_lock_file_case(raw, "cleanup")
+        assert cleanup["completed"].returncode == 0 and not cleanup["exists"], cleanup
+        assert cleanup["lock-probe"] == expected + ":0\n" and cleanup["remove"] == "remove\n"
+        identity = _run_gateway_lock_file_case(raw, "identity", main_pid=expected)
+        assert identity["completed"].returncode == 0 and identity["exists"], identity
+        assert identity["lock-probe"] == identity["remove"] == identity["sleep"] == ""
+    mismatch = _run_gateway_lock_file_case(b"12\n", "identity", main_pid="13")
+    assert mismatch["completed"].returncode == 18 and mismatch["exists"]
+    assert mismatch["sleep"] == "sleep\n" * 12 and mismatch["remove"] == mismatch["lock-probe"] == ""
+    live = _run_gateway_lock_file_case(b"12", "cleanup", probe_case="live")
+    assert live["completed"].returncode == 14 and live["exists"] and live["remove"] == ""
+    assert live["lock-probe"] == "12:0\n"
+
+
+def test_gateway_lock_file_reader_errors_and_argument_refuse_without_probe() -> None:
+    for read_case, expected in (("permission", 14), ("launcher_failure", 29)):
+        for caller in ("cleanup", "identity"):
+            result = _run_gateway_lock_file_case(b"12", caller, read_case=read_case)
+            assert result["completed"].returncode == (18 if caller == "identity" else expected), result
+            assert result["exists"] and result["remove"] == result["lock-probe"] == ""
+    for kind in ("missing", "directory"):
+        result = _run_gateway_lock_file_case(b"12", "reader", file_kind=kind)
+        assert result["completed"].returncode == 14 and result["completed"].stdout == "", result
+    result = _run_gateway_lock_file_case(b"12", "reader", extra_argument=True)
+    assert result["completed"].returncode == 14 and result["completed"].stdout == ""
+
+
+@unittest.skipIf(os.name != "posix", "Actual lock-reader symlink checks require Linux CI")
+def test_gateway_lock_file_reader_rejects_links_without_probe() -> None:
+    for kind in ("symlink", "dangling"):
+        result = _run_gateway_lock_file_case(b"12", "reader", file_kind=kind)
+        assert result["completed"].returncode == 14 and result["exists"]
+        assert result["remove"] == result["lock-probe"] == result["completed"].stdout == ""
 
 
 def _run_gateway_rollback_guard(
@@ -533,6 +645,7 @@ def _run_gateway_rollback_guard(
     service_was_active: bool = True, real_timeout_mode: str = "",
     restore_fault: str = "", second_source: bool = False, prior_dropin: bool = False,
     directory_case: str = "", metadata_case: str = "", real_lock_case: str = "",
+    lock_file_bytes: bytes | None = None,
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1039,7 +1152,6 @@ rmdir() {
   if [[ "$DROPIN_DIRECTORY_FAULT" == dangling_symlink && "${@: -1}" == "$SERVICE_DROP_IN_DIR" ]]; then fixture_dropin_directory_fault || return $?; fi
   if [[ "$RUNTIME_DIRECTORY_FAULT" == dangling_symlink && "${@: -1}" == "$RUN_DIR" ]]; then fixture_runtime_directory_fault || return $?; fi
 }
-tr() { if [[ "$REAL_LOCK_CASE" == tr_failure ]]; then return 27; fi; command tr "$@"; }
 cp() {
   printf 'cp\n' >> "$PWD/restore.calls"
   fixture_operation cp "${@: -1}" || return $?
@@ -1135,6 +1247,7 @@ read_recovery_state() {
             harness += 'read_recovery_runtime_directory_target_state() { fixture_run_target_drift query || return $?; actual_runtime_target_state "$@"; }\n'
         if real_lock_case:
             _write_lock_probe_runtime(root)
+            harness += _bash_function(script, "read_gateway_lock_pid") + "\n"
             harness += _bash_function(script, "require_absent_lock_owner") + "\n"
             harness += r'''
 PYTHON_BIN=fixture_lock_python
@@ -1144,7 +1257,11 @@ fixture_lock_python() {
 }
 '''
             harness += _bash_function(script, "remove_verified_dead_lock") + "\n"
-            if real_lock_case == "live":
+            if real_lock_case == "reader_failure":
+                harness += 'read_gateway_lock_pid() { return 27; }\n'
+            if lock_file_bytes is not None:
+                (root / "run/fixture.lock").write_bytes(lock_file_bytes)
+            elif real_lock_case == "live":
                 harness += 'printf "%s\\n" "$BASHPID" > "$LOCK_FILE"\n'
             elif real_lock_case == "invalid":
                 harness += 'printf "invalid\\n" > "$LOCK_FILE"\n'
@@ -1577,6 +1694,7 @@ record_recovery_evidence() {
             evidence["source_state_receipt_exists"] = (root / "backup/source_state.json").exists()
             evidence["retained_unrelated_files"] = [p.read_bytes() for p in root.glob("*/unrelated-retained")]
             evidence["lock_exists"] = (root / "run/fixture.lock").exists()
+            evidence["lock_probe_calls"] = (root / "lock-probe.calls").read_text() if (root / "lock-probe.calls").exists() else ""
             evidence["dropin_directory_exists"] = (root / "dropins").exists()
             evidence["dropin_dir_drift_applied"] = (root / "dropin-dir-drift-applied").exists()
             evidence["dropin_dir_forward_calls"] = (root / "dropin-dir-forward.calls").read_text().splitlines() if (root / "dropin-dir-forward.calls").exists() else []
@@ -2019,7 +2137,7 @@ fixture_lock_python() {
             if probed: assert calls.read_text() == f"{arguments[0]}:0\n"
         # Native Windows/MSYS argv transport strips the trailing newline in
         # this otherwise-invalid direct input. Exercise the actual Python body
-        # without that shell transport; production tr already strips whitespace.
+        # without that shell transport; original file grammar is tested separately.
         if calls.exists(): calls.unlink()
         body = function.split("<<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
         completed = subprocess.run([sys.executable, "lock-probe-runtime.py", "-", "1\n"],
@@ -2045,6 +2163,26 @@ def test_gateway_lock_probe_refusal_stops_actual_rollback_before_restoration() -
         assert "Removed verified dead-PID" not in completed.stdout
 
 
+def test_gateway_lock_file_malformed_bytes_stop_actual_rollback_and_preserve_trigger() -> None:
+    for raw, case in ((b"1 2", "lock_grammar"), (b"12\x00", "lock_grammar"),
+                      (b"12\n\n", "rollback_write_failure")):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case=case, real_lock_case="dead", lock_file_bytes=raw, evidence=evidence)
+        assert completed.returncode == 17 and current == b"candidate source\n" and dropin_exists
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["operation_calls"] == ""
+        assert evidence["lock_exists"] and evidence["lock_probe_calls"] == ""
+        assert evidence["backup"] == b"previous source\n" and "Removed verified dead-PID" not in completed.stdout
+        if case == "rollback_write_failure":
+            assert "private rollback receipt persistence failed" in completed.stderr
+        else:
+            receipt = evidence["rollback"]
+            assert receipt["failed_restoration_operation"] == dict(operation="dead_lock", target="gateway_lock", exit_code=14)
+            assert receipt["trigger_exit_code"] == 17 and receipt["service_restart_attempted"] is False
+            assert receipt["restoration_verified"] is False and receipt["further_restoration_stopped"] is True
+
+
 def test_gateway_lock_probe_refusal_preserves_trigger_when_receipt_write_fails() -> None:
     evidence: dict = {}
     completed, current, dropin_exists = _run_gateway_rollback_guard(
@@ -2059,7 +2197,7 @@ def test_gateway_lock_probe_refusal_preserves_trigger_when_receipt_write_fails()
 
 def test_gateway_inner_lock_errors_cannot_be_hidden_by_successful_echo() -> None:
     for lock_case, fault, expected_code in (
-        ("dead", "rm:lock", 23), ("tr_failure", "", 27), ("invalid", "", 14), ("live", "", 14),
+        ("dead", "rm:lock", 23), ("reader_failure", "", 27), ("invalid", "", 14), ("live", "", 14),
     ):
         evidence: dict = {}
         completed, current, dropin_exists = _run_gateway_rollback_guard(

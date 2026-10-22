@@ -1450,6 +1450,45 @@ assert decision.allowed is False
 assert decision.mode == "blocked_live_order"
 PY
 
+read_gateway_lock_pid() {
+  [[ $# -eq 0 ]] || return 14
+  # Keep original file bytes out of shell substitution until their grammar is
+  # validated. Never collapse internal whitespace or discard NUL bytes.
+  "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
+import os
+import re
+import stat
+import sys
+
+if len(sys.argv) != 2:
+    raise SystemExit(14)
+try:
+    before = os.lstat(sys.argv[1])
+    if not stat.S_ISREG(before.st_mode):
+        raise SystemExit(14)
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    with os.fdopen(os.open(sys.argv[1], flags), "rb") as stream:
+        opened = os.fstat(stream.fileno())
+        if not stat.S_ISREG(opened.st_mode) or (opened.st_dev, opened.st_ino) != (before.st_dev, before.st_ino):
+            raise SystemExit(14)
+        raw = stream.read(13)  # Ten digits plus one CRLF; the extra byte rejects oversize.
+        after = os.fstat(stream.fileno())
+    current = os.lstat(sys.argv[1])
+    def version(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+    if version(before) != version(opened) or version(opened) != version(after) or version(after) != version(current):
+        raise SystemExit(14)
+    if len(raw) != opened.st_size or re.fullmatch(rb"[1-9][0-9]{0,9}(?:\r?\n)?", raw) is None:
+        raise SystemExit(14)
+    pid = int(raw)
+    if pid > 2147483647:
+        raise SystemExit(14)
+except OSError:
+    raise SystemExit(14)
+sys.stdout.write(str(pid))
+PY
+}
+
 require_absent_lock_owner() {
   [[ $# -eq 1 ]] || return 14
   # A failed signal-zero probe is not proof of absence. Authorize removal only
@@ -1484,11 +1523,7 @@ remove_verified_dead_lock() {
     return 14
   }
   local lock_pid
-  lock_pid="$(tr -d '[:space:]' < "$LOCK_FILE")" || return $?
-  [[ "$lock_pid" =~ ^[1-9][0-9]*$ ]] || {
-    echo "ERROR: singleton lock PID is not a positive integer" >&2
-    return 14
-  }
+  lock_pid="$(read_gateway_lock_pid)" || return $?
   require_absent_lock_owner "$lock_pid" || {
     local probe_rc=$?
     echo "ERROR: singleton lock owner absence was not confirmed; refusing removal" >&2
@@ -1834,7 +1869,7 @@ lock_ready=false
 for attempt in $(seq 1 12); do
   if [[ -f "$LOCK_FILE" && ! -L "$LOCK_FILE" ]]; then
     main_pid="$(systemctl show "$SERVICE" --property=MainPID --value)"
-    lock_pid="$(tr -d '[:space:]' < "$LOCK_FILE")"
+    lock_pid="$(read_gateway_lock_pid)" || rollback 18
     if [[ "$main_pid" =~ ^[1-9][0-9]*$ && "$lock_pid" == "$main_pid" ]]; then
       lock_ready=true
       break
