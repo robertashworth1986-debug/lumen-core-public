@@ -30,6 +30,22 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 22 lock-cleanup increment adds one fixed-path presence observer at
+the initial skip decision and after a successful removal command. Only an
+explicit ENOENT from trusted-Python lstat establishes absence; all present
+objects, including dangling links, remain present and other observation errors
+refuse. Strict output framing rejects malformed results and preserves interpreter
+failure. Existing binary PID parsing and ESRCH-only owner classification remain.
+A removal command reporting success while leaving or recreating a lock now stops
+later restoration and restart through the existing first-failure receipt path,
+retaining the original trigger and visible receipt-persistence failures. This is
+a point-in-time absence observation, not object ownership or atomic deletion.
+PID reuse, lock/parent substitution before removal, later reappearance and
+validation-to-use races remain; whole restoration, overall I/O duration and late
+external-postcheck recovery remain unverified. Controlled inert fixtures are
+local validation, not evidence of a native removal or production incident.
+Exact-new-head hosted validation and independent source review are pending.
+
 This source-only follow-up advances outcome 2 by correcting a failure path in the
 existing gateway repair control. Twelve post-change checks now call rollback
 directly instead of exiting past the error handler. Rollback disables its error

@@ -1514,15 +1514,49 @@ raise SystemExit(14)
 PY
 }
 
+read_gateway_lock_presence() {
+  [[ $# -eq 0 ]] || return 14
+  local observation
+  # Only explicit ENOENT establishes absence. Preserve the interpreter status
+  # and exact output, including unexpected trailing newlines, before trusting it.
+  observation="$(
+    "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
+import errno
+import os
+import sys
+
+if len(sys.argv) != 2:
+    raise SystemExit(14)
+try:
+    os.lstat(sys.argv[1])
+except OSError as exc:
+    if exc.errno != errno.ENOENT:
+        raise SystemExit(14)
+    sys.stdout.write("ABSENT")
+else:
+    sys.stdout.write("PRESENT")
+PY
+    observation_rc=$?
+    [[ "$observation_rc" -eq 0 ]] || exit "$observation_rc"
+    printf ':LOCK_PRESENCE_END'
+  )" || return $?
+  case "$observation" in
+    ABSENT:LOCK_PRESENCE_END) printf ABSENT ;;
+    PRESENT:LOCK_PRESENCE_END) printf PRESENT ;;
+    *) return 14 ;;
+  esac
+}
+
 remove_verified_dead_lock() {
-  if [[ ! -e "$LOCK_FILE" && ! -L "$LOCK_FILE" ]]; then
+  local lock_presence lock_pid
+  lock_presence="$(read_gateway_lock_presence)" || return $?
+  if [[ "$lock_presence" == ABSENT ]]; then
     return 0
   fi
   [[ -f "$LOCK_FILE" && ! -L "$LOCK_FILE" ]] || {
     echo "ERROR: singleton lock is not a regular file" >&2
     return 14
   }
-  local lock_pid
   lock_pid="$(read_gateway_lock_pid)" || return $?
   require_absent_lock_owner "$lock_pid" || {
     local probe_rc=$?
@@ -1530,6 +1564,8 @@ remove_verified_dead_lock() {
     return "$probe_rc"
   }
   rm -f -- "$LOCK_FILE" || return $?
+  lock_presence="$(read_gateway_lock_presence)" || return $?
+  [[ "$lock_presence" == ABSENT ]] || return 14
   echo "Removed verified dead-PID gateway singleton lock."
 }
 

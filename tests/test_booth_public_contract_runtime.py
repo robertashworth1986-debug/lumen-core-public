@@ -245,6 +245,11 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
     assert '[[ $# -eq 0 ]] || return 14' in lock_reader
     assert '"$PYTHON_BIN" - "$LOCK_FILE"' in lock_reader
     assert 'stream.read(13)' in lock_reader
+    presence_reader = _bash_function(script, "read_gateway_lock_presence")
+    assert '[[ $# -eq 0 ]] || return 14' in presence_reader
+    assert '"$PYTHON_BIN" - "$LOCK_FILE"' in presence_reader
+    assert 'if exc.errno != errno.ENOENT:' in presence_reader
+    assert _bash_function(script, "remove_verified_dead_lock").count('lock_presence="$(read_gateway_lock_presence)" || return $?') == 2
     assert "Removed verified dead-PID gateway singleton lock" in script
     assert "POST_APPLY_SOURCE_SHA256" in script
     assert "POST_APPLY_TARGET_SHA256" in script
@@ -529,14 +534,44 @@ os.kill = fixture_probe
 if os.environ.get("LOCK_READ_CASE") == "permission":
     def denied_open(*args, **kwargs): raise PermissionError(errno.EACCES, "fixture")
     os.open = denied_open
+if 'sys.stdout.write("ABSENT")' in source:
+    calls = Path("lock-presence.calls")
+    previous = calls.read_text() if calls.exists() else ""
+    calls.write_text(previous + "observe\n")
+    stage = "initial" if not previous else "after"
+    requested = os.environ.get("LOCK_PRESENCE_CASE", "")
+    if requested.startswith(stage + ":"):
+        case = requested.split(":", 1)[1]
+        if case in {"empty", "wrong", "trailing_lf", "print_then_failure", "interpreter_failure"}:
+            sys.stdout.write({"empty": "", "wrong": "UNKNOWN", "trailing_lf": "ABSENT\n",
+                              "print_then_failure": "ABSENT", "interpreter_failure": ""}[case])
+            raise SystemExit(29 if case in {"print_then_failure", "interpreter_failure"} else 0)
+        def fixture_lstat(*args, **kwargs):
+            if case == "unclassified_lookup": raise FileNotFoundError("fixture without errno")
+            raise OSError({"enoent": errno.ENOENT, "permission": errno.EACCES,
+                           "eperm": errno.EPERM, "not_directory": errno.ENOTDIR,
+                           "unknown": errno.EIO}[case], "fixture")
+        os.lstat = fixture_lstat
 sys.argv = sys.argv[1:]
 exec(compile(source, "<actual-lock-owner-probe>", "exec"), {"__name__": "__main__"})
+''', encoding="utf-8", newline="\n")
+    (root / "lock-remove-result.py").write_text('''
+import os
+import sys
+from pathlib import Path
+p = Path(sys.argv[1])
+case = os.environ.get("LOCK_REMOVE_CASE", "")
+if case == "regular": p.write_bytes(b"intervening lock owner\\n")
+elif case == "directory": p.mkdir()
+elif case == "symlink": p.symlink_to(p.parent / "missing-lock-target")
+elif case: raise AssertionError(case)
 ''', encoding="utf-8", newline="\n")
 
 
 def _run_gateway_lock_file_case(raw: bytes, caller: str, *, main_pid: str = "12",
                                 probe_case: str = "dead", read_case: str = "",
-                                file_kind: str = "regular", extra_argument: bool = False) -> dict:
+                                file_kind: str = "regular", extra_argument: bool = False,
+                                presence_case: str = "", remove_case: str = "") -> dict:
     script = _repair_script()
     with tempfile.TemporaryDirectory(prefix="gateway-lock-bytes-test-") as directory:
         root = Path(directory)
@@ -561,12 +596,18 @@ fixture_lock_python() {
 systemctl() { printf '%s\n' "$MAIN_PID"; }
 sleep() { printf 'sleep\n' >> "$PWD/sleep.calls"; }
 rollback() { printf '%s\n' "$1" >> "$PWD/rollback.calls"; exit "$1"; }
-rm() { printf 'remove\n' >> "$PWD/remove.calls"; command rm "$@"; }
+rm() {
+  printf 'remove\n' >> "$PWD/remove.calls"
+  if [[ "$LOCK_REMOVE_CASE" == noop ]]; then return 0; fi
+  command rm "$@" || return $?
+  "$TEST_PYTHON" "$PWD/lock-remove-result.py" "$LOCK_FILE"
+}
 '''
-        for name in ("read_gateway_lock_pid", "require_absent_lock_owner", "remove_verified_dead_lock"):
+        for name in ("read_gateway_lock_pid", "require_absent_lock_owner", "read_gateway_lock_presence", "remove_verified_dead_lock"):
             harness += _bash_function(script, name) + "\n"
         if caller == "cleanup": harness += "remove_verified_dead_lock\n"
         elif caller == "reader": harness += "read_gateway_lock_pid" + (" ignored" if extra_argument else "") + "\n"
+        elif caller == "presence": harness += "read_gateway_lock_presence" + (" ignored" if extra_argument else "") + "\n"
         elif caller == "identity":
             # Execute the actual post-start polling and failure guard, replacing
             # only systemd, sleep and rollback side effects with bounded stubs.
@@ -577,10 +618,11 @@ rm() { printf 'remove\n' >> "$PWD/remove.calls"; command rm "$@"; }
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
         completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
             env=dict(os.environ, TEST_PYTHON=Path(sys.executable).as_posix(), MAIN_PID=main_pid,
-                     LOCK_PROBE_CASE=probe_case, LOCK_READ_CASE=read_case),
+                     LOCK_PROBE_CASE=probe_case, LOCK_READ_CASE=read_case,
+                     LOCK_PRESENCE_CASE=presence_case, LOCK_REMOVE_CASE=remove_case),
             capture_output=True, text=True, timeout=10, check=False)
         result = {"completed": completed, "exists": lock.exists() or lock.is_symlink()}
-        for name in ("lock-probe", "sleep", "rollback", "remove"):
+        for name in ("lock-probe", "lock-presence", "sleep", "rollback", "remove"):
             path = root / (name + ".calls")
             result[name] = path.read_text() if path.exists() else ""
         return result
@@ -646,6 +688,7 @@ def _run_gateway_rollback_guard(
     restore_fault: str = "", second_source: bool = False, prior_dropin: bool = False,
     directory_case: str = "", metadata_case: str = "", real_lock_case: str = "",
     lock_file_bytes: bytes | None = None,
+    lock_presence_case: str = "", lock_remove_case: str = "",
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1093,6 +1136,7 @@ chmod() {
 rm() {
   printf 'rm\n' >> "$PWD/restore.calls"
   fixture_operation rm "${@: -1}" || return $?
+  if [[ "${@: -1}" == "$LOCK_FILE" && "$LOCK_REMOVE_CASE" == noop ]]; then return 0; fi
   if [[ "$RESULT_FAULT" == remove_noop && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then
     printf no_op > "$PWD/result-fault-applied"
     return 0
@@ -1102,6 +1146,7 @@ rm() {
     return 0
   fi
   command rm "$@" || return $?
+  if [[ "${@: -1}" == "$LOCK_FILE" ]]; then "$TEST_PYTHON" "$PWD/lock-remove-result.py" "$LOCK_FILE" || return $?; fi
   if [[ "$DROPIN_FAULT" == remove_* && "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_fault || return $?; fi
   if [[ "$RESULT_FAULT" == remove_symlink && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_remove || return $?; fixture_target_drift after_first_remove || return $?; fi
@@ -1249,6 +1294,7 @@ read_recovery_state() {
             _write_lock_probe_runtime(root)
             harness += _bash_function(script, "read_gateway_lock_pid") + "\n"
             harness += _bash_function(script, "require_absent_lock_owner") + "\n"
+            harness += _bash_function(script, "read_gateway_lock_presence") + "\n"
             harness += r'''
 PYTHON_BIN=fixture_lock_python
 fixture_lock_python() {
@@ -1621,6 +1667,7 @@ record_recovery_evidence() {
             SERVICE_EXIT_CODE=str(service_exit_code),
             REAL_TIMEOUT_MODE=real_timeout_mode,
             RESTORE_FAULT=restore_fault, REAL_LOCK_CASE=real_lock_case,
+            LOCK_PRESENCE_CASE=lock_presence_case, LOCK_REMOVE_CASE=lock_remove_case,
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1693,7 +1740,7 @@ record_recovery_evidence() {
             evidence["source_drift_applied"] = (root / "source-drift-applied").exists()
             evidence["source_state_receipt_exists"] = (root / "backup/source_state.json").exists()
             evidence["retained_unrelated_files"] = [p.read_bytes() for p in root.glob("*/unrelated-retained")]
-            evidence["lock_exists"] = (root / "run/fixture.lock").exists()
+            evidence["lock_exists"] = (root / "run/fixture.lock").exists() or (root / "run/fixture.lock").is_symlink()
             evidence["lock_probe_calls"] = (root / "lock-probe.calls").read_text() if (root / "lock-probe.calls").exists() else ""
             evidence["dropin_directory_exists"] = (root / "dropins").exists()
             evidence["dropin_dir_drift_applied"] = (root / "dropin-dir-drift-applied").exists()
@@ -2227,6 +2274,77 @@ def test_gateway_valid_or_absent_lock_and_prior_dropin_restore_normally() -> Non
             "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed", "SYSTEMCTL:start"]
         assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
         assert "failed_restoration_operation" not in evidence["rollback"]
+
+
+def test_gateway_lock_presence_only_explicit_enoent_means_absent() -> None:
+    for kind, expected in (("missing", "ABSENT"), ("regular", "PRESENT"), ("directory", "PRESENT")):
+        result = _run_gateway_lock_file_case(b"12", "presence", file_kind=kind)
+        assert result["completed"].returncode == 0 and result["completed"].stdout == expected, result
+        assert result["lock-probe"] == result["remove"] == ""
+    explicit = _run_gateway_lock_file_case(b"", "presence", file_kind="missing", presence_case="initial:enoent")
+    assert explicit["completed"].returncode == 0 and explicit["completed"].stdout == "ABSENT"
+    extra = _run_gateway_lock_file_case(b"12", "presence", extra_argument=True)
+    assert extra["completed"].returncode == 14 and extra["lock-presence"] == ""
+
+
+def test_gateway_lock_presence_errors_and_malformed_output_refuse_at_both_observations() -> None:
+    for stage in ("initial", "after"):
+        for case in ("permission", "eperm", "not_directory", "unknown", "unclassified_lookup",
+                     "empty", "wrong", "trailing_lf", "print_then_failure", "interpreter_failure"):
+            # An actually missing path must not hide an initial observation error.
+            result = _run_gateway_lock_file_case(b"12", "cleanup",
+                file_kind="missing" if stage == "initial" else "regular",
+                presence_case=stage + ":" + case)
+            expected = 29 if case in {"print_then_failure", "interpreter_failure"} else 14
+            assert result["completed"].returncode == expected, (stage, case, result)
+            assert "Removed verified dead-PID" not in result["completed"].stdout
+            assert result["remove"] == ("remove\n" if stage == "after" else "")
+            assert result["lock-probe"] == ("12:0\n" if stage == "after" else "")
+
+
+def _assert_gateway_lock_presence_rollback_refuses(*, remove_case: str = "", presence_case: str = "",
+                                                  absent_before: bool = False, receipt_failure: bool = False) -> None:
+    evidence: dict = {}
+    completed, current, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure" if receipt_failure else "lock_presence_result",
+        real_lock_case="absent" if absent_before else "dead", lock_remove_case=remove_case,
+        lock_presence_case=presence_case, evidence=evidence)
+    assert completed.returncode == 17 and current == b"candidate source\n" and dropin_exists, completed.stderr
+    assert evidence["backup"] == b"previous source\n" and evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert evidence["operation_calls"] == ("" if presence_case.startswith("initial:") else "rm:lock\n")
+    assert "Removed verified dead-PID" not in completed.stdout
+    if remove_case:
+        assert evidence["lock_exists"], evidence
+    if receipt_failure:
+        assert "private rollback receipt persistence failed" in completed.stderr
+    else:
+        receipt = evidence["rollback"]
+        operation_rc = 29 if presence_case.endswith((":print_then_failure", ":interpreter_failure")) else 14
+        assert receipt["failed_restoration_operation"] == dict(operation="dead_lock", target="gateway_lock", exit_code=operation_rc)
+        assert receipt["trigger_exit_code"] == 17 and receipt["further_restoration_stopped"] is True
+        assert receipt["restoration_verified"] is False and receipt["service_restart_attempted"] is False
+
+
+def test_gateway_lock_presence_noop_or_reappearance_stops_all_later_restoration() -> None:
+    for case in ("noop", "regular", "directory"):
+        _assert_gateway_lock_presence_rollback_refuses(remove_case=case)
+
+
+def test_gateway_lock_presence_observation_and_receipt_failures_keep_original_trigger() -> None:
+    _assert_gateway_lock_presence_rollback_refuses(presence_case="initial:permission", absent_before=True)
+    _assert_gateway_lock_presence_rollback_refuses(presence_case="after:unknown")
+    _assert_gateway_lock_presence_rollback_refuses(presence_case="after:print_then_failure")
+    _assert_gateway_lock_presence_rollback_refuses(remove_case="noop", receipt_failure=True)
+
+
+@unittest.skipIf(os.name != "posix", "Actual lock presence symlinks require Linux CI")
+def test_gateway_lock_presence_symlink_is_present_and_reappearance_refuses() -> None:
+    for kind in ("symlink", "dangling"):
+        result = _run_gateway_lock_file_case(b"12", "presence", file_kind=kind)
+        assert result["completed"].returncode == 0 and result["completed"].stdout == "PRESENT", result
+        assert result["lock-probe"] == result["remove"] == ""
+    _assert_gateway_lock_presence_rollback_refuses(remove_case="symlink")
 
 
 @unittest.skipIf(os.name != "posix", "Real dangling lock symlink refusal requires Linux CI")
