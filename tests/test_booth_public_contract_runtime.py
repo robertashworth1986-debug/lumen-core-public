@@ -340,6 +340,8 @@ def _run_gateway_rollback_guard(
     dropin_forward_case: str = "", dropin_target_query_case: str = "",
     run_target_drift: str = "", run_target_boundary: str = "stop",
     run_forward_case: str = "", run_target_query_case: str = "",
+    dropin_dir_drift: str = "", dropin_dir_boundary: str = "before_directory_restore",
+    dropin_dir_forward_case: str = "", dropin_dir_query_case: str = "",
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -436,6 +438,20 @@ elif kind == "manifest_changed":
 elif kind in {"uid_mismatch", "gid_mismatch", "remove_noop"}: pass
 else: raise ValueError("unsupported_dropin_directory_fault")
 Path("dropin-directory-fault-applied").write_text(kind)
+''', encoding="utf-8", newline="\n")
+        if dropin_dir_drift:
+            (root / "dropin-dir-drift.py").write_text('''from pathlib import Path
+import os
+p=Path("dropins"); kind=os.environ["DROPIN_DIR_DRIFT"]
+if kind == "identity": p.rename("prior-dropin-dir"); p.mkdir(); p.chmod(0o755)
+elif kind == "missing": p.rmdir()
+elif kind == "file": p.rmdir(); p.write_bytes(b"intervening directory replacement")
+elif kind == "mode": p.chmod(0o700)
+elif kind == "symlink": p.rename("outside-dropin-dir"); p.symlink_to(Path("outside-dropin-dir").resolve(), target_is_directory=True)
+elif kind == "children": (p/"new-child").mkdir(); (p/"new-child").rmdir()
+elif kind == "parent_mode": p.parent.chmod(0o777)
+else: raise ValueError("unsupported_dropin_directory_drift")
+Path("dropin-dir-drift-applied").write_text(kind)
 ''', encoding="utf-8", newline="\n")
         if run_target_drift:
             (root / "run-target-drift.py").write_text('''from pathlib import Path
@@ -593,6 +609,9 @@ RECOVERY_DROPIN_RESULT=NOT_CHECKED
 RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 DROPIN_WRITE_STATE=UNTOUCHED
 DROPIN_TARGET_VERSION=""
+DROPIN_DIR_WRITE_STATE=UNTOUCHED
+DROPIN_DIR_TARGET_VERSION=""
+DROPIN_DIR_CANDIDATE_METADATA="0:0:755"
 RUN_WRITE_STATE=UNTOUCHED
 RUN_TARGET_VERSION=""
 RUN_CANDIDATE_METADATA="$("$TEST_PYTHON" -c 'import os;print(str(os.getuid() if hasattr(os,"getuid") else 0)+":"+str(os.getgid() if hasattr(os,"getgid") else 0)+":750")')"
@@ -600,6 +619,7 @@ declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=
 python3() { "$TEST_PYTHON" "$@"; }
 FIXTURE_FORWARD=false
 FIXTURE_DROPIN_FORWARD=false
+FIXTURE_DROPIN_DIR_FORWARD=false
 FIXTURE_RUN_FORWARD=false
 RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
@@ -706,6 +726,11 @@ fixture_run_target_drift() {
     "$TEST_PYTHON" "$PWD/run-target-drift.py" || return $?
   fi
 }
+fixture_dropin_dir_drift() {
+  if [[ -n "$DROPIN_DIR_DRIFT" && "$DROPIN_DIR_BOUNDARY" == "$1" && ! -e "$PWD/dropin-dir-drift-applied" ]]; then
+    "$TEST_PYTHON" "$PWD/dropin-dir-drift.py" || return $?
+  fi
+}
 fixture_operation() {
   local command_name="$1" fixture_target=unknown
   case "$2" in
@@ -750,7 +775,13 @@ rm() {
   if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_target_drift after_remove || return $?; fi
 }
 install() {
-  if [[ "$FIXTURE_RUN_FORWARD" == true ]]; then
+  if [[ "$FIXTURE_DROPIN_DIR_FORWARD" == true ]]; then
+    printf '%s\n' "${@: -1}" >> "$PWD/dropin-dir-forward.calls"
+    command mkdir -p -- "${@: -1}" || return $?
+    if [[ "$DROPIN_DIR_FORWARD_CASE" == partial ]]; then return 31; fi
+    if [[ "$DROPIN_DIR_FORWARD_CASE" == wrong_type ]]; then command mv -- "${@: -1}" "$PWD/partial-dropin-dir"; printf 'wrong type' > "${@: -1}"; return 0; fi
+    command chmod 0755 -- "${@: -1}" || return $?
+  elif [[ "$FIXTURE_RUN_FORWARD" == true ]]; then
     printf '%s\n' "${@: -1}" >> "$PWD/run-forward.calls"
     command mkdir -p -- "${@: -1}" || return $?
     if [[ "$RUN_FORWARD_CASE" == partial ]]; then return 31; fi
@@ -854,14 +885,30 @@ fi
         for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "recorded_target_version", "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent",
                      "dropin_target_version", "capture_dropin_target_version", "install_gateway_dropin", "read_recovery_dropin_target_state", "require_recovery_dropin_absent",
+                     "dropin_directory_target_version", "capture_dropin_directory_target_version", "install_gateway_dropin_directory", "read_recovery_dropin_directory_target_state",
                      "runtime_directory_target_version", "capture_runtime_directory_target_version", "install_gateway_runtime_directory", "read_recovery_runtime_directory_target_state"):
             function = _bash_function(script, name)
+            if name == "recorded_target_version":
+                # Production requires numeric root:root. Disposable fixtures
+                # do not change ownership; adapt only that capture expectation.
+                needle = '    if (before.st_uid, before.st_gid, stat.S_IMODE(before.st_mode)) != (uid, gid, permissions):'
+                assert function.count(needle) == 1
+                function = function.replace(needle, '    if object_kind == "dropin_directory":\n        uid, gid = (os.getuid(), os.getgid()) if os.name == "posix" else (0, 0)\n' + needle)
             if os.name != "posix" and name == "recorded_target_version":
                 # Windows cannot represent Unix directory mode0750. Substitute
                 # only that fixture comparison; real mode/link coverage is POSIX.
                 assert function.count("!= (uid, gid, permissions)") == 1
                 function = function.replace("!= (uid, gid, permissions)", "!= (uid, gid, stat.S_IMODE(before.st_mode))")
             harness += function + "\n"
+        harness += _bash_function(script, "read_recovery_state").replace(
+            "read_recovery_state() {", "actual_read_recovery_state() {", 1) + "\n"
+        harness += r'''
+read_recovery_state() {
+  actual_read_recovery_state "$@" || return $?
+  if [[ "$1" == "$BACKUP_DIR/service-drop-in.state" ]]; then fixture_dropin_dir_drift before_parent_install || return $?; fi
+  if [[ "$1" == "$BACKUP_DIR/service-drop-in-dir.state" ]]; then fixture_dropin_dir_drift before_directory_restore || return $?; fi
+}
+'''
         if run_target_boundary == "query":
             harness += _bash_function(script, "read_recovery_runtime_directory_target_state").replace(
                 "read_recovery_runtime_directory_target_state() {", "actual_runtime_target_state() {", 1) + "\n"
@@ -979,8 +1026,13 @@ done
 printf 'candidate hardening\n' > "$STAGE_DIR/20-lumencore-runtime-hardening.conf"
 if [[ "$DROPIN_FORWARD_CASE" == stage_changed ]]; then printf 'changed staged hardening\n' > "$STAGE_DIR/20-lumencore-runtime-hardening.conf"; fi
 if [[ "$DROPIN_FORWARD_CASE" == capture_failed ]]; then capture_dropin_target_version() { return 29; }; fi
-if [[ "$DROPIN_FORWARD_CASE" != untouched ]]; then
-  command mkdir -p -- "$SERVICE_DROP_IN_DIR"
+if [[ "$DROPIN_DIR_FORWARD_CASE" == capture_failed ]]; then capture_dropin_directory_target_version() { return 29; }; fi
+if [[ "$DROPIN_DIR_FORWARD_CASE" != untouched ]]; then
+  FIXTURE_DROPIN_DIR_FORWARD=true
+  install_gateway_dropin_directory
+  FIXTURE_DROPIN_DIR_FORWARD=false
+fi
+if [[ "$DROPIN_FORWARD_CASE" != untouched && "$DROPIN_DIR_FORWARD_CASE" != untouched ]]; then
   FIXTURE_DROPIN_FORWARD=true
   install_gateway_dropin
   FIXTURE_DROPIN_FORWARD=false
@@ -1016,6 +1068,14 @@ case "$RUN_FORWARD_CASE" in
   invalid_version) RUN_TARGET_VERSION=invalid ;;
   untouched_version) RUN_WRITE_STATE=UNTOUCHED ;;
 esac
+case "$DROPIN_DIR_FORWARD_CASE" in
+  unknown_state) DROPIN_DIR_WRITE_STATE=UNKNOWN ;;
+  invalid_state) DROPIN_DIR_WRITE_STATE=invalid ;;
+  missing_version) DROPIN_DIR_TARGET_VERSION="" ;;
+  invalid_version) DROPIN_DIR_TARGET_VERSION=invalid ;;
+  untouched_version) DROPIN_DIR_WRITE_STATE=UNTOUCHED ;;
+  untouched_child_installed) DROPIN_DIR_WRITE_STATE=UNTOUCHED; DROPIN_DIR_TARGET_VERSION="" ;;
+esac
 case "$DROPIN_FORWARD_CASE" in
   unknown_state) DROPIN_WRITE_STATE=UNKNOWN ;;
   invalid_state) DROPIN_WRITE_STATE=invalid ;;
@@ -1026,6 +1086,23 @@ esac
 '''
         if recovery_case == "hardening_binding":
             harness += "HARDENING_SHA=" + "d" * 64 + "\n"
+        if dropin_dir_query_case:
+            harness += _bash_function(script, "dropin_directory_target_version").replace(
+                "dropin_directory_target_version() {", "actual_dropin_directory_target_version() {", 1) + "\n"
+            harness += r'''
+dropin_directory_target_version() {
+  case "$DROPIN_DIR_QUERY_CASE" in
+    failed) actual_dropin_directory_target_version; return 29 ;;
+    extra_line) actual_dropin_directory_target_version; printf 'extra\n' ;;
+    extra_newline) actual_dropin_directory_target_version; printf '\n' ;;
+    no_newline) printf '%064d' 0 ;;
+    extra_argument) actual_dropin_directory_target_version ignored ;;
+    supplied_path) recorded_target_version dropin_directory capture ../outside "$DROPIN_DIR_CANDIDATE_METADATA" ;;
+    invalid_mode) recorded_target_version dropin_directory absent '' '' ;;
+    *) return 99 ;;
+  esac
+}
+'''
         if run_target_query_case:
             harness += _bash_function(script, "runtime_directory_target_version").replace(
                 "runtime_directory_target_version() {", "actual_runtime_directory_target_version() {", 1) + "\n"
@@ -1205,6 +1282,8 @@ record_recovery_evidence() {
             DROPIN_FORWARD_CASE=dropin_forward_case, DROPIN_TARGET_QUERY_CASE=dropin_target_query_case,
             RUN_TARGET_DRIFT=run_target_drift, RUN_TARGET_BOUNDARY=run_target_boundary,
             RUN_FORWARD_CASE=run_forward_case, RUN_TARGET_QUERY_CASE=run_target_query_case,
+            DROPIN_DIR_DRIFT=dropin_dir_drift, DROPIN_DIR_BOUNDARY=dropin_dir_boundary,
+            DROPIN_DIR_FORWARD_CASE=dropin_dir_forward_case, DROPIN_DIR_QUERY_CASE=dropin_dir_query_case,
             DROP_BACKUP_AFTER_VERIFY=metadata_case.split(":", 1)[1] if metadata_case.startswith("missing:") else "",
         )
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
@@ -1261,6 +1340,8 @@ record_recovery_evidence() {
             evidence["retained_unrelated_files"] = [p.read_bytes() for p in root.glob("*/unrelated-retained")]
             evidence["lock_exists"] = (root / "run/fixture.lock").exists()
             evidence["dropin_directory_exists"] = (root / "dropins").exists()
+            evidence["dropin_dir_drift_applied"] = (root / "dropin-dir-drift-applied").exists()
+            evidence["dropin_dir_forward_calls"] = (root / "dropin-dir-forward.calls").read_text().splitlines() if (root / "dropin-dir-forward.calls").exists() else []
             dropin_path = root / "dropins/hardening.conf"
             evidence["dropin_bytes"] = dropin_path.read_bytes() if dropin_path.is_file() else None
             evidence["dropin_is_symlink"] = dropin_path.is_symlink()
@@ -2555,7 +2636,7 @@ def _assert_dropin_target_conflict(kind: str, boundary: str = "stop", *, receipt
     assert len(evidence["dropin_forward_calls"]) == 1
     assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
     absent_guard = boundary == "after_remove"
-    operation = "dropin_target_absent" if absent_guard else "dropin_target_state"
+    operation = "dropin_directory_target_state" if kind == "parent_link" else "dropin_target_absent" if absent_guard else "dropin_target_state"
     assert f"restoration operation {operation} failed" in completed.stderr
     expected_calls = ["rm:first_source", "cp:first_source"]
     if absent_guard:
@@ -3289,3 +3370,147 @@ def test_gateway_runtime_directory_target_guard_allows_own_child_changes_and_pin
     assert install.index("capture_runtime_directory_target_version") < install.index("RUN_WRITE_STATE=INSTALLED")
     rollback = _bash_function(script, "rollback")
     assert rollback.index("run_target_state") < rollback.index("run_directory_state_read")
+
+
+def _assert_dropin_directory_target_conflict(kind: str, *, boundary: str = "before_directory_restore",
+                                            receipt_failure: bool = False) -> dict:
+    evidence: dict = {}
+    completed, source, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure" if receipt_failure else "dropin_directory_target_guard",
+        prior_dropin=boundary == "before_parent_install",
+        directory_case="" if boundary == "before_parent_install" else "missing_dropin",
+        dropin_dir_drift=kind, dropin_dir_boundary=boundary, evidence=evidence,
+    )
+    assert completed.returncode == 17, completed.stderr
+    assert evidence["dropin_dir_drift_applied"] and len(evidence["dropin_dir_forward_calls"]) == 1
+    assert source == b"previous source\n" and evidence["backup_exists"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert ":dropin_dir" not in evidence["operation_calls"] and ":run_dir" not in evidence["operation_calls"]
+    assert "cp:dropin" not in evidence["operation_calls"]
+    assert "dropin_directory_target_state failed" in completed.stderr
+    if kind == "identity": assert evidence["dropin_directory_is_directory"]
+    if kind == "file": assert evidence["dropin_directory_exists"] and not evidence["dropin_directory_is_directory"]
+    if receipt_failure:
+        assert "receipt persistence failed" in completed.stderr and evidence.get("rollback") is None
+    else:
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"]["operation"] == "dropin_directory_target_state"
+        assert receipt["trigger_exit_code"] == 17 and receipt["partial_state_possible"]
+        assert receipt["dropin_directory_write_state"]["state"] == "INSTALLED"
+        assert receipt["dropin_directory_result_observation"] == "NOT_CHECKED"
+        assert not receipt["restoration_verified"] and not receipt["service_state_verified"]
+    return evidence
+
+
+def test_gateway_dropin_directory_target_guard_protects_both_restoration_sites() -> None:
+    # This is the preserved baseline interleaving, plus the earlier parent-install
+    # mutation site. Neither may adopt or remove a newly substituted directory.
+    for boundary in ("before_directory_restore", "before_parent_install"):
+        _assert_dropin_directory_target_conflict("identity", boundary=boundary)
+    for kind in ("missing", "file"):
+        _assert_dropin_directory_target_conflict(kind)
+    _assert_dropin_directory_target_conflict("identity", receipt_failure=True)
+
+
+@unittest.skipIf(os.name != "posix", "POSIX fixed-directory metadata, links and safe parents")
+def test_gateway_dropin_directory_target_guard_rejects_metadata_links_and_parent_drift() -> None:
+    for kind in ("mode", "symlink", "parent_mode"):
+        evidence = _assert_dropin_directory_target_conflict(kind)
+        if kind == "mode": assert evidence["dropin_directory_metadata"][2] == 0o700
+        if kind == "symlink": assert evidence["dropin_directory_is_symlink"]
+
+
+def test_gateway_dropin_directory_target_guard_actual_forward_valid_and_untouched() -> None:
+    for case, prior_file in (("", True), ("missing_dropin", False), ("nonempty_dropin", False)):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_directory_target_guard", directory_case=case,
+            prior_dropin=prior_file, second_source=True, evidence=evidence,
+        )
+        assert completed.returncode == 17, completed.stderr
+        assert len(evidence["dropin_dir_forward_calls"]) == 1
+        receipt = evidence["rollback"]
+        version = receipt["dropin_directory_write_state"]
+        assert version["state"] == "INSTALLED" and len(version["installed_version_sha256"]) == 64
+        assert version["candidate_metadata"] == "0:0:755"
+        if case == "nonempty_dropin":
+            assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+            assert evidence["retained_unrelated_files"] == [b"preserve unrelated bytes\n"]
+        else:
+            assert evidence["service_calls"].endswith("SYSTEMCTL:start\n")
+            assert receipt["dropin_directory_result_observation"] == (
+                "MATCHED_PREPARED_PRESENT" if not case else "MATCHED_PREPARED_ABSENCE")
+            assert evidence["second_target"] == b"second previous\n"
+            if prior_file: assert evidence["dropin_bytes"] == b"previous hardening\n"
+    evidence = {}
+    completed, _, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="dropin_directory_target_guard", dropin_dir_forward_case="untouched", evidence=evidence,
+    )
+    assert completed.returncode == 17 and not evidence["dropin_dir_forward_calls"]
+    assert not evidence["dropin_forward_calls"] and evidence["dropin_bytes"] == b"candidate hardening\n"
+    assert ":dropin_dir" not in evidence["operation_calls"] and "rm:dropin\n" not in evidence["operation_calls"]
+    assert evidence["rollback"]["dropin_directory_result_observation"] == "UNCHECKED_UNTOUCHED"
+    assert evidence["rollback"]["dropin_result_observation"] == "UNCHECKED_UNTOUCHED"
+
+
+def test_gateway_dropin_directory_target_guard_partial_write_or_readback_refuses_child_work() -> None:
+    for case, trigger in (("partial", 31), ("wrong_type", 1), ("capture_failed", 29)):
+        evidence: dict = {}
+        completed, source, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_directory_target_guard", dropin_dir_forward_case=case, evidence=evidence,
+        )
+        assert completed.returncode == trigger, (case, completed.stderr)
+        assert source == b"candidate source\n" and evidence["backup_exists"]
+        assert not evidence["dropin_forward_calls"] and not evidence["run_forward_calls"]
+        assert ":dropin_dir" not in evidence["operation_calls"] and "rm:dropin\n" not in evidence["operation_calls"]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        receipt = evidence["rollback"]
+        assert receipt["dropin_directory_write_state"]["state"] == "WRITE_PENDING"
+        assert receipt["dropin_directory_write_state"]["installed_version_sha256"] is None
+        assert receipt["failed_restoration_operation"] == dict(operation="dropin_directory_target_state", target="service_drop_in_directory", exit_code=14)
+
+
+def test_gateway_dropin_directory_target_guard_strict_queries_and_inconsistent_state() -> None:
+    for query in ("failed", "extra_line", "extra_newline", "no_newline", "extra_argument", "supplied_path", "invalid_mode"):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_directory_target_guard", dropin_dir_query_case=query, evidence=evidence,
+        )
+        assert completed.returncode == 17 and "rm:dropin\n" not in evidence["operation_calls"], (query, completed.stderr)
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["rollback"]["failed_restoration_operation"]["operation"] == "dropin_directory_target_state"
+    for case in ("unknown_state", "invalid_state", "missing_version", "invalid_version", "untouched_version", "untouched_child_installed"):
+        evidence = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_directory_target_guard", dropin_dir_forward_case=case, evidence=evidence,
+        )
+        assert completed.returncode == 17 and "rm:dropin\n" not in evidence["operation_calls"], completed.stderr
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+        assert "dropin_directory_target_state failed" in completed.stderr
+        if case in {"invalid_state", "invalid_version"}:
+            assert "receipt persistence failed" in completed.stderr and "rollback" not in evidence
+
+
+def test_gateway_dropin_directory_target_guard_allows_child_changes_and_pins_before_write() -> None:
+    evidence: dict = {}
+    completed, _, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="dropin_directory_target_guard", prior_dropin=True,
+        dropin_dir_drift="children", evidence=evidence,
+    )
+    assert completed.returncode == 17 and evidence["dropin_dir_drift_applied"], completed.stderr
+    assert evidence["service_calls"].endswith("SYSTEMCTL:start\n")
+    script = _repair_script()
+    assert script.index('DROPIN_DIR_CANDIDATE_METADATA="0:0:755"') < script.index('RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"')
+    install = _bash_function(script, "install_gateway_dropin_directory")
+    assert install.index("DROPIN_DIR_WRITE_STATE=WRITE_PENDING") < install.index("install -d -o 0 -g 0 -m 0755")
+    assert install.index("capture_dropin_directory_target_version") < install.index("DROPIN_DIR_WRITE_STATE=INSTALLED")
+    rollback = _bash_function(script, "rollback")
+    assert rollback.index("dropin_directory_target_state") < rollback.index("dropin_target_state service_drop_in")
+    assert 'install_gateway_dropin_directory\ninstall_gateway_dropin\n' in script

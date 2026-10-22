@@ -50,6 +50,9 @@ RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 RECOVERY_DROPIN_DIRECTORY_RESULT=NOT_CHECKED
 DROPIN_WRITE_STATE=UNTOUCHED
 DROPIN_TARGET_VERSION=""
+DROPIN_DIR_WRITE_STATE=UNTOUCHED
+DROPIN_DIR_TARGET_VERSION=""
+DROPIN_DIR_CANDIDATE_METADATA="0:0:755"
 RUN_WRITE_STATE=UNTOUCHED
 RUN_TARGET_VERSION=""
 RUN_CANDIDATE_METADATA=""
@@ -472,7 +475,8 @@ record_recovery_evidence() {
     "$RUN_DIR" "${RECOVERY_RUNTIME_DIRECTORY_RESULT:-NOT_CHECKED}" \
     "$SERVICE_DROP_IN_DIR" "${RECOVERY_DROPIN_DIRECTORY_RESULT:-NOT_CHECKED}" \
     "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" \
-    "${RUN_WRITE_STATE:-UNKNOWN}" "${RUN_TARGET_VERSION:-}" "${RUN_CANDIDATE_METADATA:-}" "${BUNDLE_FILES[@]}" <<'PY'
+    "${RUN_WRITE_STATE:-UNKNOWN}" "${RUN_TARGET_VERSION:-}" "${RUN_CANDIDATE_METADATA:-}" \
+    "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" "${DROPIN_DIR_TARGET_VERSION:-}" "${DROPIN_DIR_CANDIDATE_METADATA:-}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -493,7 +497,8 @@ runtime_directory_target, runtime_directory_result = sys.argv[19:21]
 dropin_directory_target, dropin_directory_result = sys.argv[21:23]
 dropin_write_state, dropin_target_version = sys.argv[23:25]
 run_write_state, run_target_version, run_candidate_metadata = sys.argv[25:28]
-relatives = sys.argv[28:]
+dropin_dir_write_state, dropin_dir_target_version, dropin_dir_candidate_metadata = sys.argv[28:31]
+relatives = sys.argv[31:]
 query_kinds = {"source_state", "source_result"}
 if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
@@ -579,8 +584,17 @@ if kind in {"helper", "rollback", "rollback_refused"}:
     payload["runtime_directory_write_state"] = dict(state=run_write_state,
         candidate_metadata=run_candidate_metadata or None, installed_version_sha256=run_target_version or None)
     payload["runtime_directory_result_observation"] = runtime_directory_result
-    if dropin_directory_result not in {"NOT_CHECKED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+    if dropin_directory_result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
         raise SystemExit("invalid_dropin_directory_result_observation")
+    if (dropin_dir_write_state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+            or (dropin_dir_target_version and not re.fullmatch(r"[0-9a-f]{64}", dropin_dir_target_version))
+            or dropin_dir_candidate_metadata != "0:0:755"
+            or (dropin_directory_result == "UNCHECKED_UNTOUCHED" and dropin_dir_write_state != "UNTOUCHED")
+            or (dropin_directory_result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                and dropin_dir_write_state != "INSTALLED")):
+        raise SystemExit("invalid_dropin_directory_write_state_record")
+    payload["dropin_directory_write_state"] = dict(state=dropin_dir_write_state,
+        candidate_metadata=dropin_dir_candidate_metadata, installed_version_sha256=dropin_dir_target_version or None)
     payload["dropin_directory_result_observation"] = dropin_directory_result
     states = []
     for row in source_states.splitlines():
@@ -977,6 +991,7 @@ if kind == "rollback":
         "source_remove": set(relatives), "source_copy": set(relatives), "source_result": set(relatives),
         "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"}, "dropin_result": {"service_drop_in"},
         "dropin_target_state": {"service_drop_in"}, "dropin_target_absent": {"service_drop_in"},
+        "dropin_directory_target_state": {"service_drop_in_directory"},
         "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
         "dropin_directory_state_read": {"service_drop_in_directory"},
         "dropin_metadata_read": {"service_drop_in_directory"},
@@ -1051,12 +1066,17 @@ elif object_kind == "runtime":
         raise SystemExit("invalid_runtime_directory_version_query")
     root, relative = runtime.parent, runtime.name
     allowlist = [relative]
+elif object_kind == "dropin_directory":
+    if relative or mode != "capture" or not dropin.is_absolute() or expected != "0:0:755":
+        raise SystemExit("invalid_dropin_directory_version_query")
+    root, relative = dropin.parent.parent, dropin.parent.name
+    allowlist = [relative]
 elif object_kind != "source":
     raise SystemExit("invalid_target_object")
 if (mode not in {"capture", "absent"} or relative not in allowlist
         or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative)
         or any(part in {"", ".", ".."} for part in relative.split("/"))
-        or (mode == "capture" and not re.fullmatch(r"[0-9]+:[0-9]+:750" if object_kind == "runtime" else r"[0-9a-f]{64}", expected))
+        or (mode == "capture" and not re.fullmatch(r"[0-9]+:[0-9]+:750" if object_kind == "runtime" else r"0:0:755" if object_kind == "dropin_directory" else r"[0-9a-f]{64}", expected))
         or (mode == "absent" and expected)):
     raise SystemExit("invalid_target_version_query")
 if not root.is_absolute() or root.resolve(strict=True) != root:
@@ -1096,7 +1116,7 @@ def identity(info):
             info.st_gid, info.st_size, info.st_mtime_ns, info.st_ctime_ns]
 
 before = path.lstat()
-if object_kind == "runtime":
+if object_kind in {"runtime", "dropin_directory"}:
     if not stat.S_ISDIR(before.st_mode):
         raise SystemExit("unsafe_runtime_directory_target")
     uid, gid, permissions = (int(part, 8 if i == 2 else 10) for i, part in enumerate(expected.split(":")))
@@ -1194,6 +1214,47 @@ require_recovery_dropin_absent() {
   [[ $# -eq 0 ]] || return 14
   response="$(dropin_target_version absent && printf '.')" || return $?
   [[ "$response" == $'absent\n.' ]] || return 14
+}
+
+dropin_directory_target_version() {
+  [[ $# -eq 0 && "$DROPIN_DIR_CANDIDATE_METADATA" == 0:0:755 ]] || return 14
+  recorded_target_version dropin_directory capture '' "$DROPIN_DIR_CANDIDATE_METADATA"
+}
+
+capture_dropin_directory_target_version() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(dropin_directory_target_version && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_DROPIN_DIR_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_dropin_directory() {
+  [[ $# -eq 0 && "$DROPIN_DIR_WRITE_STATE" == UNTOUCHED
+    && "$DROPIN_DIR_CANDIDATE_METADATA" == 0:0:755 ]] || return 14
+  DROPIN_DIR_WRITE_STATE=WRITE_PENDING
+  install -d -o 0 -g 0 -m 0755 -- "$SERVICE_DROP_IN_DIR" || return $?
+  capture_dropin_directory_target_version || return $?
+  DROPIN_DIR_TARGET_VERSION="$CAPTURED_DROPIN_DIR_TARGET_VERSION"
+  DROPIN_DIR_WRITE_STATE=INSTALLED
+}
+
+read_recovery_dropin_directory_target_state() {
+  [[ $# -eq 0 && "$DROPIN_DIR_CANDIDATE_METADATA" == 0:0:755 ]] || return 14
+  case "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" in
+    UNTOUCHED)
+      # A child write cannot be authorized through an untouched parent. Skip
+      # both only when the actual forward sequence reached neither install.
+      [[ -z "${DROPIN_DIR_TARGET_VERSION:-}" && "${DROPIN_WRITE_STATE:-UNKNOWN}" == UNTOUCHED
+        && -z "${DROPIN_TARGET_VERSION:-}" ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${DROPIN_DIR_TARGET_VERSION:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_dropin_directory_target_version || return $?
+      [[ "$CAPTURED_DROPIN_DIR_TARGET_VERSION" == "$DROPIN_DIR_TARGET_VERSION" ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
 }
 
 runtime_directory_target_version() {
@@ -1587,6 +1648,7 @@ rollback() {
       checked_restore_step source_result "$rel" read_recovery_source_result "$rel" "$RECOVERY_SOURCE_STATE" || finish_rollback "$rc"
     done
 
+    checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
     checked_restore_step dropin_target_state service_drop_in read_recovery_dropin_target_state || finish_rollback "$rc"
     if [[ "$RECOVERY_DROPIN_TARGET_STATE" == untouched ]]; then
       RECOVERY_DROPIN_RESULT=UNCHECKED_UNTOUCHED
@@ -1595,23 +1657,29 @@ rollback() {
       checked_restore_step dropin_state_read service_drop_in read_recovery_state "$BACKUP_DIR/service-drop-in.state" || finish_rollback "$rc"
       prior_drop_in_state="$RECOVERY_STATE"
       if [[ "$prior_drop_in_state" == "present" ]]; then
+        checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
         checked_restore_step dropin_parent_create service_drop_in_directory install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
         checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
         checked_restore_step dropin_copy service_drop_in cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
       fi
       checked_restore_step dropin_result service_drop_in read_recovery_dropin_result "$prior_drop_in_state" || finish_rollback "$rc"
     fi
-    checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state "$BACKUP_DIR/service-drop-in-dir.state" || finish_rollback "$rc"
-    prior_drop_in_dir_state="$RECOVERY_STATE"
-    if [[ "$prior_drop_in_dir_state" == "present" ]]; then
-      checked_restore_step dropin_metadata_read service_drop_in_directory read_recovery_metadata "$BACKUP_DIR/service-drop-in-dir.metadata" || finish_rollback "$rc"
-      checked_restore_step dropin_chown service_drop_in_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
-      checked_restore_step dropin_chmod service_drop_in_directory chmod "$RECOVERY_MODE" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+    if [[ "$RECOVERY_DROPIN_DIRECTORY_TARGET_STATE" == untouched ]]; then
+      RECOVERY_DROPIN_DIRECTORY_RESULT=UNCHECKED_UNTOUCHED
     else
-      checked_restore_step dropin_directory_remove service_drop_in_directory remove_recovery_directory "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+      checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state "$BACKUP_DIR/service-drop-in-dir.state" || finish_rollback "$rc"
+      prior_drop_in_dir_state="$RECOVERY_STATE"
+      if [[ "$prior_drop_in_dir_state" == "present" ]]; then
+        checked_restore_step dropin_metadata_read service_drop_in_directory read_recovery_metadata "$BACKUP_DIR/service-drop-in-dir.metadata" || finish_rollback "$rc"
+        checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
+        checked_restore_step dropin_chown service_drop_in_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+        checked_restore_step dropin_chmod service_drop_in_directory chmod "$RECOVERY_MODE" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+      else
+        checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
+        checked_restore_step dropin_directory_remove service_drop_in_directory remove_recovery_directory "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+      fi
+      checked_restore_step dropin_directory_result service_drop_in_directory read_recovery_dropin_directory_result "$prior_drop_in_dir_state" || finish_rollback "$rc"
     fi
-
-    checked_restore_step dropin_directory_result service_drop_in_directory read_recovery_dropin_directory_result "$prior_drop_in_dir_state" || finish_rollback "$rc"
 
     checked_restore_step run_target_state run_directory read_recovery_runtime_directory_target_state || finish_rollback "$rc"
     if [[ "$RECOVERY_RUN_TARGET_STATE" == untouched ]]; then
@@ -1652,7 +1720,7 @@ systemctl stop "$SERVICE"
 SERVICE_STOPPED=true
 remove_verified_dead_lock
 
-install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR"
+install_gateway_dropin_directory
 install_gateway_dropin
 [[ "$(sha256sum "$SERVICE_DROP_IN" | awk '{print $1}')" == "$HARDENING_SHA" ]] || {
   echo "ERROR: installed gateway service hardening SHA-256 mismatch" >&2

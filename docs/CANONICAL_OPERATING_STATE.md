@@ -246,6 +246,51 @@ test hashes; Bash syntax and diff checks passed. These overlapping local observa
 are not additive and do not replace exact-new-head hosted Linux validation, which
 remains pending for this revision.
 
+The completed runtime-target draft at `ee0aeb12` subsequently passed all fourteen
+hosted checks. Its actual merge checkout `02bb5e73` has parents main `2d82be53`
+and that exact draft head: 134 Linux public-contract checks passed without skips,
+and the repository suite passed 2,130 tests with eight unrelated skips and 350
+subtests. Those are completed historical results, not validation of the next edit.
+
+The October 22 source-only increment advances outcome 2 and protects the fixed
+service drop-in directory before rollback can mutate it. Expected numeric
+root:root ownership and mode0755 are fixed before forward writes. The actual
+directory install records untouched, write pending or installed state; only
+successful matching readback records a stable directory/parent version. Unknown,
+partial, missing or changed state refuses recovery before the child-file work,
+before rollback's separate parent-install command, and before the later directory
+ownership/mode/removal branch. Untouched parent and child must be consistent;
+they are skipped and explicitly unchecked, not treated as restored. The existing
+nonempty refusal, prepared-inventory verification and narrow result observation
+remain in place. Original trigger status and retained evidence survive refusal,
+while earlier source or child restoration may already have left partial state.
+
+The preserved disposable baseline replaced an empty directory after the drop-in
+file result check; the old helper removed the replacement and reached restart.
+That is a controlled interleaving, not a production incident. New fixtures execute
+the actual forward transitions and both guarded rollback sites. Directory
+timestamps and child counts are excluded so this invocation's child changes do
+not appear as conflicts. Root ownership is substituted only in unprivileged test
+fixtures, and Windows additionally substitutes its unavailable Unix-mode read;
+actual mode/link behavior still requires exact-head hosted Linux validation.
+Privileged install/readback and validation-to-use races, directory contents,
+ACLs/xattrs, whole restoration, an overall filesystem deadline and recovery after
+a later workflow postcheck remain outside this increment. No deployment or merge
+is authorized by these local source changes.
+
+The final affected-path run passed ten local tests with two POSIX-only skips,
+covering the new directory guard and adjacent source, runtime-directory, fixed-file
+and deployment-contract controls. Three public-contract modules imported without
+site packages, discovering 140 tests but executing none in that import check.
+Bash syntax and diff checks passed. The first new-case run retained four passes,
+one platform skip and one fixture assertion failure: a deliberately unreadable
+rollback receipt is represented by a null entry, not a missing key. The assertion
+was corrected; the original failure, original exit status and no-restart evidence
+remain preserved. No production guard was relaxed and no broad overlapping suite
+was repeated. Independent review and exact-new-head hosted validation remain
+pending for this increment; the prior head's fourteen green checks do not apply
+to these uncommitted changes.
+
 The preceding runtime-directory revision at `2e0fdcb8` passed all 14 hosted checks:
 114 Linux public-contract checks with no skips and 2,110 full-suite tests with eight
 unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
