@@ -695,6 +695,7 @@ def _run_gateway_rollback_guard(
     directory_case: str = "", metadata_case: str = "", real_lock_case: str = "",
     lock_file_bytes: bytes | None = None,
     lock_presence_case: str = "", lock_remove_case: str = "",
+    presence_deadline_stage: str = "", presence_deadline_exit_code: int = 124,
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1000,6 +1001,17 @@ RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
   shift 3
+  if [[ "$1" == fixture_lock_python ]]; then
+    [[ $# -eq 3 && "$2" == - && "$3" == "$LOCK_FILE" ]] || return 99
+    local presence_stage=initial
+    [[ ! -s "$PWD/presence-timeout.calls" ]] || presence_stage=after
+    printf '%s\n' "$presence_stage" >> "$PWD/presence-timeout.calls"
+    if [[ "$PRESENCE_DEADLINE_STAGE" == "$presence_stage" ]]; then
+      # Valid-looking output before a failed launch must never establish absence.
+      printf ABSENT
+      return "$PRESENCE_DEADLINE_EXIT_CODE"
+    fi
+  fi
   if [[ "$1" == python3 && "$3" == "$TARGET_ROOT" ]]; then
     [[ "$2" == - && "$4" == "$SERVICE_DROP_IN" && "$5" == "$RUN_DIR" ]] || return 99
     local target_phase=rollback target_query
@@ -1739,6 +1751,8 @@ rollback "$forward_lock_rc"
             REAL_TIMEOUT_MODE=real_timeout_mode,
             RESTORE_FAULT=restore_fault, REAL_LOCK_CASE=real_lock_case,
             LOCK_PRESENCE_CASE=lock_presence_case, LOCK_REMOVE_CASE=lock_remove_case,
+            PRESENCE_DEADLINE_STAGE=presence_deadline_stage,
+            PRESENCE_DEADLINE_EXIT_CODE=str(presence_deadline_exit_code),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1797,6 +1811,7 @@ rollback "$forward_lock_rc"
             evidence["mutation_timeout_calls"] = (root / "mutation-timeout.calls").read_text().splitlines() if (root / "mutation-timeout.calls").exists() else []
             evidence["evidence_timeout_calls"] = (root / "evidence-timeout.calls").read_text().splitlines() if (root / "evidence-timeout.calls").exists() else []
             evidence["target_timeout_calls"] = (root / "target-timeout.calls").read_text().splitlines() if (root / "target-timeout.calls").exists() else []
+            evidence["presence_timeout_calls"] = (root / "presence-timeout.calls").read_text().splitlines() if (root / "presence-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
@@ -3026,6 +3041,163 @@ def test_gateway_valid_or_absent_lock_and_prior_dropin_restore_normally() -> Non
             "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed", "SYSTEMCTL:start"]
         assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
         assert "failed_restoration_operation" not in evidence["rollback"]
+
+
+def test_gateway_lock_presence_deadline_dispatch_refuses_partial_output() -> None:
+    function = _bash_function(_repair_script(), "read_gateway_lock_presence")
+    harness = r'''
+set -uo pipefail
+PYTHON_BIN=must_not_execute LOCK_FILE='fixture lock'
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ $# -eq 6 && "$1 $2 $3 $4 $5" == '--signal=TERM --kill-after=5s 60s must_not_execute -' && "$6" == 'fixture lock' ]] || return 99
+  printf 'call\n' >> calls
+  printf '%s' "$fixture_output"
+  return "$fixture_rc"
+}
+'''
+    harness += function + r'''
+for fixture_output in ABSENT PRESENT; do
+  for fixture_rc in 0 29 124 125 126 127 137; do
+    output="$(read_gateway_lock_presence)"; actual_rc=$?
+    [[ "$actual_rc" == "$fixture_rc" ]] || exit 96
+    if [[ "$fixture_rc" == 0 ]]; then
+      [[ "$output" == "$fixture_output" ]] || exit 95
+    else
+      [[ -z "$output" ]] || exit 94
+    fi
+  done
+done
+fixture_output=$'ABSENT\n'; fixture_rc=0
+output="$(read_gateway_lock_presence)"; [[ $? == 14 && -z "$output" ]] || exit 93
+read_gateway_lock_presence extra; [[ $? == 14 ]] || exit 92
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-presence-dispatch-") as directory:
+        root = Path(directory)
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                capture_output=True, text=True, timeout=10, check=False)
+        assert result.returncode == 0 and result.stdout == "", result.stderr
+        assert (root / "calls").read_text().splitlines() == ["call"] * 15
+
+
+def test_gateway_lock_presence_deadline_stops_both_rollback_observations() -> None:
+    for stage in ("initial", "after"):
+        for code in (124, 137):
+            evidence: dict = {}
+            completed, current, dropin_exists = _run_gateway_rollback_guard(
+                _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+                recovery_case="presence_deadline", real_lock_case="dead", prior_dropin=True,
+                presence_deadline_stage=stage, presence_deadline_exit_code=code, evidence=evidence)
+            assert completed.returncode == 17 and current == b"candidate source\n" and dropin_exists, completed.stderr
+            assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+            assert evidence["backup"] == b"previous source\n" and evidence["dropin_bytes"] == b"candidate hardening\n"
+            assert evidence["presence_timeout_calls"] == (["initial"] if stage == "initial" else ["initial", "after"])
+            assert evidence["operation_calls"] == ("" if stage == "initial" else "rm:lock\n")
+            assert bool(evidence["lock_probe_calls"]) == (stage == "after")
+            assert evidence["lock_exists"] == (stage == "initial")
+            assert "Removed verified dead-PID" not in completed.stdout
+            receipt = evidence["rollback"]
+            assert receipt["failed_restoration_operation"] == dict(operation="dead_lock", target="gateway_lock", exit_code=code)
+            assert receipt["trigger_exit_code"] == 17 and receipt["further_restoration_stopped"] is True
+            assert receipt["partial_state_possible"] and receipt["restoration_verified"] is False
+            assert receipt["service_restart_attempted"] is False
+
+
+def test_gateway_lock_presence_deadline_receipt_failure_keeps_original_trigger() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="presence_deadline", real_lock_case="dead", presence_deadline_stage="after",
+        presence_deadline_exit_code=124, evidence_deadline_kind="rollback", evidence_deadline_exit_code=137,
+        evidence_deadline_after=True, evidence=evidence)
+    assert completed.returncode == 17 and current == b"candidate source\n", completed.stderr
+    assert evidence["presence_timeout_calls"] == ["initial", "after"] and not evidence["lock_exists"]
+    assert evidence["operation_calls"] == "rm:lock\n" and evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert evidence["backup_exists"] and evidence["evidence_timeout_calls"].count("rollback") == 1
+    assert evidence["rollback"]["trigger_exit_code"] == 17
+    assert evidence["rollback"]["failed_restoration_operation"] == dict(operation="dead_lock", target="gateway_lock", exit_code=124)
+    assert "receipt persistence failed" in completed.stderr and "kind=rollback exit=137" in completed.stderr
+    assert "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
+
+
+def _run_native_gateway_lock_presence_deadline(mode: str) -> tuple[subprocess.CompletedProcess[str], dict]:
+    # Native timeout runs only an extracted presence reader with a fake Python
+    # process. No cleanup, mutation or service function is included in this shell.
+    function = _bash_function(_repair_script(), "read_gateway_lock_presence")
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    assert function.count(policy) == 1
+    function = function.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+    with tempfile.TemporaryDirectory(prefix="gateway-presence-native-") as directory:
+        root = Path(directory)
+        reader = root / "fake-reader"
+        reader.write_text(r'''#!/bin/bash
+set -eu
+[[ $# -eq 2 && "$1" == - && "$2" == "$PWD/fixture.lock" ]] || exit 91
+if [[ "$FIXTURE_MODE" == ignore_term ]]; then trap '' TERM; fi
+printf 'observe\n' >> "$PWD/reader.calls"
+/bin/cat "/proc/$BASHPID/stat" > "$PWD/reader.stat"
+printf PRESENT
+if [[ "$FIXTURE_MODE" == success ]]; then exit 0; fi
+while :; do :; done
+''', encoding="utf-8", newline="\n")
+        reader.chmod(0o700)
+        harness = 'set -Eeuo pipefail\n' + _bash_function(_repair_script(), "require_recovery_timeout") + r'''
+require_recovery_timeout
+PYTHON_BIN="$PWD/fake-reader" LOCK_FILE="$PWD/fixture.lock"
+'''
+        harness += function + r'''
+reader_status=0
+adopted=not-adopted
+if observation="$(read_gateway_lock_presence)"; then adopted="$observation"; else reader_status=$?; fi
+printf 'STATUS=%s\nCAPTURE=%s\nRAW=%s\n' "$reader_status" "$adopted" "$observation"
+exit "$reader_status"
+'''
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                    env=dict(os.environ, FIXTURE_MODE=mode),
+                                    capture_output=True, text=True, timeout=5, check=False)
+        finally:
+            identity = root / "reader.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        return result, {"elapsed_seconds": time.monotonic() - started,
+                        "live_after_command": len(live),
+                        "calls": (root / "reader.calls").read_text().splitlines()}
+
+
+@unittest.skipIf(sys.platform != "linux", "Native lock-presence isolation requires Linux CI")
+def test_gateway_native_lock_presence_deadline_success_control() -> None:
+    completed, facts = _run_native_gateway_lock_presence_deadline("success")
+    assert completed.returncode == 0 and completed.stdout == "STATUS=0\nCAPTURE=PRESENT\nRAW=PRESENT\n", completed.stderr
+    assert facts["calls"] == ["observe"] and facts["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native lock-presence deadline and ignored TERM require Linux CI")
+def test_gateway_native_lock_presence_deadline_hang_and_ignored_term_refuse_output() -> None:
+    for mode, code in (("hang", 124), ("ignore_term", 137)):
+        completed, facts = _run_native_gateway_lock_presence_deadline(mode)
+        assert completed.returncode == code, completed.stderr
+        assert completed.stdout == f"STATUS={code}\nCAPTURE=not-adopted\nRAW=\n"
+        assert facts["elapsed_seconds"] < 4 and facts["live_after_command"] == 0
+        assert facts["calls"] == ["observe"]
 
 
 def test_gateway_lock_presence_only_explicit_enoent_means_absent() -> None:

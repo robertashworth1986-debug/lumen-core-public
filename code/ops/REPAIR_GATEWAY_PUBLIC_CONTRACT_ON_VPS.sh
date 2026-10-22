@@ -1573,7 +1573,7 @@ read_gateway_lock_presence() {
   # Only explicit ENOENT establishes absence. Preserve the interpreter status
   # and exact output, including unexpected trailing newlines, before trusting it.
   observation="$(
-    "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
+    "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
 import errno
 import os
 import sys

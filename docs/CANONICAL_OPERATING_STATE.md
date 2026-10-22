@@ -30,6 +30,28 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 22 lock-presence reader increment wraps only the
+`read_gateway_lock_presence` Python launch in the existing preflight-checked GNU
+timeout policy: TERM after 60 seconds, then forced termination after five more
+seconds. Its Python body, lock-path argument, explicit ENOENT rule and exact-output
+sentinel are unchanged. A nonzero result still prevents adoption of even a
+valid-looking ABSENT or PRESENT response. Both observations around dead-lock
+removal use this boundary. Failure before removal prevents that mutation;
+failure after removal does not undo it or establish a successful absence check.
+Existing rollback preserves the original trigger, records the first failed step,
+stops later restoration and restart, and retains evidence without a new retry.
+
+Disposable fixtures cover the fixed arguments, partial output with nonzero
+status, both observation stages and terminal receipt failure. Native Linux-only
+fixtures exercise a successful fake reader and hung/ignored-TERM termination
+using only the extracted reader, not real recovery commands. Windows skips do
+not establish native signal behavior. Status 124 or 137 remains ambiguous with
+the command returning that value or another SIGKILL. This bounds one subprocess,
+not lock-PID readers, owner probes, all forward commands, aggregate recovery or
+uninterruptible kernel I/O. Privileged-writer races, complete restoration and
+recovery after outer postchecks remain unresolved. Local and hosted results are
+separate evidence; no deployment or new-head hosted result is asserted here.
+
 The October 22 target-version reader increment applies the preflight-checked GNU
 timeout policy of 60 seconds plus five seconds before forced termination to the
 single `recorded_target_version` Python subprocess. Its embedded Python checks,
