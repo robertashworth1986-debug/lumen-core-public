@@ -1013,6 +1013,15 @@ if kind == "rollback":
                        further_restoration_stopped=True, service_restart_attempted=False,
                        failed_restoration_operation=dict(operation=restore_failure, target=restore_target,
                                                          exit_code=int(restore_exit_code)))
+        if restore_failure in {"source_copy", "dropin_copy"}:
+            code = int(restore_exit_code)
+            outcome = ("DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124" if code == 124
+                       else "FORCED_TERMINATION_OR_SIGKILL" if code == 137
+                       else "LAUNCHER_OR_COMMAND_FAILURE" if code in {125, 126, 127}
+                       else "COMMAND_FAILED")
+            payload["failed_restoration_operation"].update(
+                outcome=outcome, timeout_seconds=60, kill_after_seconds=5,
+                partial_destination_possible=True)
     elif restore_exit_code != "0" or restore_target:
         raise SystemExit("unexpected_restoration_failure_fields")
 raw = (json.dumps(payload, sort_keys=True, indent=2) + "\n").encode()
@@ -1492,6 +1501,14 @@ finish_rollback() {
   exit "$rc"
 }
 
+bounded_recovery_copy() {
+  [[ $# -eq 2 ]] || return 125
+  # Bound only this copy process group. A failed/terminated copy can leave a
+  # partial destination; the caller stops recovery without retry or cleanup.
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    cp -a -- "$1" "$2"
+}
+
 checked_restore_step() {
   local operation="$1" target_id="$2" operation_rc=0
   shift 2
@@ -1643,7 +1660,7 @@ rollback() {
         # changed recovery bytes must not be copied or followed by service start.
         checked_restore_step source_state "$rel" read_recovery_source_state "$rel" present || finish_rollback "$rc"
         checked_restore_step target_absent "$rel" require_recovery_target_absent "$rel" || finish_rollback "$rc"
-        checked_restore_step source_copy "$rel" cp -a -- "$backup" "$target" || finish_rollback "$rc"
+        checked_restore_step source_copy "$rel" bounded_recovery_copy "$backup" "$target" || finish_rollback "$rc"
       fi
       checked_restore_step source_result "$rel" read_recovery_source_result "$rel" "$RECOVERY_SOURCE_STATE" || finish_rollback "$rc"
     done
@@ -1660,7 +1677,7 @@ rollback() {
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
         checked_restore_step dropin_parent_create service_drop_in_directory install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
         checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
-        checked_restore_step dropin_copy service_drop_in cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
+        checked_restore_step dropin_copy service_drop_in bounded_recovery_copy "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
       fi
       checked_restore_step dropin_result service_drop_in read_recovery_dropin_result "$prior_drop_in_state" || finish_rollback "$rc"
     fi

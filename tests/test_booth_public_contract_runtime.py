@@ -511,6 +511,8 @@ def _run_gateway_rollback_guard(
     run_forward_case: str = "", run_target_query_case: str = "",
     dropin_dir_drift: str = "", dropin_dir_boundary: str = "before_directory_restore",
     dropin_dir_forward_case: str = "", dropin_dir_query_case: str = "",
+    copy_deadline_target: str = "", copy_deadline_exit_code: int = 124,
+    copy_deadline_partial: bool = False,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -794,6 +796,20 @@ RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
   shift 3
+  if [[ "$1" == cp ]]; then
+    [[ $# -eq 5 && "$2 $3" == '-a --' ]] || return 99
+    local copy_target=unknown
+    case "$5" in
+      "$TARGET_ROOT/entry.py") copy_target=first_source ;;
+      "$TARGET_ROOT/second.py") copy_target=second_source ;;
+      "$SERVICE_DROP_IN") copy_target=dropin ;;
+    esac
+    printf '%s\n' "$copy_target" >> "$PWD/copy-timeout.calls"
+    if [[ "$COPY_DEADLINE_TARGET" == "$copy_target" ]]; then
+      if [[ "$COPY_DEADLINE_PARTIAL" == true ]]; then printf 'partial copy\n' > "$5"; fi
+      return "$COPY_DEADLINE_EXIT_CODE"
+    fi
+  fi
   "$@"
 }
 STAGE_DIR=""
@@ -1051,7 +1067,7 @@ fi
             harness += 'export PATH="/usr/bin:$PATH"\nRECOVERY_TIMEOUT_BIN="$(type -P timeout)"\n'
             harness += 'export PATH="$PWD/bin:$PATH"\n'
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
-        for name in ("checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
+        for name in ("bounded_recovery_copy", "checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "recorded_target_version", "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent",
                      "dropin_target_version", "capture_dropin_target_version", "install_gateway_dropin", "read_recovery_dropin_target_state", "require_recovery_dropin_absent",
                      "dropin_directory_target_version", "capture_dropin_directory_target_version", "install_gateway_dropin_directory", "read_recovery_dropin_directory_target_state",
@@ -1433,6 +1449,9 @@ record_recovery_evidence() {
         env.update(
             PREDICATE_PASSES=str(predicate_passes).lower(),
             COPY_FAILS=str(copy_fails).lower(),
+            COPY_DEADLINE_TARGET=copy_deadline_target,
+            COPY_DEADLINE_EXIT_CODE=str(copy_deadline_exit_code),
+            COPY_DEADLINE_PARTIAL=str(copy_deadline_partial).lower(),
             SIGNAL_DURING_COPY=str(signal_during_copy).lower(),
             TEST_PYTHON=Path(sys.executable).as_posix(),
             SERVICE_FAILURE=service_failure,
@@ -1490,6 +1509,7 @@ record_recovery_evidence() {
         target = root / "target/entry.py"
         if evidence is not None:
             evidence["elapsed_seconds"] = time.monotonic() - started
+            evidence["copy_timeout_calls"] = (root / "copy-timeout.calls").read_text().splitlines() if (root / "copy-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
@@ -1592,6 +1612,115 @@ def test_gateway_post_mutation_failures_restore_source_before_cleanup() -> None:
         assert dropin_exists
         assert "Rolling back" not in completed.stderr
         assert completed.stdout == "GUARD_PASSED\nCLEANUP\n"
+
+
+def test_gateway_copy_deadline_preserves_partial_state_and_stops_sequence() -> None:
+    # A bounded launcher stub returns immediately: these are outcome/control-flow
+    # fixtures, not elapsed-time or native-copy failure evidence.
+    for target, code, options, calls in (
+        ("first_source", 124, {}, ["first_source"]),
+        ("second_source", 137, {"second_source": True}, ["first_source", "second_source"]),
+        ("dropin", 124, {"prior_dropin": True}, ["first_source", "dropin"]),
+    ):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="copy_deadline", copy_deadline_target=target,
+            copy_deadline_exit_code=code, copy_deadline_partial=True, evidence=evidence, **options,
+        )
+        assert completed.returncode == 17, completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        assert evidence["copy_timeout_calls"] == calls
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["backup"] == b"previous source\n" and evidence["backup_exists"]
+        receipt = evidence["rollback"]
+        assert receipt["status"] == "ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED"
+        assert receipt["trigger_exit_code"] == 17 and receipt["restoration_verified"] is False
+        assert receipt["partial_state_possible"] and receipt["further_restoration_stopped"]
+        assert receipt["service_restart_attempted"] is False
+        assert receipt["failed_restoration_operation"] == dict(
+            operation="dropin_copy" if target == "dropin" else "source_copy",
+            target={"first_source": "entry.py", "second_source": "second.py", "dropin": "service_drop_in"}[target],
+            exit_code=code,
+            outcome="DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124" if code == 124 else "FORCED_TERMINATION_OR_SIGKILL",
+            timeout_seconds=60, kill_after_seconds=5, partial_destination_possible=True,
+        )
+        assert current == (b"partial copy\n" if target == "first_source" else b"previous source\n")
+        if target == "second_source":
+            assert evidence["second_target"] == b"partial copy\n"
+            assert evidence["second_backup"] == b"second previous\n"
+        if target == "dropin":
+            assert evidence["dropin_bytes"] == b"partial copy\n"
+
+
+def test_gateway_copy_deadline_launcher_and_receipt_failure_keep_original_status() -> None:
+    for collision, code in ((False, 125), (True, 124)):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="rollback_write_failure" if collision else "copy_launcher_failure",
+            copy_deadline_target="first_source", copy_deadline_exit_code=code,
+            evidence=evidence,
+        )
+        assert completed.returncode == 17 and current is None and dropin_exists
+        assert evidence["copy_timeout_calls"] == ["first_source"]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["backup"] == b"previous source\n" and evidence["backup_exists"]
+        if collision:
+            assert evidence["rollback"] is None
+            assert "receipt persistence failed" in completed.stderr
+        else:
+            assert evidence["rollback"]["failed_restoration_operation"]["outcome"] == "LAUNCHER_OR_COMMAND_FAILURE"
+
+
+def test_gateway_bounded_copy_success_keeps_existing_result_checks() -> None:
+    evidence: dict = {}
+    completed, current, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="bounded_copy_success", second_source=True, prior_dropin=True,
+        evidence=evidence,
+    )
+    assert completed.returncode == 17, completed.stderr
+    assert current == b"previous source\n" and evidence["second_target"] == b"second previous\n"
+    assert dropin_exists and evidence["dropin_bytes"] == b"previous hardening\n"
+    assert evidence["copy_timeout_calls"] == ["first_source", "second_source", "dropin"]
+    assert evidence["service_calls"].splitlines() == [
+        "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed", "SYSTEMCTL:start"]
+    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert evidence["rollback"]["restoration_verified"] is False
+    assert "failed_restoration_operation" not in evidence["rollback"]
+
+
+def test_gateway_copy_deadline_wrapper_has_fixed_policy_and_preserves_command_codes() -> None:
+    script = _repair_script()
+    function = _bash_function(script, "bounded_recovery_copy")
+    assert function.count('--signal=TERM --kill-after=5s 60s') == 1
+    assert _bash_function(script, "rollback").count(" bounded_recovery_copy ") == 2
+    with tempfile.TemporaryDirectory(prefix="gateway-copy-policy-") as directory:
+        root = Path(directory)
+        harness = '''set -u
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ "$1 $2 $3 $4 $5 $6 $7 $8" == '--signal=TERM --kill-after=5s 60s cp -a -- -source -destination' ]] || return 99
+  printf 'FIXED_COPY_POLICY\n'
+  shift 3
+  "$@"
+}
+cp() { return "$COMMAND_EXIT"; }
+''' + function + '''
+if [[ "$BAD_ARITY" == true ]]; then bounded_recovery_copy -source; else bounded_recovery_copy -source -destination; fi
+'''
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        for code, invalid in ((0, False), (9, False), (124, False), (137, False), (0, True)):
+            completed = subprocess.run(
+                [_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, COMMAND_EXIT=str(code), BAD_ARITY=str(invalid).lower()),
+                capture_output=True, text=True, timeout=10, check=False,
+            )
+            assert completed.returncode == (125 if invalid else code), completed.stderr
+            assert completed.stdout == ("" if invalid else "FIXED_COPY_POLICY\n")
+    # In particular an underlying copy exit124 is preserved, not identified as
+    # proof that a deadline expired. No child sleeps or spins in these fixtures.
 
 
 def test_gateway_recovery_service_failure_stops_sequence_and_keeps_original_code() -> None:

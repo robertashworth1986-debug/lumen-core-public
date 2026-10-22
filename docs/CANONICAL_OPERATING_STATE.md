@@ -322,8 +322,43 @@ control flow and evidence behavior, not live HTTP responses or JSON-tool
 integration. There was no production action and no baseline reproduction rerun.
 The three dependency-free public-contract modules imported with 145 tests
 discovered and none executed; extracted-step Bash syntax and diff checks passed.
-Exact-new-head hosted validation and independent review remain pending for this
-workflow-only behavior change.
+Independent review and hosted validation subsequently passed at `145def3b`:
+all fifteen checks, 145 Linux public-contract checks without skips, and 2,141
+repository tests with eight unrelated skips and 350 subtests. Its tested merge
+used public main `2d82be53` and that exact head. The reviewed workflow's CRLF
+working bytes normalized exactly to the committed LF bytes; tests and this note
+were byte-exact. Those results are historical, not validation of the next edit.
+
+The next outcome-2 source increment bounds only the two rollback copy call sites:
+each source-backup copy and the fixed service-drop-in backup copy. Each invocation
+uses the already preflighted GNU timeout with a fixed 60-second limit and five-second
+forced-termination grace. There is no retry or caller-selected duration. Existing
+custody, source intent, target version, true-absence and post-copy result checks
+remain in place. A nonzero copy/launcher result uses the existing first-failure
+path, stops later restoration and service commands, and preserves the original
+trigger status separately from the copy status. A partial destination is retained
+as unverified. Private failure metadata states the fixed budget and preserves
+exit124 and exit137 ambiguity; neither code uniquely proves a timeout cause.
+
+The prior disposable Windows hang harness failed its own cleanup and was not a
+qualified reproduction; its exact identified process was subsequently stopped
+and absence verified. This increment does not rerun that harness. New bounded
+fixtures use an immediate-return launcher stub to exercise actual rollback paths,
+exact command arguments, first/later copy failures, partial destinations, ordinary
+command status, receipt-write failure and successful copy result checks. They do
+not demonstrate real copy elapsed-time or signal behavior. Four new tests and
+six selected adjacent/preflight controls passed in two bounded local invocations,
+with no failures or skips. Three public-contract modules imported without site
+packages, discovering 149 tests and executing none during that import check.
+Bash syntax and diff checks passed; exact-new-head hosted validation is still
+required. No merge or production operation is established by this draft.
+
+Only copy invocation duration is addressed. Source/target queries, filesystem
+removal and metadata operations, receipt writes, cleanup and aggregate recovery
+duration remain unbounded. Uninterruptible kernel I/O or scheduling can prevent
+prompt process termination. Privileged validation-to-use races, earlier partial
+restoration, whole-restoration verification and later external-check recovery
+remain unresolved.
 
 The preceding runtime-directory revision at `2e0fdcb8` passed all 14 hosted checks:
 114 Linux public-contract checks with no skips and 2,110 full-suite tests with eight
