@@ -30,6 +30,33 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 22 recovery-evidence increment applies the preflight-checked GNU
+timeout policy of 60 seconds plus five seconds before forced termination to the
+single `record_recovery_evidence` Python subprocess. A shell allowlist covers its
+ten existing receipt, verification and result-query kinds. Its Python arguments,
+receipt schema, exclusive publication and readback checks are unchanged. A
+nonzero subprocess result is returned unchanged even after partial stdout;
+existing callers refuse it before proceeding or preserve the original rollback
+trigger. Preparation still finishes before forward runtime changes.
+
+The failure diagnostic separates the evidence kind and numeric exit from service
+or filesystem-mutation failures. Exit 124 remains ambiguous between deadline
+expiry and that command exit; 137 remains ambiguous with another SIGKILL. A
+writer may publish before failing or terminating, so evidence completion is
+UNKNOWN, all existing files remain, and no retry or replacement is attempted.
+The fixed deadline applies to this subprocess, not all other readers, probes,
+staging operations, forward commands or overall recovery. Uninterruptible kernel
+I/O, privileged writers, check-to-use races, complete restoration and automatic
+recovery after external postchecks remain unresolved. Disposable fixtures check
+normal receipts, nonzero results with valid output and before/after-publication
+failure. Separate Linux-only fake-writer fixtures check native termination and
+ignored TERM; their test-copy deadlines are shortened without changing production
+policy or running real service/filesystem repair commands. Focused local
+validation passed nine tests with the two Linux-only tests skipped on Windows.
+Those native process/signal cases remain unexecuted locally. Independent source
+review found no blocking findings. Hosted validation for this increment remains
+pending; prior hosted results do not establish exact-new-head validation.
+
 The October 22 target-filesystem command increment routes the ten remaining
 rollback mutation sites through one operation/target allowlist: dead-lock and
 source/drop-in removal, fixed drop-in parent creation, and ownership, mode and

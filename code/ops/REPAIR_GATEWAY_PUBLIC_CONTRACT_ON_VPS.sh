@@ -460,16 +460,21 @@ prepare_recovery_directory() {
 }
 
 record_recovery_evidence() {
-  local kind="$1" trigger_code="${2:-0}" requested_source="${3:-}"
-  [[ $# -le 3 ]] || return 14
+  local kind="${1:-}" trigger_code="${2:-0}" requested_source="${3:-}"
+  [[ $# -ge 1 && $# -le 3 ]] || return 14
+  case "$kind" in
+    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result) ;;
+    *) return 14 ;;
+  esac
   [[ "$kind" != dropin_result || $# -eq 2 ]] || return 14
   [[ "$kind" != runtime_directory_result || $# -eq 2 ]] || return 14
   [[ "$kind" != dropin_directory_result || $# -eq 2 ]] || return 14
-  local source_states="" source_relative
+  local source_states="" source_relative evidence_rc=0 evidence_outcome
   for source_relative in "${BUNDLE_FILES[@]}"; do
     source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}:${SOURCE_RESULT_STATES[$source_relative]:-NOT_CHECKED}"$'\n'
   done
-  python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
     "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
     "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
     "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
@@ -480,7 +485,7 @@ record_recovery_evidence() {
     "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" \
     "${RUN_WRITE_STATE:-UNKNOWN}" "${RUN_TARGET_VERSION:-}" "${RUN_CANDIDATE_METADATA:-}" \
     "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" "${DROPIN_DIR_TARGET_VERSION:-}" "${DROPIN_DIR_CANDIDATE_METADATA:-}" \
-    "${RECOVERY_MUTATION_FAILURE:-}" "${RECOVERY_MUTATION_TARGET:-}" "${RECOVERY_MUTATION_EXIT_CODE:-0}" "${BUNDLE_FILES[@]}" <<'PY'
+    "${RECOVERY_MUTATION_FAILURE:-}" "${RECOVERY_MUTATION_TARGET:-}" "${RECOVERY_MUTATION_EXIT_CODE:-0}" "${BUNDLE_FILES[@]}" <<'PY' || evidence_rc=$?
 import hashlib
 import json
 import os
@@ -1067,6 +1072,19 @@ if os.name == "posix":
         os.close(directory_fd)
 print(hashlib.sha256(raw).hexdigest())
 PY
+  if [[ "$evidence_rc" -ne 0 ]]; then
+    case "$evidence_rc" in
+      124) evidence_outcome=DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124 ;;
+      137) evidence_outcome=FORCED_TERMINATION_OR_SIGKILL ;;
+      125|126|127) evidence_outcome=LAUNCHER_OR_COMMAND_FAILURE ;;
+      *) evidence_outcome=COMMAND_FAILED ;;
+    esac
+    # Publication may precede timeout/failure. Retain all evidence; never retry
+    # or infer a missing receipt from nonzero status (including partial stdout).
+    printf 'Recovery evidence failed: kind=%s exit=%s outcome=%s timeout_seconds=60 kill_after_seconds=5 completion=UNKNOWN possibly_published=true retained=true retry=false\n' \
+      "$kind" "$evidence_rc" "$evidence_outcome" >&2
+  fi
+  return "$evidence_rc"
 }
 
 recorded_target_version() {

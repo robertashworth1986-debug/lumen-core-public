@@ -713,6 +713,8 @@ def _run_gateway_rollback_guard(
     mutation_deadline_fault: str = "", mutation_deadline_exit_code: int = 124,
     mutation_deadline_after: bool = False,
     forward_lock_deadline_failure: bool = False,
+    evidence_deadline_kind: str = "", evidence_deadline_exit_code: int = 124,
+    evidence_deadline_after: bool = False,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -996,6 +998,15 @@ RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
   shift 3
+  if [[ "$1" == python3 ]]; then
+    printf '%s\n' "$4" >> "$PWD/evidence-timeout.calls"
+    if [[ "$EVIDENCE_DEADLINE_KIND" == "$4" ]]; then
+      # Simulate failure after real fixture publication/output as well as before
+      # it. A valid-looking response must not turn a nonzero launch into success.
+      if [[ "$EVIDENCE_DEADLINE_AFTER" == true ]]; then "$@" || return $?; fi
+      return "$EVIDENCE_DEADLINE_EXIT_CODE"
+    fi
+  fi
   if [[ "$1" == cp ]]; then
     [[ $# -eq 5 && "$2 $3" == '-a --' ]] || return 99
     local copy_target=unknown
@@ -1703,6 +1714,9 @@ rollback "$forward_lock_rc"
             MUTATION_DEADLINE_FAULT=mutation_deadline_fault,
             MUTATION_DEADLINE_EXIT_CODE=str(mutation_deadline_exit_code),
             MUTATION_DEADLINE_AFTER=str(mutation_deadline_after).lower(),
+            EVIDENCE_DEADLINE_KIND=evidence_deadline_kind,
+            EVIDENCE_DEADLINE_EXIT_CODE=str(evidence_deadline_exit_code),
+            EVIDENCE_DEADLINE_AFTER=str(evidence_deadline_after).lower(),
             SIGNAL_DURING_COPY=str(signal_during_copy).lower(),
             TEST_PYTHON=Path(sys.executable).as_posix(),
             SERVICE_FAILURE=service_failure,
@@ -1766,6 +1780,7 @@ rollback "$forward_lock_rc"
             evidence["elapsed_seconds"] = time.monotonic() - started
             evidence["copy_timeout_calls"] = (root / "copy-timeout.calls").read_text().splitlines() if (root / "copy-timeout.calls").exists() else []
             evidence["mutation_timeout_calls"] = (root / "mutation-timeout.calls").read_text().splitlines() if (root / "mutation-timeout.calls").exists() else []
+            evidence["evidence_timeout_calls"] = (root / "evidence-timeout.calls").read_text().splitlines() if (root / "evidence-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
@@ -2253,7 +2268,242 @@ def test_gateway_recovery_timeout_preflight_is_required_before_mutation() -> Non
             assert completed.returncode == (0 if fixture and fixture.startswith("timeout (GNU") else 10), completed.stderr
             assert completed.stdout == ("MUTATED" if completed.returncode == 0 else "")
     assert script.index('require_recovery_timeout || {') < script.index('systemctl stop "$SERVICE"\nSERVICE_STOPPED=true')
+    assert script.index('require_recovery_timeout || {') < script.index('RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"')
     assert script.index('record_recovery_evidence verify "$rc"') < script.index('if ! bounded_recovery_systemctl stop;')
+
+
+def test_gateway_evidence_deadline_dispatch_is_fixed_and_rejects_unknown_kinds() -> None:
+    function = _bash_function(_repair_script(), "record_recovery_evidence")
+    # This launcher never runs the Python body. It checks the real wrapper's
+    # fixed argv and proves stdout cannot hide a nonzero subprocess exit.
+    harness = r'''
+set -uo pipefail
+BACKUP_DIR=fixture-backup SOURCE_COMMIT=fixture-source BUNDLE_SHA=fixture-bundle
+HARDENING_SHA=fixture-hardening RECOVERY_MANIFEST_SHA=fixture-manifest
+TARGET_ROOT=fixture-target SERVICE_DROP_IN=fixture-dropin RUN_DIR=fixture-run
+SERVICE_DROP_IN_DIR=fixture-dropin-dir RECOVERY_TIMEOUT_BIN=fixture_timeout
+BUNDLE_FILES=(entry.py)
+declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
+fixture_timeout() {
+  [[ "$1 $2 $3 $4 $5" == '--signal=TERM --kill-after=5s 60s python3 -' ]] || return 99
+  [[ "$6" == fixture-backup && "$7" == "$expected_kind" ]] || return 98
+  printf '%s\n' "$7" >> calls
+  printf 'valid-looking-output\n'
+  return "$fixture_rc"
+}
+'''
+    harness += function + r'''
+for expected_kind in prepared helper rollback verify rollback_refused source_state source_result dropin_result runtime_directory_result dropin_directory_result; do
+  for fixture_rc in 0 29 124 125 126 127 137; do
+    output="$(record_recovery_evidence "$expected_kind" 0)"; actual_rc=$?
+    [[ "$actual_rc" == "$fixture_rc" && "$output" == valid-looking-output ]] || exit 97
+  done
+done
+for invalid in unknown 'prepared;printf unsafe' ''; do
+  record_recovery_evidence "$invalid"; [[ $? == 14 ]] || exit 96
+done
+record_recovery_evidence; [[ $? == 14 ]] || exit 95
+record_recovery_evidence prepared 0 extra excess; [[ $? == 14 ]] || exit 94
+for invalid in dropin_result runtime_directory_result dropin_directory_result; do
+  record_recovery_evidence "$invalid" 0 extra; [[ $? == 14 ]] || exit 93
+done
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-evidence-dispatch-") as directory:
+        root = Path(directory)
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                capture_output=True, text=True, timeout=10, check=False)
+        assert result.returncode == 0, result.stderr
+        assert len((root / "calls").read_text().splitlines()) == 70
+    assert result.stdout == ""
+    for outcome in ("DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124", "FORCED_TERMINATION_OR_SIGKILL",
+                    "LAUNCHER_OR_COMMAND_FAILURE", "COMMAND_FAILED"):
+        assert outcome in result.stderr
+    assert result.stderr.count("completion=UNKNOWN possibly_published=true retained=true retry=false") == 60
+
+
+def test_gateway_evidence_deadline_preparation_and_verification_fail_before_runtime() -> None:
+    for kind in ("prepared", "verify"):
+        for code in (124, 137, 125):
+            evidence: dict = {}
+            completed, current, _ = _run_gateway_rollback_guard(
+                _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+                recovery_case="evidence_deadline", evidence=evidence,
+                evidence_deadline_kind=kind, evidence_deadline_exit_code=code,
+                evidence_deadline_after=True)
+            assert completed.returncode == (code if kind == "prepared" else 17), completed.stderr
+            assert current == b"candidate source\n" and evidence["backup"] == b"previous source\n"
+            assert evidence["service_calls"] == evidence["restore_calls"] == ""
+            # Preparation precedes the fixture's forward copy. Verification is
+            # a rollback entry guard after that copy, but before recovery work.
+            assert len(evidence["forward_calls"]) == (0 if kind == "prepared" else 1)
+            # Even a preparation receipt already published before timeout is
+            # retained, but its stdout is not accepted as a verified result.
+            assert evidence["prepared"]["kind"] == "prepared"
+            assert evidence["evidence_timeout_calls"].count(kind) == 1
+            assert f"kind={kind} exit={code}" in completed.stderr
+            assert "completion=UNKNOWN" in completed.stderr
+            if kind == "verify":
+                assert evidence["rollback_refused"]["trigger_exit_code"] == 17
+
+
+def test_gateway_evidence_deadline_queries_reject_valid_stdout_and_stop_recovery() -> None:
+    for kind in ("source_state", "source_result", "dropin_result",
+                 "runtime_directory_result", "dropin_directory_result"):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="evidence_deadline", evidence=evidence,
+            evidence_deadline_kind=kind, evidence_deadline_exit_code=137,
+            evidence_deadline_after=True)
+        assert completed.returncode == 17, (kind, completed.stderr)
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["backup"] == b"previous source\n" and evidence["backup_exists"]
+        assert evidence["evidence_timeout_calls"].count(kind) == 1
+        assert f"kind={kind} exit=137" in completed.stderr
+        assert "completion=UNKNOWN" in completed.stderr
+        assert evidence["rollback"]["trigger_exit_code"] == 17
+        assert evidence["rollback"]["status"] == "ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED"
+        assert evidence["rollback"]["failed_restoration_operation"]["exit_code"] == 137
+        assert not evidence[kind + "_receipt_exists"]
+        if kind == "source_state":
+            # The established sequence checks/removes the dead lock first;
+            # source-query failure must prevent source restoration after it.
+            assert evidence["restore_calls"] == "lock\n"
+
+
+def test_gateway_evidence_deadline_terminal_failures_retain_receipts_and_original_trigger() -> None:
+    for kind in ("helper", "rollback", "rollback_refused"):
+        for after in (False, True):
+            evidence: dict = {}
+            completed, _, _ = _run_gateway_rollback_guard(
+                _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=kind == "helper",
+                recovery_case="later_gate_failure" if kind == "helper" else "backup_changed" if kind == "rollback_refused" else "evidence_deadline",
+                evidence=evidence, evidence_deadline_kind=kind,
+                evidence_deadline_exit_code=124, evidence_deadline_after=after)
+            assert completed.returncode == (23 if kind == "helper" else 17), (kind, completed.stderr)
+            assert evidence["backup_exists"]
+            assert evidence["evidence_timeout_calls"].count(kind) == 1
+            assert (kind in evidence) is after
+            assert f"kind={kind} exit=124" in completed.stderr
+            assert "completion=UNKNOWN possibly_published=true retained=true retry=false" in completed.stderr
+            assert "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK" not in completed.stdout
+            if after and kind != "helper":
+                assert evidence[kind]["trigger_exit_code"] == 17
+            if kind == "rollback_refused":
+                assert evidence["service_calls"] == evidence["restore_calls"] == ""
+
+
+def test_gateway_evidence_deadline_normal_receipts_and_queries_keep_existing_contract() -> None:
+    evidence: dict = {}
+    completed, current, dropin = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="evidence_success", second_source=True, prior_dropin=True, evidence=evidence)
+    assert completed.returncode == 17, completed.stderr
+    assert current == b"previous source\n" and evidence["second_target"] == b"second previous\n"
+    assert dropin and evidence["dropin_bytes"] == b"previous hardening\n"
+    assert set(evidence["evidence_timeout_calls"]) == {
+        "prepared", "verify", "source_state", "source_result", "dropin_result",
+        "runtime_directory_result", "dropin_directory_result", "rollback"}
+    assert evidence["rollback"]["manifest_sha256"] == evidence["prepared_sha256"]
+    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert evidence["rollback"]["restoration_verified"] is False
+    assert "Recovery evidence failed:" not in completed.stderr
+
+
+def _run_native_gateway_evidence_deadline(mode: str) -> tuple[subprocess.CompletedProcess[str], dict]:
+    # Execute the real wrapper with native GNU timeout and a fake Python writer.
+    # Only the extracted test copy's two durations are shortened. The fake writer
+    # creates one private fixture artifact, never source/runtime/service state.
+    function = _bash_function(_repair_script(), "record_recovery_evidence")
+    assert function.count('"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s') == 1
+    function = function.replace('"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s',
+                                '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+    with tempfile.TemporaryDirectory(prefix="gateway-evidence-native-") as directory:
+        root = Path(directory)
+        (root / "bin").mkdir()
+        writer = root / "bin/python3"
+        writer.write_text(r'''#!/bin/bash
+set -eu
+[[ "$1" == - && "$2" == "$PWD/backup" && "$3" == rollback ]] || exit 91
+printf '%s\n' "$3" >> "$PWD/writer.calls"
+/bin/cat "/proc/$BASHPID/stat" > "$PWD/writer.stat"
+set -C
+printf 'possibly published receipt\n' > "$2/rollback.json"
+printf 'valid-looking-hash\n'
+if [[ "$FIXTURE_MODE" == success ]]; then exit 0; fi
+if [[ "$FIXTURE_MODE" == ignore_term ]]; then trap '' TERM; fi
+while :; do :; done
+''', encoding="utf-8", newline="\n")
+        writer.chmod(0o700)
+        (root / "backup").mkdir()
+        harness = 'set -Eeuo pipefail\n' + _bash_function(_repair_script(), "require_recovery_timeout") + r'''
+require_recovery_timeout
+BACKUP_DIR="$PWD/backup" SOURCE_COMMIT=fixture-source BUNDLE_SHA=fixture-bundle
+HARDENING_SHA=fixture-hardening RECOVERY_MANIFEST_SHA=fixture-manifest
+TARGET_ROOT="$PWD/target" SERVICE_DROP_IN="$PWD/dropin" RUN_DIR="$PWD/run"
+SERVICE_DROP_IN_DIR="$PWD/dropins"
+BUNDLE_FILES=()
+declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
+PATH="$PWD/bin:$PATH"
+'''
+        harness += function + "\n" + _bash_function(_repair_script(), "finish_rollback") + '\nfinish_rollback 17\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        env = dict(os.environ, FIXTURE_MODE=mode)
+        started = time.monotonic()
+        live = []
+        try:
+            result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root, env=env,
+                                    capture_output=True, text=True, timeout=5, check=False)
+        finally:
+            # Guard cleanup by the recorded process start identity. A regression
+            # must not leave the deliberately hung writer alive or kill a reused PID.
+            identity = root / "writer.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        facts = {"elapsed_seconds": time.monotonic() - started, "live_after_command": len(live),
+                 "calls": (root / "writer.calls").read_text().splitlines(),
+                 "receipt": (root / "backup/rollback.json").read_bytes(),
+                 "backup_files": sorted(p.name for p in (root / "backup").iterdir())}
+        return result, facts
+
+
+@unittest.skipIf(sys.platform != "linux", "Native evidence launcher isolation requires Linux CI")
+def test_gateway_native_evidence_launcher_isolated_success_control() -> None:
+    completed, facts = _run_native_gateway_evidence_deadline("success")
+    assert completed.returncode == 17, completed.stderr
+    assert completed.stdout == "valid-looking-hash\n" and completed.stderr == ""
+    assert facts["calls"] == ["rollback"] and facts["live_after_command"] == 0
+    assert facts["backup_files"] == ["rollback.json"]
+    assert facts["receipt"] == b"possibly published receipt\n"
+
+
+@unittest.skipIf(sys.platform != "linux", "Native evidence deadline and ignored TERM require Linux CI")
+def test_gateway_hung_evidence_writer_and_ignored_term_are_bounded_without_retry() -> None:
+    for mode, outcome in (("hang", "DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124"),
+                          ("ignore_term", "FORCED_TERMINATION_OR_SIGKILL")):
+        completed, facts = _run_native_gateway_evidence_deadline(mode)
+        assert completed.returncode == 17, completed.stderr
+        assert facts["elapsed_seconds"] < 4 and facts["live_after_command"] == 0
+        assert facts["calls"] == ["rollback"] and facts["backup_files"] == ["rollback.json"]
+        assert facts["receipt"] == b"possibly published receipt\n"
+        assert outcome in completed.stderr and "completion=UNKNOWN" in completed.stderr
+        assert "receipt persistence failed" in completed.stderr
+        assert completed.stdout == "valid-looking-hash\n"
 
 
 @unittest.skipIf(sys.platform != "linux", "Native service launcher isolation requires Linux CI")
