@@ -1202,25 +1202,25 @@ rm() {
   if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_target_drift after_remove || return $?; fi
 }
 install() {
-  if [[ "$FIXTURE_DROPIN_DIR_FORWARD" == true ]]; then
+  if [[ "${RECOVERY_RESTORE_ATTEMPTED:-false}" != true && "$FIXTURE_DROPIN_DIR_FORWARD" == true ]]; then
     printf '%s\n' "${@: -1}" >> "$PWD/dropin-dir-forward.calls"
     command mkdir -p -- "${@: -1}" || return $?
     if [[ "$DROPIN_DIR_FORWARD_CASE" == partial ]]; then return 31; fi
     if [[ "$DROPIN_DIR_FORWARD_CASE" == wrong_type ]]; then command mv -- "${@: -1}" "$PWD/partial-dropin-dir"; printf 'wrong type' > "${@: -1}"; return 0; fi
     command chmod 0755 -- "${@: -1}" || return $?
-  elif [[ "$FIXTURE_RUN_FORWARD" == true ]]; then
+  elif [[ "${RECOVERY_RESTORE_ATTEMPTED:-false}" != true && "$FIXTURE_RUN_FORWARD" == true ]]; then
     printf '%s\n' "${@: -1}" >> "$PWD/run-forward.calls"
     command mkdir -p -- "${@: -1}" || return $?
     if [[ "$RUN_FORWARD_CASE" == partial ]]; then return 31; fi
     if [[ "$RUN_FORWARD_CASE" == wrong_type ]]; then command rmdir -- "${@: -1}"; printf 'wrong type' > "${@: -1}"; return 0; fi
     command chmod 0750 -- "${@: -1}" || return $?
-  elif [[ "$FIXTURE_DROPIN_FORWARD" == true ]]; then
+  elif [[ "${RECOVERY_RESTORE_ATTEMPTED:-false}" != true && "$FIXTURE_DROPIN_FORWARD" == true ]]; then
     printf '%s\n' "${@: -1}" >> "$PWD/dropin-forward.calls"
     if [[ "$DROPIN_FORWARD_CASE" == partial ]]; then printf 'partial hardening\n' > "${@: -1}"; return 31; fi
     if [[ "$DROPIN_FORWARD_CASE" == wrong_bytes ]]; then printf 'wrong candidate\n' > "${@: -1}"; return 0; fi
     command cp -- "${@: -2:1}" "${@: -1}" || return $?
     command chmod 0644 -- "${@: -1}"
-  elif [[ "$FIXTURE_FORWARD" == true ]]; then
+  elif [[ "${RECOVERY_RESTORE_ATTEMPTED:-false}" != true && "$FIXTURE_FORWARD" == true ]]; then
     # Run the real forward transition/readback; only ownership/system install
     # effects are substituted so this fixture remains unprivileged and local.
     printf '%s\n' "${@: -1}" >> "$PWD/forward.calls"
@@ -2530,11 +2530,11 @@ def test_gateway_target_reader_deadline_absence_rejects_valid_stdout_before_copy
 
 
 def test_gateway_target_reader_deadline_forward_readback_keeps_write_pending() -> None:
-    for query, field in (
-        ("source:capture:entry.py:forward", "source_write_states"),
-        ("dropin:capture::forward", "dropin_write_state"),
-        ("dropin_directory:capture::forward", "dropin_directory_write_state"),
-        ("runtime:capture::forward", "runtime_directory_write_state"),
+    for query, field, operation, target in (
+        ("source:capture:entry.py:forward", "source_write_states", "target_state", "entry.py"),
+        ("dropin:capture::forward", "dropin_write_state", "dropin_target_state", "service_drop_in"),
+        ("dropin_directory:capture::forward", "dropin_directory_write_state", "dropin_directory_target_state", "service_drop_in_directory"),
+        ("runtime:capture::forward", "runtime_directory_write_state", "run_target_state", "run_directory"),
     ):
         evidence: dict = {}
         completed, current, _ = _run_gateway_rollback_guard(
@@ -2547,7 +2547,14 @@ def test_gateway_target_reader_deadline_forward_readback_keeps_write_pending() -
         state = next(item for item in receipt[field] if item["path"] == "entry.py") if field == "source_write_states" else receipt[field]
         assert state["state"] == "WRITE_PENDING" and state["installed_version_sha256"] is None
         assert receipt["trigger_exit_code"] == 124 and receipt["partial_state_possible"]
-        assert receipt["failed_restoration_operation"]["exit_code"] == 14
+        assert receipt["failed_restoration_operation"] == dict(
+            operation=operation, target=target, exit_code=14), (query, receipt["failed_restoration_operation"], completed.stderr)
+        if field == "runtime_directory_write_state":
+            # A forward readback failure invokes rollback before the caller can
+            # clear its fixture flag. Recovery must not reuse forward install.
+            calls = evidence["run_forward_calls"]
+            assert len(calls) == 1 and calls[0].endswith("/run"), (query, calls, completed.stderr)
+            assert "install:dropin_dir" in evidence["operation_calls"], (query, evidence["operation_calls"])
         assert current == b"candidate source\n" and evidence["backup_exists"]
 
 
