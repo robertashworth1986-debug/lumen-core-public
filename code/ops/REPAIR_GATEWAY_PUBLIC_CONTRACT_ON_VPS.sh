@@ -45,6 +45,9 @@ RECOVERY_RESTORE_ATTEMPTED=false
 RECOVERY_RESTORE_FAILURE=""
 RECOVERY_RESTORE_EXIT_CODE=0
 RECOVERY_RESTORE_TARGET=""
+RECOVERY_MUTATION_FAILURE=""
+RECOVERY_MUTATION_TARGET=""
+RECOVERY_MUTATION_EXIT_CODE=0
 RECOVERY_DROPIN_RESULT=NOT_CHECKED
 RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 RECOVERY_DROPIN_DIRECTORY_RESULT=NOT_CHECKED
@@ -317,7 +320,7 @@ fi
   exit 9
 }
 for required_command in \
-  systemctl curl install cp stat mktemp id getent chown chmod dirname rmdir \
+  systemctl curl install cp rm stat mktemp id getent chown chmod dirname rmdir \
   awk grep seq sleep tr; do
   command -v "$required_command" >/dev/null 2>&1 || {
     echo "ERROR: $required_command is required" >&2
@@ -476,7 +479,8 @@ record_recovery_evidence() {
     "$SERVICE_DROP_IN_DIR" "${RECOVERY_DROPIN_DIRECTORY_RESULT:-NOT_CHECKED}" \
     "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" \
     "${RUN_WRITE_STATE:-UNKNOWN}" "${RUN_TARGET_VERSION:-}" "${RUN_CANDIDATE_METADATA:-}" \
-    "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" "${DROPIN_DIR_TARGET_VERSION:-}" "${DROPIN_DIR_CANDIDATE_METADATA:-}" "${BUNDLE_FILES[@]}" <<'PY'
+    "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" "${DROPIN_DIR_TARGET_VERSION:-}" "${DROPIN_DIR_CANDIDATE_METADATA:-}" \
+    "${RECOVERY_MUTATION_FAILURE:-}" "${RECOVERY_MUTATION_TARGET:-}" "${RECOVERY_MUTATION_EXIT_CODE:-0}" "${BUNDLE_FILES[@]}" <<'PY'
 import hashlib
 import json
 import os
@@ -498,7 +502,8 @@ dropin_directory_target, dropin_directory_result = sys.argv[21:23]
 dropin_write_state, dropin_target_version = sys.argv[23:25]
 run_write_state, run_target_version, run_candidate_metadata = sys.argv[25:28]
 dropin_dir_write_state, dropin_dir_target_version, dropin_dir_candidate_metadata = sys.argv[28:31]
-relatives = sys.argv[31:]
+mutation_failure, mutation_target, mutation_exit_code = sys.argv[31:34]
+relatives = sys.argv[34:]
 query_kinds = {"source_state", "source_result"}
 if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
@@ -1003,6 +1008,18 @@ if kind == "rollback":
         "run_target_state": {"run_directory"},
         "run_directory_remove": {"run_directory"}, "runtime_directory_result": {"run_directory"},
     }
+    mutation_operations = {
+        "dead_lock", "source_remove", "dropin_remove", "dropin_parent_create",
+        "dropin_chown", "dropin_chmod", "dropin_directory_remove",
+        "run_chown", "run_chmod", "run_directory_remove",
+    }
+    if mutation_failure:
+        if (mutation_failure not in mutation_operations
+                or mutation_failure != restore_failure or mutation_target != restore_target
+                or mutation_exit_code != restore_exit_code):
+            raise SystemExit("invalid_mutation_deadline_failure_record")
+    elif mutation_target or mutation_exit_code != "0":
+        raise SystemExit("unexpected_mutation_deadline_fields")
     if restore_failure:
         if (restore_failure not in restoration_targets or restore_target not in restoration_targets[restore_failure]
                 or not re.fullmatch(r"[0-9]{1,3}", restore_exit_code) or not 1 <= int(restore_exit_code) <= 255
@@ -1013,15 +1030,18 @@ if kind == "rollback":
                        further_restoration_stopped=True, service_restart_attempted=False,
                        failed_restoration_operation=dict(operation=restore_failure, target=restore_target,
                                                          exit_code=int(restore_exit_code)))
-        if restore_failure in {"source_copy", "dropin_copy"}:
+        if restore_failure in {"source_copy", "dropin_copy"} or mutation_failure:
             code = int(restore_exit_code)
             outcome = ("DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124" if code == 124
                        else "FORCED_TERMINATION_OR_SIGKILL" if code == 137
                        else "LAUNCHER_OR_COMMAND_FAILURE" if code in {125, 126, 127}
                        else "COMMAND_FAILED")
             payload["failed_restoration_operation"].update(
-                outcome=outcome, timeout_seconds=60, kill_after_seconds=5,
-                partial_destination_possible=True)
+                outcome=outcome, timeout_seconds=60, kill_after_seconds=5)
+            if mutation_failure:
+                payload["failed_restoration_operation"].update(mutation_effect_verified=False)
+            else:
+                payload["failed_restoration_operation"].update(partial_destination_possible=True)
     elif restore_exit_code != "0" or restore_target:
         raise SystemExit("unexpected_restoration_failure_fields")
 raw = (json.dumps(payload, sort_keys=True, indent=2) + "\n").encode()
@@ -1563,7 +1583,7 @@ remove_verified_dead_lock() {
     echo "ERROR: singleton lock owner absence was not confirmed; refusing removal" >&2
     return "$probe_rc"
   }
-  rm -f -- "$LOCK_FILE" || return $?
+  bounded_recovery_mutation dead_lock gateway_lock || return $?
   lock_presence="$(read_gateway_lock_presence)" || return $?
   [[ "$lock_presence" == ABSENT ]] || return 14
   echo "Removed verified dead-PID gateway singleton lock."
@@ -1604,6 +1624,47 @@ bounded_recovery_copy() {
   # partial destination; the caller stops recovery without retry or cleanup.
   "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
     cp -a -- "$1" "$2"
+}
+
+bounded_recovery_mutation() {
+  local operation="${1:-}" target_id="${2:-}" command_rc=0 relative matched=false
+  local -a arguments=()
+  [[ $# -eq 2 ]] || return 125
+  # Callers supply only allowlisted identifiers. Paths and command options are
+  # derived here; no caller can add recursive removal or override the deadline.
+  case "$operation:$target_id" in
+    dead_lock:gateway_lock) arguments=(rm -f -- "$LOCK_FILE") ;;
+    source_remove:*)
+      for relative in "${BUNDLE_FILES[@]}"; do
+        if [[ "$target_id" == "$relative" ]]; then matched=true; break; fi
+      done
+      [[ "$matched" == true && "$target_id" != /* && "$target_id" != *..* ]] || return 125
+      arguments=(rm -f -- "$TARGET_ROOT/$target_id") ;;
+    dropin_remove:service_drop_in) arguments=(rm -f -- "$SERVICE_DROP_IN") ;;
+    dropin_parent_create:service_drop_in_directory)
+      arguments=(install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR") ;;
+    dropin_chown:service_drop_in_directory|run_chown:run_directory)
+      [[ "${RECOVERY_UID:-}" =~ ^[0-9]+$ && "${RECOVERY_GID:-}" =~ ^[0-9]+$ ]] || return 125
+      if [[ "$operation" == dropin_chown ]]; then
+        arguments=(chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR")
+      else
+        arguments=(chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR")
+      fi ;;
+    dropin_chmod:service_drop_in_directory|run_chmod:run_directory)
+      [[ "${RECOVERY_MODE:-}" =~ ^[0-7]{3,4}$ ]] || return 125
+      if [[ "$operation" == dropin_chmod ]]; then arguments=(chmod "$RECOVERY_MODE" "$SERVICE_DROP_IN_DIR")
+      else arguments=(chmod "$RECOVERY_MODE" "$RUN_DIR"); fi ;;
+    dropin_directory_remove:service_drop_in_directory) arguments=(rmdir -- "$SERVICE_DROP_IN_DIR") ;;
+    run_directory_remove:run_directory) arguments=(rmdir -- "$RUN_DIR") ;;
+    *) return 125 ;;
+  esac
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "${arguments[@]}" || command_rc=$?
+  if [[ "$command_rc" -ne 0 && -z "${RECOVERY_MUTATION_FAILURE:-}" ]]; then
+    RECOVERY_MUTATION_FAILURE="$operation"
+    RECOVERY_MUTATION_TARGET="$target_id"
+    RECOVERY_MUTATION_EXIT_CODE="$command_rc"
+  fi
+  return "$command_rc"
 }
 
 checked_restore_step() {
@@ -1715,13 +1776,24 @@ read_recovery_dropin_directory_result() {
 }
 
 remove_recovery_directory() {
-  # Missing is the intended state; nonempty, linked or inaccessible is not.
+  local operation target_id
+  [[ $# -eq 1 ]] || return 125
+  case "$1" in
+    "$SERVICE_DROP_IN_DIR") operation=dropin_directory_remove; target_id=service_drop_in_directory ;;
+    "$RUN_DIR") operation=run_directory_remove; target_id=run_directory ;;
+    *) return 125 ;;
+  esac
+  # Missing is the intended state; the existing result query still verifies it.
   if [[ ! -e "$1" && ! -L "$1" ]]; then return 0; fi
-  rmdir -- "$1" || return $?
+  bounded_recovery_mutation "$operation" "$target_id" || return $?
 }
 
 rollback() {
   local rc="${1:-1}"
+  # A forward dead-lock cleanup failure is distinct from this recovery attempt.
+  RECOVERY_MUTATION_FAILURE=""
+  RECOVERY_MUTATION_TARGET=""
+  RECOVERY_MUTATION_EXIT_CODE=0
   # Recovery failures must not re-enter rollback or replace the triggering code.
   trap - ERR
   trap '' INT TERM
@@ -1751,7 +1823,7 @@ rollback() {
         SOURCE_RESULT_STATES[$rel]=UNCHECKED_UNTOUCHED
         continue
       fi
-      checked_restore_step source_remove "$rel" rm -f -- "$target" || finish_rollback "$rc"
+      checked_restore_step source_remove "$rel" bounded_recovery_mutation source_remove "$rel" || finish_rollback "$rc"
       if [[ "$RECOVERY_SOURCE_STATE" == present ]]; then
         # Recheck before copy as well: a removal may already have happened, but
         # changed recovery bytes must not be copied or followed by service start.
@@ -1767,12 +1839,12 @@ rollback() {
     if [[ "$RECOVERY_DROPIN_TARGET_STATE" == untouched ]]; then
       RECOVERY_DROPIN_RESULT=UNCHECKED_UNTOUCHED
     else
-      checked_restore_step dropin_remove service_drop_in rm -f -- "$SERVICE_DROP_IN" || finish_rollback "$rc"
+      checked_restore_step dropin_remove service_drop_in bounded_recovery_mutation dropin_remove service_drop_in || finish_rollback "$rc"
       checked_restore_step dropin_state_read service_drop_in read_recovery_state "$BACKUP_DIR/service-drop-in.state" || finish_rollback "$rc"
       prior_drop_in_state="$RECOVERY_STATE"
       if [[ "$prior_drop_in_state" == "present" ]]; then
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
-        checked_restore_step dropin_parent_create service_drop_in_directory install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+        checked_restore_step dropin_parent_create service_drop_in_directory bounded_recovery_mutation dropin_parent_create service_drop_in_directory || finish_rollback "$rc"
         checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
         checked_restore_step dropin_copy service_drop_in bounded_recovery_copy "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
       fi
@@ -1786,8 +1858,8 @@ rollback() {
       if [[ "$prior_drop_in_dir_state" == "present" ]]; then
         checked_restore_step dropin_metadata_read service_drop_in_directory read_recovery_metadata "$BACKUP_DIR/service-drop-in-dir.metadata" || finish_rollback "$rc"
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
-        checked_restore_step dropin_chown service_drop_in_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
-        checked_restore_step dropin_chmod service_drop_in_directory chmod "$RECOVERY_MODE" "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+        checked_restore_step dropin_chown service_drop_in_directory bounded_recovery_mutation dropin_chown service_drop_in_directory || finish_rollback "$rc"
+        checked_restore_step dropin_chmod service_drop_in_directory bounded_recovery_mutation dropin_chmod service_drop_in_directory || finish_rollback "$rc"
       else
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
         checked_restore_step dropin_directory_remove service_drop_in_directory remove_recovery_directory "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
@@ -1803,8 +1875,8 @@ rollback() {
       prior_run_dir_state="$RECOVERY_STATE"
       if [[ "$prior_run_dir_state" == "present" ]]; then
         checked_restore_step run_metadata_read run_directory read_recovery_metadata "$BACKUP_DIR/run-dir.metadata" || finish_rollback "$rc"
-        checked_restore_step run_chown run_directory chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR" || finish_rollback "$rc"
-        checked_restore_step run_chmod run_directory chmod "$RECOVERY_MODE" "$RUN_DIR" || finish_rollback "$rc"
+        checked_restore_step run_chown run_directory bounded_recovery_mutation run_chown run_directory || finish_rollback "$rc"
+        checked_restore_step run_chmod run_directory bounded_recovery_mutation run_chmod run_directory || finish_rollback "$rc"
       else
         checked_restore_step run_directory_remove run_directory remove_recovery_directory "$RUN_DIR" || finish_rollback "$rc"
       fi

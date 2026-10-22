@@ -589,6 +589,12 @@ set -Eeuo pipefail
 LOCK_FILE="$PWD/fixture.lock"
 SERVICE=fixture
 PYTHON_BIN=fixture_lock_python
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
+  shift 3
+  "$@"
+}
 fixture_lock_python() {
   if [[ "$LOCK_READ_CASE" == launcher_failure ]]; then return 29; fi
   "$TEST_PYTHON" "$PWD/lock-probe-runtime.py" "$@"
@@ -603,7 +609,7 @@ rm() {
   "$TEST_PYTHON" "$PWD/lock-remove-result.py" "$LOCK_FILE"
 }
 '''
-        for name in ("read_gateway_lock_pid", "require_absent_lock_owner", "read_gateway_lock_presence", "remove_verified_dead_lock"):
+        for name in ("read_gateway_lock_pid", "require_absent_lock_owner", "read_gateway_lock_presence", "bounded_recovery_mutation", "remove_verified_dead_lock"):
             harness += _bash_function(script, name) + "\n"
         if caller == "cleanup": harness += "remove_verified_dead_lock\n"
         elif caller == "reader": harness += "read_gateway_lock_pid" + (" ignored" if extra_argument else "") + "\n"
@@ -704,6 +710,9 @@ def _run_gateway_rollback_guard(
     dropin_dir_forward_case: str = "", dropin_dir_query_case: str = "",
     copy_deadline_target: str = "", copy_deadline_exit_code: int = 124,
     copy_deadline_partial: bool = False,
+    mutation_deadline_fault: str = "", mutation_deadline_exit_code: int = 124,
+    mutation_deadline_after: bool = False,
+    forward_lock_deadline_failure: bool = False,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -1001,6 +1010,23 @@ fixture_timeout() {
       return "$COPY_DEADLINE_EXIT_CODE"
     fi
   fi
+  if [[ "$1" == rm || "$1" == install || "$1" == chown || "$1" == chmod || "$1" == rmdir ]]; then
+    local mutation_target=unknown mutation_key
+    case "${@: -1}" in
+      "$TARGET_ROOT/entry.py") mutation_target=first_source ;;
+      "$TARGET_ROOT/second.py") mutation_target=second_source ;;
+      "$SERVICE_DROP_IN") mutation_target=dropin ;;
+      "$SERVICE_DROP_IN_DIR") mutation_target=dropin_dir ;;
+      "$RUN_DIR") mutation_target=run_dir ;;
+      "$LOCK_FILE") mutation_target=lock ;;
+    esac
+    mutation_key="$1:$mutation_target"
+    printf '%s\n' "$mutation_key" >> "$PWD/mutation-timeout.calls"
+    if [[ "$MUTATION_DEADLINE_FAULT" == "$mutation_key" ]]; then
+      if [[ "$MUTATION_DEADLINE_AFTER" == true ]]; then "$@" || return $?; fi
+      return "$MUTATION_DEADLINE_EXIT_CODE"
+    fi
+  fi
   "$@"
 }
 STAGE_DIR=""
@@ -1236,6 +1262,10 @@ trap cleanup EXIT
             # production has no caller-controlled duration or environment escape.
             assert bounded.count("--kill-after=5s 60s") == 1
             bounded = bounded.replace("--kill-after=5s 60s", "--kill-after=0.2s 0.2s")
+            # Only systemctl uses the real launcher. Copy/filesystem commands
+            # must retain their shell fixture stubs and operation accounting.
+            assert bounded.count('"$RECOVERY_TIMEOUT_BIN"') == 1
+            bounded = bounded.replace('"$RECOVERY_TIMEOUT_BIN"', '"$FIXTURE_NATIVE_TIMEOUT_BIN"')
             (root / "bin").mkdir()
             fake = root / "bin/systemctl"
             fake.write_text('''#!/bin/bash
@@ -1256,10 +1286,10 @@ if [[ "$1" == "$SERVICE_FAILURE" ]]; then
 fi
 ''', encoding="utf-8", newline="\n")
             fake.chmod(0o755)
-            harness += 'export PATH="/usr/bin:$PATH"\nRECOVERY_TIMEOUT_BIN="$(type -P timeout)"\n'
+            harness += 'export PATH="/usr/bin:$PATH"\nFIXTURE_NATIVE_TIMEOUT_BIN="$(type -P timeout)"\n'
             harness += 'export PATH="$PWD/bin:$PATH"\n'
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
-        for name in ("bounded_recovery_copy", "checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
+        for name in ("bounded_recovery_copy", "bounded_recovery_mutation", "checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "recorded_target_version", "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent",
                      "dropin_target_version", "capture_dropin_target_version", "install_gateway_dropin", "read_recovery_dropin_target_state", "require_recovery_dropin_absent",
                      "dropin_directory_target_version", "capture_dropin_directory_target_version", "install_gateway_dropin_directory", "read_recovery_dropin_directory_target_state",
@@ -1646,6 +1676,15 @@ record_recovery_evidence() {
   esac
 }
 '''
+        if forward_lock_deadline_failure:
+            harness += r'''
+forward_lock_rc=0
+remove_verified_dead_lock || forward_lock_rc=$?
+[[ "$forward_lock_rc" == 124 && "$RECOVERY_MUTATION_FAILURE" == dead_lock ]] || exit 97
+printf 'FORWARD_LOCK_FAILURE=%s\n' "$forward_lock_rc"
+MUTATION_DEADLINE_FAULT=""
+rollback "$forward_lock_rc"
+'''
         harness += guard
         if recovery_case in {"later_gate_failure", "helper_write_failure", "manifest_changed", "backup_changed"}:
             outcome = script.split('if ! helper_receipt_sha="$(record_recovery_evidence helper 0)";', 1)[1]
@@ -1661,6 +1700,9 @@ record_recovery_evidence() {
             COPY_DEADLINE_TARGET=copy_deadline_target,
             COPY_DEADLINE_EXIT_CODE=str(copy_deadline_exit_code),
             COPY_DEADLINE_PARTIAL=str(copy_deadline_partial).lower(),
+            MUTATION_DEADLINE_FAULT=mutation_deadline_fault,
+            MUTATION_DEADLINE_EXIT_CODE=str(mutation_deadline_exit_code),
+            MUTATION_DEADLINE_AFTER=str(mutation_deadline_after).lower(),
             SIGNAL_DURING_COPY=str(signal_during_copy).lower(),
             TEST_PYTHON=Path(sys.executable).as_posix(),
             SERVICE_FAILURE=service_failure,
@@ -1723,6 +1765,7 @@ record_recovery_evidence() {
         if evidence is not None:
             evidence["elapsed_seconds"] = time.monotonic() - started
             evidence["copy_timeout_calls"] = (root / "copy-timeout.calls").read_text().splitlines() if (root / "copy-timeout.calls").exists() else []
+            evidence["mutation_timeout_calls"] = (root / "mutation-timeout.calls").read_text().splitlines() if (root / "mutation-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
@@ -1826,6 +1869,192 @@ def test_gateway_post_mutation_failures_restore_source_before_cleanup() -> None:
         assert dropin_exists
         assert "Rolling back" not in completed.stderr
         assert completed.stdout == "GUARD_PASSED\nCLEANUP\n"
+
+
+def test_gateway_mutation_deadlines_cover_every_runtime_command_and_stop_sequence() -> None:
+    cases = (
+        ("rm:lock", "dead_lock", "gateway_lock", {"real_lock_case": "dead"}),
+        ("rm:first_source", "source_remove", "entry.py", {}),
+        ("rm:dropin", "dropin_remove", "service_drop_in", {}),
+        ("install:dropin_dir", "dropin_parent_create", "service_drop_in_directory", {"prior_dropin": True}),
+        ("chown:dropin_dir", "dropin_chown", "service_drop_in_directory", {}),
+        ("chmod:dropin_dir", "dropin_chmod", "service_drop_in_directory", {}),
+        ("rmdir:dropin_dir", "dropin_directory_remove", "service_drop_in_directory", {"directory_case": "empty_dropin"}),
+        ("chown:run_dir", "run_chown", "run_directory", {}),
+        ("chmod:run_dir", "run_chmod", "run_directory", {}),
+        ("rmdir:run_dir", "run_directory_remove", "run_directory", {"directory_case": "empty_run"}),
+    )
+    # Deterministic launcher failures: no sleep, spin or native signal is used.
+    for fault, operation, target, options in cases:
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="mutation_deadline", mutation_deadline_fault=fault, evidence=evidence, **options)
+        assert completed.returncode == 17, (fault, completed.stderr)
+        assert evidence["mutation_timeout_calls"][-1] == fault
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["backup"] == b"previous source\n" and evidence["backup_exists"]
+        assert fault not in evidence["operation_calls"].splitlines()
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"] == dict(
+            operation=operation, target=target, exit_code=124,
+            outcome="DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124", timeout_seconds=60,
+            kill_after_seconds=5, mutation_effect_verified=False)
+        assert receipt["trigger_exit_code"] == 17 and receipt["partial_state_possible"]
+        assert receipt["further_restoration_stopped"] and receipt["service_restart_attempted"] is False
+        assert receipt["restoration_verified"] is False
+        if fault in {"rm:lock", "rm:first_source"}:
+            assert current == b"candidate source\n" and evidence["copy_timeout_calls"] == []
+
+
+def test_gateway_mutation_deadline_can_follow_a_completed_mutation_without_claiming_unchanged() -> None:
+    for fault, options, code in (
+        ("rm:first_source", {}, 124),
+        ("rm:second_source", {"second_source": True}, 137),
+        ("rm:dropin", {}, 124),
+        ("rm:lock", {"real_lock_case": "dead"}, 137),
+    ):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="mutation_partial", mutation_deadline_fault=fault,
+            mutation_deadline_exit_code=code, mutation_deadline_after=True,
+            evidence=evidence, **options)
+        assert completed.returncode == 17 and evidence["service_calls"] == "SYSTEMCTL:stop\n", completed.stderr
+        assert evidence["operation_calls"].splitlines()[-1] == fault
+        assert evidence["mutation_timeout_calls"][-1] == fault and evidence["backup_exists"]
+        failure = evidence["rollback"]["failed_restoration_operation"]
+        assert failure["exit_code"] == code and failure["mutation_effect_verified"] is False
+        assert failure["outcome"] == ("FORCED_TERMINATION_OR_SIGKILL" if code == 137
+                                      else "DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124")
+        if fault == "rm:first_source": assert current is None
+        if fault == "rm:second_source": assert current == b"previous source\n" and evidence["second_target"] is None
+        if fault == "rm:dropin": assert not dropin_exists
+        if fault == "rm:lock": assert not evidence["lock_exists"] and "Removed verified dead-PID" not in completed.stdout
+
+
+def test_gateway_mutation_deadline_launcher_and_receipt_failures_preserve_trigger() -> None:
+    for collision, code in ((False, 125), (False, 127), (True, 124)):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="rollback_write_failure" if collision else "mutation_launcher",
+            mutation_deadline_fault="rm:first_source", mutation_deadline_exit_code=code, evidence=evidence)
+        assert completed.returncode == 17 and current == b"candidate source\n", completed.stderr
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+        assert evidence["operation_calls"] == ""
+        if collision:
+            assert evidence["rollback"] is None and "receipt persistence failed" in completed.stderr
+        else:
+            assert evidence["rollback"]["failed_restoration_operation"]["outcome"] == "LAUNCHER_OR_COMMAND_FAILURE"
+
+
+def test_gateway_mutation_wrapper_has_exact_allowlist_argv_and_fixed_policy() -> None:
+    function = _bash_function(_repair_script(), "bounded_recovery_mutation")
+    assert function.count('--signal=TERM --kill-after=5s 60s') == 1
+    with tempfile.TemporaryDirectory(prefix="gateway-mutation-policy-") as directory:
+        root = Path(directory)
+        harness = r'''set -u
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+TARGET_ROOT=/fixture/source
+LOCK_FILE=/fixture/run/lock
+SERVICE_DROP_IN=/fixture/dropins/hardening
+SERVICE_DROP_IN_DIR=/fixture/dropins
+RUN_DIR=/fixture/run
+BUNDLE_FILES=(entry.py nested/module.py)
+RECOVERY_UID=${FIXTURE_UID:-12}
+RECOVERY_GID=${FIXTURE_GID:-34}
+RECOVERY_MODE=${FIXTURE_MODE:-0750}
+fixture_timeout() {
+  [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
+  shift 3
+  printf '%s\0' "$@" >> "$PWD/argv.calls"
+  printf '\n' >> "$PWD/argv.calls"
+  return "$COMMAND_EXIT"
+}
+''' + function + r'''
+bounded_recovery_mutation "$OPERATION" "$TARGET_ID" ${EXTRA_ARGUMENT:+unexpected}
+rc=$?
+printf '%s|%s|%s\n' "${RECOVERY_MUTATION_FAILURE:-}" "${RECOVERY_MUTATION_TARGET:-}" "${RECOVERY_MUTATION_EXIT_CODE:-0}"
+exit "$rc"
+'''
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        cases = (
+            ("dead_lock", "gateway_lock", ["rm", "-f", "--", "/fixture/run/lock"]),
+            ("source_remove", "nested/module.py", ["rm", "-f", "--", "/fixture/source/nested/module.py"]),
+            ("dropin_remove", "service_drop_in", ["rm", "-f", "--", "/fixture/dropins/hardening"]),
+            ("dropin_parent_create", "service_drop_in_directory", ["install", "-d", "-o", "root", "-g", "root", "-m", "0755", "--", "/fixture/dropins"]),
+            ("dropin_chown", "service_drop_in_directory", ["chown", "--no-dereference", "12:34", "/fixture/dropins"]),
+            ("run_chown", "run_directory", ["chown", "--no-dereference", "12:34", "/fixture/run"]),
+            ("dropin_chmod", "service_drop_in_directory", ["chmod", "0750", "/fixture/dropins"]),
+            ("run_chmod", "run_directory", ["chmod", "0750", "/fixture/run"]),
+            ("dropin_directory_remove", "service_drop_in_directory", ["rmdir", "--", "/fixture/dropins"]),
+            ("run_directory_remove", "run_directory", ["rmdir", "--", "/fixture/run"]),
+        )
+        for operation, target, expected in cases:
+            for code in (0, 9, 124, 137):
+                calls = root / "argv.calls"
+                calls.unlink(missing_ok=True)
+                result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                    env=dict(os.environ, OPERATION=operation, TARGET_ID=target, COMMAND_EXIT=str(code), EXTRA_ARGUMENT=""),
+                    capture_output=True, text=True, timeout=10, check=False)
+                assert result.returncode == code, result.stderr
+                assert calls.read_bytes() == b"\x00".join(item.encode() for item in expected) + b"\x00\n"
+                assert result.stdout == (f"{operation}|{target}|{code}\n" if code else "||0\n")
+        for operation, target, extra in (("unknown", "gateway_lock", ""), ("dead_lock", "wrong", ""),
+                ("source_remove", "../entry.py", ""), ("source_remove", "/entry.py", ""),
+                ("source_remove", "unregistered.py", ""), ("run_chown", "service_drop_in_directory", ""),
+                ("dead_lock", "gateway_lock", "yes")):
+            calls = root / "argv.calls"
+            calls.unlink(missing_ok=True)
+            result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, OPERATION=operation, TARGET_ID=target, COMMAND_EXIT="0", EXTRA_ARGUMENT=extra),
+                capture_output=True, text=True, timeout=10, check=False)
+            assert result.returncode == 125 and not calls.exists(), result.stderr
+        for operation, variable, invalid in (("run_chown", "FIXTURE_UID", "--reference=evil"),
+                ("run_chown", "FIXTURE_GID", "1:2"), ("run_chmod", "FIXTURE_MODE", "888")):
+            calls = root / "argv.calls"
+            calls.unlink(missing_ok=True)
+            result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, OPERATION=operation, TARGET_ID="run_directory", COMMAND_EXIT="0",
+                         EXTRA_ARGUMENT="", **{variable: invalid}),
+                capture_output=True, text=True, timeout=10, check=False)
+            assert result.returncode == 125 and not calls.exists(), result.stderr
+
+
+def test_gateway_forward_lock_mutation_failure_does_not_poison_rollback_evidence() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="forward_lock_deadline", real_lock_case="dead",
+        mutation_deadline_fault="rm:lock", forward_lock_deadline_failure=True, evidence=evidence)
+    assert completed.returncode == 124 and current == b"previous source\n", completed.stderr
+    assert "FORWARD_LOCK_FAILURE=124" in completed.stdout
+    assert evidence["mutation_timeout_calls"][:2] == ["rm:lock", "rm:lock"]
+    assert evidence["service_calls"].splitlines() == [
+        "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed", "SYSTEMCTL:start"]
+    assert evidence["rollback"]["trigger_exit_code"] == 124
+    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert "failed_restoration_operation" not in evidence["rollback"]
+    assert evidence["backup_exists"] and not evidence["lock_exists"]
+
+
+def test_gateway_mutation_success_keeps_result_checks_and_missing_directory_policy() -> None:
+    for directory_case, prior_dropin in (("", True), ("empty_run", False), ("empty_dropin", False)):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="mutation_success", second_source=True, prior_dropin=prior_dropin,
+            real_lock_case="dead", directory_case=directory_case, evidence=evidence)
+        assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+        assert evidence["second_target"] == b"second previous\n" and not evidence["lock_exists"]
+        assert evidence["service_calls"].splitlines() == [
+            "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed", "SYSTEMCTL:start"]
+        assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+        assert evidence["rollback"]["restoration_verified"] is False
+        assert "failed_restoration_operation" not in evidence["rollback"]
+        assert evidence["mutation_timeout_calls"][:3] == ["rm:lock", "rm:first_source", "rm:second_source"]
+        if directory_case: assert "rmdir:" + ("run_dir" if directory_case == "empty_run" else "dropin_dir") in evidence["mutation_timeout_calls"]
 
 
 def test_gateway_copy_deadline_preserves_partial_state_and_stops_sequence() -> None:
@@ -2025,6 +2254,29 @@ def test_gateway_recovery_timeout_preflight_is_required_before_mutation() -> Non
             assert completed.stdout == ("MUTATED" if completed.returncode == 0 else "")
     assert script.index('require_recovery_timeout || {') < script.index('systemctl stop "$SERVICE"\nSERVICE_STOPPED=true')
     assert script.index('record_recovery_evidence verify "$rc"') < script.index('if ! bounded_recovery_systemctl stop;')
+
+
+@unittest.skipIf(sys.platform != "linux", "Native service launcher isolation requires Linux CI")
+def test_gateway_native_service_launcher_keeps_filesystem_commands_inert() -> None:
+    # No command hangs in this control. Native timeout dispatch applies only to
+    # the fake systemctl executable, never root ownership or other FS commands.
+    evidence: dict = {}
+    completed, current, dropin_exists = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="native_service_isolation", real_timeout_mode="success",
+        second_source=True, prior_dropin=True, real_lock_case="dead", evidence=evidence)
+    assert completed.returncode == 17, completed.stderr
+    assert current == b"previous source\n" and evidence["second_target"] == b"second previous\n"
+    assert dropin_exists and evidence["dropin_bytes"] == b"previous hardening\n"
+    assert evidence["copy_timeout_calls"] == ["first_source", "second_source", "dropin"]
+    assert evidence["mutation_timeout_calls"] == [
+        "rm:lock", "rm:first_source", "rm:second_source", "rm:dropin", "install:dropin_dir",
+        "chown:dropin_dir", "chmod:dropin_dir", "chown:run_dir", "chmod:run_dir"]
+    assert evidence["service_calls"].splitlines() == [
+        "SYSTEMCTL:stop", "SYSTEMCTL:daemon-reload", "SYSTEMCTL:reset-failed", "SYSTEMCTL:start"]
+    assert not evidence["command_entered"] and evidence["recorded_fixture_processes"] == 0
+    assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert evidence["rollback"]["restoration_verified"] is False
 
 
 @unittest.skipIf(sys.platform != "linux", "Real GNU timeout process-group signals require Linux CI")
@@ -2256,8 +2508,11 @@ def test_gateway_inner_lock_errors_cannot_be_hidden_by_successful_echo() -> None
         assert evidence["operation_calls"] == ("rm:lock\n" if fault else "")
         assert "Removed verified dead-PID" not in completed.stdout
         assert evidence["lock_exists"]
-        assert evidence["rollback"]["failed_restoration_operation"] == dict(
-            operation="dead_lock", target="gateway_lock", exit_code=expected_code)
+        expected_failure = dict(operation="dead_lock", target="gateway_lock", exit_code=expected_code)
+        if fault:
+            expected_failure.update(outcome="COMMAND_FAILED", timeout_seconds=60,
+                                    kill_after_seconds=5, mutation_effect_verified=False)
+        assert evidence["rollback"]["failed_restoration_operation"] == expected_failure
 
 
 def test_gateway_valid_or_absent_lock_and_prior_dropin_restore_normally() -> None:

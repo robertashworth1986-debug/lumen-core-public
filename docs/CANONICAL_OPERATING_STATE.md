@@ -30,6 +30,37 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 22 target-filesystem command increment routes the ten remaining
+rollback mutation sites through one operation/target allowlist: dead-lock and
+source/drop-in removal, fixed drop-in parent creation, and ownership, mode and
+empty-directory removal for the two fixed directories. The wrapper derives the
+exact command and path from those identifiers, with no caller-supplied command,
+recursive removal, retry or deadline override. It reuses the preflight-checked
+GNU timeout policy of 60 seconds plus five seconds before forced termination.
+The shared dead-lock cleanup also applies this command limit in the forward path.
+Existing copy and service limits, state/version guards, custody verification and
+result queries remain unchanged.
+
+The first failed command still stops later restoration and service restart while
+preserving the original trigger. Failure receipts name a deadline only when the
+allowlisted wrapper was actually reached; an earlier lock read, owner-probe or
+later absence-query failure is not mislabeled as a bounded mutation failure.
+Forward mutation failure markers are cleared when rollback begins. A command may
+change its target before failing or terminating; its effect remains unverified.
+Exit 124 cannot distinguish deadline expiry from a command returning 124, and
+137 cannot distinguish forced timeout termination from another SIGKILL.
+
+Validation uses inert command/launcher stubs and disposable files, including
+exact argument rejection, every mutation site, after-effect failures and retained
+receipt/original-code behavior. These controls do not establish native elapsed
+time or signal delivery. They do not bound Python reads, probes, hashing, receipt
+persistence, all forward commands or total recovery duration; uninterruptible I/O
+can also exceed the nominal policy. Privileged writers, check-to-use races,
+complete restoration and automatic recovery after external postchecks remain
+unresolved. The affected-path local run passed 17 tests; standard-library import
+found 168 tests and executed none. At local preparation, exact-new-head CI and
+independent source review were pending.
+
 The October 22 lock-cleanup increment adds one fixed-path presence observer at
 the initial skip decision and after a successful removal command. Only an
 explicit ENOENT from trusted-Python lstat establishes absence; all present
