@@ -30,6 +30,25 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 22 CI-budget correction changes only the public-contract job limit
+from five to ten minutes. At head
+`1109bbd60ac1ddc69cb377e92bc61753c812649a`, all 195 public-contract test
+calls printed PASS, but the job was cancelled by its five-minute maximum after
+the test step took about 301.25 seconds. Its final inspect-only/exact-hash step
+was skipped, so that run did not pass the complete public gate. The independent
+full suite passed 2,191 tests with eight skips and 350 passing subtests in
+389.65 seconds; it does not substitute for the cancelled public gate. The
+cancelled job, annotation and complete logs remain historical evidence.
+
+The ten-minute cap leaves finite room for setup, the observed test duration,
+final controls and runner variation. Tests, triggers, permissions, runtime pins
+and every gate are unchanged, as are the production helper and its native
+60-second TERM plus five-second KILL policy. This CI scalar does not implement
+the separately proposed owner-probe deadline. No workflow rerun or deployment
+is part of this correction. Successful exact-new-head hosted execution must
+still include every public test and the previously skipped final control step;
+the larger budget is not evidence that those checks have completed.
+
 The October 22 lock-PID reader increment wraps only the
 `read_gateway_lock_pid` Python launch with the existing validated GNU timeout
 policy: TERM after 60 seconds, then forced termination after five more seconds.
