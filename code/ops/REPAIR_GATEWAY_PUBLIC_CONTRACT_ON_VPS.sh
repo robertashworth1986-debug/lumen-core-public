@@ -1089,7 +1089,9 @@ PY
 
 recorded_target_version() {
   [[ $# -eq 4 ]] || return 14
-  python3 - "$TARGET_ROOT" "$SERVICE_DROP_IN" "$RUN_DIR" "$1" "$2" "$3" "$4" "${BUNDLE_FILES[@]}" <<'PY'
+  local reader_rc=0 reader_outcome
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    python3 - "$TARGET_ROOT" "$SERVICE_DROP_IN" "$RUN_DIR" "$1" "$2" "$3" "$4" "${BUNDLE_FILES[@]}" <<'PY' || reader_rc=$?
 import hashlib
 import json
 import os
@@ -1207,6 +1209,19 @@ version = dict(sha256=digest.hexdigest(), identity=identity(before), parents=par
                xattrs_sha256=hashlib.sha256(json.dumps(attributes).encode()).hexdigest())
 sys.stdout.buffer.write(hashlib.sha256(json.dumps(version, sort_keys=True).encode()).hexdigest().encode() + b"\n")
 PY
+  if [[ "$reader_rc" -ne 0 ]]; then
+    case "$reader_rc" in
+      124) reader_outcome=DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124 ;;
+      137) reader_outcome=FORCED_TERMINATION_OR_SIGKILL ;;
+      125|126|127) reader_outcome=LAUNCHER_OR_COMMAND_FAILURE ;;
+      *) reader_outcome=COMMAND_FAILED ;;
+    esac
+    # Even a valid-looking partial response is not a completed observation.
+    # Callers retain pending/partial state and must not adopt output after failure.
+    printf 'Target version reader failed: exit=%s outcome=%s timeout_seconds=60 kill_after_seconds=5 observation=UNKNOWN retry=false\n' \
+      "$reader_rc" "$reader_outcome" >&2
+  fi
+  return "$reader_rc"
 }
 
 source_target_version() {

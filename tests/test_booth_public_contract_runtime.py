@@ -715,6 +715,8 @@ def _run_gateway_rollback_guard(
     forward_lock_deadline_failure: bool = False,
     evidence_deadline_kind: str = "", evidence_deadline_exit_code: int = 124,
     evidence_deadline_after: bool = False,
+    target_deadline_query: str = "", target_deadline_exit_code: int = 124,
+    target_deadline_after: bool = True,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -998,7 +1000,17 @@ RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
   shift 3
-  if [[ "$1" == python3 ]]; then
+  if [[ "$1" == python3 && "$3" == "$TARGET_ROOT" ]]; then
+    [[ "$2" == - && "$4" == "$SERVICE_DROP_IN" && "$5" == "$RUN_DIR" ]] || return 99
+    local target_phase=rollback target_query
+    if [[ "${RECOVERY_RESTORE_ATTEMPTED:-false}" != true && ( "$FIXTURE_FORWARD" == true || "$FIXTURE_DROPIN_FORWARD" == true || "$FIXTURE_DROPIN_DIR_FORWARD" == true || "$FIXTURE_RUN_FORWARD" == true ) ]]; then target_phase=forward; fi
+    target_query="$6:$7:$8:$target_phase"
+    printf '%s\n' "$target_query" >> "$PWD/target-timeout.calls"
+    if [[ "$TARGET_DEADLINE_QUERY" == "$target_query" ]]; then
+      if [[ "$TARGET_DEADLINE_AFTER" == true ]]; then "$@" || return $?; fi
+      return "$TARGET_DEADLINE_EXIT_CODE"
+    fi
+  elif [[ "$1" == python3 && "$3" == "$BACKUP_DIR" ]]; then
     printf '%s\n' "$4" >> "$PWD/evidence-timeout.calls"
     if [[ "$EVIDENCE_DEADLINE_KIND" == "$4" ]]; then
       # Simulate failure after real fixture publication/output as well as before
@@ -1717,6 +1729,9 @@ rollback "$forward_lock_rc"
             EVIDENCE_DEADLINE_KIND=evidence_deadline_kind,
             EVIDENCE_DEADLINE_EXIT_CODE=str(evidence_deadline_exit_code),
             EVIDENCE_DEADLINE_AFTER=str(evidence_deadline_after).lower(),
+            TARGET_DEADLINE_QUERY=target_deadline_query,
+            TARGET_DEADLINE_EXIT_CODE=str(target_deadline_exit_code),
+            TARGET_DEADLINE_AFTER=str(target_deadline_after).lower(),
             SIGNAL_DURING_COPY=str(signal_during_copy).lower(),
             TEST_PYTHON=Path(sys.executable).as_posix(),
             SERVICE_FAILURE=service_failure,
@@ -1781,6 +1796,7 @@ rollback "$forward_lock_rc"
             evidence["copy_timeout_calls"] = (root / "copy-timeout.calls").read_text().splitlines() if (root / "copy-timeout.calls").exists() else []
             evidence["mutation_timeout_calls"] = (root / "mutation-timeout.calls").read_text().splitlines() if (root / "mutation-timeout.calls").exists() else []
             evidence["evidence_timeout_calls"] = (root / "evidence-timeout.calls").read_text().splitlines() if (root / "evidence-timeout.calls").exists() else []
+            evidence["target_timeout_calls"] = (root / "target-timeout.calls").read_text().splitlines() if (root / "target-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
@@ -2409,6 +2425,230 @@ def test_gateway_evidence_deadline_normal_receipts_and_queries_keep_existing_con
     assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
     assert evidence["rollback"]["restoration_verified"] is False
     assert "Recovery evidence failed:" not in completed.stderr
+
+
+def test_gateway_target_reader_deadline_dispatch_preserves_argv_and_status() -> None:
+    function = _bash_function(_repair_script(), "recorded_target_version")
+    harness = r'''
+set -uo pipefail
+TARGET_ROOT=fixture-target SERVICE_DROP_IN=fixture-dropin RUN_DIR=fixture-run
+BUNDLE_FILES=(entry.py second.py)
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ "$1 $2 $3 $4 $5" == '--signal=TERM --kill-after=5s 60s python3 -' ]] || return 99
+  shift 5
+  [[ $# == 9 && "$1" == fixture-target && "$2" == fixture-dropin && "$3" == fixture-run ]] || return 98
+  [[ "$4" == "$kind" && "$5" == "$mode" && "$6" == "$relative" && "$7" == "$candidate" && "$8 $9" == 'entry.py second.py' ]] || return 97
+  printf 'call\n' >> calls
+  printf 'valid-looking-output\n'
+  return "$fixture_rc"
+}
+'''
+    harness += function + r'''
+for query in source:capture source:absent dropin:capture dropin:absent runtime:capture dropin_directory:capture; do
+  kind="${query%:*}"; mode="${query#*:}"
+  relative=''; candidate=''
+  [[ "$kind" != source ]] || relative=entry.py
+  if [[ "$mode" == capture ]]; then candidate=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; fi
+  [[ "$kind" != runtime ]] || candidate=1:2:750
+  [[ "$kind" != dropin_directory ]] || candidate=0:0:755
+  for fixture_rc in 0 29 124 125 126 127 137; do
+    output="$(recorded_target_version "$kind" "$mode" "$relative" "$candidate")"; actual_rc=$?
+    [[ "$actual_rc" == "$fixture_rc" && "$output" == valid-looking-output ]] || exit 96
+  done
+done
+recorded_target_version; [[ $? == 14 ]] || exit 95
+recorded_target_version a b c d e; [[ $? == 14 ]] || exit 94
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-target-dispatch-") as directory:
+        root = Path(directory)
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                capture_output=True, text=True, timeout=10, check=False)
+        assert result.returncode == 0, result.stderr
+        assert len((root / "calls").read_text().splitlines()) == 42
+    assert result.stdout == ""
+    for outcome in ("DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124", "FORCED_TERMINATION_OR_SIGKILL",
+                    "LAUNCHER_OR_COMMAND_FAILURE", "COMMAND_FAILED"):
+        assert outcome in result.stderr
+    assert result.stderr.count("observation=UNKNOWN retry=false") == 36
+
+
+def test_gateway_target_reader_deadline_recovery_capture_stops_at_first_failure() -> None:
+    cases = (
+        ("source:capture:entry.py:rollback", "target_state", "entry.py", 124),
+        ("source:capture:second.py:rollback", "target_state", "second.py", 137),
+        ("dropin_directory:capture::rollback", "dropin_directory_target_state", "service_drop_in_directory", 125),
+        ("dropin:capture::rollback", "dropin_target_state", "service_drop_in", 126),
+        ("runtime:capture::rollback", "run_target_state", "run_directory", 127),
+    )
+    for query, operation, target, code in cases:
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="target_reader_deadline", second_source=True, prior_dropin=True,
+            target_deadline_query=query, target_deadline_exit_code=code, evidence=evidence)
+        assert completed.returncode == 17, (query, completed.stderr)
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+        assert evidence["target_timeout_calls"].count(query) == 1
+        assert evidence["rollback"]["failed_restoration_operation"] == dict(
+            operation=operation, target=target, exit_code=code)
+        assert evidence["rollback"]["trigger_exit_code"] == 17
+        assert evidence["rollback"]["partial_state_possible"]
+        assert evidence["rollback"]["restoration_verified"] is False
+        assert f"Target version reader failed: exit={code}" in completed.stderr
+        if target == "entry.py":
+            assert current == b"candidate source\n" and "rm:first_source" not in evidence["operation_calls"]
+        elif target == "second.py":
+            assert current == b"previous source\n" and evidence["second_target"] == b"second candidate\n"
+            assert "rm:second_source" not in evidence["operation_calls"]
+        elif target.startswith("service_drop_in"):
+            assert evidence["dropin_bytes"] == b"candidate hardening\n"
+            assert "rm:dropin" not in evidence["operation_calls"]
+        else:
+            assert "chown:run_dir" not in evidence["operation_calls"]
+
+
+def test_gateway_target_reader_deadline_absence_rejects_valid_stdout_before_copy() -> None:
+    for query, operation, target in (
+        ("source:absent:entry.py:rollback", "target_absent", "entry.py"),
+        ("dropin:absent::rollback", "dropin_target_absent", "service_drop_in"),
+    ):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="target_reader_deadline", prior_dropin=True,
+            target_deadline_query=query, target_deadline_exit_code=137, evidence=evidence)
+        assert completed.returncode == 17 and evidence["service_calls"] == "SYSTEMCTL:stop\n", completed.stderr
+        assert evidence["target_timeout_calls"].count(query) == 1
+        assert evidence["rollback"]["failed_restoration_operation"] == dict(operation=operation, target=target, exit_code=137)
+        assert evidence["rollback"]["partial_state_possible"] and evidence["backup_exists"]
+        if target == "entry.py":
+            assert current is None and "cp:first_source" not in evidence["operation_calls"]
+        else:
+            assert evidence["dropin_bytes"] is None and "cp:dropin" not in evidence["operation_calls"]
+
+
+def test_gateway_target_reader_deadline_forward_readback_keeps_write_pending() -> None:
+    for query, field in (
+        ("source:capture:entry.py:forward", "source_write_states"),
+        ("dropin:capture::forward", "dropin_write_state"),
+        ("dropin_directory:capture::forward", "dropin_directory_write_state"),
+        ("runtime:capture::forward", "runtime_directory_write_state"),
+    ):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="target_reader_deadline", prior_dropin=True,
+            target_deadline_query=query, target_deadline_exit_code=124, evidence=evidence)
+        assert completed.returncode == 124 and evidence["service_calls"] == "SYSTEMCTL:stop\n", (query, completed.stderr)
+        assert evidence["target_timeout_calls"].count(query) == 1
+        receipt = evidence["rollback"]
+        state = next(item for item in receipt[field] if item["path"] == "entry.py") if field == "source_write_states" else receipt[field]
+        assert state["state"] == "WRITE_PENDING" and state["installed_version_sha256"] is None
+        assert receipt["trigger_exit_code"] == 124 and receipt["partial_state_possible"]
+        assert receipt["failed_restoration_operation"]["exit_code"] == 14
+        assert current == b"candidate source\n" and evidence["backup_exists"]
+
+
+def test_gateway_target_reader_deadline_receipt_failure_retains_original_trigger() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="target_reader_deadline", target_deadline_query="source:capture:entry.py:rollback",
+        target_deadline_exit_code=124, evidence_deadline_kind="rollback",
+        evidence_deadline_exit_code=137, evidence_deadline_after=False, evidence=evidence)
+    assert completed.returncode == 17 and current == b"candidate source\n", completed.stderr
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+    assert "rollback" not in evidence and "receipt persistence failed" in completed.stderr
+    assert "Target version reader failed: exit=124" in completed.stderr
+    assert "kind=rollback exit=137" in completed.stderr
+
+
+def _run_native_gateway_target_reader_deadline(mode: str) -> tuple[subprocess.CompletedProcess[str], dict]:
+    # Only this extracted reader launch uses native GNU timeout. The fake reader
+    # cannot invoke service or target mutations; its PID identity enables cleanup.
+    function = _bash_function(_repair_script(), "recorded_target_version")
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    assert function.count(policy) == 1
+    function = function.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+    with tempfile.TemporaryDirectory(prefix="gateway-target-native-") as directory:
+        root = Path(directory)
+        (root / "bin").mkdir()
+        reader = root / "bin/python3"
+        reader.write_text(r'''#!/bin/bash
+set -eu
+[[ "$1" == - && "$2" == "$PWD/target" && "$5 $6 $7" == 'source capture entry.py' ]] || exit 91
+printf 'capture\n' >> "$PWD/reader.calls"
+/bin/cat "/proc/$BASHPID/stat" > "$PWD/reader.stat"
+printf '%064d\n' 0
+if [[ "$FIXTURE_MODE" == success ]]; then exit 0; fi
+if [[ "$FIXTURE_MODE" == ignore_term ]]; then trap '' TERM; fi
+while :; do :; done
+''', encoding="utf-8", newline="\n")
+        reader.chmod(0o700)
+        harness = 'set -Eeuo pipefail\n' + _bash_function(_repair_script(), "require_recovery_timeout") + r'''
+require_recovery_timeout
+TARGET_ROOT="$PWD/target" SERVICE_DROP_IN="$PWD/dropin" RUN_DIR="$PWD/run"
+BUNDLE_FILES=(entry.py)
+CAPTURED_TARGET_VERSION=not-adopted
+PATH="$PWD/bin:$PATH"
+'''
+        harness += function + "\n" + _bash_function(_repair_script(), "source_target_version") + "\n"
+        harness += _bash_function(_repair_script(), "capture_source_target_version") + r'''
+reader_status=0
+capture_source_target_version entry.py aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa || reader_status=$?
+printf 'STATUS=%s\nCAPTURE=%s\n' "$reader_status" "$CAPTURED_TARGET_VERSION"
+exit "$reader_status"
+'''
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        env = dict(os.environ, FIXTURE_MODE=mode)
+        started = time.monotonic()
+        live = []
+        try:
+            result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root, env=env,
+                                    capture_output=True, text=True, timeout=5, check=False)
+        finally:
+            identity = root / "reader.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        return result, {"elapsed_seconds": time.monotonic() - started,
+                        "live_after_command": len(live),
+                        "calls": (root / "reader.calls").read_text().splitlines()}
+
+
+@unittest.skipIf(sys.platform != "linux", "Native target reader isolation requires Linux CI")
+def test_gateway_native_target_reader_deadline_success_control() -> None:
+    completed, facts = _run_native_gateway_target_reader_deadline("success")
+    assert completed.returncode == 0 and completed.stderr == "", completed.stderr
+    assert completed.stdout == "STATUS=0\nCAPTURE=" + "0" * 64 + "\n"
+    assert facts["calls"] == ["capture"] and facts["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native target reader deadline and ignored TERM require Linux CI")
+def test_gateway_hung_target_reader_and_ignored_term_are_bounded_without_adoption() -> None:
+    for mode, code, outcome in (("hang", 124, "DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124"),
+                                ("ignore_term", 137, "FORCED_TERMINATION_OR_SIGKILL")):
+        completed, facts = _run_native_gateway_target_reader_deadline(mode)
+        assert completed.returncode == code, completed.stderr
+        assert completed.stdout == f"STATUS={code}\nCAPTURE=not-adopted\n"
+        assert facts["elapsed_seconds"] < 4 and facts["live_after_command"] == 0
+        assert facts["calls"] == ["capture"]
+        assert outcome in completed.stderr and "observation=UNKNOWN retry=false" in completed.stderr
 
 
 def _run_native_gateway_evidence_deadline(mode: str) -> tuple[subprocess.CompletedProcess[str], dict]:

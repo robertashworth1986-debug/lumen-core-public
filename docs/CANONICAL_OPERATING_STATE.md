@@ -30,6 +30,31 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 22 target-version reader increment applies the preflight-checked GNU
+timeout policy of 60 seconds plus five seconds before forced termination to the
+single `recorded_target_version` Python subprocess. Its embedded Python checks,
+arguments, fixed-object/source allowlists, version representation and absence
+queries are unchanged. The shared boundary covers source, service drop-in,
+runtime-directory and drop-in-directory observations in both forward readback and
+recovery. A nonzero result remains a failure even after valid-looking output;
+callers must not adopt it or advance a pending write to installed. Existing
+first-failure handling stops subsequent restoration and restart, retains the
+original trigger and preserves any already-partial state and recovery evidence.
+
+Reader diagnostics report observation UNKNOWN and no retry. Exit 124 remains
+ambiguous between deadline expiry and that command exit; 137 remains ambiguous
+with another SIGKILL. Inert launcher fixtures exercise exact arguments, failed
+capture/absence queries, actual forward transitions and receipt failures. Two
+Linux-only fake-reader fixtures cover native success and hung/ignored-TERM
+termination with identity-checked cleanup; they do not run real recovery commands.
+This single-process policy does not bound other lock readers, probes, forward
+commands, uninterruptible kernel I/O or aggregate recovery duration. It does not
+eliminate privileged-writer/check-to-use races or establish complete restoration
+or automatic recovery after external postchecks. Focused local validation passed
+seven tests with the two native Linux cases skipped on Windows. At local
+preparation, independent source review and exact-new-head hosted validation were
+pending; the earlier head's passing checks do not validate these new bytes.
+
 The October 22 recovery-evidence increment applies the preflight-checked GNU
 timeout policy of 60 seconds plus five seconds before forced termination to the
 single `record_recovery_evidence` Python subprocess. A shell allowlist covers its
@@ -54,8 +79,8 @@ ignored TERM; their test-copy deadlines are shortened without changing productio
 policy or running real service/filesystem repair commands. Focused local
 validation passed nine tests with the two Linux-only tests skipped on Windows.
 Those native process/signal cases remain unexecuted locally. Independent source
-review found no blocking findings. Hosted validation for this increment remains
-pending; prior hosted results do not establish exact-new-head validation.
+review found no blocking findings. Hosted validation was pending at preparation;
+prior hosted results did not establish exact-new-head validation.
 
 The October 22 target-filesystem command increment routes the ten remaining
 rollback mutation sites through one operation/target allowlist: dead-lock and
