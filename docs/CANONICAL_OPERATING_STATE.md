@@ -22,8 +22,777 @@ rollback. The existing read-only diagnostic now captures the active allowlisted
 MIME declarations and installed module hashes, without dumping the server config.
 Inspection is a prerequisite: the effective table and inheritance must be verified
 before applying the four-byte extension. No DNS, credential, route, trading or
-business authority is changed. Until successful repair receipts are appended,
-full release verification remains open. The earlier failed gate remains evidence.
+business authority is changed. The subsequent scoped repair completed in
+[run 39531993525](https://github.com/robertashworth1986-debug/lumen-core-public/actions/runs/39531993525):
+all 246 file checks, six module checks and seven service checks before and after
+the change passed. This closes the module-type release gate; the earlier failed
+gate remains historical evidence. It does not resolve the separate backend holds.
+
+### October 21 local gateway recovery correction
+
+The October 23 post-start metadata increment advances the existing outcome-2
+private-review repair path. Only the three fixed stat queries for the service
+drop-in file, runtime directory and singleton lock gain the validated TERM
+after 60 seconds and KILL after five more seconds policy. Each guarded
+assignment requires a successful query before comparing the existing ownership
+and mode string. Expected-looking stdout followed by nonzero cannot authorize
+progress. Query failure and successful but mismatched metadata retain the
+existing diagnostic, ordering and explicit rollback-18 mapping, with one
+parent-shell rollback and no second ERR-triggered rollback.
+
+Inert fixtures execute the actual three blocks and ERR trap, cover every target
+with statuses 1/29/124/137, malformed output, successful metadata, and actual
+rollback with recovery-stop and terminal-evidence failure. Faults are scoped
+to these query launches so recovery observations do not inherit them. Native
+Linux controls contain only extracted blocks and a fake stat executable, with
+shortened test-copy deadlines and process-identity cleanup. At local preparation,
+independent review and exact-new-head hosted validation were pending; local
+Linux skips do not establish native signal behavior.
+
+Pre-mutation and inspect-only metadata reads, PID binding, recovery wrappers,
+HTTP probes and later external postchecks are unchanged. These three client
+budgets are not a shared phase or total recovery deadline. A successful stat is
+a point-in-time observation, not stable ownership proof or protection against
+privileged writers, parent replacement and validation-to-use races. Ambiguous
+timeout outcomes, uninterruptible I/O, partial restoration, final service state
+and recovery after the later external postcheck remain unresolved. No deployment,
+external validation or production-readiness claim follows from this increment.
+
+The October 23 post-start active-observation increment advances the existing
+private-review repair path. Only the post-start systemctl is-active --quiet
+launch gains the validated TERM-after-60-seconds and KILL-after-five-more
+seconds policy. Its explicit rollback-18 mapping is unchanged for every
+nonzero observation, including inactive, launcher error and ambiguous timeout
+statuses. Plausible failed stdout cannot authorize later property checks.
+The actual parent-shell ERR trap still leads to one rollback; the explicit
+failure block handles this observation without a second ERR rollback.
+
+Inert tests execute the actual block and trap, cover statuses 3/29/124/137,
+success, query-specific failure during actual recovery, and terminal evidence
+uncertainty while retaining trigger 18 and backups. Native Linux controls use
+only the extracted block and a fake systemctl executable with shortened
+test-copy deadlines and process-identity cleanup. At local preparation,
+independent review and exact-new-head native hosted validation remain pending;
+local Linux skips do not establish native signal behavior.
+
+The pre-mutation and inspect-only activity observations are unchanged because
+their contracts differ. This single client bound does not cancel systemd jobs,
+prove final service state or establish a shared phase/total recovery deadline.
+Other read/probe boundaries, privileged writers, PID/check-to-use races,
+uninterruptible I/O, complete restoration and outer-postcheck recovery remain
+unresolved. No deployment or production-readiness claim follows.
+
+The October 23 forward-service increment adds fixed TERM-after-60-seconds
+and KILL-after-five-more-seconds bounds to the existing forward stop,
+daemon-reload, reset-failed and start launches. Stop, reload and start retain
+their original strict status through the actual parent-shell ERR trap and
+single rollback path. Later forward steps and state assignments do not run
+after those failures. Reset-failed keeps its existing suppressed output and
+best-effort continuation; its failure does not establish service readiness.
+
+Inert tests extract the real launch lines and adjacent bookkeeping, verify
+exact arguments and failure ordering, and separate injected forward faults
+from the first recovery stop. Actual rollback retains the original trigger
+when recovery stop or terminal evidence also fails, preserving backups and
+uncertain receipts without retry. Native Linux controls use only a fake
+systemctl executable with shortened test-copy deadlines. At local preparation,
+native execution, independent review and exact-new-head hosted validation
+remain separate gates; local Linux skips are not native behavior evidence.
+
+These four bounds limit clients individually. They do not cancel systemd
+manager jobs, prove service state, or create a shared phase/recovery deadline.
+At that increment, active/inspect probes remained outside scope; the later
+post-start observation boundary is described above. Aggregate budgeting,
+privileged writers and state races,
+uninterruptible I/O, complete restoration and outer-postcheck recovery remain
+outside this change. Recovery service-command handling is unchanged.
+
+The October 23 effective-property increment wraps the six post-start systemd
+readbacks for User, Group, Restart, UMask, NoNewPrivileges and PrivateTmp with
+six fixed per-query deadlines: TERM after 60 seconds, then KILL after five more
+seconds. Each assignment explicitly preserves a nonzero query status and
+enters parent-shell rollback once, without querying later properties or
+accepting plausible failed stdout. Exact query arguments and the existing
+exit-18 comparisons for successful but nonconforming values are unchanged.
+
+Inert fixtures execute the actual phase and ERR trap, check every failing
+property and query prefix, and preserve the original trigger when rollback
+stop or receipt persistence also fails. Native Linux controls use only a fake
+systemctl executable and shortened test-copy deadlines; local Linux skips do
+not establish signal behavior. At local preparation, independent review and
+exact-new-head hosted validation remain pending.
+
+These are six per-query bounds, not one shared phase deadline. The nominal
+sequential timeout envelope can reach six times 65 seconds before rollback;
+uninterruptible I/O and rollback itself prevent any total-duration guarantee.
+Other forward commands, aggregate recovery budgeting, PID/check-to-use races,
+privileged writers, complete restoration and outer-postcheck recovery remain
+outside this change.
+
+The October 23 MainPID query increment bounds only the post-start systemd
+MainPID observation with the validated 60-second TERM and five-second KILL
+policy. A guarded assignment preserves the exact query failure status and
+enters parent-shell rollback once, even when failed stdout resembles a valid
+PID. The failed observation cannot reach lock-PID comparison, readiness
+adoption or another polling iteration. Successful-query mismatch and lock-PID
+reader failure still use the existing exit-18 path.
+
+Disposable tests exercise the actual ERR trap, parent-shell rollback identity,
+fixed arguments, partial output, original-trigger retention and uncertain
+receipt persistence without retry. Native Linux controls contain only the
+extracted query and a fake systemctl executable, with shortened test-copy
+deadlines and identity-guarded fixture cleanup. Local Linux skips do not prove
+native timeout behavior. At local preparation, independent review and exact
+new-head hosted validation remain pending; previous-head success is separate.
+That MainPID change is a per-query bound, not a total polling or recovery
+deadline. The later six-property boundary is described above. PID reuse and
+check-to-use races, privileged writers, uninterruptible I/O, complete
+restoration and outer-postcheck recovery remain unresolved.
+
+The October 23 owner-probe deadline increment wraps only the
+`require_absent_lock_owner` Python launch with the preflight-validated GNU
+timeout policy: TERM after 60 seconds and KILL after five more seconds. The
+Python body and original PID argument are unchanged. Only explicit ESRCH
+authorizes absence; live owners, permission/range/unknown errors and launcher
+failures still refuse removal. Nonzero status, including 124 or 137 with
+misleading stdout, stops cleanup before lock removal. Rollback retains its
+original trigger, first failed operation and uncertain receipt outcome without
+adding a retry. The post-start PID identity mapping is unchanged.
+
+Disposable tests route the exact owner stdin body separately from the PID and
+presence bodies. Malformed PID arguments reach the unchanged inert parser;
+unknown, NUL-altered or newline-altered bodies refuse dispatch. All actual-body
+owner signals are mocked. Native Linux controls run only the extracted probe
+with a fake interpreter and shortened test-copy deadlines; they never probe a
+real lock owner or run service/restoration commands. Local Linux skips are not
+signal-behavior evidence, and prior-head CI does not validate this increment.
+
+That owner-probe increment bounds one additional subprocess; the later MainPID
+boundary is described above. Other forward operations and total recovery
+duration remain outside those per-process bounds. PID reuse/check-to-use races,
+privileged concurrent writers, uninterruptible I/O, complete restoration and
+outer-postcheck recovery remain unresolved. Independent review and exact-head
+hosted validation remain separate from merge or deployment authority.
+
+The October 22 CI-budget correction changes only the public-contract job limit
+from five to ten minutes. At head
+`1109bbd60ac1ddc69cb377e92bc61753c812649a`, all 195 public-contract test
+calls printed PASS, but the job was cancelled by its five-minute maximum after
+the test step took about 301.25 seconds. Its final inspect-only/exact-hash step
+was skipped, so that run did not pass the complete public gate. The independent
+full suite passed 2,191 tests with eight skips and 350 passing subtests in
+389.65 seconds; it does not substitute for the cancelled public gate. The
+cancelled job, annotation and complete logs remain historical evidence.
+
+The ten-minute cap leaves finite room for setup, the observed test duration,
+final controls and runner variation. Tests, triggers, permissions, runtime pins
+and every gate are unchanged, as are the production helper and its native
+60-second TERM plus five-second KILL policy. This CI scalar does not implement
+the separately proposed owner-probe deadline. No workflow rerun or deployment
+is part of this correction. Successful exact-new-head hosted execution must
+still include every public test and the previously skipped final control step;
+the larger budget is not evidence that those checks have completed.
+
+The October 22 lock-PID reader increment wraps only the
+`read_gateway_lock_pid` Python launch with the existing validated GNU timeout
+policy: TERM after 60 seconds, then forced termination after five more seconds.
+Its original-byte parser, fixed lock-path argument, grammar and version checks
+are unchanged. Failed subprocess output can still exist, but cleanup propagates
+the exact nonzero status before owner probing or removal. Post-start identity
+verification retains its existing rollback-18 mapping and never adopts a failed
+PID capture. Rollback retains the original trigger and first failed operation,
+stops subsequent restoration/restart and preserves uncertain receipt completion.
+No retry or status reinterpretation was added.
+
+Disposable fixtures distinguish the PID and presence readers by their exact
+stdin bodies because their launch arguments match. Existing presence-stage
+injections remain separate. Focused cases cover partial output with nonzero
+status, both caller contracts, rollback and terminal-receipt failure. Native
+Linux-only controls run an extracted PID reader with a fake interpreter; they
+never run real cleanup, probes, service or recovery commands. Local skips do not
+establish Linux signal behavior, and prior-head CI does not validate this change.
+
+That increment bounded only the PID reader; the owner-probe boundary is
+described above. The systemd MainPID query, other forward commands and aggregate
+recovery duration remain separate. Exit 124 or 137 does not prove
+a unique timeout cause. Uninterruptible I/O, privileged concurrent writers, PID
+reuse/check-to-use races, complete restoration and recovery after outer
+postchecks remain unresolved. Independent review and exact-head hosted evidence
+are separate gates; no merge, deployment or production-readiness claim follows.
+
+The October 22 lock-presence reader increment wraps only the
+`read_gateway_lock_presence` Python launch in the existing preflight-checked GNU
+timeout policy: TERM after 60 seconds, then forced termination after five more
+seconds. Its Python body, lock-path argument, explicit ENOENT rule and exact-output
+sentinel are unchanged. A nonzero result still prevents adoption of even a
+valid-looking ABSENT or PRESENT response. Both observations around dead-lock
+removal use this boundary. Failure before removal prevents that mutation;
+failure after removal does not undo it or establish a successful absence check.
+Existing rollback preserves the original trigger, records the first failed step,
+stops later restoration and restart, and retains evidence without a new retry.
+
+Disposable fixtures cover the fixed arguments, partial output with nonzero
+status, both observation stages and terminal receipt failure. Native Linux-only
+fixtures exercise a successful fake reader and hung/ignored-TERM termination
+using only the extracted reader, not real recovery commands. Windows skips do
+not establish native signal behavior. Status 124 or 137 remains ambiguous with
+the command returning that value or another SIGKILL. That increment bounded the presence subprocess only; the PID boundary is
+described above. Owner probes, all forward commands, aggregate recovery and
+uninterruptible kernel I/O remain outside those two bounds. Privileged-writer races, complete restoration and
+recovery after outer postchecks remain unresolved. Local and hosted results are
+separate evidence; no deployment or new-head hosted result is asserted here.
+
+The October 22 target-version reader increment applies the preflight-checked GNU
+timeout policy of 60 seconds plus five seconds before forced termination to the
+single `recorded_target_version` Python subprocess. Its embedded Python checks,
+arguments, fixed-object/source allowlists, version representation and absence
+queries are unchanged. The shared boundary covers source, service drop-in,
+runtime-directory and drop-in-directory observations in both forward readback and
+recovery. A nonzero result remains a failure even after valid-looking output;
+callers must not adopt it or advance a pending write to installed. Existing
+first-failure handling stops subsequent restoration and restart, retains the
+original trigger and preserves any already-partial state and recovery evidence.
+
+Reader diagnostics report observation UNKNOWN and no retry. Exit 124 remains
+ambiguous between deadline expiry and that command exit; 137 remains ambiguous
+with another SIGKILL. Inert launcher fixtures exercise exact arguments, failed
+capture/absence queries, actual forward transitions and receipt failures. Two
+Linux-only fake-reader fixtures cover native success and hung/ignored-TERM
+termination with identity-checked cleanup; they do not run real recovery commands.
+This single-process policy does not bound other lock readers, probes, forward
+commands, uninterruptible kernel I/O or aggregate recovery duration. It does not
+eliminate privileged-writer/check-to-use races or establish complete restoration
+or automatic recovery after external postchecks. Focused local validation passed
+seven tests with the two native Linux cases skipped on Windows. At local
+preparation, independent source review and exact-new-head hosted validation were
+pending; the earlier head's passing checks do not validate these new bytes.
+
+The October 22 recovery-evidence increment applies the preflight-checked GNU
+timeout policy of 60 seconds plus five seconds before forced termination to the
+single `record_recovery_evidence` Python subprocess. A shell allowlist covers its
+ten existing receipt, verification and result-query kinds. Its Python arguments,
+receipt schema, exclusive publication and readback checks are unchanged. A
+nonzero subprocess result is returned unchanged even after partial stdout;
+existing callers refuse it before proceeding or preserve the original rollback
+trigger. Preparation still finishes before forward runtime changes.
+
+The failure diagnostic separates the evidence kind and numeric exit from service
+or filesystem-mutation failures. Exit 124 remains ambiguous between deadline
+expiry and that command exit; 137 remains ambiguous with another SIGKILL. A
+writer may publish before failing or terminating, so evidence completion is
+UNKNOWN, all existing files remain, and no retry or replacement is attempted.
+The fixed deadline applies to this subprocess, not all other readers, probes,
+staging operations, forward commands or overall recovery. Uninterruptible kernel
+I/O, privileged writers, check-to-use races, complete restoration and automatic
+recovery after external postchecks remain unresolved. Disposable fixtures check
+normal receipts, nonzero results with valid output and before/after-publication
+failure. Separate Linux-only fake-writer fixtures check native termination and
+ignored TERM; their test-copy deadlines are shortened without changing production
+policy or running real service/filesystem repair commands. Focused local
+validation passed nine tests with the two Linux-only tests skipped on Windows.
+Those native process/signal cases remain unexecuted locally. Independent source
+review found no blocking findings. Hosted validation was pending at preparation;
+prior hosted results did not establish exact-new-head validation.
+
+The October 22 target-filesystem command increment routes the ten remaining
+rollback mutation sites through one operation/target allowlist: dead-lock and
+source/drop-in removal, fixed drop-in parent creation, and ownership, mode and
+empty-directory removal for the two fixed directories. The wrapper derives the
+exact command and path from those identifiers, with no caller-supplied command,
+recursive removal, retry or deadline override. It reuses the preflight-checked
+GNU timeout policy of 60 seconds plus five seconds before forced termination.
+The shared dead-lock cleanup also applies this command limit in the forward path.
+Existing copy and service limits, state/version guards, custody verification and
+result queries remain unchanged.
+
+The first failed command still stops later restoration and service restart while
+preserving the original trigger. Failure receipts name a deadline only when the
+allowlisted wrapper was actually reached; an earlier lock read, owner-probe or
+later absence-query failure is not mislabeled as a bounded mutation failure.
+Forward mutation failure markers are cleared when rollback begins. A command may
+change its target before failing or terminating; its effect remains unverified.
+Exit 124 cannot distinguish deadline expiry from a command returning 124, and
+137 cannot distinguish forced timeout termination from another SIGKILL.
+
+Validation uses inert command/launcher stubs and disposable files, including
+exact argument rejection, every mutation site, after-effect failures and retained
+receipt/original-code behavior. These controls do not establish native elapsed
+time or signal delivery. They do not bound Python reads, probes, hashing, receipt
+persistence, all forward commands or total recovery duration; uninterruptible I/O
+can also exceed the nominal policy. Privileged writers, check-to-use races,
+complete restoration and automatic recovery after external postchecks remain
+unresolved. The affected-path local run passed 17 tests; standard-library import
+found 168 tests and executed none. At local preparation, exact-new-head CI and
+independent source review were pending.
+
+The October 22 lock-cleanup increment adds one fixed-path presence observer at
+the initial skip decision and after a successful removal command. Only an
+explicit ENOENT from trusted-Python lstat establishes absence; all present
+objects, including dangling links, remain present and other observation errors
+refuse. Strict output framing rejects malformed results and preserves interpreter
+failure. Existing binary PID parsing and ESRCH-only owner classification remain.
+A removal command reporting success while leaving or recreating a lock now stops
+later restoration and restart through the existing first-failure receipt path,
+retaining the original trigger and visible receipt-persistence failures. This is
+a point-in-time absence observation, not object ownership or atomic deletion.
+PID reuse, lock/parent substitution before removal, later reappearance and
+validation-to-use races remain; whole restoration, overall I/O duration and late
+external-postcheck recovery remain unverified. Controlled inert fixtures are
+local validation, not evidence of a native removal or production incident.
+Exact-new-head hosted validation and independent source review are pending.
+
+This source-only follow-up advances outcome 2 by correcting a failure path in the
+existing gateway repair control. Twelve post-change checks now call rollback
+directly instead of exiting past the error handler. Rollback disables its error
+trap and ignores INT/TERM during recovery so a failed restoration or another
+termination signal cannot re-enter recovery or replace the original failure code.
+Subprocess regression cases execute the actual guards and rollback function
+against disposable files, including failed restoration and TERM during recovery.
+
+The same source-only correction now retains recovery files in a unique private
+directory under `/var/backups/lumencore-gateway-repair` after every exit. Existing
+unsafe directories are refused without repairing their permissions. A private,
+hash-bound manifest and its readback must finish before runtime mutation; immutable
+outcome receipts distinguish helper checks passed with external verification
+pending from rollback attempted without verified restoration. Receipt persistence
+failure remains a non-success outcome. A later workflow postcheck cannot remove
+these retained files through the helper's cleanup path.
+
+Before the first restoration command, rollback now verifies the prepared manifest
+and its source bindings, exact present/missing inventory, file hashes and recorded
+metadata. Unsafe links, altered files and unexpected inventory cause refusal before
+service, lock or installed-file changes. A private refusal receipt states that no
+restoration was attempted; the original failure code and retained evidence remain.
+Refusal leaves any earlier partial runtime change unresolved. This verification is
+a point-in-time check and cannot prevent a later concurrent edit.
+
+The next local increment bounds only rollback's four service-control commands:
+stop, daemon-reload, reset-failed and conditional start. GNU timeout availability
+is checked before forward runtime mutation. Each command has a fixed 60-second
+limit and five-second forced-termination grace, with no retries. An unconfirmed
+stop prevents lock and file restoration; a later service-command failure stops
+the remaining service sequence. Private receipts retain the original failure code,
+attempted command outcomes and unverified service/restoration status. Exit codes
+that could come from either the launcher or command remain explicitly ambiguous.
+Terminating a systemctl client does not prove cancellation of its systemd job.
+
+The next local increment checks each rollback lock, file, metadata and directory
+operation explicitly. The first failure stops all later restoration work and the
+service reload/reset/start sequence. Lock-content read and inner removal failures
+cannot be hidden by a later successful message. Missing-before directories are
+removed only when empty; unrelated contents are retained. The private failure
+receipt names an allowlisted operation and target, records its exit code separately
+from the original trigger code, and marks partial state and unverified restoration.
+If changed backup evidence prevents receipt persistence, that failure stays visible
+and the original nonzero result and remaining recovery files are preserved.
+
+Source restoration intent now comes from the pinned preparation manifest's
+present/missing inventory, with a read-only source-state query before target
+removal and again before copying an originally present source. Each query repeats
+the full source/schema/inventory/hash/metadata validation and accepts only an
+allowlisted relative path with exact response bytes. A vanished backup cannot be
+reinterpreted as an originally absent source, and altered or newly introduced
+backup data stops later restoration and service restart. A change after an earlier
+file was restored or after target removal still leaves explicitly partial state;
+receipt integrity checks remain intact even when they prevent receipt persistence.
+Repeated validation over a bounded file set is not a wall-clock deadline.
+
+The next source-only increment records actual forward installation progress for
+each source: untouched, write pending, or installed with a stable version digest.
+Candidate hashes come from the approved source manifest and are checked against
+staged files before runtime mutation. The installed version is recorded only after
+successful installation and matching candidate readback. Before source removal,
+rollback compares bytes, regular single-link identity, ownership, mode, timestamps,
+extended attributes and stable parent identity with that recorded version. Parent
+directory timestamps are excluded because this invocation changes sibling entries.
+An unknown state, incomplete write or changed target stops remaining restoration
+and service restart without removing that target. Untouched sources are skipped;
+their present state is not certified. A target that reappears after removal is
+refused before backup copy. Private outcomes include per-source state and digests,
+while retaining the original failure code, partial-state warning and receipt
+integrity checks. Earlier restored files can still leave partial state.
+
+Source recovery now also checks the observed result after each installed source's
+removal and optional backup copy, before the next source or service sequence.
+The read-only result query repeats pinned custody validation, then checks stable
+regular single-link target bytes, ownership, mode, modification time and extended
+attributes against the prepared inventory, or confirms actual absence for a
+missing-before source. Copied inode and change time may differ from the backup;
+their stability during this read is still required. Parent identity and safe path
+checks are included. A command returning zero with an absent, incorrect or unsafe
+result stops later restoration and restart. This closes the controlled fixture
+case where a copy reported success without producing the required file; it is
+not evidence that the real copy utility or production runtime suffered that fault.
+Private receipts distinguish each matched observation, failed result query,
+unchecked untouched source and source not yet checked. They retain partial-state
+and whole-restoration/service-unverified status, even when every source observation
+matches. Later edits, other restored objects and external workflow checks are not
+certified by these observations.
+
+The single service drop-in file now has a separate result check immediately after
+its removal or backup copy, before later directory metadata and service recovery.
+The fixed-object query accepts no source path, repeats pinned custody validation,
+and derives prior presence from the prepared inventory. A present result must
+match stable regular single-link bytes and preserved metadata; a missing-before
+result must actually be absent, including no dangling link. An already absent
+immediate parent is allowed only with safe existing ancestors and stable parent
+observations. Failure stops later recovery, preserves the original trigger and
+prior partial source observations, and leaves any receipt persistence failure
+visible. The private receipt labels this as a file-only observation. Directory
+metadata, effective service configuration and whole restoration remain unverified.
+The motivating disposable fault reports copy success without restoring the drop-in;
+it is not evidence of a native copy-command or production failure.
+
+The next source-only increment adds a separate result check for the fixed runtime
+directory after its existing metadata restoration or empty-directory removal,
+before service reload/reset/start. It repeats pinned recovery-evidence validation
+and parses the exact captured state/metadata bytes that match the prepared
+inventory. A present result must be an actual stable directory with the recorded
+numeric owner, group and mode; a missing result must truly be absent, including
+no dangling link. Safe parent observations are included. Failed or malformed
+queries use the existing fail-stop receipt path, retain the original trigger and
+earlier partial source/drop-in observations, and prevent later service commands.
+Nonempty missing-before directories remain preserved with recovery stopped.
+
+The private receipt records this directory's narrow observation separately;
+restoration and service verification remain false. It does not certify directory
+contents, timestamps, extended attributes, ACLs, exclusive ownership, earlier
+inode identity or later state. The motivating disposable removal stub reported
+success while leaving an empty originally-missing directory, yet the prior helper
+reached restart. That is a controlled fault injection, not a native-command or
+production incident. Initial local failures exposed Windows fixture CRLF bytes
+where production emits LF; fixture preparation now uses explicit LF, without
+relaxing the production parser. The failed run and diagnostic remain preserved.
+
+The service drop-in directory now has its own fixed result check after its existing
+metadata restoration or empty-directory removal, before any runtime-directory
+restoration or service restart. Its no-path query repeats pinned recovery-evidence
+validation and parses only captured state/metadata bytes matching the prepared
+inventory. It requires a stable actual directory with the recorded numeric owner,
+group and mode, or true absence including no dangling link, with safe parent
+observations. Wrong results and malformed queries stop later recovery through the
+existing first-failure path; the original trigger, earlier partial observations,
+retained backups and visible receipt persistence failures remain. Nonempty
+missing-before directories are still preserved and refused. The separate receipt
+observation does not certify contents, timestamps, ACLs, extended attributes,
+exclusive ownership, effective service state or whole restoration. The motivating
+disposable removal stub returned success without removing an empty originally
+absent directory; that controlled fault is not a native-command or production
+incident.
+
+The next local increment protects the fixed service drop-in before rollback
+overwrites it. Its actual forward file installation now records untouched, write
+pending, or installed state. The already approved hardening digest is pinned and
+checked against staging before runtime mutation; an installed version is captured
+only after successful installation and matching stable readback. The existing
+source version reader is shared through an explicit fixed-object dispatch, without
+allowing a caller-selected drop-in path or changing the source query interface.
+Before removing the drop-in, rollback compares its current bytes, regular
+single-link identity, ownership, mode, timestamps, extended attributes and stable
+parent identity with that recorded version. Unknown/partial writes and conflicts
+stop later file, directory and service recovery while preserving the target and
+original failure code. A reappearing target is refused before backup copy.
+Untouched drop-ins are skipped and explicitly unchecked, rather than certified.
+
+The motivating disposable case changed only the drop-in after recovery stop;
+the earlier helper overwrote that edit and reached service start, despite honestly
+retaining whole-restoration-unverified status. The regression executes actual
+forward transitions and recovery functions, with service/ownership operations
+stubbed and files confined to temporary fixtures. This is not a production incident.
+The new guard remains a point-in-time observation: an intervening privileged
+writer before installed-version capture can be adopted if approved bytes still
+match, and validation-to-use intervals are not atomic. Directory ownership,
+source-backup races, filesystem/total-recovery deadlines and outer postcheck
+recovery remain unresolved. No backend production repair or merge is authorized
+by these local results.
+
+This increment passed 136 focused local tests with 11 platform skips. The separate
+dependency-free runner passed 117 checks with the same 11 skips (128 discovered);
+the overlapping counts are not additive. Both runs bound unchanged helper and
+test hashes. Initial selected coverage retained one assertion failure: the fixture
+represents an unparsable collision receipt as null, rather than omitting its key.
+Only that assertion was corrected; original failure-code and evidence retention
+already worked. Final independent source review found no blocking issue. Committed head
+4905be42 subsequently passed all 14 hosted checks: 128 Linux public-contract
+checks without skips and 2,124 full-suite tests with eight unrelated skips and
+350 passing subtests. Both jobs checked out merge ba2cd218, whose parents are
+fresh main 2d82be53 and that exact head. The provider still reports the older
+PR-base metadata; the actual tested merge parents take precedence for this claim.
+
+The next local increment protects only the fixed runtime directory before rollback
+changes its ownership/mode or removes it. Expected numeric service owner/group and
+mode0750 are pinned before forward runtime mutation. The actual directory install
+records untouched, write pending or installed state, with a stable directory and
+parent identity digest captured only after matching readback. Rollback checks that
+version before this object's first restoration operation. A changed, missing,
+replaced, linked, unknown or partially installed directory stops later recovery,
+preserves the original failure and remaining evidence, and prevents service restart.
+An untouched directory is skipped and explicitly unchecked. The existing narrow
+post-result query and nonempty-directory refusal remain in place.
+
+The motivating disposable baseline replaced an empty originally-missing runtime
+directory after recovery stop; the previous rollback removed that replacement and
+reached restart. It is a controlled interleaving, not a production incident. The
+guard binds type, device/inode, numeric owner/group, mode and stable safe parents.
+Child counts and directory timestamps are excluded because this invocation and
+the service can legitimately change lock/child entries. It does not certify
+contents, ACLs/xattrs, exclusive ownership or whole restoration. Windows fixtures
+substitute only the unavailable Unix-mode comparison; actual mode/link behavior
+requires hosted POSIX validation. Privileged install/readback and check-to-use
+races, prior partial source/drop-in/lock restoration, the other directory's
+ownership, overall filesystem deadlines and outer postcheck recovery remain
+unresolved. No backend deployment or merge is established by this draft.
+
+Final affected-path validation passed 10 local tests with 1 POSIX-only skip,
+including the actual RUN_DIR transitions, the amended install contract and adjacent
+source/drop-in controls. All three public-contract files also imported under
+Python without site packages (134 tests discovered; none executed by that import
+check). The initial five-file and three-file runs were stopped after the known
+obsolete direct-install marker failed: they remain interrupted, incomplete results,
+not successful suites. The focused log showed 42 pass, one fail and six skip markers;
+the dependency-free runner last reported 40 completed with one failure. The static
+assertion now requires the numeric pinned install and actual guarded forward call;
+no production guard was relaxed. The selected final run binds unchanged helper and
+test hashes; Bash syntax and diff checks passed. These overlapping local observations
+are not additive and do not replace exact-new-head hosted Linux validation, which
+remains pending for this revision.
+
+The completed runtime-target draft at `ee0aeb12` subsequently passed all fourteen
+hosted checks. Its actual merge checkout `02bb5e73` has parents main `2d82be53`
+and that exact draft head: 134 Linux public-contract checks passed without skips,
+and the repository suite passed 2,130 tests with eight unrelated skips and 350
+subtests. Those are completed historical results, not validation of the next edit.
+
+The October 22 source-only increment advances outcome 2 and protects the fixed
+service drop-in directory before rollback can mutate it. Expected numeric
+root:root ownership and mode0755 are fixed before forward writes. The actual
+directory install records untouched, write pending or installed state; only
+successful matching readback records a stable directory/parent version. Unknown,
+partial, missing or changed state refuses recovery before the child-file work,
+before rollback's separate parent-install command, and before the later directory
+ownership/mode/removal branch. Untouched parent and child must be consistent;
+they are skipped and explicitly unchecked, not treated as restored. The existing
+nonempty refusal, prepared-inventory verification and narrow result observation
+remain in place. Original trigger status and retained evidence survive refusal,
+while earlier source or child restoration may already have left partial state.
+
+The preserved disposable baseline replaced an empty directory after the drop-in
+file result check; the old helper removed the replacement and reached restart.
+That is a controlled interleaving, not a production incident. New fixtures execute
+the actual forward transitions and both guarded rollback sites. Directory
+timestamps and child counts are excluded so this invocation's child changes do
+not appear as conflicts. Root ownership is substituted only in unprivileged test
+fixtures, and Windows additionally substitutes its unavailable Unix-mode read;
+actual mode/link behavior still requires exact-head hosted Linux validation.
+Privileged install/readback and validation-to-use races, directory contents,
+ACLs/xattrs, whole restoration, an overall filesystem deadline and recovery after
+a later workflow postcheck remain outside this increment. No deployment or merge
+is authorized by these local source changes.
+
+The final affected-path run passed ten local tests with two POSIX-only skips,
+covering the new directory guard and adjacent source, runtime-directory, fixed-file
+and deployment-contract controls. Three public-contract modules imported without
+site packages, discovering 140 tests but executing none in that import check.
+Bash syntax and diff checks passed. The first new-case run retained four passes,
+one platform skip and one fixture assertion failure: a deliberately unreadable
+rollback receipt is represented by a null entry, not a missing key. The assertion
+was corrected; the original failure, original exit status and no-restart evidence
+remain preserved. No production guard was relaxed and no broad overlapping suite
+was repeated. Independent review and hosted validation subsequently passed at
+`6ba9e37d`: fourteen checks, 140 Linux public-contract checks with no skips, and
+2,136 repository tests with eight unrelated skips and 350 subtests. The tested
+merge used public main `2d82be53` and that exact draft head; the provider's older
+PR-base field was retained as a metadata discrepancy. Those historical results
+do not validate the following workflow edit.
+
+The next outcome-2 increment records runner-side evidence when the existing
+external postcheck starts and terminates. It binds the release, bundle, hardening,
+run and attempt identifiers to the retained helper stdout and its reported private
+outcome hash; it does not independently read the private helper receipt. The
+started record means the external result is unknown. A terminal record identifies
+the active request or assertion stage, whether it began/completed, the completed
+stage prefix and original exit status. Existing public contract probes, exact-main
+gate and authorization controls are unchanged. Both records join the existing
+always-upload artifact list; raw response bodies and credentials are excluded.
+
+First/later probe or assertion failures retain their original nonzero status even
+if outcome persistence fails. Successful checks followed by failed persistence
+instead fail the step. Signals produce an interrupted/unknown result when the
+exit handler can run; abrupt runner loss may leave only the started record or no
+record, so absence never proves success. Ordinary failed workflow logs remain
+evidence too. These records neither invoke restoration nor establish service
+state, production readiness or whole recovery. Later recovery still needs a
+separately reviewed interface and action-time authorization; overall filesystem
+deadlines, privileged races and artifact upload/durability limits remain open.
+
+Eight selected local tests passed, including actual extracted workflow execution
+with inert HTTP/JSON stubs for first/later failure, full success, interrupted and
+incomplete exits, invalid helper binding and receipt-persistence failures, plus
+adjacent retained-backup and unchanged-gate controls. The stubs test workflow
+control flow and evidence behavior, not live HTTP responses or JSON-tool
+integration. There was no production action and no baseline reproduction rerun.
+The three dependency-free public-contract modules imported with 145 tests
+discovered and none executed; extracted-step Bash syntax and diff checks passed.
+Independent review and hosted validation subsequently passed at `145def3b`:
+all fifteen checks, 145 Linux public-contract checks without skips, and 2,141
+repository tests with eight unrelated skips and 350 subtests. Its tested merge
+used public main `2d82be53` and that exact head. The reviewed workflow's CRLF
+working bytes normalized exactly to the committed LF bytes; tests and this note
+were byte-exact. Those results are historical, not validation of the next edit.
+
+The next outcome-2 source increment bounds only the two rollback copy call sites:
+each source-backup copy and the fixed service-drop-in backup copy. Each invocation
+uses the already preflighted GNU timeout with a fixed 60-second limit and five-second
+forced-termination grace. There is no retry or caller-selected duration. Existing
+custody, source intent, target version, true-absence and post-copy result checks
+remain in place. A nonzero copy/launcher result uses the existing first-failure
+path, stops later restoration and service commands, and preserves the original
+trigger status separately from the copy status. A partial destination is retained
+as unverified. Private failure metadata states the fixed budget and preserves
+exit124 and exit137 ambiguity; neither code uniquely proves a timeout cause.
+
+The prior disposable Windows hang harness failed its own cleanup and was not a
+qualified reproduction; its exact identified process was subsequently stopped
+and absence verified. This increment does not rerun that harness. New bounded
+fixtures use an immediate-return launcher stub to exercise actual rollback paths,
+exact command arguments, first/later copy failures, partial destinations, ordinary
+command status, receipt-write failure and successful copy result checks. They do
+not demonstrate real copy elapsed-time or signal behavior. Four new tests and
+six selected adjacent/preflight controls passed in two bounded local invocations,
+with no failures or skips. Three public-contract modules imported without site
+packages, discovering 149 tests and executing none during that import check.
+Bash syntax and diff checks passed. Exact-head validation of the subsequent
+correction is recorded below; no merge or production operation is established.
+
+Initial hosted head `285e6c0a` failed the public-contract job before the new copy
+cases: the older deployment-contract assertion still required the previous direct
+drop-in copy spelling. That assertion now requires the exact bounded call with the
+fixed backup/target arguments, plus the wrapper's two-argument guard, fixed timeout
+policy and `cp -a --` ordering. The runtime helper is unchanged by this test-only
+correction. Initial failed CI evidence remains preserved; the previous selected
+local results did not cover this static contract. The full hosted suite retained
+the same single assertion failure, 2,144 passes, eight unrelated skips and 350
+subtests. After the test-only correction, the exact static contract plus the four
+new copy tests passed locally (five passes, no failures or skips); these overlap
+the initial selected results and are not additive. Corrected head `f207a725`
+subsequently passed all fifteen checks, 149 Linux public-contract checks without
+skips, and 2,145 repository tests with eight unrelated skips and 350 subtests.
+The tested merge used public main `2d82be53` and that exact head. The failed first
+head remains preserved; these completed results do not validate later edits.
+
+The current outcome-2 draft narrows singleton-lock cleanup to an explicit process
+absence observation. A Python signal-zero probe authorizes removal only when its
+error number is ESRCH. A live process, permission denial, invalid or out-of-range
+PID, other probe errors and interpreter failures refuse removal. ASCII decimal
+syntax and a ten-digit bound are checked before conversion; the positive signed-32-bit
+range is checked before any probe. The fixed lock path and existing read, link and removal checks remain in
+place. The shell requires the interpreter's successful classification, retains
+its nonzero status otherwise, and uses the existing first-failure rollback path:
+no later restore/service work follows refusal, the original trigger status is
+preserved separately, and lock, target and recovery evidence remain available.
+
+Deterministic fixtures execute the actual embedded classifier and extracted
+rollback while replacing only its process probe. They exercise explicit ESRCH,
+live/permission/invalid/unknown classifications, argument bounds, interpreter
+failure, refusal with receipt-write failure, valid/absent locks and adjacent
+restoration controls. No native Windows process signal or hanging fixture runs.
+The first selected invocation retained four passes, two failures and one POSIX
+skip: an old error-message assertion and a trailing-newline argument crossing
+the Windows/MSYS fixture boundary. The static assertion now requires the new
+message and exact classifier call; the newline case executes the same embedded
+Python body directly and verifies rejection before probing. The final bounded
+selection passed six tests with one POSIX-only skip. The two invocations overlap
+and are not additive. The three dependency-free public-contract modules imported
+with 152 tests discovered and none executed. Bash syntax and diff checks passed;
+independent review and exact-new-head hosted CI remain pending.
+
+ESRCH is only a point-in-time absence observation. This does not establish that a
+lock was historically owned by that PID, eliminate PID reuse or lock replacement
+between checking and deletion, or verify complete recovery. Permission failures
+may be uncommon under the production root identity; this corrects classification,
+not a demonstrated production incident. Existing aggregate deadlines, privileged
+writer races, partial-restoration and external-postcheck recovery limits remain.
+
+The resulting head `ce968a07` subsequently passed all fifteen hosted checks:
+152 Linux public-contract checks without skips and 2,148 repository tests with
+eight unrelated skips and 350 subtests. Those completed results belong to that
+head and do not validate the following local increment.
+
+The next outcome-2 increment replaces both lock-file whitespace-normalization
+reads with one no-argument reader of the fixed approved lock path. It reads at
+most thirteen binary bytes and accepts only a positive ASCII decimal PID of at
+most ten digits and signed-32-bit range, optionally followed by exactly one LF
+or CRLF. Original internal whitespace, extra lines, NUL, Unicode, signs, leading
+zeros, oversized records and invalid ranges are refused before a process probe
+or removal. The reader requires a regular file and checks stable file identity,
+size and timestamps across its bounded read; available no-follow/nonblocking
+open flags prevent following a final symlink or waiting on a substituted FIFO.
+Only validated canonical decimal output reaches the shell. Cleanup preserves
+reader/classifier failure status through the existing fail-stop path. The actual
+post-start identity check uses the same reader and calls rollback with its
+existing failure code on a read/grammar error. ESRCH-only removal authorization,
+recovery evidence and original-trigger preservation remain unchanged.
+
+Ten selected local tests passed with one POSIX-only symlink case skipped in one
+executable invocation. Actual extracted cleanup and post-start code consume exact
+file bytes; process probes, systemd, polling delays and rollback side effects in
+those small fixtures are inert. Separate actual-rollback fixtures establish that
+malformed bytes stop later restoration/restart and preserve the original trigger,
+including receipt-write failure. Existing ESRCH, valid/absent-lock, read/removal
+failure and deployment contracts were included. The three dependency-free modules
+imported with 157 tests discovered and none executed; syntax and diff checks
+passed. The previous optional inert diagnostic remains a failed, unqualified
+attempt and was not rerun. Independent review and exact-new-head hosted validation
+remain pending; no merge or production operation occurred.
+
+This grammar check is not atomic ownership protection. A service can be observed
+mid-write and safely refused, and PID reuse, parent/lock replacement and the
+read/probe/removal intervals remain races. The bounded byte count is not a total
+I/O or recovery deadline. Earlier partial restoration, privileged writers, whole
+restoration/service verification and later external-postcheck recovery remain
+unresolved.
+
+Only copy invocation duration is addressed. Source/target queries, filesystem
+removal and metadata operations, receipt writes, cleanup and aggregate recovery
+duration remain unbounded. Uninterruptible kernel I/O or scheduling can prevent
+prompt process termination. Privileged validation-to-use races, earlier partial
+restoration, whole-restoration verification and later external-check recovery
+remain unresolved.
+
+The preceding runtime-directory revision at `2e0fdcb8` passed all 14 hosted checks:
+114 Linux public-contract checks with no skips and 2,110 full-suite tests with eight
+unrelated skips. It included actual GNU timeout process-group, ignored-TERM,
+descendant-termination and link/extended-attribute cases. The service drop-in
+directory increment passed seven selected local tests with one platform skip,
+then 129 focused local tests with ten platform skips. The dependency-free runner
+passed 110 checks with the same ten skips (120 discovered). Independent final
+review and exact-head hosted Linux validation of that increment subsequently passed:
+head `15c53f3c` has 14 successful checks, 120 Linux public-contract checks with no
+skips, and 2,116 full-suite tests with eight unrelated skips. Those checks tested
+merge base `50969f7f`; the freshly observed public main is now `2d82be53` and that
+new-main combination has not been established by those prior runs. Validation of
+the new fixed-drop-in target guard is recorded separately and does not inherit
+the prior head's CI success. The
+initial local strict-query failure in the earlier revision exposed platform newline
+translation; exact byte output corrected it without relaxing response parsing.
+Local subprocess cases execute actual rollback operations against disposable files,
+including failures before and after earlier files were restored. No backend repair was
+dispatched or installed. This does not establish deployment readiness: restoration
+remains best effort, there is no verified restore API for a later public postcheck
+failure, and concurrent-state protection remains incomplete. The guard addresses
+the reproduced target-only edit observed before recovery removal; it cannot close
+the install/readback or backup/target validation-to-use intervals against a
+privileged writer. Forward target writes, service configuration and runtime-directory
+state are not covered by an atomic transaction. Parent replacement after removal
+and the last absence-check/copy interval remain unprotected; the absence query
+does not bind an atomic restoration to a directory handle. A version digest does not establish
+exclusive ownership, complete restoration or full concurrency protection.
+File, metadata, lock,
+evidence and cleanup operations still lack comprehensive deadlines; the four
+service-command budgets are not a total rollback deadline. File and top-directory synchronization does not prove
+power-loss persistence of every nested backup entry. The existing six runtime holds
+require fresh evidence and separate backend action approval. Paper-only controls
+and all ledger/history bytes remain unchanged.
 
 ### October 17 draft integration review
 
