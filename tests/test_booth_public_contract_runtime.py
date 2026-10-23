@@ -498,7 +498,7 @@ def _gateway_post_mutation_guards(script: str) -> list[str]:
     segment = script.split('systemctl stop "$SERVICE"\nSERVICE_STOPPED=true', 1)[1]
     segment = segment.split("\nprobe_json() {", 1)[0]
     guards = re.findall(
-        r'(?m)^\s*(?:\[\[ [^\n]+ \]\]|"\$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl is-active --quiet "\$SERVICE")'
+        r'(?m)^\s*(?:(?:effective_(?:dropin|run|lock)_metadata="[^\n]+" && )?\[\[ [^\n]+ \]\]|"\$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl is-active --quiet "\$SERVICE")'
         r' \|\| \{\n[^\n]*\n[^\n]*\n[ \t]*\}',
         segment,
     )
@@ -690,7 +690,7 @@ rm() {
             # Execute the actual post-start polling and failure guard, replacing
             # only systemd, sleep and rollback side effects with bounded stubs.
             identity = script.split("\nlock_ready=false\n", 1)[1]
-            identity = identity.split('[[ "$(stat -c \'%U:%G:%a\' "$LOCK_FILE")"', 1)[0]
+            identity = identity.split('effective_lock_metadata=', 1)[0]
             # Exercise production ERR inheritance, not only an untrapped exit.
             error_trap = next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR"))
             harness += 'printf "%s\\n" "$BASHPID" > "$PWD/harness-pid.calls"\n'
@@ -781,6 +781,7 @@ def _run_gateway_rollback_guard(
     property_query_fault: str = "", property_query_exit_code: int = 0,
     forward_service_fault: str = "", forward_service_exit_code: int = 0,
     active_query_exit_code: int | None = None,
+    stat_query_fault: str = "", stat_query_exit_code: int = 0,
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1086,6 +1087,20 @@ RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
   shift 3
+  if [[ "$1" == stat ]]; then
+    [[ $# -eq 4 && "$2" == -c && "$3" == '%U:%G:%a' ]] || return 99
+    local stat_target
+    case "$4" in
+      "$SERVICE_DROP_IN") stat_target=dropin ;;
+      "$RUN_DIR") stat_target=run ;;
+      "$LOCK_FILE") stat_target=lock ;;
+      *) return 99 ;;
+    esac
+    printf '%s\n' "$stat_target" >> "$PWD/stat-timeout.calls"
+    stat "${@:2}" || return $?
+    if [[ "$STAT_QUERY_FAULT" == "$stat_target" ]]; then return "$STAT_QUERY_EXIT_CODE"; fi
+    return 0
+  fi
   if [[ "$1" == fixture_lock_python ]]; then
     fixture_lock_reader_timeout "$@"
     return $?
@@ -1900,6 +1915,7 @@ rollback "$forward_lock_rc"
             FORWARD_SERVICE_FAULT=forward_service_fault, FORWARD_SERVICE_EXIT_CODE=str(forward_service_exit_code),
             FIXTURE_SERVICE_PHASE="forward" if forward_service_fault else "recovery",
             ACTIVE_QUERY_EXIT_CODE="" if active_query_exit_code is None else str(active_query_exit_code),
+            STAT_QUERY_FAULT=stat_query_fault, STAT_QUERY_EXIT_CODE=str(stat_query_exit_code),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1966,6 +1982,7 @@ rollback "$forward_lock_rc"
             evidence["forward_service_calls"] = (root / "forward-service.calls").read_text().splitlines() if (root / "forward-service.calls").exists() else []
             evidence["active_timeout_calls"] = (root / "active-timeout.calls").read_text().splitlines() if (root / "active-timeout.calls").exists() else []
             evidence["active_query_calls"] = (root / "active-query.calls").read_text().splitlines() if (root / "active-query.calls").exists() else []
+            evidence["stat_timeout_calls"] = (root / "stat-timeout.calls").read_text().splitlines() if (root / "stat-timeout.calls").exists() else []
             evidence["property_timeout_calls"] = (root / "property-timeout.calls").read_text().splitlines() if (root / "property-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
@@ -3433,6 +3450,215 @@ def test_gateway_lock_owner_deadline_receipt_failure_keeps_original_trigger() ->
 
 
 
+_POST_START_STAT_TARGETS = ("dropin", "run", "lock")
+
+
+def _gateway_post_start_stat_blocks() -> dict[str, str]:
+    script = _repair_script()
+    targets = dict(zip(_POST_START_STAT_TARGETS, ("SERVICE_DROP_IN", "RUN_DIR", "LOCK_FILE")))
+    expected = ("root:root:644", "${SERVICE_USER}:${SERVICE_GROUP}:750", "${SERVICE_USER}:${SERVICE_GROUP}:640")
+    messages = ("gateway service hardening file ownership or mode is unsafe",
+                "gateway run directory identity is not bounded", "gateway singleton lock identity is not bounded")
+    blocks = {}
+    for (name, target), value, message in zip(targets.items(), expected, messages):
+        prefix = f'effective_{name}_metadata="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c \'%U:%G:%a\' "${target}")"'
+        launch = prefix + f' && [[ "$effective_{name}_metadata" == "{value}" ]] || {{'
+        assert script.splitlines().count(launch) == 1
+        block = script[script.index(launch):].split("\n}", 1)[0] + "\n}\n"
+        assert block.splitlines() == [launch, f'  echo "ERROR: {message}" >&2', "  rollback 18", "}"]
+        blocks[name] = block
+    assert list(blocks) == list(_POST_START_STAT_TARGETS)
+    assert script.index(blocks["dropin"]) < script.index(blocks["run"]) < script.index("\nlock_ready=false\n") < script.index(blocks["lock"])
+    return blocks
+
+
+def _run_gateway_post_start_stat_case(fault: str = "", code: int = 0, *,
+                                      output: str = "expected", native_mode: str = "") -> dict:
+    # Execute only the three actual metadata blocks and ERR trap. The native
+    # executable is a fake stat; no original path, manager or recovery runs here.
+    script = _repair_script()
+    blocks = _gateway_post_start_stat_blocks()
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    command_body = r'''
+[[ $# -eq 3 && "$1" == -c && "$2" == '%U:%G:%a' ]] || return 91
+case "$3" in
+  fixture-dropin) target=dropin; value='root:root:644' ;;
+  fixture-run) target=run; value='lumencore:lumencore:750' ;;
+  fixture-lock) target=lock; value='lumencore:lumencore:640' ;;
+  *) return 91 ;;
+esac
+printf '%s\n' "$target" >> "$PWD/query.calls"
+if [[ "$STAT_FAULT" != "$target" ]]; then printf '%s\n' "$value"; return 0; fi
+if [[ "$NATIVE_MODE" == ignore_term ]]; then trap '' TERM; fi
+case "$STAT_OUTPUT" in
+  expected) printf '%s\n' "$value" ;;
+  empty) : ;;
+  truncated) printf 'root:' ;;
+  extra) printf '%s extra\n' "$value" ;;
+  multiline) printf '%s\nunexpected\n' "$value" ;;
+  *) return 92 ;;
+esac
+if [[ "$NATIVE_MODE" == hang || "$NATIVE_MODE" == ignore_term ]]; then
+  /bin/cat "/proc/$BASHPID/stat" > "$PWD/query.stat"
+  while :; do :; done
+fi
+return "$STAT_CODE"
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-post-start-stat-") as directory:
+        root = Path(directory)
+        harness = "set -Eeuo pipefail\n"
+        if native_mode:
+            blocks = {key: value.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+                      for key, value in blocks.items()}
+            command = root / "stat"
+            command.write_text('#!/bin/bash\nset -eu\nfixture_query() {\n' + command_body +
+                               '\n}\nfixture_query "$@"\n', encoding="utf-8", newline="\n")
+            command.chmod(0o700)
+            harness += _bash_function(script, "require_recovery_timeout") + '\nrequire_recovery_timeout\nPATH="$PWD:$PATH"\n'
+        else:
+            harness += "stat() {\n" + command_body + "\n}\n" + r'''
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ $# -eq 7 && "$1 $2 $3 $4" == '--signal=TERM --kill-after=5s 60s stat' ]] || return 99
+  shift 3
+  "$@"
+}
+'''
+        harness += r'''
+SERVICE_DROP_IN=fixture-dropin
+RUN_DIR=fixture-run
+LOCK_FILE=fixture-lock
+SERVICE_USER=lumencore
+SERVICE_GROUP=lumencore
+printf '%s\n' "$BASHPID" > "$PWD/harness-pid.calls"
+rollback() {
+  printf '%s\n' "$1" >> "$PWD/rollback.calls"
+  printf '%s\n' "$BASHPID" >> "$PWD/rollback-pid.calls"
+  exit "$1"
+}
+'''
+        harness += next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR")) + "\n"
+        for name, block in blocks.items():
+            harness += block + f"printf '{name}\\n' >> checkpoints\n"
+        harness += 'printf "METADATA_VERIFIED\\n"\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, STAT_FAULT=fault, STAT_CODE=str(code), STAT_OUTPUT=output, NATIVE_MODE=native_mode),
+                capture_output=True, text=True, timeout=10, check=False)
+        finally:
+            identity = root / "query.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        result = {"completed": completed, "elapsed_seconds": time.monotonic() - started,
+                  "live_after_command": len(live),
+                  "checkpoints": (root / "checkpoints").read_text().splitlines() if (root / "checkpoints").exists() else []}
+        for name in ("query", "harness-pid", "rollback", "rollback-pid"):
+            path = root / (name + ".calls")
+            result[name] = path.read_text() if path.exists() else ""
+        return result
+
+
+def test_gateway_post_start_stat_deadlines_reject_failed_expected_output() -> None:
+    for index, target in enumerate(_POST_START_STAT_TARGETS):
+        for code in (1, 29, 124, 137):
+            result = _run_gateway_post_start_stat_case(target, code)
+            assert result["completed"].returncode == 18, result
+            assert result["query"].splitlines() == list(_POST_START_STAT_TARGETS[:index + 1])
+            assert result["checkpoints"] == list(_POST_START_STAT_TARGETS[:index])
+            assert result["completed"].stdout == "" and result["rollback"] == "18\n"
+            assert result["rollback-pid"] == result["harness-pid"]
+            assert "stopped on line" not in result["completed"].stderr
+
+
+def test_gateway_post_start_stat_deadlines_validate_successful_output() -> None:
+    result = _run_gateway_post_start_stat_case()
+    assert result["completed"].returncode == 0 and result["rollback"] == "", result
+    assert result["checkpoints"] == list(_POST_START_STAT_TARGETS)
+    assert result["query"].splitlines() == list(_POST_START_STAT_TARGETS)
+    assert result["completed"].stdout == "METADATA_VERIFIED\n"
+    for index, target in enumerate(_POST_START_STAT_TARGETS):
+        for output in ("empty", "truncated", "extra", "multiline"):
+            result = _run_gateway_post_start_stat_case(target, output=output)
+            assert result["completed"].returncode == 18 and result["rollback"] == "18\n", result
+            assert result["query"].splitlines() == list(_POST_START_STAT_TARGETS[:index + 1])
+            assert result["checkpoints"] == list(_POST_START_STAT_TARGETS[:index])
+            assert result["rollback-pid"] == result["harness-pid"]
+
+
+def test_gateway_post_start_stat_deadlines_actual_rollback_keeps_mapping() -> None:
+    blocks = _gateway_post_start_stat_blocks()
+    for target, block in blocks.items():
+        for code in (1, 29, 124, 137):
+            evidence: dict = {}
+            completed, current, dropin_exists = _run_gateway_rollback_guard(
+                block, predicate_passes=True, recovery_case="stat_query",
+                stat_query_fault=target, stat_query_exit_code=code,
+                service_failure="stop", service_exit_code=23, evidence=evidence)
+            assert completed.returncode == 18 and current == b"candidate source\n" and dropin_exists, completed.stderr
+            assert completed.stderr.count("Rolling back the complete gateway") == 1
+            assert "GUARD_PASSED" not in completed.stdout and "stopped on line" not in completed.stderr
+            assert evidence["stat_timeout_calls"] == [target]
+            assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+            assert evidence["backup"] == b"previous source\n"
+            assert evidence["rollback"]["trigger_exit_code"] == 18
+            assert evidence["rollback"]["status"] == "ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED"
+            assert evidence["rollback"]["service_commands"][-1]["exit_code"] == 23
+
+
+def test_gateway_post_start_stat_deadlines_uncertain_receipt_keeps_mapping() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_start_stat_blocks()["lock"], predicate_passes=True,
+        recovery_case="stat_query", stat_query_fault="lock", stat_query_exit_code=124,
+        service_failure="stop", service_exit_code=23, evidence_deadline_kind="rollback",
+        evidence_deadline_exit_code=137, evidence_deadline_after=True, evidence=evidence)
+    assert completed.returncode == 18 and current == b"candidate source\n", completed.stderr
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert evidence["stat_timeout_calls"] == ["lock"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+    assert evidence["backup_exists"] and evidence["property_query_calls"] == []
+    assert evidence["evidence_timeout_calls"].count("rollback") == 1
+    assert evidence["rollback"]["trigger_exit_code"] == 18
+    assert "kind=rollback exit=137" in completed.stderr and "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
+
+
+@unittest.skipIf(sys.platform != "linux", "Native post-start stat isolation requires Linux CI")
+def test_gateway_native_post_start_stat_deadlines_success_control() -> None:
+    result = _run_gateway_post_start_stat_case(native_mode="success")
+    assert result["completed"].returncode == 0 and result["rollback"] == "", result
+    assert result["checkpoints"] == list(_POST_START_STAT_TARGETS)
+    assert result["query"].splitlines() == list(_POST_START_STAT_TARGETS) and result["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native post-start stat deadline and ignored TERM require Linux CI")
+def test_gateway_native_post_start_stat_deadlines_hang_and_ignored_term() -> None:
+    for index, target in enumerate(_POST_START_STAT_TARGETS):
+        for mode in ("hang", "ignore_term"):
+            result = _run_gateway_post_start_stat_case(target, native_mode=mode)
+            assert result["completed"].returncode == 18 and result["completed"].stdout == "", result
+            assert result["query"].splitlines() == list(_POST_START_STAT_TARGETS[:index + 1])
+            assert result["checkpoints"] == list(_POST_START_STAT_TARGETS[:index])
+            assert result["rollback"] == "18\n" and result["rollback-pid"] == result["harness-pid"]
+            assert result["elapsed_seconds"] < 4 and result["live_after_command"] == 0
+
+
 def _gateway_post_start_active_block() -> str:
     script = _repair_script()
     launch = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl is-active --quiet "$SERVICE" || {'
@@ -3794,7 +4020,7 @@ _EFFECTIVE_PROPERTIES = ("User", "Group", "Restart", "UMask", "NoNewPrivileges",
 def _gateway_effective_property_phase() -> str:
     script = _repair_script()
     phase = script.split("\neffective_user=", 1)[1]
-    phase = phase.split('[[ "$(stat -c \'%U:%G:%a\' "$SERVICE_DROP_IN")"', 1)[0]
+    phase = phase.split('effective_dropin_metadata=', 1)[0]
     return "effective_user=" + phase
 
 

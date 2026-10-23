@@ -1997,11 +1997,11 @@ effective_private_tmp="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 6
   echo "ERROR: effective gateway PrivateTmp control is not enabled" >&2
   rollback 18
 }
-[[ "$(stat -c '%U:%G:%a' "$SERVICE_DROP_IN")" == "root:root:644" ]] || {
+effective_dropin_metadata="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%U:%G:%a' "$SERVICE_DROP_IN")" && [[ "$effective_dropin_metadata" == "root:root:644" ]] || {
   echo "ERROR: gateway service hardening file ownership or mode is unsafe" >&2
   rollback 18
 }
-[[ "$(stat -c '%U:%G:%a' "$RUN_DIR")" == "${SERVICE_USER}:${SERVICE_GROUP}:750" ]] || {
+effective_run_metadata="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%U:%G:%a' "$RUN_DIR")" && [[ "$effective_run_metadata" == "${SERVICE_USER}:${SERVICE_GROUP}:750" ]] || {
   echo "ERROR: gateway run directory identity is not bounded" >&2
   rollback 18
 }
@@ -2022,7 +2022,7 @@ done
   echo "ERROR: gateway singleton lock did not bind to the systemd main PID" >&2
   rollback 18
 }
-[[ "$(stat -c '%U:%G:%a' "$LOCK_FILE")" == "${SERVICE_USER}:${SERVICE_GROUP}:640" ]] || {
+effective_lock_metadata="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%U:%G:%a' "$LOCK_FILE")" && [[ "$effective_lock_metadata" == "${SERVICE_USER}:${SERVICE_GROUP}:640" ]] || {
   echo "ERROR: gateway singleton lock identity is not bounded" >&2
   rollback 18
 }

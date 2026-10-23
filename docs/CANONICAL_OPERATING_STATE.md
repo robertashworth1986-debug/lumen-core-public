@@ -30,6 +30,34 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 23 post-start metadata increment advances the existing outcome-2
+private-review repair path. Only the three fixed stat queries for the service
+drop-in file, runtime directory and singleton lock gain the validated TERM
+after 60 seconds and KILL after five more seconds policy. Each guarded
+assignment requires a successful query before comparing the existing ownership
+and mode string. Expected-looking stdout followed by nonzero cannot authorize
+progress. Query failure and successful but mismatched metadata retain the
+existing diagnostic, ordering and explicit rollback-18 mapping, with one
+parent-shell rollback and no second ERR-triggered rollback.
+
+Inert fixtures execute the actual three blocks and ERR trap, cover every target
+with statuses 1/29/124/137, malformed output, successful metadata, and actual
+rollback with recovery-stop and terminal-evidence failure. Faults are scoped
+to these query launches so recovery observations do not inherit them. Native
+Linux controls contain only extracted blocks and a fake stat executable, with
+shortened test-copy deadlines and process-identity cleanup. At local preparation,
+independent review and exact-new-head hosted validation were pending; local
+Linux skips do not establish native signal behavior.
+
+Pre-mutation and inspect-only metadata reads, PID binding, recovery wrappers,
+HTTP probes and later external postchecks are unchanged. These three client
+budgets are not a shared phase or total recovery deadline. A successful stat is
+a point-in-time observation, not stable ownership proof or protection against
+privileged writers, parent replacement and validation-to-use races. Ambiguous
+timeout outcomes, uninterruptible I/O, partial restoration, final service state
+and recovery after the later external postcheck remain unresolved. No deployment,
+external validation or production-readiness claim follows from this increment.
+
 The October 23 post-start active-observation increment advances the existing
 private-review repair path. Only the post-start systemctl is-active --quiet
 launch gains the validated TERM-after-60-seconds and KILL-after-five-more
