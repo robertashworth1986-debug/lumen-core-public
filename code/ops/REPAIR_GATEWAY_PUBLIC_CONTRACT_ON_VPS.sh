@@ -1546,7 +1546,7 @@ require_absent_lock_owner() {
   [[ $# -eq 1 ]] || return 14
   # A failed signal-zero probe is not proof of absence. Authorize removal only
   # for explicit ESRCH; permission, range and unknown errors must fail closed.
-  "$PYTHON_BIN" - "$1" <<'PY'
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "$PYTHON_BIN" - "$1" <<'PY'
 import errno
 import os
 import re

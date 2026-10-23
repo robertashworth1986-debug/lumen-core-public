@@ -30,6 +30,30 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 23 owner-probe deadline increment wraps only the
+`require_absent_lock_owner` Python launch with the preflight-validated GNU
+timeout policy: TERM after 60 seconds and KILL after five more seconds. The
+Python body and original PID argument are unchanged. Only explicit ESRCH
+authorizes absence; live owners, permission/range/unknown errors and launcher
+failures still refuse removal. Nonzero status, including 124 or 137 with
+misleading stdout, stops cleanup before lock removal. Rollback retains its
+original trigger, first failed operation and uncertain receipt outcome without
+adding a retry. The post-start PID identity mapping is unchanged.
+
+Disposable tests route the exact owner stdin body separately from the PID and
+presence bodies. Malformed PID arguments reach the unchanged inert parser;
+unknown, NUL-altered or newline-altered bodies refuse dispatch. All actual-body
+owner signals are mocked. Native Linux controls run only the extracted probe
+with a fake interpreter and shortened test-copy deadlines; they never probe a
+real lock owner or run service/restoration commands. Local Linux skips are not
+signal-behavior evidence, and prior-head CI does not validate this increment.
+
+This bounds one additional subprocess, not the systemd MainPID query, other
+forward operations or total recovery duration. PID reuse/check-to-use races,
+privileged concurrent writers, uninterruptible I/O, complete restoration and
+outer-postcheck recovery remain unresolved. Independent review and exact-head
+hosted validation remain separate from merge or deployment authority.
+
 The October 22 CI-budget correction changes only the public-contract job limit
 from five to ten minutes. At head
 `1109bbd60ac1ddc69cb377e92bc61753c812649a`, all 195 public-contract test
@@ -68,8 +92,9 @@ Linux-only controls run an extracted PID reader with a fake interpreter; they
 never run real cleanup, probes, service or recovery commands. Local skips do not
 establish Linux signal behavior, and prior-head CI does not validate this change.
 
-This bounds one subprocess, not the owner probe, systemd MainPID query, other
-forward commands or aggregate recovery duration. Exit 124 or 137 does not prove
+That increment bounded only the PID reader; the owner-probe boundary is
+described above. The systemd MainPID query, other forward commands and aggregate
+recovery duration remain separate. Exit 124 or 137 does not prove
 a unique timeout cause. Uninterruptible I/O, privileged concurrent writers, PID
 reuse/check-to-use races, complete restoration and recovery after outer
 postchecks remain unresolved. Independent review and exact-head hosted evidence
