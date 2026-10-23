@@ -265,7 +265,7 @@ def test_deployment_repairs_the_exact_gateway_dependency_closure() -> None:
         "NoNewPrivileges=true",
         "PrivateTmp=true",
         'install -d -o "$run_uid" -g "$run_gid" -m "$run_mode" -- "$RUN_DIR"',
-        'install_gateway_runtime_directory\nsystemctl daemon-reload',
+        'install_gateway_runtime_directory\n"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl daemon-reload',
         'systemctl daemon-reload',
         'effective gateway service identity is not lumencore:lumencore',
         'gateway singleton lock did not bind to the systemd main PID',
@@ -779,6 +779,7 @@ def _run_gateway_rollback_guard(
     pid_deadline_exit_code: int = 0, owner_deadline_exit_code: int = 0,
     main_pid_query_exit_code: int = 0, main_pid_deadline_exit_code: int = 0,
     property_query_fault: str = "", property_query_exit_code: int = 0,
+    forward_service_fault: str = "", forward_service_exit_code: int = 0,
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1201,6 +1202,16 @@ systemctl() {
   elif [[ "$1" == is-active ]]; then
     [[ "$PREDICATE_PASSES" == true ]]
   else
+    if [[ "$FIXTURE_SERVICE_PHASE" == forward ]]; then
+      case "$1" in
+        daemon-reload) [[ $# -eq 1 ]] || return 99 ;;
+        stop|reset-failed|start) [[ $# -eq 2 && "$2" == "$SERVICE" ]] || return 99 ;;
+        *) return 99 ;;
+      esac
+      printf '%s\n' "$1" >> "$PWD/forward-service.calls"
+      if [[ "$1" == "$FORWARD_SERVICE_FAULT" ]]; then return "$FORWARD_SERVICE_EXIT_CODE"; fi
+      return 0
+    fi
     printf 'SYSTEMCTL:%s\n' "$1" >> "$PWD/systemctl.calls"
     if [[ "$1" == stop ]]; then fixture_source_drift stop || return $?; fixture_target_drift stop || return $?; fi
     if [[ "$1" == stop ]]; then fixture_dropin_target_drift stop || return $?; fixture_run_target_drift stop || return $?; fi
@@ -1493,7 +1504,13 @@ fixture_lock_python() {
                 (root / "run/fixture.lock").symlink_to(root / "not-present")
             elif real_lock_case != "absent":
                 harness += 'printf "999999999\\n" > "$LOCK_FILE"\n'
-        harness += rollback_source + "\n"
+        if forward_service_fault:
+            # Explicit phase routing: the first recovery stop must never inherit
+            # the injected forward stop/start fault.
+            harness += rollback_source.replace("rollback() {", "fixture_actual_rollback() {", 1) + "\n"
+            harness += 'rollback() { FIXTURE_SERVICE_PHASE=recovery; fixture_actual_rollback "$@"; }\n'
+        else:
+            harness += rollback_source + "\n"
         if second_source:
             harness += 'BUNDLE_FILES+=(second.py)\n'
         if not service_was_active:
@@ -1869,6 +1886,8 @@ rollback "$forward_lock_rc"
             MAIN_PID_QUERY_EXIT_CODE=str(main_pid_query_exit_code),
             MAIN_PID_DEADLINE_EXIT_CODE=str(main_pid_deadline_exit_code),
             PROPERTY_QUERY_FAULT=property_query_fault, PROPERTY_QUERY_EXIT_CODE=str(property_query_exit_code),
+            FORWARD_SERVICE_FAULT=forward_service_fault, FORWARD_SERVICE_EXIT_CODE=str(forward_service_exit_code),
+            FIXTURE_SERVICE_PHASE="forward" if forward_service_fault else "recovery",
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1932,6 +1951,7 @@ rollback "$forward_lock_rc"
             evidence["main_pid_timeout_calls"] = (root / "main-pid-timeout.calls").read_text().splitlines() if (root / "main-pid-timeout.calls").exists() else []
             evidence["main_pid_query_calls"] = (root / "main-pid-query.calls").read_text().splitlines() if (root / "main-pid-query.calls").exists() else []
             evidence["property_query_calls"] = (root / "property-query.calls").read_text().splitlines() if (root / "property-query.calls").exists() else []
+            evidence["forward_service_calls"] = (root / "forward-service.calls").read_text().splitlines() if (root / "forward-service.calls").exists() else []
             evidence["property_timeout_calls"] = (root / "property-timeout.calls").read_text().splitlines() if (root / "property-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
@@ -3396,6 +3416,198 @@ def test_gateway_lock_owner_deadline_receipt_failure_keeps_original_trigger() ->
     assert "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
 
 
+
+
+
+_FORWARD_SERVICE_VERBS = ("stop", "daemon-reload", "reset-failed", "start")
+
+
+def _gateway_forward_service_lines() -> dict[str, str]:
+    script = _repair_script()
+    prefix = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl '
+    lines = {}
+    for verb in _FORWARD_SERVICE_VERBS:
+        suffix = verb + ("" if verb == "daemon-reload" else ' "$SERVICE"')
+        if verb == "reset-failed":
+            suffix += " >/dev/null 2>&1 || true"
+        expected = prefix + suffix
+        assert script.splitlines().count(expected) == 1
+        lines[verb] = expected
+    assert lines["stop"] + "\nSERVICE_STOPPED=true\nremove_verified_dead_lock" in script
+    assert lines["reset-failed"] + "\n" + lines["start"] + "\nSERVICE_STOPPED=false" in script
+    return lines
+
+
+def _run_gateway_forward_service_case(fault: str = "", code: int = 0, *,
+                                       native_mode: str = "") -> dict:
+    # Run the actual four launch lines, adjacent bookkeeping and ERR trap.
+    # Intermediate checkpoints are inert markers, not filesystem operations.
+    script = _repair_script()
+    commands = _gateway_forward_service_lines()
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    command_body = r'''
+case "$1" in
+  daemon-reload) [[ $# -eq 1 ]] || return 91 ;;
+  stop|reset-failed|start) [[ $# -eq 2 && "$2" == fixture ]] || return 91 ;;
+  *) return 91 ;;
+esac
+printf '%s\n' "$1" >> "$PWD/command.calls"
+if [[ "$1" == "$FAULT_VERB" ]]; then
+  if [[ "$NATIVE_MODE" == ignore_term ]]; then trap '' TERM; fi
+  printf 'untrusted service output\n'
+  if [[ "$NATIVE_MODE" == hang || "$NATIVE_MODE" == ignore_term ]]; then
+    /bin/cat "/proc/$BASHPID/stat" > "$PWD/command.stat"
+    while :; do :; done
+  fi
+  return "$FAULT_CODE"
+fi
+return 0
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-forward-service-") as directory:
+        root = Path(directory)
+        harness = 'set -Eeuo pipefail\n'
+        if native_mode:
+            commands = {verb: line.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+                        for verb, line in commands.items()}
+            command = root / "systemctl"
+            command.write_text('#!/bin/bash\nset -eu\nfixture_command() {\n' + command_body +
+                               '\n}\nfixture_command "$@"\n', encoding="utf-8", newline="\n")
+            command.chmod(0o700)
+            harness += _bash_function(script, "require_recovery_timeout") + '\nrequire_recovery_timeout\nPATH="$PWD:$PATH"\n'
+        else:
+            harness += 'systemctl() {\n' + command_body + '\n}\n' + r'''
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ "$1 $2 $3 $4" == '--signal=TERM --kill-after=5s 60s systemctl' ]] || return 99
+  shift 3
+  "$@"
+}
+'''
+        harness += r'''
+SERVICE=fixture SERVICE_STOPPED=false
+printf '%s\n' "$BASHPID" > "$PWD/harness-pid.calls"
+rollback() {
+  printf '%s\n' "$1" >> "$PWD/rollback.calls"
+  printf '%s\n' "$BASHPID" >> "$PWD/rollback-pid.calls"
+  printf '%s\n' "$SERVICE_STOPPED" >> "$PWD/stopped-at-rollback.calls"
+  exit "$1"
+}
+'''
+        harness += next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR")) + "\n"
+        harness += commands["stop"] + "\nSERVICE_STOPPED=true\nprintf 'after-stop\\n' >> checkpoints\n"
+        harness += commands["daemon-reload"] + "\nprintf 'after-reload\\n' >> checkpoints\n"
+        harness += commands["reset-failed"] + "\nprintf 'after-reset\\n' >> checkpoints\n"
+        harness += commands["start"] + "\nSERVICE_STOPPED=false\nprintf 'after-start\\n' >> checkpoints\n"
+        harness += 'printf "COMPLETE:%s\\n" "$SERVICE_STOPPED"\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, FAULT_VERB=fault, FAULT_CODE=str(code), NATIVE_MODE=native_mode),
+                capture_output=True, text=True, timeout=10, check=False)
+        finally:
+            identity = root / "command.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        result = {"completed": completed, "elapsed_seconds": time.monotonic() - started,
+                  "live_after_command": len(live),
+                  "calls": (root / "command.calls").read_text().splitlines() if (root / "command.calls").exists() else [],
+                  "checkpoints": (root / "checkpoints").read_text().splitlines() if (root / "checkpoints").exists() else []}
+        for name in ("harness-pid", "rollback", "rollback-pid", "stopped-at-rollback"):
+            path = root / (name + ".calls")
+            result[name] = path.read_text() if path.exists() else ""
+        return result
+
+
+def test_gateway_forward_service_deadlines_strict_failures_roll_back_once() -> None:
+    checkpoints = ["after-stop", "after-reload", "after-reset", "after-start"]
+    for verb in ("stop", "daemon-reload", "start"):
+        index = _FORWARD_SERVICE_VERBS.index(verb)
+        for code in (29, 124, 137):
+            result = _run_gateway_forward_service_case(verb, code)
+            assert result["completed"].returncode == code, result
+            assert "COMPLETE:" not in result["completed"].stdout
+            assert result["calls"] == list(_FORWARD_SERVICE_VERBS[:index + 1])
+            assert result["checkpoints"] == checkpoints[:index]
+            assert result["rollback"] == str(code) + "\n" and result["rollback-pid"] == result["harness-pid"]
+            assert result["stopped-at-rollback"] == ("false\n" if verb == "stop" else "true\n")
+
+
+def test_gateway_forward_service_deadlines_success_and_best_effort_reset() -> None:
+    for code in (0, 29, 124, 137):
+        result = _run_gateway_forward_service_case("reset-failed" if code else "", code)
+        assert result["completed"].returncode == 0 and result["completed"].stdout == "COMPLETE:false\n", result
+        assert result["calls"] == list(_FORWARD_SERVICE_VERBS)
+        assert result["checkpoints"] == ["after-stop", "after-reload", "after-reset", "after-start"]
+        assert result["rollback"] == "" and "stopped on line" not in result["completed"].stderr
+
+
+def test_gateway_forward_service_deadlines_actual_rollback_preserves_failure() -> None:
+    for verb, code in (("stop", 29), ("daemon-reload", 124), ("start", 137)):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_forward_service_lines()[verb] + "\n", predicate_passes=False,
+            recovery_case="forward_service", forward_service_fault=verb, forward_service_exit_code=code,
+            service_failure="stop", service_exit_code=23, evidence=evidence)
+        assert completed.returncode == code and current == b"candidate source\n" and dropin_exists, completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1 and "GUARD_PASSED" not in completed.stdout
+        assert evidence["forward_service_calls"] == [verb]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+        assert evidence["backup"] == b"previous source\n"
+        assert evidence["rollback"]["trigger_exit_code"] == code
+        assert evidence["rollback"]["status"] == "ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED"
+        assert evidence["rollback"]["service_commands"][-1]["exit_code"] == 23
+        assert evidence["rollback"]["systemd_job_cancellation_verified"] is False
+
+
+def test_gateway_forward_service_deadlines_uncertain_receipt_keeps_trigger() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_forward_service_lines()["start"] + "\n", predicate_passes=False,
+        recovery_case="forward_service", forward_service_fault="start", forward_service_exit_code=124,
+        service_failure="stop", service_exit_code=23, evidence_deadline_kind="rollback",
+        evidence_deadline_exit_code=137, evidence_deadline_after=True, evidence=evidence)
+    assert completed.returncode == 124 and current == b"candidate source\n", completed.stderr
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert evidence["forward_service_calls"] == ["start"] and evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert evidence["restore_calls"] == "" and evidence["backup_exists"]
+    assert evidence["evidence_timeout_calls"].count("rollback") == 1
+    assert evidence["rollback"]["trigger_exit_code"] == 124
+    assert "kind=rollback exit=137" in completed.stderr and "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
+
+
+@unittest.skipIf(sys.platform != "linux", "Native forward-service deadline isolation requires Linux CI")
+def test_gateway_native_forward_service_deadlines_success_control() -> None:
+    result = _run_gateway_forward_service_case(native_mode="success")
+    assert result["completed"].returncode == 0 and result["completed"].stdout == "COMPLETE:false\n", result
+    assert result["calls"] == list(_FORWARD_SERVICE_VERBS) and result["rollback"] == "" and result["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native forward-service deadlines and ignored TERM require Linux CI")
+def test_gateway_native_forward_service_deadlines_hang_and_ignored_term() -> None:
+    for mode, code in (("hang", 124), ("ignore_term", 137)):
+        result = _run_gateway_forward_service_case("start", native_mode=mode)
+        assert result["completed"].returncode == code and "COMPLETE:" not in result["completed"].stdout, result
+        assert result["calls"] == list(_FORWARD_SERVICE_VERBS)
+        assert result["checkpoints"] == ["after-stop", "after-reload", "after-reset"]
+        assert result["rollback"] == str(code) + "\n" and result["rollback-pid"] == result["harness-pid"]
+        assert result["stopped-at-rollback"] == "true\n"
+        assert result["elapsed_seconds"] < 4 and result["live_after_command"] == 0
 
 
 _EFFECTIVE_PROPERTIES = ("User", "Group", "Restart", "UMask", "NoNewPrivileges", "PrivateTmp")

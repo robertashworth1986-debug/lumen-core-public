@@ -30,6 +30,29 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 23 forward-service increment adds fixed TERM-after-60-seconds
+and KILL-after-five-more-seconds bounds to the existing forward stop,
+daemon-reload, reset-failed and start launches. Stop, reload and start retain
+their original strict status through the actual parent-shell ERR trap and
+single rollback path. Later forward steps and state assignments do not run
+after those failures. Reset-failed keeps its existing suppressed output and
+best-effort continuation; its failure does not establish service readiness.
+
+Inert tests extract the real launch lines and adjacent bookkeeping, verify
+exact arguments and failure ordering, and separate injected forward faults
+from the first recovery stop. Actual rollback retains the original trigger
+when recovery stop or terminal evidence also fails, preserving backups and
+uncertain receipts without retry. Native Linux controls use only a fake
+systemctl executable with shortened test-copy deadlines. At local preparation,
+native execution, independent review and exact-new-head hosted validation
+remain separate gates; local Linux skips are not native behavior evidence.
+
+These four bounds limit clients individually. They do not cancel systemd
+manager jobs, prove service state, or create a shared phase/recovery deadline.
+Active/inspect probes, aggregate budgeting, privileged writers and state races,
+uninterruptible I/O, complete restoration and outer-postcheck recovery remain
+outside this change. Recovery service-command handling is unchanged.
+
 The October 23 effective-property increment wraps the six post-start systemd
 readbacks for User, Group, Restart, UMask, NoNewPrivileges and PrivateTmp with
 six fixed per-query deadlines: TERM after 60 seconds, then KILL after five more

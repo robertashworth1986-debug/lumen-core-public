@@ -1935,7 +1935,7 @@ rollback() {
 trap 'rc=$?; echo "ERROR: gateway closure repair stopped on line $LINENO" >&2; rollback "$rc"' ERR
 trap 'echo "Gateway closure repair interrupted." >&2; rollback 130' INT TERM
 
-systemctl stop "$SERVICE"
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl stop "$SERVICE"
 SERVICE_STOPPED=true
 remove_verified_dead_lock
 
@@ -1946,7 +1946,7 @@ install_gateway_dropin
   rollback 17
 }
 install_gateway_runtime_directory
-systemctl daemon-reload
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl daemon-reload
 
 POST_APPLY_HASH_MATCHES=0
 printf '%-64s  %-64s  %s\n' "POST_APPLY_SOURCE_SHA256" "POST_APPLY_TARGET_SHA256" "RELATIVE_PATH"
@@ -1963,8 +1963,8 @@ for rel in "${BUNDLE_FILES[@]}"; do
 done
 printf 'POST_APPLY_HASH_PARITY=%s/%s\n' "$POST_APPLY_HASH_MATCHES" "${#BUNDLE_FILES[@]}"
 
-systemctl reset-failed "$SERVICE" >/dev/null 2>&1 || true
-systemctl start "$SERVICE"
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl reset-failed "$SERVICE" >/dev/null 2>&1 || true
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl start "$SERVICE"
 SERVICE_STOPPED=false
 
 systemctl is-active --quiet "$SERVICE" || {
