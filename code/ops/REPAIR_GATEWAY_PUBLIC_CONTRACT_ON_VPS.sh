@@ -1967,7 +1967,7 @@ printf 'POST_APPLY_HASH_PARITY=%s/%s\n' "$POST_APPLY_HASH_MATCHES" "${#BUNDLE_FI
 "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl start "$SERVICE"
 SERVICE_STOPPED=false
 
-systemctl is-active --quiet "$SERVICE" || {
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl is-active --quiet "$SERVICE" || {
   echo "ERROR: gateway service did not become active" >&2
   rollback 18
 }

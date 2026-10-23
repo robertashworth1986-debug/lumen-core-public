@@ -30,6 +30,30 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 23 post-start active-observation increment advances the existing
+private-review repair path. Only the post-start systemctl is-active --quiet
+launch gains the validated TERM-after-60-seconds and KILL-after-five-more
+seconds policy. Its explicit rollback-18 mapping is unchanged for every
+nonzero observation, including inactive, launcher error and ambiguous timeout
+statuses. Plausible failed stdout cannot authorize later property checks.
+The actual parent-shell ERR trap still leads to one rollback; the explicit
+failure block handles this observation without a second ERR rollback.
+
+Inert tests execute the actual block and trap, cover statuses 3/29/124/137,
+success, query-specific failure during actual recovery, and terminal evidence
+uncertainty while retaining trigger 18 and backups. Native Linux controls use
+only the extracted block and a fake systemctl executable with shortened
+test-copy deadlines and process-identity cleanup. At local preparation,
+independent review and exact-new-head native hosted validation remain pending;
+local Linux skips do not establish native signal behavior.
+
+The pre-mutation and inspect-only activity observations are unchanged because
+their contracts differ. This single client bound does not cancel systemd jobs,
+prove final service state or establish a shared phase/total recovery deadline.
+Other read/probe boundaries, privileged writers, PID/check-to-use races,
+uninterruptible I/O, complete restoration and outer-postcheck recovery remain
+unresolved. No deployment or production-readiness claim follows.
+
 The October 23 forward-service increment adds fixed TERM-after-60-seconds
 and KILL-after-five-more-seconds bounds to the existing forward stop,
 daemon-reload, reset-failed and start launches. Stop, reload and start retain
@@ -49,7 +73,9 @@ remain separate gates; local Linux skips are not native behavior evidence.
 
 These four bounds limit clients individually. They do not cancel systemd
 manager jobs, prove service state, or create a shared phase/recovery deadline.
-Active/inspect probes, aggregate budgeting, privileged writers and state races,
+At that increment, active/inspect probes remained outside scope; the later
+post-start observation boundary is described above. Aggregate budgeting,
+privileged writers and state races,
 uninterruptible I/O, complete restoration and outer-postcheck recovery remain
 outside this change. Recovery service-command handling is unchanged.
 

@@ -498,7 +498,7 @@ def _gateway_post_mutation_guards(script: str) -> list[str]:
     segment = script.split('systemctl stop "$SERVICE"\nSERVICE_STOPPED=true', 1)[1]
     segment = segment.split("\nprobe_json() {", 1)[0]
     guards = re.findall(
-        r'(?m)^\s*(?:\[\[ [^\n]+ \]\]|systemctl is-active --quiet "\$SERVICE")'
+        r'(?m)^\s*(?:\[\[ [^\n]+ \]\]|"\$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl is-active --quiet "\$SERVICE")'
         r' \|\| \{\n[^\n]*\n[^\n]*\n[ \t]*\}',
         segment,
     )
@@ -780,6 +780,7 @@ def _run_gateway_rollback_guard(
     main_pid_query_exit_code: int = 0, main_pid_deadline_exit_code: int = 0,
     property_query_fault: str = "", property_query_exit_code: int = 0,
     forward_service_fault: str = "", forward_service_exit_code: int = 0,
+    active_query_exit_code: int | None = None,
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1102,6 +1103,10 @@ fixture_timeout() {
       printf '%s\n' "$4" >> "$PWD/property-timeout.calls"
     fi
   fi
+  if [[ "$1" == systemctl && "${2:-}" == is-active ]]; then
+    [[ $# -eq 4 && "$3" == --quiet && "$4" == "$SERVICE" ]] || return 99
+    printf 'query\n' >> "$PWD/active-timeout.calls"
+  fi
   if [[ "$1" == python3 && "$3" == "$TARGET_ROOT" ]]; then
     [[ "$2" == - && "$4" == "$SERVICE_DROP_IN" && "$5" == "$RUN_DIR" ]] || return 99
     local target_phase=rollback target_query
@@ -1200,6 +1205,12 @@ systemctl() {
     if [[ "$property" == "$PROPERTY_QUERY_FAULT" ]]; then return "$PROPERTY_QUERY_EXIT_CODE"; fi
     return 0
   elif [[ "$1" == is-active ]]; then
+    [[ $# -eq 3 && "$2" == --quiet && "$3" == "$SERVICE" ]] || return 99
+    printf 'query\n' >> "$PWD/active-query.calls"
+    if [[ -n "$ACTIVE_QUERY_EXIT_CODE" ]]; then
+      printf 'active\n'
+      return "$ACTIVE_QUERY_EXIT_CODE"
+    fi
     [[ "$PREDICATE_PASSES" == true ]]
   else
     if [[ "$FIXTURE_SERVICE_PHASE" == forward ]]; then
@@ -1888,6 +1899,7 @@ rollback "$forward_lock_rc"
             PROPERTY_QUERY_FAULT=property_query_fault, PROPERTY_QUERY_EXIT_CODE=str(property_query_exit_code),
             FORWARD_SERVICE_FAULT=forward_service_fault, FORWARD_SERVICE_EXIT_CODE=str(forward_service_exit_code),
             FIXTURE_SERVICE_PHASE="forward" if forward_service_fault else "recovery",
+            ACTIVE_QUERY_EXIT_CODE="" if active_query_exit_code is None else str(active_query_exit_code),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1952,6 +1964,8 @@ rollback "$forward_lock_rc"
             evidence["main_pid_query_calls"] = (root / "main-pid-query.calls").read_text().splitlines() if (root / "main-pid-query.calls").exists() else []
             evidence["property_query_calls"] = (root / "property-query.calls").read_text().splitlines() if (root / "property-query.calls").exists() else []
             evidence["forward_service_calls"] = (root / "forward-service.calls").read_text().splitlines() if (root / "forward-service.calls").exists() else []
+            evidence["active_timeout_calls"] = (root / "active-timeout.calls").read_text().splitlines() if (root / "active-timeout.calls").exists() else []
+            evidence["active_query_calls"] = (root / "active-query.calls").read_text().splitlines() if (root / "active-query.calls").exists() else []
             evidence["property_timeout_calls"] = (root / "property-timeout.calls").read_text().splitlines() if (root / "property-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
@@ -3417,6 +3431,170 @@ def test_gateway_lock_owner_deadline_receipt_failure_keeps_original_trigger() ->
 
 
 
+
+
+def _gateway_post_start_active_block() -> str:
+    script = _repair_script()
+    launch = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl is-active --quiet "$SERVICE" || {'
+    assert script.splitlines().count(launch) == 1
+    start = script.index(launch)
+    block = script[start:script.index("\neffective_user=", start)] + "\n"
+    assert block.splitlines() == [
+        launch, '  echo "ERROR: gateway service did not become active" >&2',
+        "  rollback 18", "}",
+    ]
+    assert 'SERVICE_STOPPED=false\n\n' + block.rstrip("\n") in script
+    return block
+
+
+def _run_gateway_post_start_active_case(code: int = 0, *, native_mode: str = "") -> dict:
+    # Only the actual observation block and ERR trap are executed. No manager,
+    # service transition, lock probe or restoration command is present.
+    script = _repair_script()
+    block = _gateway_post_start_active_block()
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    command_body = r'''
+[[ $# -eq 3 && "$1" == is-active && "$2" == --quiet && "$3" == fixture ]] || return 91
+printf 'query\n' >> "$PWD/query.calls"
+if [[ "$NATIVE_MODE" == ignore_term ]]; then trap '' TERM; fi
+printf 'active\n'
+if [[ "$NATIVE_MODE" == hang || "$NATIVE_MODE" == ignore_term ]]; then
+  /bin/cat "/proc/$BASHPID/stat" > "$PWD/query.stat"
+  while :; do :; done
+fi
+return "$QUERY_CODE"
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-post-start-active-") as directory:
+        root = Path(directory)
+        harness = "set -Eeuo pipefail\n"
+        if native_mode:
+            block = block.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+            command = root / "systemctl"
+            command.write_text('#!/bin/bash\nset -eu\nfixture_query() {\n' + command_body +
+                               '\n}\nfixture_query "$@"\n', encoding="utf-8", newline="\n")
+            command.chmod(0o700)
+            harness += _bash_function(script, "require_recovery_timeout") + '\nrequire_recovery_timeout\nPATH="$PWD:$PATH"\n'
+        else:
+            harness += "systemctl() {\n" + command_body + "\n}\n" + r'''
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ $# -eq 7 && "$1 $2 $3 $4" == '--signal=TERM --kill-after=5s 60s systemctl' ]] || return 99
+  shift 3
+  "$@"
+}
+'''
+        harness += r'''
+SERVICE=fixture
+printf '%s\n' "$BASHPID" > "$PWD/harness-pid.calls"
+rollback() {
+  printf '%s\n' "$1" >> "$PWD/rollback.calls"
+  printf '%s\n' "$BASHPID" >> "$PWD/rollback-pid.calls"
+  exit "$1"
+}
+'''
+        harness += next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR")) + "\n"
+        harness += block + 'printf "after-active\\n" > checkpoint\nprintf "ACTIVE_VERIFIED\\n"\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, QUERY_CODE=str(code), NATIVE_MODE=native_mode),
+                capture_output=True, text=True, timeout=10, check=False)
+        finally:
+            identity = root / "query.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        result = {"completed": completed, "elapsed_seconds": time.monotonic() - started,
+                  "live_after_command": len(live), "checkpoint": (root / "checkpoint").exists()}
+        for name in ("query", "harness-pid", "rollback", "rollback-pid"):
+            path = root / (name + ".calls")
+            result[name] = path.read_text() if path.exists() else ""
+        return result
+
+
+def test_gateway_post_start_active_deadline_rejects_failed_active_output_once() -> None:
+    for code in (3, 29, 124, 137):
+        result = _run_gateway_post_start_active_case(code)
+        assert result["completed"].returncode == 18, result
+        assert result["completed"].stdout == "active\n" and not result["checkpoint"]
+        assert result["query"] == "query\n" and result["rollback"] == "18\n"
+        assert result["rollback-pid"] == result["harness-pid"]
+        assert "stopped on line" not in result["completed"].stderr
+
+
+def test_gateway_post_start_active_deadline_success_reaches_next_checkpoint() -> None:
+    result = _run_gateway_post_start_active_case()
+    assert result["completed"].returncode == 0 and result["checkpoint"], result
+    assert result["completed"].stdout == "active\nACTIVE_VERIFIED\n"
+    assert result["query"] == "query\n" and result["rollback"] == ""
+
+
+def test_gateway_post_start_active_deadline_actual_rollback_keeps_mapping() -> None:
+    for code in (3, 29, 124, 137):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_post_start_active_block(), predicate_passes=True,
+            recovery_case="active_query", active_query_exit_code=code,
+            service_failure="stop", service_exit_code=23, evidence=evidence)
+        assert completed.returncode == 18 and current == b"candidate source\n" and dropin_exists, completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        assert "GUARD_PASSED" not in completed.stdout and "stopped on line" not in completed.stderr
+        assert evidence["active_timeout_calls"] == evidence["active_query_calls"] == ["query"]
+        assert evidence["property_query_calls"] == []
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+        assert evidence["backup"] == b"previous source\n"
+        assert evidence["rollback"]["trigger_exit_code"] == 18
+        assert evidence["rollback"]["status"] == "ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED"
+        assert evidence["rollback"]["service_commands"][-1]["exit_code"] == 23
+
+
+def test_gateway_post_start_active_deadline_uncertain_receipt_keeps_mapping() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_start_active_block(), predicate_passes=True,
+        recovery_case="active_query", active_query_exit_code=124,
+        service_failure="stop", service_exit_code=23, evidence_deadline_kind="rollback",
+        evidence_deadline_exit_code=137, evidence_deadline_after=True, evidence=evidence)
+    assert completed.returncode == 18 and current == b"candidate source\n", completed.stderr
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert evidence["active_timeout_calls"] == evidence["active_query_calls"] == ["query"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+    assert evidence["backup_exists"] and evidence["property_query_calls"] == []
+    assert evidence["evidence_timeout_calls"].count("rollback") == 1
+    assert evidence["rollback"]["trigger_exit_code"] == 18
+    assert "kind=rollback exit=137" in completed.stderr and "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
+
+
+@unittest.skipIf(sys.platform != "linux", "Native post-start active-query isolation requires Linux CI")
+def test_gateway_native_post_start_active_deadline_success_control() -> None:
+    result = _run_gateway_post_start_active_case(native_mode="success")
+    assert result["completed"].returncode == 0 and result["checkpoint"], result
+    assert result["query"] == "query\n" and result["rollback"] == "" and result["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native post-start active deadline and ignored TERM require Linux CI")
+def test_gateway_native_post_start_active_deadline_hang_and_ignored_term() -> None:
+    for mode in ("hang", "ignore_term"):
+        result = _run_gateway_post_start_active_case(native_mode=mode)
+        assert result["completed"].returncode == 18 and not result["checkpoint"], result
+        assert result["completed"].stdout == "active\n" and result["query"] == "query\n"
+        assert result["rollback"] == "18\n" and result["rollback-pid"] == result["harness-pid"]
+        assert result["elapsed_seconds"] < 4 and result["live_after_command"] == 0
 
 
 _FORWARD_SERVICE_VERBS = ("stop", "daemon-reload", "reset-failed", "start")
