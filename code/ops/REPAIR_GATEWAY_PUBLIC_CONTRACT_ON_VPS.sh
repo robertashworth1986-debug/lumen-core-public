@@ -1971,12 +1971,12 @@ systemctl is-active --quiet "$SERVICE" || {
   echo "ERROR: gateway service did not become active" >&2
   rollback 18
 }
-effective_user="$(systemctl show "$SERVICE" --property=User --value)"
-effective_group="$(systemctl show "$SERVICE" --property=Group --value)"
-effective_restart="$(systemctl show "$SERVICE" --property=Restart --value)"
-effective_umask="$(systemctl show "$SERVICE" --property=UMask --value)"
-effective_no_new_privileges="$(systemctl show "$SERVICE" --property=NoNewPrivileges --value)"
-effective_private_tmp="$(systemctl show "$SERVICE" --property=PrivateTmp --value)"
+effective_user="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=User --value)" || rollback "$?"
+effective_group="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=Group --value)" || rollback "$?"
+effective_restart="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=Restart --value)" || rollback "$?"
+effective_umask="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=UMask --value)" || rollback "$?"
+effective_no_new_privileges="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=NoNewPrivileges --value)" || rollback "$?"
+effective_private_tmp="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=PrivateTmp --value)" || rollback "$?"
 [[ "$effective_user" == "$SERVICE_USER" && "$effective_group" == "$SERVICE_GROUP" ]] || {
   echo "ERROR: effective gateway service identity is not lumencore:lumencore" >&2
   rollback 18

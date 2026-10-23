@@ -30,6 +30,28 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 23 effective-property increment wraps the six post-start systemd
+readbacks for User, Group, Restart, UMask, NoNewPrivileges and PrivateTmp with
+six fixed per-query deadlines: TERM after 60 seconds, then KILL after five more
+seconds. Each assignment explicitly preserves a nonzero query status and
+enters parent-shell rollback once, without querying later properties or
+accepting plausible failed stdout. Exact query arguments and the existing
+exit-18 comparisons for successful but nonconforming values are unchanged.
+
+Inert fixtures execute the actual phase and ERR trap, check every failing
+property and query prefix, and preserve the original trigger when rollback
+stop or receipt persistence also fails. Native Linux controls use only a fake
+systemctl executable and shortened test-copy deadlines; local Linux skips do
+not establish signal behavior. At local preparation, independent review and
+exact-new-head hosted validation remain pending.
+
+These are six per-query bounds, not one shared phase deadline. The nominal
+sequential timeout envelope can reach six times 65 seconds before rollback;
+uninterruptible I/O and rollback itself prevent any total-duration guarantee.
+Other forward commands, aggregate recovery budgeting, PID/check-to-use races,
+privileged writers, complete restoration and outer-postcheck recovery remain
+outside this change.
+
 The October 23 MainPID query increment bounds only the post-start systemd
 MainPID observation with the validated 60-second TERM and five-second KILL
 policy. A guarded assignment preserves the exact query failure status and
@@ -45,10 +67,10 @@ extracted query and a fake systemctl executable, with shortened test-copy
 deadlines and identity-guarded fixture cleanup. Local Linux skips do not prove
 native timeout behavior. At local preparation, independent review and exact
 new-head hosted validation remain pending; previous-head success is separate.
-This is a per-query bound, not a total polling or recovery deadline. Other
-forward property queries, PID reuse/check-to-use races, privileged writers,
-uninterruptible I/O, complete restoration and outer-postcheck recovery remain
-unresolved.
+That MainPID change is a per-query bound, not a total polling or recovery
+deadline. The later six-property boundary is described above. PID reuse and
+check-to-use races, privileged writers, uninterruptible I/O, complete
+restoration and outer-postcheck recovery remain unresolved.
 
 The October 23 owner-probe deadline increment wraps only the
 `require_absent_lock_owner` Python launch with the preflight-validated GNU

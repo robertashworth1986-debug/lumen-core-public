@@ -778,6 +778,7 @@ def _run_gateway_rollback_guard(
     presence_deadline_stage: str = "", presence_deadline_exit_code: int = 124,
     pid_deadline_exit_code: int = 0, owner_deadline_exit_code: int = 0,
     main_pid_query_exit_code: int = 0, main_pid_deadline_exit_code: int = 0,
+    property_query_fault: str = "", property_query_exit_code: int = 0,
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1088,9 +1089,17 @@ fixture_timeout() {
     return $?
   fi
   if [[ "$1" == systemctl && "${2:-}" == show ]]; then
-    [[ $# -eq 5 && "$3" == "$SERVICE" && "$4 $5" == '--property=MainPID --value' ]] || return 99
-    printf 'query\n' >> "$PWD/main-pid-timeout.calls"
-    if [[ "$MAIN_PID_DEADLINE_EXIT_CODE" != 0 ]]; then printf 12; return "$MAIN_PID_DEADLINE_EXIT_CODE"; fi
+    [[ $# -eq 5 && "$3" == "$SERVICE" && "$5" == --value ]] || return 99
+    if [[ "$4" == --property=MainPID ]]; then
+      printf 'query\n' >> "$PWD/main-pid-timeout.calls"
+      if [[ "$MAIN_PID_DEADLINE_EXIT_CODE" != 0 ]]; then printf 12; return "$MAIN_PID_DEADLINE_EXIT_CODE"; fi
+    else
+      case "$4" in
+        --property=User|--property=Group|--property=Restart|--property=UMask|--property=NoNewPrivileges|--property=PrivateTmp) ;;
+        *) return 99 ;;
+      esac
+      printf '%s\n' "$4" >> "$PWD/property-timeout.calls"
+    fi
   fi
   if [[ "$1" == python3 && "$3" == "$TARGET_ROOT" ]]; then
     [[ "$2" == - && "$4" == "$SERVICE_DROP_IN" && "$5" == "$RUN_DIR" ]] || return 99
@@ -1169,10 +1178,26 @@ if [[ "$PREDICATE_PASSES" == true ]]; then
 fi
 systemctl() {
   if [[ "$1" == show ]]; then
-    [[ $# -eq 4 && "$2" == "$SERVICE" && "$3 $4" == '--property=MainPID --value' ]] || return 99
-    printf 'query\n' >> "$PWD/main-pid-query.calls"
-    printf 12
-    return "$MAIN_PID_QUERY_EXIT_CODE"
+    [[ $# -eq 4 && "$2" == "$SERVICE" && "$4" == --value ]] || return 99
+    if [[ "$3" == --property=MainPID ]]; then
+      printf 'query\n' >> "$PWD/main-pid-query.calls"
+      printf 12
+      return "$MAIN_PID_QUERY_EXIT_CODE"
+    fi
+    local property value
+    case "$3" in
+      --property=User) property=User; value="$SERVICE_USER" ;;
+      --property=Group) property=Group; value="$SERVICE_GROUP" ;;
+      --property=Restart) property=Restart; value=on-failure ;;
+      --property=UMask) property=UMask; value=0027 ;;
+      --property=NoNewPrivileges) property=NoNewPrivileges; value=yes ;;
+      --property=PrivateTmp) property=PrivateTmp; value=yes ;;
+      *) return 99 ;;
+    esac
+    printf '%s\n' "$property" >> "$PWD/property-query.calls"
+    printf '%s\n' "$value"
+    if [[ "$property" == "$PROPERTY_QUERY_FAULT" ]]; then return "$PROPERTY_QUERY_EXIT_CODE"; fi
+    return 0
   elif [[ "$1" == is-active ]]; then
     [[ "$PREDICATE_PASSES" == true ]]
   else
@@ -1843,6 +1868,7 @@ rollback "$forward_lock_rc"
             OWNER_DEADLINE_EXIT_CODE=str(owner_deadline_exit_code),
             MAIN_PID_QUERY_EXIT_CODE=str(main_pid_query_exit_code),
             MAIN_PID_DEADLINE_EXIT_CODE=str(main_pid_deadline_exit_code),
+            PROPERTY_QUERY_FAULT=property_query_fault, PROPERTY_QUERY_EXIT_CODE=str(property_query_exit_code),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1905,6 +1931,8 @@ rollback "$forward_lock_rc"
             evidence["reader_timeout_calls"] = (root / "reader-timeout.calls").read_text().splitlines() if (root / "reader-timeout.calls").exists() else []
             evidence["main_pid_timeout_calls"] = (root / "main-pid-timeout.calls").read_text().splitlines() if (root / "main-pid-timeout.calls").exists() else []
             evidence["main_pid_query_calls"] = (root / "main-pid-query.calls").read_text().splitlines() if (root / "main-pid-query.calls").exists() else []
+            evidence["property_query_calls"] = (root / "property-query.calls").read_text().splitlines() if (root / "property-query.calls").exists() else []
+            evidence["property_timeout_calls"] = (root / "property-timeout.calls").read_text().splitlines() if (root / "property-timeout.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
@@ -3367,6 +3395,192 @@ def test_gateway_lock_owner_deadline_receipt_failure_keeps_original_trigger() ->
     assert "receipt persistence failed" in completed.stderr and "kind=rollback exit=137" in completed.stderr
     assert "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
 
+
+
+
+_EFFECTIVE_PROPERTIES = ("User", "Group", "Restart", "UMask", "NoNewPrivileges", "PrivateTmp")
+
+
+def _gateway_effective_property_phase() -> str:
+    script = _repair_script()
+    phase = script.split("\neffective_user=", 1)[1]
+    phase = phase.split('[[ "$(stat -c \'%U:%G:%a\' "$SERVICE_DROP_IN")"', 1)[0]
+    return "effective_user=" + phase
+
+
+def _run_gateway_effective_property_case(fault: str = "", code: int = 0, *,
+                                         invalid: str = "", native_mode: str = "") -> dict:
+    # The actual readback phase and ERR trap run; only a fixture systemctl can
+    # execute. No service action, file restoration or production helper runs.
+    script = _repair_script()
+    phase = _gateway_effective_property_phase()
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    assert phase.count(policy) == 6
+    command_body = r'''
+[[ $# -eq 4 && "$1" == show && "$2" == fixture && "$4" == --value ]] || return 91
+local property value
+case "$3" in
+  --property=User) property=User; value=fixtureuser ;;
+  --property=Group) property=Group; value=fixturegroup ;;
+  --property=Restart) property=Restart; value=on-failure ;;
+  --property=UMask) property=UMask; value=0027 ;;
+  --property=NoNewPrivileges) property=NoNewPrivileges; value=yes ;;
+  --property=PrivateTmp) property=PrivateTmp; value=yes ;;
+  *) return 91 ;;
+esac
+printf '%s\n' "$property" >> "$PWD/query.calls"
+if [[ "$property" == "$INVALID_PROPERTY" ]]; then value=incorrect; fi
+if [[ "$property" == "$FAULT_PROPERTY" && "$NATIVE_MODE" == ignore_term ]]; then trap '' TERM; fi
+printf '%s\n' "$value"
+if [[ "$property" == "$FAULT_PROPERTY" ]]; then
+  if [[ "$NATIVE_MODE" == hang || "$NATIVE_MODE" == ignore_term ]]; then
+    /bin/cat "/proc/$BASHPID/stat" > "$PWD/query.stat"
+    while :; do :; done
+  fi
+  return "$FAULT_CODE"
+fi
+return 0
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-property-query-") as directory:
+        root = Path(directory)
+        harness = 'set -Eeuo pipefail\n'
+        if native_mode:
+            phase = phase.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+            command = root / "systemctl"
+            command.write_text('#!/bin/bash\nset -eu\nfixture_query() {\n' + command_body +
+                               '\n}\nfixture_query "$@"\n', encoding="utf-8", newline="\n")
+            command.chmod(0o700)
+            harness += _bash_function(script, "require_recovery_timeout") + '\nrequire_recovery_timeout\nPATH="$PWD:$PATH"\n'
+        else:
+            harness += 'systemctl() {\n' + command_body + '\n}\n' + r'''
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ $# -eq 8 && "$1 $2 $3 $4" == '--signal=TERM --kill-after=5s 60s systemctl' ]] || return 99
+  shift 3
+  "$@"
+}
+'''
+        harness += r'''
+SERVICE=fixture SERVICE_USER=fixtureuser SERVICE_GROUP=fixturegroup
+printf '%s\n' "$BASHPID" > "$PWD/harness-pid.calls"
+rollback() {
+  printf '%s\n' "$1" >> "$PWD/rollback.calls"
+  printf '%s\n' "$BASHPID" >> "$PWD/rollback-pid.calls"
+  exit "$1"
+}
+'''
+        harness += next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR")) + "\n"
+        harness += phase + "printf 'PROPERTIES_VERIFIED\\n'\n"
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, FAULT_PROPERTY=fault, FAULT_CODE=str(code),
+                         INVALID_PROPERTY=invalid, NATIVE_MODE=native_mode),
+                capture_output=True, text=True, timeout=10, check=False)
+        finally:
+            identity = root / "query.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        return {"completed": completed, "elapsed_seconds": time.monotonic() - started,
+                "live_after_command": len(live),
+                "calls": (root / "query.calls").read_text().splitlines() if (root / "query.calls").exists() else [],
+                "harness_pid": (root / "harness-pid.calls").read_text(),
+                "rollback_pid": (root / "rollback-pid.calls").read_text() if (root / "rollback-pid.calls").exists() else "",
+                "rollback": (root / "rollback.calls").read_text() if (root / "rollback.calls").exists() else ""}
+
+
+def test_gateway_effective_property_deadlines_refuse_partial_output_once() -> None:
+    phase = _gateway_effective_property_phase()
+    for index, property_name in enumerate(_EFFECTIVE_PROPERTIES):
+        assert phase.count(f'systemctl show "$SERVICE" --property={property_name} --value)" || rollback "$?"') == 1
+        for code in (29, 124, 137):
+            result = _run_gateway_effective_property_case(property_name, code)
+            completed = result["completed"]
+            assert completed.returncode == code and completed.stdout == "", result
+            assert result["calls"] == list(_EFFECTIVE_PROPERTIES[:index + 1])
+            assert result["rollback"] == str(code) + "\n" and result["rollback_pid"] == result["harness_pid"]
+            assert "stopped on line" not in completed.stderr
+
+
+def test_gateway_effective_property_deadlines_valid_and_invalid_controls() -> None:
+    result = _run_gateway_effective_property_case()
+    assert result["completed"].returncode == 0 and result["completed"].stdout == "PROPERTIES_VERIFIED\n", result
+    assert result["calls"] == list(_EFFECTIVE_PROPERTIES) and result["rollback"] == ""
+    for property_name in _EFFECTIVE_PROPERTIES:
+        result = _run_gateway_effective_property_case(invalid=property_name)
+        assert result["completed"].returncode == 18 and result["completed"].stdout == "", result
+        assert result["calls"] == list(_EFFECTIVE_PROPERTIES)
+        assert result["rollback"] == "18\n" and result["rollback_pid"] == result["harness_pid"]
+
+
+def test_gateway_effective_property_deadlines_rollback_keeps_query_trigger() -> None:
+    for code in (29, 124, 137):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_effective_property_phase(), predicate_passes=False,
+            recovery_case="property_query", property_query_fault="PrivateTmp",
+            property_query_exit_code=code, service_failure="stop", service_exit_code=23,
+            evidence=evidence)
+        assert completed.returncode == code and current == b"candidate source\n" and dropin_exists, completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1 and "stopped on line" not in completed.stderr
+        assert "GUARD_PASSED" not in completed.stdout
+        assert evidence["property_query_calls"] == list(_EFFECTIVE_PROPERTIES)
+        assert evidence["property_timeout_calls"] == ["--property=" + p for p in _EFFECTIVE_PROPERTIES]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+        assert evidence["backup"] == b"previous source\n"
+        assert evidence["rollback"]["trigger_exit_code"] == code
+        assert evidence["rollback"]["status"] == "ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED"
+        assert evidence["rollback"]["service_commands"][-1]["exit_code"] == 23
+
+
+def test_gateway_effective_property_deadlines_uncertain_receipt_keeps_trigger() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_effective_property_phase(), predicate_passes=False,
+        recovery_case="property_query", property_query_fault="User", property_query_exit_code=124,
+        service_failure="stop", service_exit_code=23, evidence_deadline_kind="rollback",
+        evidence_deadline_exit_code=137, evidence_deadline_after=True, evidence=evidence)
+    assert completed.returncode == 124 and current == b"candidate source\n", completed.stderr
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert evidence["property_query_calls"] == ["User"] and evidence["property_timeout_calls"] == ["--property=User"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+    assert evidence["evidence_timeout_calls"].count("rollback") == 1 and evidence["backup_exists"]
+    assert evidence["rollback"]["trigger_exit_code"] == 124
+    assert "kind=rollback exit=137" in completed.stderr and "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
+
+
+@unittest.skipIf(sys.platform != "linux", "Native effective-property query isolation requires Linux CI")
+def test_gateway_native_effective_property_deadlines_success_control() -> None:
+    result = _run_gateway_effective_property_case(native_mode="success")
+    assert result["completed"].returncode == 0 and result["completed"].stdout == "PROPERTIES_VERIFIED\n", result
+    assert result["calls"] == list(_EFFECTIVE_PROPERTIES) and result["rollback"] == "" and result["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native effective-property deadlines and ignored TERM require Linux CI")
+def test_gateway_native_effective_property_deadlines_hang_and_ignored_term() -> None:
+    for mode, code in (("hang", 124), ("ignore_term", 137)):
+        result = _run_gateway_effective_property_case("UMask", native_mode=mode)
+        assert result["completed"].returncode == code and result["completed"].stdout == "", result
+        assert result["calls"] == list(_EFFECTIVE_PROPERTIES[:4])
+        assert result["rollback"] == str(code) + "\n" and result["rollback_pid"] == result["harness_pid"]
+        assert "stopped on line" not in result["completed"].stderr
+        assert result["elapsed_seconds"] < 4 and result["live_after_command"] == 0
 
 
 def _gateway_main_pid_query_guard() -> str:
