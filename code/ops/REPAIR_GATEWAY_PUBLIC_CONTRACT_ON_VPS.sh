@@ -2009,7 +2009,7 @@ effective_private_tmp="$(systemctl show "$SERVICE" --property=PrivateTmp --value
 lock_ready=false
 for attempt in $(seq 1 12); do
   if [[ -f "$LOCK_FILE" && ! -L "$LOCK_FILE" ]]; then
-    main_pid="$(systemctl show "$SERVICE" --property=MainPID --value)"
+    main_pid="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=MainPID --value)" || rollback "$?"
     lock_pid="$(read_gateway_lock_pid)" || rollback 18
     if [[ "$main_pid" =~ ^[1-9][0-9]*$ && "$lock_pid" == "$main_pid" ]]; then
       lock_ready=true

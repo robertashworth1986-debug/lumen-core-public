@@ -625,7 +625,8 @@ def _run_gateway_lock_file_case(raw: bytes, caller: str, *, main_pid: str = "12"
                                 probe_case: str = "dead", read_case: str = "",
                                 file_kind: str = "regular", extra_argument: bool = False,
                                 presence_case: str = "", remove_case: str = "",
-                                pid_deadline_exit_code: int = 0, owner_deadline_exit_code: int = 0) -> dict:
+                                pid_deadline_exit_code: int = 0, owner_deadline_exit_code: int = 0,
+                                main_pid_query_exit_code: int = 0, main_pid_deadline_exit_code: int = 0) -> dict:
     script = _repair_script()
     with tempfile.TemporaryDirectory(prefix="gateway-lock-bytes-test-") as directory:
         root = Path(directory)
@@ -648,15 +649,30 @@ fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
   shift 3
   if [[ "$1" == fixture_lock_python ]]; then fixture_lock_reader_timeout "$@"; return $?; fi
+  if [[ "$1" == systemctl ]]; then
+    [[ $# -eq 5 && "$2" == show && "$3" == "$SERVICE" && "$4 $5" == '--property=MainPID --value' ]] || return 99
+    printf 'query\n' >> "$PWD/main-pid-timeout.calls"
+    if [[ "$MAIN_PID_DEADLINE_EXIT_CODE" != 0 ]]; then printf '%s\n' "$MAIN_PID"; return "$MAIN_PID_DEADLINE_EXIT_CODE"; fi
+  fi
   "$@"
 }
 fixture_lock_python() {
   if [[ "$LOCK_READ_CASE" == launcher_failure ]]; then return 29; fi
   "$TEST_PYTHON" "$PWD/lock-probe-runtime.py" "$@"
 }
-systemctl() { printf '%s\n' "$MAIN_PID"; }
+systemctl() {
+  [[ $# -eq 4 && "$1" == show && "$2" == "$SERVICE" && "$3 $4" == '--property=MainPID --value' ]] || return 99
+  printf 'query\n' >> "$PWD/main-pid-query.calls"
+  printf '%s\n' "$MAIN_PID"
+  return "$MAIN_PID_QUERY_EXIT_CODE"
+}
 sleep() { printf 'sleep\n' >> "$PWD/sleep.calls"; }
-rollback() { printf '%s\n' "$1" >> "$PWD/rollback.calls"; exit "$1"; }
+rollback() {
+  printf '%s\n' "$1" >> "$PWD/rollback.calls"
+  printf '%s\n' "$BASHPID" >> "$PWD/rollback-pid.calls"
+  printf '%s\n' "${lock_ready:-unset}" >> "$PWD/rollback-ready.calls"
+  exit "$1"
+}
 rm() {
   printf 'remove\n' >> "$PWD/remove.calls"
   if [[ "$LOCK_REMOVE_CASE" == noop ]]; then return 0; fi
@@ -675,7 +691,10 @@ rm() {
             # only systemd, sleep and rollback side effects with bounded stubs.
             identity = script.split("\nlock_ready=false\n", 1)[1]
             identity = identity.split('[[ "$(stat -c \'%U:%G:%a\' "$LOCK_FILE")"', 1)[0]
-            harness += "lock_ready=false\n" + identity
+            # Exercise production ERR inheritance, not only an untrapped exit.
+            error_trap = next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR"))
+            harness += 'printf "%s\\n" "$BASHPID" > "$PWD/harness-pid.calls"\n'
+            harness += error_trap + "\nlock_ready=false\n" + identity
         else: raise AssertionError(caller)
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
         completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
@@ -683,10 +702,13 @@ rm() {
                      LOCK_PROBE_CASE=probe_case, LOCK_READ_CASE=read_case,
                      LOCK_PRESENCE_CASE=presence_case, LOCK_REMOVE_CASE=remove_case,
                      PID_DEADLINE_EXIT_CODE=str(pid_deadline_exit_code),
-                     OWNER_DEADLINE_EXIT_CODE=str(owner_deadline_exit_code)),
+                     OWNER_DEADLINE_EXIT_CODE=str(owner_deadline_exit_code),
+                     MAIN_PID_QUERY_EXIT_CODE=str(main_pid_query_exit_code),
+                     MAIN_PID_DEADLINE_EXIT_CODE=str(main_pid_deadline_exit_code)),
             capture_output=True, text=True, timeout=10, check=False)
         result = {"completed": completed, "exists": lock.exists() or lock.is_symlink()}
-        for name in ("lock-probe", "lock-presence", "sleep", "rollback", "remove", "reader-timeout", "presence-timeout"):
+        for name in ("lock-probe", "lock-presence", "sleep", "rollback", "remove", "reader-timeout", "presence-timeout",
+                     "main-pid-query", "main-pid-timeout", "harness-pid", "rollback-pid", "rollback-ready"):
             path = root / (name + ".calls")
             result[name] = path.read_text() if path.exists() else ""
         return result
@@ -755,6 +777,7 @@ def _run_gateway_rollback_guard(
     lock_presence_case: str = "", lock_remove_case: str = "",
     presence_deadline_stage: str = "", presence_deadline_exit_code: int = 124,
     pid_deadline_exit_code: int = 0, owner_deadline_exit_code: int = 0,
+    main_pid_query_exit_code: int = 0, main_pid_deadline_exit_code: int = 0,
     source_drift: str = "", drift_boundary: str = "stop", source_query_case: str = "",
     target_drift: str = "", target_boundary: str = "stop", forward_case: str = "",
     target_query_case: str = "", target_relative: str = "",
@@ -1064,6 +1087,11 @@ fixture_timeout() {
     fixture_lock_reader_timeout "$@"
     return $?
   fi
+  if [[ "$1" == systemctl && "${2:-}" == show ]]; then
+    [[ $# -eq 5 && "$3" == "$SERVICE" && "$4 $5" == '--property=MainPID --value' ]] || return 99
+    printf 'query\n' >> "$PWD/main-pid-timeout.calls"
+    if [[ "$MAIN_PID_DEADLINE_EXIT_CODE" != 0 ]]; then printf 12; return "$MAIN_PID_DEADLINE_EXIT_CODE"; fi
+  fi
   if [[ "$1" == python3 && "$3" == "$TARGET_ROOT" ]]; then
     [[ "$2" == - && "$4" == "$SERVICE_DROP_IN" && "$5" == "$RUN_DIR" ]] || return 99
     local target_phase=rollback target_query
@@ -1140,7 +1168,12 @@ if [[ "$PREDICATE_PASSES" == true ]]; then
   lock_ready=true
 fi
 systemctl() {
-  if [[ "$1" == is-active ]]; then
+  if [[ "$1" == show ]]; then
+    [[ $# -eq 4 && "$2" == "$SERVICE" && "$3 $4" == '--property=MainPID --value' ]] || return 99
+    printf 'query\n' >> "$PWD/main-pid-query.calls"
+    printf 12
+    return "$MAIN_PID_QUERY_EXIT_CODE"
+  elif [[ "$1" == is-active ]]; then
     [[ "$PREDICATE_PASSES" == true ]]
   else
     printf 'SYSTEMCTL:%s\n' "$1" >> "$PWD/systemctl.calls"
@@ -1808,6 +1841,8 @@ rollback "$forward_lock_rc"
             PRESENCE_DEADLINE_EXIT_CODE=str(presence_deadline_exit_code),
             PID_DEADLINE_EXIT_CODE=str(pid_deadline_exit_code),
             OWNER_DEADLINE_EXIT_CODE=str(owner_deadline_exit_code),
+            MAIN_PID_QUERY_EXIT_CODE=str(main_pid_query_exit_code),
+            MAIN_PID_DEADLINE_EXIT_CODE=str(main_pid_deadline_exit_code),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1868,6 +1903,8 @@ rollback "$forward_lock_rc"
             evidence["target_timeout_calls"] = (root / "target-timeout.calls").read_text().splitlines() if (root / "target-timeout.calls").exists() else []
             evidence["presence_timeout_calls"] = (root / "presence-timeout.calls").read_text().splitlines() if (root / "presence-timeout.calls").exists() else []
             evidence["reader_timeout_calls"] = (root / "reader-timeout.calls").read_text().splitlines() if (root / "reader-timeout.calls").exists() else []
+            evidence["main_pid_timeout_calls"] = (root / "main-pid-timeout.calls").read_text().splitlines() if (root / "main-pid-timeout.calls").exists() else []
+            evidence["main_pid_query_calls"] = (root / "main-pid-query.calls").read_text().splitlines() if (root / "main-pid-query.calls").exists() else []
             evidence["command_entered"] = (root / "command-entered").exists()
             backup_path = root / "backup/existing/entry.py"
             evidence["backup"] = backup_path.read_bytes() if backup_path.is_file() else None
@@ -3329,6 +3366,174 @@ def test_gateway_lock_owner_deadline_receipt_failure_keeps_original_trigger() ->
     assert evidence["rollback"]["failed_restoration_operation"] == dict(operation="dead_lock", target="gateway_lock", exit_code=124)
     assert "receipt persistence failed" in completed.stderr and "kind=rollback exit=137" in completed.stderr
     assert "completion=UNKNOWN" in completed.stderr and "retry=false" in completed.stderr
+
+
+
+def _gateway_main_pid_query_guard() -> str:
+    lines = [line.strip() for line in _repair_script().splitlines()
+             if line.strip().startswith('main_pid="$(')]
+    assert len(lines) == 1
+    return lines[0] + "\n"
+
+
+def test_gateway_main_pid_deadline_failed_query_rolls_back_once_in_parent() -> None:
+    assert _gateway_main_pid_query_guard() == (
+        'main_pid="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s '
+        'systemctl show "$SERVICE" --property=MainPID --value)" || rollback "$?"\n')
+    for code in (29, 124, 137):
+        for partial in ("12", "12\nmisleading"):
+            result = _run_gateway_lock_file_case(
+                b"12\n", "identity", main_pid=partial,
+                main_pid_query_exit_code=code if code == 29 else 0,
+                main_pid_deadline_exit_code=code if code != 29 else 0)
+            completed = result["completed"]
+            assert completed.returncode == code and result["exists"], result
+            assert result["rollback"] == str(code) + "\n"
+            assert result["rollback-pid"] == result["harness-pid"]
+            assert result["rollback-ready"] == "false\n"
+            assert result["main-pid-timeout"] == "query\n"
+            assert result["main-pid-query"] == ("query\n" if code == 29 else "")
+            assert result["reader-timeout"] == result["sleep"] == result["lock-probe"] == result["remove"] == ""
+            assert completed.stdout == "" and "stopped on line" not in completed.stderr
+
+
+def test_gateway_main_pid_deadline_success_and_invalid_output_controls() -> None:
+    matched = _run_gateway_lock_file_case(b"12\n", "identity")
+    assert matched["completed"].returncode == 0 and matched["rollback"] == ""
+    assert matched["main-pid-query"] == matched["main-pid-timeout"] == "query\n"
+    assert matched["reader-timeout"] == "pid\n" and matched["sleep"] == ""
+    for observed in ("", "0", "13", "12\n13"):
+        result = _run_gateway_lock_file_case(b"12\n", "identity", main_pid=observed)
+        assert result["completed"].returncode == 18 and result["exists"], result
+        assert result["rollback"] == "18\n" and result["rollback-ready"] == "false\n"
+        assert result["rollback-pid"] == result["harness-pid"]
+        assert result["main-pid-query"] == result["main-pid-timeout"] == "query\n" * 12
+        assert result["reader-timeout"] == "pid\n" * 12 and result["sleep"] == "sleep\n" * 12
+
+
+def test_gateway_main_pid_deadline_actual_rollback_retains_query_trigger() -> None:
+    for code in (29, 124, 137):
+        evidence: dict = {}
+        completed, current, dropin_exists = _run_gateway_rollback_guard(
+            _gateway_main_pid_query_guard(), predicate_passes=False,
+            recovery_case="main_pid_query", service_failure="stop", service_exit_code=23,
+            main_pid_query_exit_code=code if code == 29 else 0,
+            main_pid_deadline_exit_code=code if code != 29 else 0, evidence=evidence)
+        assert completed.returncode == code and current == b"candidate source\n" and dropin_exists, completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        assert "stopped on line" not in completed.stderr and "GUARD_PASSED" not in completed.stdout
+        assert evidence["main_pid_timeout_calls"] == ["query"]
+        assert evidence["main_pid_query_calls"] == (["query"] if code == 29 else [])
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+        assert evidence["backup"] == b"previous source\n"
+        receipt = evidence["rollback"]
+        assert receipt["trigger_exit_code"] == code and receipt["restore_attempted"] is False
+        assert receipt["status"] == "ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED"
+        assert receipt["service_commands"][-1] == dict(
+            verb="stop", exit_code=23, outcome="COMMAND_FAILED", timeout_seconds=60, kill_after_seconds=5)
+
+
+def test_gateway_main_pid_deadline_uncertain_receipt_keeps_query_trigger() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_main_pid_query_guard(), predicate_passes=False,
+        recovery_case="main_pid_query", service_failure="stop", service_exit_code=23,
+        main_pid_deadline_exit_code=124, evidence_deadline_kind="rollback",
+        evidence_deadline_exit_code=137, evidence_deadline_after=True, evidence=evidence)
+    assert completed.returncode == 124 and current == b"candidate source\n", completed.stderr
+    assert completed.stderr.count("Rolling back the complete gateway") == 1
+    assert evidence["main_pid_timeout_calls"] == ["query"] and evidence["main_pid_query_calls"] == []
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+    assert evidence["evidence_timeout_calls"].count("rollback") == 1 and evidence["backup_exists"]
+    assert evidence["rollback"]["trigger_exit_code"] == 124
+    assert "kind=rollback exit=137" in completed.stderr and "completion=UNKNOWN" in completed.stderr
+    assert "retry=false" in completed.stderr
+
+
+def _run_native_gateway_main_pid_deadline(mode: str) -> tuple[subprocess.CompletedProcess[str], dict]:
+    # Only the query assignment, validated GNU timeout and production ERR trap
+    # run here. systemctl resolves exclusively to this inert fixture executable.
+    script = _repair_script()
+    query = _gateway_main_pid_query_guard()
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    assert query.count(policy) == 1
+    query = query.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+    with tempfile.TemporaryDirectory(prefix="gateway-main-pid-native-") as directory:
+        root = Path(directory)
+        command = root / "systemctl"
+        command.write_text(r'''#!/bin/bash
+set -eu
+[[ $# -eq 4 && "$1" == show && "$2" == fixture && "$3 $4" == '--property=MainPID --value' ]] || exit 91
+if [[ "$FIXTURE_MODE" == ignore_term ]]; then trap '' TERM; fi
+printf 'query\n' >> "$PWD/query.calls"
+/bin/cat "/proc/$BASHPID/stat" > "$PWD/query.stat"
+printf 12
+if [[ "$FIXTURE_MODE" == success ]]; then exit 0; fi
+while :; do :; done
+''', encoding="utf-8", newline="\n")
+        command.chmod(0o700)
+        harness = 'set -Eeuo pipefail\n' + _bash_function(script, "require_recovery_timeout") + r'''
+require_recovery_timeout
+PATH="$PWD:$PATH"
+SERVICE=fixture
+printf '%s\n' "$BASHPID" > "$PWD/harness-pid.calls"
+rollback() {
+  printf '%s\n' "$1" >> "$PWD/rollback.calls"
+  printf '%s\n' "$BASHPID" >> "$PWD/rollback-pid.calls"
+  exit "$1"
+}
+'''
+        harness += next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR")) + "\n"
+        harness += query + 'printf "ADOPTED=%s\\n" "$main_pid"\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                       env=dict(os.environ, FIXTURE_MODE=mode),
+                                       capture_output=True, text=True, timeout=5, check=False)
+        finally:
+            identity = root / "query.stat"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        return completed, {"elapsed_seconds": time.monotonic() - started,
+                           "live_after_command": len(live),
+                           "calls": (root / "query.calls").read_text().splitlines(),
+                           "harness_pid": (root / "harness-pid.calls").read_text(),
+                           "rollback_pid": (root / "rollback-pid.calls").read_text() if (root / "rollback-pid.calls").exists() else "",
+                           "rollback": (root / "rollback.calls").read_text() if (root / "rollback.calls").exists() else ""}
+
+
+@unittest.skipIf(sys.platform != "linux", "Native MainPID query isolation requires Linux CI")
+def test_gateway_native_main_pid_deadline_success_control() -> None:
+    completed, facts = _run_native_gateway_main_pid_deadline("success")
+    assert completed.returncode == 0 and completed.stdout == "ADOPTED=12\n", completed.stderr
+    assert facts["calls"] == ["query"] and facts["live_after_command"] == 0 and facts["rollback"] == ""
+
+
+@unittest.skipIf(sys.platform != "linux", "Native MainPID query deadline and ignored TERM require Linux CI")
+def test_gateway_native_main_pid_deadline_hang_and_ignored_term_refuse_output() -> None:
+    for mode, code in (("hang", 124), ("ignore_term", 137)):
+        completed, facts = _run_native_gateway_main_pid_deadline(mode)
+        assert completed.returncode == code and completed.stdout == "", completed.stderr
+        assert "stopped on line" not in completed.stderr
+        assert facts["rollback"] == str(code) + "\n" and facts["rollback_pid"] == facts["harness_pid"]
+        assert facts["elapsed_seconds"] < 4 and facts["live_after_command"] == 0
+        assert facts["calls"] == ["query"]
 
 
 def _run_native_gateway_lock_owner_deadline(mode: str) -> tuple[subprocess.CompletedProcess[str], dict]:

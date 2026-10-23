@@ -30,6 +30,26 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 23 MainPID query increment bounds only the post-start systemd
+MainPID observation with the validated 60-second TERM and five-second KILL
+policy. A guarded assignment preserves the exact query failure status and
+enters parent-shell rollback once, even when failed stdout resembles a valid
+PID. The failed observation cannot reach lock-PID comparison, readiness
+adoption or another polling iteration. Successful-query mismatch and lock-PID
+reader failure still use the existing exit-18 path.
+
+Disposable tests exercise the actual ERR trap, parent-shell rollback identity,
+fixed arguments, partial output, original-trigger retention and uncertain
+receipt persistence without retry. Native Linux controls contain only the
+extracted query and a fake systemctl executable, with shortened test-copy
+deadlines and identity-guarded fixture cleanup. Local Linux skips do not prove
+native timeout behavior. At local preparation, independent review and exact
+new-head hosted validation remain pending; previous-head success is separate.
+This is a per-query bound, not a total polling or recovery deadline. Other
+forward property queries, PID reuse/check-to-use races, privileged writers,
+uninterruptible I/O, complete restoration and outer-postcheck recovery remain
+unresolved.
+
 The October 23 owner-probe deadline increment wraps only the
 `require_absent_lock_owner` Python launch with the preflight-validated GNU
 timeout policy: TERM after 60 seconds and KILL after five more seconds. The
@@ -48,8 +68,9 @@ with a fake interpreter and shortened test-copy deadlines; they never probe a
 real lock owner or run service/restoration commands. Local Linux skips are not
 signal-behavior evidence, and prior-head CI does not validate this increment.
 
-This bounds one additional subprocess, not the systemd MainPID query, other
-forward operations or total recovery duration. PID reuse/check-to-use races,
+That owner-probe increment bounds one additional subprocess; the later MainPID
+boundary is described above. Other forward operations and total recovery
+duration remain outside those per-process bounds. PID reuse/check-to-use races,
 privileged concurrent writers, uninterruptible I/O, complete restoration and
 outer-postcheck recovery remain unresolved. Independent review and exact-head
 hosted validation remain separate from merge or deployment authority.
