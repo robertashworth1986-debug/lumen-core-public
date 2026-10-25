@@ -59,6 +59,66 @@ def test_scout_reuses_relevance_helpers_without_inventing_eligibility():
     assert result['opportunities'][0]['relevance_score']>0
     with pytest.raises(rt.UserError):rt.scout_grants(PROFILE,'x',lambda *_:({'data':[]},{}))
 
+def test_scout_retains_project_query_and_distinguishes_page_from_total_results():
+    calls=[]
+    def fetch(url,payload):
+        calls.append(payload)
+        return {'errorcode':0,'data':{'hitCount':135,'oppHits':[{'id':'12345','title':'Wave research','oppStatus':'posted'}]}},{'url':url,'retrieved_utc':'2026-10-25T12:00:00Z','sha256':'a'*64}
+    result=rt.scout_grants(PROFILE,'  wave energy  ',fetch)
+    assert calls[0]['keyword']=='wave energy'
+    assert result['query']=='wave energy'
+    assert result['returned_count']==1 and result['total_available']==135
+    assert result['opportunities'][0]['eligibility']=='UNVERIFIED'
+    for query in ('', ' '*3, 'x'*121, None):
+        with pytest.raises(rt.UserError):rt.scout_grants(PROFILE,query,fetch)
+    assert len(calls)==1
+
+def test_scout_does_not_turn_provider_errors_or_bad_counts_into_successful_coverage():
+    for code in (1,'0',False,None):
+        with pytest.raises(rt.UserError,match='search error'):
+            rt.scout_grants(PROFILE,'wave',lambda *_:({'errorcode':code,'data':{'oppHits':[]}},{'url':'source'}))
+    for total in (None,'135',True,-1):
+        result=rt.scout_grants(PROFILE,'wave',lambda *_:({'errorcode':0,'data':{'hitCount':total,'oppHits':[]}},{'url':'source'}))
+        assert result['total_available'] is None
+
+def test_scout_rejects_ambiguous_identifiers_instead_of_collapsing_distinct_results():
+    for ident in (None, '', 'not-numeric'):
+        hits=[{'id':'12345','title':'Valid listing'},{'id':ident,'title':'Different listing'}]
+        with pytest.raises(rt.UserError,match='opportunity ID'):
+            rt.scout_grants(PROFILE,'wave',lambda *_:({'data':{'oppHits':hits}},{}))
+
+def test_scheduled_scout_preserves_the_latest_manual_result_across_restart(tmp_path,monkeypatch):
+    tick=[10000.0]
+    monkeypatch.setattr(rt.time,'time',lambda:tick[0])
+    monkeypatch.setattr(rt,'scout_grants',lambda profile,query:{'query':query,'opportunities':[],'source_receipt':{'retrieved_utc':str(tick[0])}})
+    store=rt.Store(tmp_path/'workspace.sqlite3');runtime=rt.MemberRuntime(PROFILE,store)
+    runtime.run('scout',{'member':PROFILE['id'],'request_id':'manual-wave','query':'wave energy'})
+    runtime.schedule('scout',True);tick[0]+=3601
+    class OneIteration:
+        calls=0
+        def wait(self,_):
+            self.calls+=1
+            return self.calls>1
+    runtime.stop=OneIteration();runtime.worker()
+    restarted=rt.MemberRuntime(PROFILE,rt.Store(store.path))
+    assert restarted.store.get('scout_manual_latest')['query']=='wave energy'
+    assert restarted.store.get('scout_scheduled_latest')['query']==PROFILE['industry']
+    assert restarted.store.get('scout_latest')['query']==PROFILE['industry']
+
+def test_all_member_packages_are_identical_across_lf_and_crlf_checkouts(tmp_path,monkeypatch):
+    builder=module(ROOT/'code/ops/build_ec_member_packages.py','ec_package_line_endings')
+    sources={p:(ROOT/p).read_bytes().replace(b'\r\n',b'\n') for p in [*builder.FILES.values(),'dashboard/cohort/catalog.json','LICENSE']}
+    receipts=[]
+    for ending,label in ((b'\n','lf'),(b'\r\n','crlf')):
+        checkout=tmp_path/label
+        for name,raw in sources.items():
+            path=checkout/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw.replace(b'\n',ending))
+        monkeypatch.setattr(builder,'ROOT',checkout);monkeypatch.setattr(builder,'DEST',checkout/'downloads')
+        builder.build()
+        receipts.append({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in builder.DEST.iterdir()})
+    assert len(receipts[0])==70
+    assert receipts[0]==receipts[1]
+
 def feed(epoch, *, stale=False, gap=False):
     end=int(epoch//3600)*3600
     rows=[[end-(21-i)*3600,95,150,100,100+i,20] for i in range(21)]
@@ -175,6 +235,8 @@ def test_stale_browser_cannot_overwrite_a_newer_local_backup(tmp_path):
 
 def test_all_69_archives_are_bounded_scoped_and_hash_verified():
     downloads=ROOT/'dashboard/cohort/downloads';manifest=json.loads((downloads/'manifest.json').read_text())
+    builder=module(ROOT/'code/ops/build_ec_member_packages.py','ec_package_archive_check')
+    assert manifest['source_catalog_sha256']==hashlib.sha256((ROOT/'dashboard/cohort/catalog.json').read_bytes().replace(b'\r\n',b'\n')).hexdigest()
     assert len(manifest['packages'])==69
     for entry in manifest['packages']:
         raw=(downloads/entry['file']).read_bytes()
@@ -188,7 +250,7 @@ def test_all_69_archives_are_bounded_scoped_and_hash_verified():
             own=json.loads(z.read('public/cohort/catalog.json'))
             assert len(own['companies'])==1 and own['companies'][0]['id']==entry['member']
             pm=json.loads(z.read('package-manifest.json'));assert pm['member']==entry['member']
-            for archived,source in [('luma_runtime.py','code/ec_member_runtime.py'),('public/cohort/studio.js','dashboard/cohort/studio.js'),('public/cohort/core.js','dashboard/cohort/core.js')]:
+            for archived,source in builder.FILES.items():
                 assert z.read(archived)==(ROOT/source).read_bytes().replace(b'\r\n',b'\n')
             for f in pm['files']:
                 b=z.read(f['path']);assert len(b)==f['bytes'];assert hashlib.sha256(b).hexdigest()==f['sha256']

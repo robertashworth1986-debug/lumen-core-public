@@ -128,3 +128,6 @@ examples/proof_capsule/** text eol=lf
 
 # Preserve the generated public review PDF as a binary artifact.
 /dashboard/portfolio/Public_Portfolio_Review_Brief_2026-10-04.pdf binary
+
+# Preserve the exact retained October 21 HTTP observations and their hashes.
+/evidence/public-site-deployments/observations/20261021T021708Z/* -text

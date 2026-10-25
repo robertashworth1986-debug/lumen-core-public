@@ -78,7 +78,16 @@ WHAT THE TOOLS DO
   This review runs offline and needs no API credits.
 - Grant Factory: turn your supplied facts into Markdown drafts. Unknowns remain
   marked. No applicant attributes, eligibility, signatures or awards are invented.
-- LumaScout: retrieve public Grants.gov listings; rank keywords, not eligibility.
+- LumaScout: enter a project topic to retrieve up to 20 public Grants.gov results.
+  The source's total-match count is shown when available; ranking covers only
+  the returned set, not the full catalog. Each added record retains its topic
+  and retrieval time. Existing notes survive duplicate matches. At the
+  500-record limit, saved opportunities remain intact and new results are
+  reported as not imported. Download latest grant results to keep the full
+  returned set separately. The latest manual results are retained separately
+  from hourly results, until the next successful manual search. Listings without
+  stable opportunity IDs cause the batch to be rejected, not silently deduplicated.
+  Relevance is not applicant eligibility.
 - Paper Lab: simulate a 5/20 moving-average rule on fabricated or imported daily
   CSV prices. The optional local paper bot reads public BTC-USD quotes hourly,
   starts with 10,000 fictional USD, uses a 25% cash allocation, modeled 10 bps
@@ -89,7 +98,9 @@ WHAT THE TOOLS DO
 
 SCHEDULED WORK
 The assistant, scout and paper screens show local task controls. You can enable
-hourly public grant checks or the paper bot. The first scheduled run is one hour
+hourly public grant checks or the paper bot. Hourly grant checks use the member's
+industry label, shown in the controls; a manual project search does not change
+that scheduled topic. The first scheduled run is one hour
 after enabling. Tasks run only while this Python process stays open. Each run
 records a success or failure, source receipts where applicable and a local
 integrity-chain entry. Failed tasks do not become completed results.
@@ -152,16 +163,19 @@ def package(profile, source_files):
     if len(raw)>3_000_000:raise ValueError('Package exceeded the 3 MB bound')
     return raw
 
+def source_bytes(path):
+    if path.is_symlink() or not path.is_file():raise ValueError('Package source must be a regular file')
+    # Every allowlisted source is UTF-8 text, including SVG and the catalog.
+    return path.read_bytes().decode('utf-8').replace('\r\n','\n').encode('utf-8')
+
 def build():
-    catalog=json.loads((ROOT/'dashboard/cohort/catalog.json').read_text(encoding='utf-8'))
+    catalog_bytes=source_bytes(ROOT/'dashboard/cohort/catalog.json')
+    catalog=json.loads(catalog_bytes)
     if len(catalog['companies'])!=69:raise ValueError('Expected the complete official 69-member roster')
     source_files={}
     for name,source in FILES.items():
         path=ROOT/source
-        if path.is_symlink() or not path.is_file():raise ValueError('Package source must be a regular file')
-        body=path.read_bytes()
-        if path.suffix in {'.py','.mjs','.js','.css','.html'}:body=body.replace(b'\r\n',b'\n')
-        source_files[name]=body
+        source_files[name]=source_bytes(path)
     DEST.mkdir(parents=True,exist_ok=True)
     packages=[]
     for profile in catalog['companies']:
@@ -169,7 +183,7 @@ def build():
         filename=profile['id']+'.zip'
         (DEST/filename).write_bytes(body)
         packages.append({'member':profile['id'],'file':filename,'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()})
-    manifest={'schema':'lumencore.ec_member_downloads.v1','source_catalog_sha256':hashlib.sha256((ROOT/'dashboard/cohort/catalog.json').read_bytes()).hexdigest(),'packages':packages}
+    manifest={'schema':'lumencore.ec_member_downloads.v1','source_catalog_sha256':hashlib.sha256(catalog_bytes).hexdigest(),'packages':packages}
     (DEST/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8',newline='\n')
     return {'packages':len(packages),'total_bytes':sum(p['bytes'] for p in packages)}
 

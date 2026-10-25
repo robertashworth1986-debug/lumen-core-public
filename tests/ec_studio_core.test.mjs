@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {emptyWorkspace,validateWorkspace,workspaceStartupChoice,reviewWork,energyComparison,reviewEnergyChange,ENERGY_CONSTRAINT_UNITS,parsePriceCSV,paperBacktest,examplePrices,draftGrant,careReview} from '../dashboard/cohort/core.js';
+import {emptyWorkspace,validateWorkspace,workspaceStartupChoice,mergeScoutOpportunities,reviewWork,energyComparison,reviewEnergyChange,ENERGY_CONSTRAINT_UNITS,parsePriceCSV,paperBacktest,examplePrices,draftGrant,careReview} from '../dashboard/cohort/core.js';
 
 test('startup restores only an empty browser and preserves competing records for owner review',()=>{
   const local=emptyWorkspace('excalis'),saved=emptyWorkspace('excalis');
@@ -23,8 +23,8 @@ test('startup restores only an empty browser and preserves competing records for
 function backupHarness(local,fetcher){
   const nodes=new Map(),timers=new Map(),storage=new Map();let timerId=0;
   const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{hidden:true,textContent:'',innerHTML:'',classList:{add(){},remove(){}},close(){}});return nodes.get(selector);};
-  const context=vm.createContext({document:{querySelector:node},structuredClone,emptyWorkspace,validateWorkspace,workspaceStartupChoice,
-    examplePrices,energyComparison,reviewEnergyChange,ENERGY_CONSTRAINT_UNITS,crypto:{randomUUID:()=>`test-${++timerId}`},STAGES:[],STAGE_NAMES:{},fetch:fetcher,console,
+  const context=vm.createContext({document:{querySelector:node},structuredClone,TextDecoder,emptyWorkspace,validateWorkspace,workspaceStartupChoice,
+    examplePrices,energyComparison,reviewEnergyChange,mergeScoutOpportunities,ENERGY_CONSTRAINT_UNITS,crypto:{randomUUID:()=>`test-${++timerId}`},STAGES:[],STAGE_NAMES:{},fetch:fetcher,console,
     setTimeout(fn){const id=++timerId;timers.set(id,fn);return id;},clearTimeout(id){timers.delete(id);},
     localStorage:{setItem(k,v){storage.set(k,v);}},initial:structuredClone(local)});
   const source=fs.readFileSync(new URL('../dashboard/cohort/studio.js',import.meta.url),'utf8').replace(/^import[^\n]*\n/,'').replace(/\binit\(\);\s*$/,'');
@@ -34,6 +34,166 @@ function backupHarness(local,fetcher){
 }
 const response=(value,status=200)=>({ok:status>=200&&status<300,status,json:async()=>structuredClone(value)});
 const statusResponse=()=>response({member:'excalis',ready:true,workspace_revision_check:true});
+
+function publicInstallerHarness(fetcher){
+  const h=backupHarness(emptyWorkspace('excalis'),fetcher);
+  vm.runInContext('runtime=false;',h.context);
+  h.context.document.querySelector=selector=>selector==='meta[name="luma-local-runtime"]'?null:h.node(selector);
+  h.node('#package-download').removeAttribute=()=>{};
+  return h;
+}
+test('returning visitors receive the current installer hash and a release-specific download URL',async()=>{
+  const stale='a'.repeat(64),current='b'.repeat(64),requests=[];
+  const h=publicInstallerHarness(async(url,options)=>{
+    requests.push({url,options});
+    // Simulate the observed disk cache: default fetch reuses the old manifest.
+    return response({packages:[{member:'excalis',sha256:options?.cache==='no-store'?current:stale}]});
+  });
+  await h.context.loadInstaller();
+  assert.equal(requests.length,1);
+  assert.match(h.node('#install-code').textContent,new RegExp(current.toUpperCase()));
+  assert.equal(h.node('#package-download').href,`./downloads/excalis.zip?sha256=${current}`);
+  assert.match(h.node('#install-code').textContent,new RegExp(`excalis.zip\\?sha256=${current}`));
+  assert.doesNotMatch(h.node('#install-code').textContent,new RegExp(stale.toUpperCase()));
+});
+test('a delayed installer response cannot replace the next member or a newly rendered package view',async()=>{
+  for(const transition of ['member','view']){
+    let finish;
+    const h=publicInstallerHarness(()=>new Promise(resolve=>{finish=resolve;}));
+    const pending=h.context.loadInstaller();
+    if(transition==='member')vm.runInContext("member={id:'next-member',name:'Next member'};",h.context);
+    else h.context.document.querySelector=selector=>selector==='#install-code'?null:selector==='meta[name="luma-local-runtime"]'?null:h.node(selector);
+    finish(response({packages:[{member:'excalis',sha256:'b'.repeat(64)},{member:'next-member',sha256:'c'.repeat(64)}]}));
+    await pending;
+    assert.equal(h.node('#install-code').textContent,'');
+    assert.equal(h.node('#package-download').href,undefined);
+  }
+});
+test('missing or malformed package fingerprints leave downloads unavailable',async()=>{
+  for(const packages of [[],[{member:'excalis',sha256:'not-a-sha'}]]){
+    const h=publicInstallerHarness(async()=>response({packages}));
+    await h.context.loadInstaller();
+    assert.equal(h.node('#package-download').href,undefined);
+    assert.match(h.node('#install-code').textContent,/being prepared/);
+  }
+});
+
+test('scout searches the owner project topic instead of silently using the industry',async()=>{
+  const sent=[];
+  const h=backupHarness(emptyWorkspace('excalis'),async(url,options)=>{
+    sent.push(JSON.parse(options.body));
+    return response({query:'wave energy',opportunities:[],source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'}});
+  });
+  vm.runInContext("member.industry='Manufacturing';",h.context);
+  h.node('#scout-query').value='  wave energy  ';
+  await vm.runInContext("action('scan-grants')",h.context);
+  assert.equal(sent.length,1);
+  assert.equal(sent[0].query,'wave energy');
+});
+
+test('scout never evicts saved owner records when a search reaches workspace capacity',async()=>{
+  const initial=emptyWorkspace('excalis');
+  initial.scout=Array.from({length:500},(_,i)=>({id:`saved-${i}`,title:`Owner record ${i}`,url:`https://example.test/${i}`,next_step:'Owner notes must survive'}));
+  const incoming=Array.from({length:20},(_,i)=>({title:`Source listing ${i}`,url:`https://www.grants.gov/search-results-detail/${10000+i}`}));
+  const h=backupHarness(initial,async()=>response({query:'wave energy',opportunities:incoming,source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'}}));
+  vm.runInContext("member.industry='Manufacturing';",h.context);
+  h.node('#scout-query').value='wave energy';
+  await vm.runInContext("action('scan-grants')",h.context);
+  assert.deepEqual(h.context.inspect().state.scout,initial.scout);
+  assert.match(h.node('#toast').textContent,/20.*not imported|20.*capacity/i);
+});
+
+test('scout merges only available slots, preserves owner edits, and reports duplicates separately',()=>{
+  const saved=Array.from({length:499},(_,i)=>({id:`saved-${i}`,title:`Owner ${i}`,url:`https://example.test/${i}`,next_step:'Keep this annotation'}));
+  const before=structuredClone(saved);
+  const result=mergeScoutOpportunities(saved,[{title:'Changed source title',url:saved[0].url},{title:'First new listing',url:'https://example.test/new'},{title:'Repeated listing',url:'https://example.test/new'},{title:'Second new listing',url:'https://example.test/overflow'}],{query:' wave energy ',retrievedAt:'2026-10-25T12:00:00Z',createId:()=> 'new-id'});
+  assert.deepEqual(saved,before);
+  assert.deepEqual(result.items.slice(0,499),before);
+  assert.deepEqual({added:result.added,duplicates:result.duplicates,capacitySkipped:result.capacitySkipped},{added:1,duplicates:2,capacitySkipped:1});
+  assert.equal(result.items[499].source_query,'wave energy');
+  assert.equal(result.items[499].source_retrieved_utc,'2026-10-25T12:00:00Z');
+});
+
+test('scout rejects incomplete source results atomically and rejects unsafe links',()=>{
+  const saved=[{id:'original',title:'Owner record',url:'https://example.test/old'}];
+  for(const url of ['javascript:alert(1)','https://user:secret@example.test/','not a URL']){
+    assert.throws(()=>mergeScoutOpportunities(saved,[{title:'New',url:'https://example.test/new'},{title:'Invalid',url}],{query:'wave',retrievedAt:'2026-10-25T12:00:00Z'}));
+    assert.equal(saved.length,1);
+  }
+});
+
+test('scout reports every unimported result at capacity without calling it saved',()=>{
+  const saved=Array.from({length:500},(_,i)=>({id:`saved-${i}`,url:`https://example.test/${i}`}));
+  const row={title:'Not saved',url:'https://example.test/overflow'};
+  const result=mergeScoutOpportunities(saved,[row,row],{query:'wave',retrievedAt:'2026-10-25T12:00:00Z'});
+  assert.equal(result.capacitySkipped,2);assert.equal(result.duplicates,0);assert.equal(result.added,0);
+  assert.deepEqual(result.items,saved);
+});
+
+test('scout requires a nonempty explicit topic before requesting public data',async()=>{
+  let calls=0;
+  const h=backupHarness(emptyWorkspace('excalis'),async()=>{calls++;return response({});});
+  h.node('#scout-query').value='   ';
+  await vm.runInContext("action('scan-grants')",h.context);
+  assert.equal(calls,0);assert.match(h.node('#toast').textContent,/Enter a project topic/);
+});
+
+test('latest scout download retains the complete returned set even when the workspace is full',async()=>{
+  const initial=emptyWorkspace('excalis');
+  initial.scout=Array.from({length:500},(_,i)=>({id:`owner-${i}`,title:`Saved ${i}`}));
+  const result={query:'wave energy',returned_count:20,total_available:135,source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'},opportunities:Array.from({length:20},(_,i)=>({title:`Listing ${i}`,url:`https://www.grants.gov/search-results-detail/${10000+i}`}))};
+  const scheduled={...result,query:'Manufacturing',opportunities:[]};
+  const h=backupHarness(initial,async()=>response({schedules:{},errors:{},scout:scheduled,scout_manual:result,scout_scheduled:scheduled,paper:null}));
+  h.context.document.querySelectorAll=()=>[];
+  h.node('#runtime-activity').querySelectorAll=()=>[];
+  await h.context.loadActivity();
+  h.node('#export-scout-results').onclick();
+  assert.equal(h.context.downloads.length,1);
+  assert.equal(h.context.downloads[0].name,'excalis-grant-search-results.json');
+  assert.deepEqual(JSON.parse(h.context.downloads[0].text),result);
+  assert.deepEqual(h.context.inspect().state.scout,initial.scout);
+});
+
+test('scout leaves the workspace unchanged when the full backup would exceed its size limit',async()=>{
+  const initial=emptyWorkspace('excalis');initial.measurements=[{notes:''}];
+  initial.measurements[0].notes='x'.repeat(999999-JSON.stringify(initial).length);
+  validateWorkspace(initial,'excalis');
+  const h=backupHarness(initial,async()=>response({opportunities:[{title:'New grant',url:'https://example.test/new'}],source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'}}));
+  h.node('#scout-query').value='wave';
+  await vm.runInContext("action('scan-grants')",h.context);
+  assert.equal(h.context.inspect().state.scout.length,0);
+  assert.equal(h.context.inspect().state.measurements[0].notes.length,initial.measurements[0].notes.length);
+  assert.match(h.node('#toast').textContent,/1 MB/);
+});
+
+test('Unicode expansion cannot change scout state before the local backup rejects its size',async()=>{
+  const initial=emptyWorkspace('excalis');initial.measurements=[{notes:'😀'.repeat(90000)}];
+  validateWorkspace(initial,'excalis'); // Legacy browser records remain readable.
+  const h=backupHarness(initial,async()=>response({opportunities:[{title:'New',url:'https://example.test/new'}],source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'}}));
+  h.node('#scout-query').value='wave';await vm.runInContext("action('scan-grants')",h.context);
+  assert.deepEqual(h.context.inspect().state,initial);
+  assert.match(h.node('#toast').textContent,/1 MB/);
+});
+
+test('workspace import rejects Unicode expansion and reserves the local request envelope before replacing records',async()=>{
+  for(const notes of ['😀'.repeat(90000),'x'.repeat(999800)]){
+    const incoming=emptyWorkspace('excalis');incoming.measurements=[{notes}];
+    const initial=emptyWorkspace('excalis');initial.scout=[{id:'keep',title:'Keep owner record'}];
+    const h=backupHarness(initial,async()=>{throw new Error('Unexpected network');});
+    h.context.importWorkspace();const raw=JSON.stringify(incoming);
+    await assert.rejects(h.context.dialog.onSubmit({get:()=>({size:Buffer.byteLength(raw),text:async()=>raw,arrayBuffer:async()=>Buffer.from(raw)})}),/1 MB/);
+    assert.deepEqual(h.context.inspect().state,initial);
+  }
+});
+
+test('malformed UTF-8 backup bytes cannot silently replace owner records with replacement characters',async()=>{
+  const incoming=emptyWorkspace('excalis');incoming.measurements=[{notes:'X'}];
+  const bytes=Buffer.from(JSON.stringify(incoming));bytes[bytes.indexOf(Buffer.from('"notes":"X"'))+9]=0xff;
+  const initial=emptyWorkspace('excalis');initial.scout=[{id:'keep',title:'Keep owner record'}];
+  const h=backupHarness(initial,async()=>{throw new Error('Unexpected network');});h.context.importWorkspace();
+  await assert.rejects(h.context.dialog.onSubmit({get:()=>({size:bytes.length,text:async()=>new TextDecoder().decode(bytes),arrayBuffer:async()=>bytes})}),/UTF-8/);
+  assert.deepEqual(h.context.inspect().state,initial);
+});
 
 test('startup conflict performs no write and offers both versions before an owner chooses',async()=>{
   const local=emptyWorkspace('excalis'),remote=emptyWorkspace('excalis');
