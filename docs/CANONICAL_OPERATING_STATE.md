@@ -30,6 +30,38 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 25 local CI comparison repair advances the existing outcome-2
+reviewer-evidence path. Readiness on head `aae77b54` successfully configured
+Python 3.11.9, ran its verifier and 16 tests, and uploaded its bounded receipt;
+its production decision remained HOLD. Public-contract and full-suite checks
+also passed, but readiness and repository trust both failed their whitespace
+gate on 21 lines of an operations manual. That file is byte-identical on the
+tested merge and its actual main parent, and absent from the PR head. The
+gates compared the older event base against a merge containing newer main.
+These historical failures remain evidence, not a passing overall CI result.
+
+Both gates now share an event-bound whitespace checker. For a pull request,
+it requires checkout HEAD to match GITHUB_SHA, the exact pull-request merge
+ref, exactly two commit parents, and the event PR head as the second parent.
+It checks the exact first-parent-to-tested-merge tree difference, covering
+PR contributions and merge-resolution changes while excluding unchanged
+base-side content. The older event base is validated and reported separately,
+never silently substituted for the tested parent. Push events retain the
+existing before-to-checkout three-dot comparison with explicit after/ref,
+non-deletion and available-commit checks. Unsupported or missing event context,
+including manual dispatch without a supported change context, fails explicitly.
+Git whitespace errors retain their nonzero status; no gate is bypassed, and
+no unrelated manual, attribute policy or production helper is changed.
+
+Disposable local Git fixtures exercise unchanged main-side whitespace, new PR
+whitespace, merge-resolution and changed base-file defects, event/checkout or
+parent disagreement, missing objects, and push refusal and success paths. They
+do not mutate the application checkout or contact GitHub. At local preparation,
+independent review and exact-new-head hosted results were pending. This scope
+does not clean the whole base branch, authenticate all repository history,
+eliminate arbitrary workflow modification risk, or resolve existing runtime
+recovery, concurrency, aggregate-deadline and external-postcheck limitations.
+
 The October 23 post-start JSON validator increment advances the existing
 outcome-2 private-review repair path. Only four Python launch sites gain the
 validated TERM-after-60-seconds and KILL-after-five-more-seconds policy:
