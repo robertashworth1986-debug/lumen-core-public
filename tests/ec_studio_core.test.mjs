@@ -23,7 +23,7 @@ test('startup restores only an empty browser and preserves competing records for
 function backupHarness(local,fetcher){
   const nodes=new Map(),timers=new Map(),storage=new Map();let timerId=0;
   const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{hidden:true,textContent:'',innerHTML:'',classList:{add(){},remove(){}},close(){}});return nodes.get(selector);};
-  const context=vm.createContext({document:{querySelector:node},structuredClone,emptyWorkspace,validateWorkspace,workspaceStartupChoice,
+  const context=vm.createContext({document:{querySelector:node},structuredClone,TextDecoder,emptyWorkspace,validateWorkspace,workspaceStartupChoice,
     examplePrices,energyComparison,reviewEnergyChange,mergeScoutOpportunities,ENERGY_CONSTRAINT_UNITS,crypto:{randomUUID:()=>`test-${++timerId}`},STAGES:[],STAGE_NAMES:{},fetch:fetcher,console,
     setTimeout(fn){const id=++timerId;timers.set(id,fn);return id;},clearTimeout(id){timers.delete(id);},
     localStorage:{setItem(k,v){storage.set(k,v);}},initial:structuredClone(local)});
@@ -138,9 +138,18 @@ test('workspace import rejects Unicode expansion and reserves the local request 
     const initial=emptyWorkspace('excalis');initial.scout=[{id:'keep',title:'Keep owner record'}];
     const h=backupHarness(initial,async()=>{throw new Error('Unexpected network');});
     h.context.importWorkspace();const raw=JSON.stringify(incoming);
-    await assert.rejects(h.context.dialog.onSubmit({get:()=>({size:Buffer.byteLength(raw),text:async()=>raw})}),/1 MB/);
+    await assert.rejects(h.context.dialog.onSubmit({get:()=>({size:Buffer.byteLength(raw),text:async()=>raw,arrayBuffer:async()=>Buffer.from(raw)})}),/1 MB/);
     assert.deepEqual(h.context.inspect().state,initial);
   }
+});
+
+test('malformed UTF-8 backup bytes cannot silently replace owner records with replacement characters',async()=>{
+  const incoming=emptyWorkspace('excalis');incoming.measurements=[{notes:'X'}];
+  const bytes=Buffer.from(JSON.stringify(incoming));bytes[bytes.indexOf(Buffer.from('"notes":"X"'))+9]=0xff;
+  const initial=emptyWorkspace('excalis');initial.scout=[{id:'keep',title:'Keep owner record'}];
+  const h=backupHarness(initial,async()=>{throw new Error('Unexpected network');});h.context.importWorkspace();
+  await assert.rejects(h.context.dialog.onSubmit({get:()=>({size:bytes.length,text:async()=>new TextDecoder().decode(bytes),arrayBuffer:async()=>bytes})}),/UTF-8/);
+  assert.deepEqual(h.context.inspect().state,initial);
 });
 
 test('startup conflict performs no write and offers both versions before an owner chooses',async()=>{
