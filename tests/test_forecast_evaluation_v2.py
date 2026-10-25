@@ -78,6 +78,139 @@ def change_protocol(inputs, key, value):
     inputs["protocol"].write_text(json.dumps(protocol), encoding="utf-8")
 
 
+def capacity_protocol(inputs, *, entities, days, baselines):
+    protocol = json.loads(inputs["protocol"].read_text(encoding="utf-8"))
+    start = date.fromisoformat(protocol["window"]["start"])
+    protocol["entities"] = [f"E{index}" for index in range(entities)]
+    protocol["window"]["end"] = (start + timedelta(days=days - 1)).isoformat()
+    protocol["baseline_strategies"] = [f"B{index}" for index in range(baselines)]
+    inputs["protocol"].write_text(json.dumps(protocol), encoding="utf-8")
+    return protocol
+
+
+@pytest.mark.parametrize("baseline_count", range(1, 13))
+def test_joint_prediction_budget_accepts_largest_schedule_for_each_strategy_count(module, inputs, baseline_count):
+    days = min(module.MAX_TARGETS, module.MAX_ROWS // (baseline_count + 1))
+    expected = capacity_protocol(inputs, entities=1, days=days, baselines=baseline_count)
+    accepted, raw = module.load_protocol(inputs["protocol"], digest(inputs["protocol"]))
+    assert accepted == expected
+    assert raw == inputs["protocol"].read_bytes()
+
+
+@pytest.mark.parametrize(("entity_count", "days", "baseline_count", "required_rows"), [
+    (1, 9091, 10, 100001),  # Exactly one row beyond the shared CSV budget.
+    (1, 7693, 12, 100009),  # One target beyond the 13-strategy capacity.
+    (100, 100, 12, 130000),  # Each independent registry/window limit is valid.
+])
+def test_joint_prediction_budget_rejects_before_reading_data(module, inputs, monkeypatch, entity_count, days, baseline_count, required_rows):
+    capacity_protocol(inputs, entities=entity_count, days=days, baselines=baseline_count)
+    original_bytes = module._bytes
+    reads = []
+
+    def counted_bytes(path):
+        reads.append(path)
+        return original_bytes(path)
+
+    monkeypatch.setattr(module, "_bytes", counted_bytes)
+    message = (
+        f"protocol requires {required_rows} prediction rows "
+        f"({entity_count * days} targets x {baseline_count + 1} strategies), "
+        f"exceeding the row budget of {module.MAX_ROWS}"
+    )
+    with pytest.raises(ValueError) as rejected:
+        module.load_protocol(inputs["protocol"], digest(inputs["protocol"]))
+    assert str(rejected.value) == message
+    assert reads == [inputs["protocol"]]
+    reads.clear()
+    with pytest.raises(ValueError) as rejected:
+        evaluate(module, inputs)
+    assert str(rejected.value) == message
+    assert reads == [inputs["protocol"]]
+
+
+def test_joint_prediction_budget_cli_rejection_stays_on_hold(inputs, tmp_path):
+    capacity_protocol(inputs, entities=1, days=9091, baselines=10)
+    output = tmp_path / "rejected_review.json"
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--protocol", str(inputs["protocol"]),
+         "--protocol-sha256", digest(inputs["protocol"]),
+         "--predictions", str(tmp_path / "missing_predictions.csv"),
+         "--history", str(tmp_path / "missing_history.csv"), "--json-out", str(output)],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 1
+    assert result.stdout == ""
+    rejection = json.loads(result.stderr)
+    assert rejection["error"] == (
+        "protocol requires 100001 prediction rows (9091 targets x 11 strategies), "
+        "exceeding the row budget of 100000"
+    )
+    assert rejection["status"] == "HUMAN_REVIEW_HOLD"
+    assert rejection["input_rejected"] is True
+    assert rejection["promotion_gate_passed"] is False
+    assert rejection["production_authorized"] is False
+    assert not output.exists()
+
+
+def test_joint_prediction_budget_full_capacity_evaluates_without_truncation(module, inputs):
+    protocol = capacity_protocol(inputs, entities=100, days=100, baselines=9)
+    protocol["history_contract"]["lookback_days"] = 28
+    inputs["protocol"].write_text(json.dumps(protocol), encoding="utf-8")
+    start = date.fromisoformat(protocol["window"]["start"])
+    strategies = [protocol["candidate_strategy"], *protocol["baseline_strategies"]]
+
+    def history_rows():
+        for entity in protocol["entities"]:
+            for offset in range(-28, 100):
+                day = start + timedelta(days=offset)
+                yield {
+                    "entity_id": entity, "date": day.isoformat(),
+                    "actual_available_at_utc": f"{day + timedelta(days=1)}T03:00:00Z",
+                    "actual_mwh": str(1000 + offset),
+                }
+
+    def prediction_rows():
+        for entity in protocol["entities"]:
+            for offset in range(100):
+                day = start + timedelta(days=offset)
+                for index, strategy in enumerate(strategies):
+                    yield {
+                        "entity_id": entity, "target_date": day.isoformat(),
+                        "issued_at_utc": f"{day}T04:00:00Z",
+                        "prediction_available_at_utc": f"{day}T04:00:00Z",
+                        "actual_available_at_utc": f"{day + timedelta(days=1)}T03:00:00Z",
+                        "strategy": strategy, "actual_mwh": str(1000 + offset),
+                        "predicted_mwh": str(1000 + offset + index + 1),
+                    }
+
+    write_rows(inputs["history"], sorted(module.HISTORY_FIELDS), history_rows())
+    write_rows(inputs["predictions"], sorted(module.PREDICTION_FIELDS), prediction_rows())
+    assert inputs["predictions"].stat().st_size <= module.MAX_FILE_BYTES
+    report = evaluate(module, inputs)
+    assert report["status"] == "HUMAN_REVIEW_HOLD"
+    assert report["promotion_gate_passed"] is False
+    assert report["production_authorized"] is False
+    assert report["external_validation_complete"] is False
+    assert report["identities"]["paired_target_count"] == 10000
+    assert report["identities"]["all_strategy_identity_sets_exact"] is True
+    assert len(report["history_diagnostics"]) == 10000
+    assert sum(row["row_count"] for row in report["strategy_summary"].values()) == 100000
+    for index, strategy in enumerate(strategies):
+        summary = report["strategy_summary"][strategy]
+        assert summary["row_count"] == 10000
+        assert summary["mae_mwh"] == pytest.approx(index + 1)
+        assert summary["mean_seasonal_mase_7"] == pytest.approx((index + 1) / 7)
+    for comparison in report["baseline_comparisons"]:
+        assert comparison["paired_target_count"] == 10000
+        assert comparison["p_value"] is None
+        assert comparison["confidence_interval"] is None
+    # The existing CSV limit still rejects a 100,001st row, not silently drops it.
+    with inputs["predictions"].open("a", newline="", encoding="utf-8") as stream:
+        csv.DictWriter(stream, fieldnames=sorted(module.PREDICTION_FIELDS)).writerow(next(prediction_rows()))
+    with pytest.raises(ValueError, match="exceeds the row budget"):
+        evaluate(module, inputs)
+
+
 def test_fixture_evaluates_deterministically_without_promoting(module, inputs):
     report = evaluate(module, inputs)
     assert evaluate(module, inputs) == report

@@ -7,6 +7,35 @@
 
 ## One commercial sentence
 
+### October 25 residual reviewer-gate and capacity hardening (draft)
+
+This bounded source change advances outcome 2: reproducible reviewer evidence.
+It is stacked on gateway recovery PR #259 at
+`e47e5cdfb71c5c020cb65284b0421c7905426d7b`; that PR's recovery changes and
+bounded timeout diagnostics are preserved. The gateway and readiness jobs
+already use Ubuntu 24.04, so the earlier runner-pin edits are superseded.
+The operations manual was separately rewritten on main as a proposed guide
+with production `HOLD`; the obsolete whitespace-only patch is not reapplied.
+
+The remaining gateway change checks GNU timeout admission before compilation
+and adds provider/failed-version/missing/non-executable regression cases. The
+existing diagnostic step, native success/hang/ignored-TERM tests, production
+admission function, recovery policies and job deadline remain unchanged.
+A job-scoped readiness regression protects Ubuntu 24.04 with CPython 3.11.9.
+
+Forecast protocol validation now rejects target-count times strategy-count
+budgets above 100,000 prediction rows before opening data files. The existing
+10,000-target and 100,000-row limits are unchanged; exact-boundary inputs remain
+accepted. Seventeen regression cases cover rejection ordering, CLI refusal,
+maximum target count and the inclusive row limit. This is bounded input
+admission, not a throughput, forecasting-quality or performance claim.
+
+Local focused tests and exact-head hosted checks are separate evidence gates.
+Publication is draft-only; current-main compatibility must be established by
+the hosted synthetic merge and its recorded parents. No merge, deployment,
+external validation, customer acceptance or production readiness is established.
+Production remains `HOLD` and existing HumanUnlock controls are unchanged.
+
 ### October 21 approved public module-type correction
 
 Founder-approved reviewer-surface repair advances outcome 2. The exact public

@@ -118,8 +118,17 @@ def load_protocol(path: Path, protocol_sha256: str) -> tuple[dict, bytes]:
     if not isinstance(window, dict) or set(window) != {"start", "end"}:
         raise ValueError("protocol requires a scheduled target window")
     start, end = _day(window["start"]), _day(window["end"])
-    if end < start or ((end - start).days + 1) * len(entities) > MAX_TARGETS:
+    target_count = ((end - start).days + 1) * len(entities)
+    if end < start or target_count > MAX_TARGETS:
         raise ValueError("target window is invalid or exceeds budget")
+    strategy_count = len(baselines) + 1
+    prediction_rows = target_count * strategy_count
+    if prediction_rows > MAX_ROWS:
+        raise ValueError(
+            f"protocol requires {prediction_rows} prediction rows "
+            f"({target_count} targets x {strategy_count} strategies), "
+            f"exceeding the row budget of {MAX_ROWS}"
+        )
     issue = protocol["issue_rule"]
     if not isinstance(issue, dict) or set(issue) != {"day_offset", "time_utc"} or not _integer(issue["day_offset"], -30, 0) or not isinstance(issue["time_utc"], str) or not re.fullmatch(r"\d{2}:\d{2}:\d{2}", issue["time_utc"]):
         raise ValueError("invalid fixed issue rule")

@@ -326,6 +326,73 @@ def _gateway_rollback_test_bash() -> str:
     raise RuntimeError("Bash is required for gateway rollback regression tests")
 
 
+def _gateway_public_contract_timeout_preflight() -> str:
+    workflow = (ROOT / ".github/workflows/gateway-public-contract-ci.yml").read_text(encoding="utf-8")
+    section = workflow.split("      - name: Verify native GNU timeout prerequisite\n", 1)[1]
+    section = section.split("      - name: Compile gateway dependency closure\n", 1)[0]
+    return textwrap.dedent(section.split("        run: |\n", 1)[1])
+
+
+def test_gateway_public_contract_ci_pins_supported_native_timeout_environment() -> None:
+    workflow = (ROOT / ".github/workflows/gateway-public-contract-ci.yml").read_text(encoding="utf-8")
+    job = workflow.split("  public-contract:\n", 1)[1]
+    assert "    runs-on: ubuntu-24.04\n" in job
+    assert "ubuntu-latest" not in job
+    assert job.index("Verify native GNU timeout prerequisite") < job.index("Compile gateway dependency closure")
+    assert job.index("Compile gateway dependency closure") < job.index("Run public contract tests without third-party dependencies")
+    assert "    timeout-minutes: 10\n" in job
+
+
+def test_gateway_public_contract_ci_preflight_matches_production_timeout_admission() -> None:
+    # Execute the real workflow step and unchanged production admission function
+    # with isolated launchers. Never treat a non-GNU/missing launcher as a skip,
+    # relax the production policy, or lengthen the native fixture deadlines.
+    preflight = _gateway_public_contract_timeout_preflight()
+    production = _bash_function(_repair_script(), "require_recovery_timeout") + "\nrequire_recovery_timeout\n"
+    with tempfile.TemporaryDirectory(prefix="gateway-timeout-preflight-") as directory:
+        root = Path(directory)
+        (root / "bin").mkdir()
+        launcher = root / "bin/timeout"
+        cases = (
+            ("gnu", "timeout (GNU coreutils) 9.4", 0, 0o700, 0),
+            ("uutils", "timeout (uutils coreutils) 0.9.0", 0, 0o700, 10),
+            ("misleading-failure", "timeout (GNU coreutils) 9.4", 29, 0o700, 10),
+            ("unknown", "timeout unknown provider", 0, 0o700, 10),
+            ("missing", "", 0, None, 10),
+        )
+        if os.name == "posix":
+            # Windows chmod does not implement POSIX executable permission bits.
+            cases += (("not-executable", "timeout (GNU coreutils) 9.4", 0, 0o600, 10),)
+        for name, banner, code, permissions, expected in cases:
+            launcher.unlink(missing_ok=True)
+            if permissions is not None:
+                launcher.write_text(
+                    '#!/bin/bash\n'
+                    '[[ $# -eq 1 && "$1" == --version ]] || exit 91\n'
+                    'printf "%s\\n" "$1" >> "$PWD/launcher.calls"\n'
+                    'printf "%s\\n" "$FIXTURE_TIMEOUT_BANNER"\n'
+                    'exit "$FIXTURE_TIMEOUT_EXIT"\n',
+                    encoding="utf-8", newline="\n")
+                launcher.chmod(permissions)
+            for label, body in (("workflow", preflight), ("production", production)):
+                calls = root / "launcher.calls"
+                calls.unlink(missing_ok=True)
+                # An absolute Bash executable launches the harness, so an empty
+                # fixture PATH cannot accidentally select the host's timeout.
+                harness = 'set -Eeuo pipefail\nPATH="$PWD/bin"\n' + body + '\nprintf "ADMITTED\\n"\n'
+                completed = subprocess.run(
+                    [_gateway_rollback_test_bash(), "-c", harness], cwd=root,
+                    env=dict(os.environ, FIXTURE_TIMEOUT_BANNER=banner, FIXTURE_TIMEOUT_EXIT=str(code)),
+                    capture_output=True, text=True, timeout=5, check=False)
+                detail = (name, label, completed)
+                assert completed.returncode == expected, detail
+                assert ("ADMITTED\n" in completed.stdout) is (expected == 0), detail
+                assert (calls.read_text().splitlines() if calls.exists() else []) == (
+                    ["--version"] if permissions == 0o700 else []), detail
+                if label == "workflow" and expected:
+                    assert "Native gateway fixtures require GNU timeout" in completed.stderr, detail
+
+
 def _gateway_external_postcheck_step() -> str:
     workflow = (ROOT / ".github/workflows/repair-gateway-dependency-closure.yml").read_text(encoding="utf-8")
     section = workflow.split("      - name: Verify public gateway contracts after repair\n", 1)[1]
