@@ -228,7 +228,9 @@ def scout_grants(profile, query, fetcher=request_json):
     for hit in hits:
         result = normalize_result(hit, score_hit(hit, qualification))
         ident = str(hit.get('id') or hit.get('oppId') or '')
-        url = f'https://www.grants.gov/search-results-detail/{ident}' if re.fullmatch(r'[0-9]{1,12}', ident) else 'https://www.grants.gov/search-grants'
+        if not re.fullmatch(r'[0-9]{1,12}', ident):
+            raise UserError('Grants.gov returned a listing without a stable numeric opportunity ID. No opportunities were accepted.')
+        url = f'https://www.grants.gov/search-results-detail/{ident}'
         rows.append({'title':str(result['title'])[:500], 'url':url, 'agency':str(result['agencyName'])[:200], 'deadline_as_reported':str(result['closeDate'])[:100], 'relevance_score':result['score'], 'reasons':result['reasons'], 'source_status':str(result['oppStatus'])[:100], 'eligibility':'UNVERIFIED'})
     rows.sort(key=lambda x:x['relevance_score'], reverse=True)
     total = response.get('data', {}).get('hitCount')
@@ -359,7 +361,7 @@ class MemberRuntime:
         self.stop=threading.Event()
         self.ai_times=store.get('ai_request_times',[])
         self.last_reads=store.get('source_read_times',{})
-    def run(self, kind, payload):
+    def run(self, kind, payload, *, scheduled=False):
         if not self.lock.acquire(blocking=False):
             raise UserError('Another task is running. Wait for its result before starting another.')
         ident=payload.get('request_id','')
@@ -386,6 +388,7 @@ class MemberRuntime:
                 self.store.put('source_read_times',self.last_reads)
                 result=scout_grants(self.profile,payload.get('query',self.profile['industry']))
                 self.store.put('scout_latest',result)
+                self.store.put('scout_scheduled_latest' if scheduled else 'scout_manual_latest',result)
             elif kind=='paper':
                 if time.time()-self.last_reads.get('paper',0)<3600:
                     raise UserError('The hourly paper bot has already checked this hour. Its latest result is below.')
@@ -423,7 +426,7 @@ class MemberRuntime:
                 schedules[kind]['next_run']=time.time()+3600
                 self.store.put('schedules',schedules)
                 try:
-                    self.run(kind,{'member':self.profile['id'],'request_id':str(uuid.uuid4()),'query':self.profile['industry']})
+                    self.run(kind,{'member':self.profile['id'],'request_id':str(uuid.uuid4()),'query':self.profile['industry']},scheduled=True)
                 except Exception as exc:
                     self.store.put(kind+'_last_error',{'utc':now(),'error_class':type(exc).__name__,'message':str(exc) if isinstance(exc,UserError) else 'Task failed; inspect the local audit.'})
 
@@ -474,7 +477,7 @@ def make_handler(runtime: MemberRuntime, public_dir: Path):
                 if path=='/health': return self.respond(200,{'status':'ok'})
                 if path=='/api/member/status':return self.respond(200,{'ready':True,'member':runtime.profile['id'],'ai_ready':bool(os.environ.get('OPENAI_API_KEY')),'schedules':runtime.store.get('schedules',{}),'live_orders':False,'workspace_revision_check':True})
                 if path=='/api/member/workspace':return self.respond(200,runtime.store.workspace_snapshot())
-                if path=='/api/member/activity':return self.respond(200,{'paper':runtime.store.get('paper_bot'),'scout':runtime.store.get('scout_latest'),'schedules':runtime.store.get('schedules',{}),'errors':{k:runtime.store.get(k+'_last_error') for k in ('paper','scout')}})
+                if path=='/api/member/activity':return self.respond(200,{'paper':runtime.store.get('paper_bot'),'scout':runtime.store.get('scout_latest'),'scout_manual':runtime.store.get('scout_manual_latest'),'scout_scheduled':runtime.store.get('scout_scheduled_latest'),'schedules':runtime.store.get('schedules',{}),'errors':{k:runtime.store.get(k+'_last_error') for k in ('paper','scout')}})
                 if path=='/api/member/audit':return self.respond(200,{'events':runtime.store.audit(),'boundary':'Local integrity chain; not external attestation.'})
                 if path not in STATIC_PATHS: return self.respond(404,{'detail':'Not found.'})
                 file=(public_dir/STATIC_PATHS[path]).resolve()

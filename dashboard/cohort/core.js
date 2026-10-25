@@ -34,7 +34,7 @@ export function workspaceStartupChoice(local, saved) {
   if (['items','measurements','grants','scout','care','reviews'].every(k=>local[k].length===0)&&local.paper===null) return 'backup';
   return 'conflict';
 }
-export function validateWorkspace(value, member) {
+export function validateWorkspace(value, member, {forLocalBackup=false}={}) {
   if (!value || value.schema !== SCHEMA || value.member !== member) throw new Error('This file belongs to a different member or workspace version.');
   const expected=['schema','member','items','measurements','grants','scout','care','reviews','paper'];
   if(Object.keys(value).some(k=>!expected.includes(k))||Object.keys(value).length!==expected.length)throw new Error('Unexpected workspace fields.');
@@ -52,6 +52,21 @@ export function validateWorkspace(value, member) {
   for(const r of value.reviews)if(!Array.isArray(r.findings)||r.findings.length>2000)throw new Error('Invalid workflow review.');
   if(value.paper!==null){const p=value.paper;if(!p||p.mode!=='paper'||p.live_authorized!==false||!Array.isArray(p.fills)||p.fills.length>3000||!Array.isArray(p.curve)||p.curve.length<22||p.curve.length>3000)throw new Error('Invalid paper simulation.');for(const key of ['cash','equity','position','fees','pnl','drawdown'])if(typeof p[key]!=='number'||!Number.isFinite(p[key]))throw new Error('Invalid paper values.');for(const f of p.fills)if(!f||!['buy','sell'].includes(f.side)||!validText(f.date,30)||['quantity','price','fee'].some(k=>typeof f[k]!=='number'||!Number.isFinite(f[k])||f[k]<0))throw new Error('Invalid paper fill.');for(const c of p.curve)if(!c||!Number.isFinite(c.equity))throw new Error('Invalid equity curve.');}
   if (JSON.stringify(value).length > 1_000_000) throw new Error('Workspace is larger than the 1 MB import limit.');
+  if (forLocalBackup) {
+    // Existing browser records remain readable. New imports/Scout merges must
+    // fit both the runtime's ASCII-escaped storage and its wire request limit.
+    let numericReserve=0;
+    const ascii=JSON.stringify(value,(_key,item)=>{
+      if(typeof item==='number'){
+        if(!Number.isFinite(item))throw new Error('Workspace contains a nonfinite number.');
+        // Reserve for Python/JS differences in finite-number formatting.
+        numericReserve+=8;
+      }
+      return item;
+    }).replace(/[\u007f-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
+    const envelope=JSON.stringify({member,workspace:null,expected_revision:Number.MAX_SAFE_INTEGER}).length-4;
+    if(ascii.length+numericReserve+envelope>1_000_000)throw new Error('Workspace exceeds the 1 MB local backup limit after encoding. Existing records were not changed.');
+  }
   return structuredClone(value);
 }
 export function reviewWork(items) {

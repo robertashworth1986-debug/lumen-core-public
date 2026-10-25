@@ -99,7 +99,8 @@ test('latest scout download retains the complete returned set even when the work
   const initial=emptyWorkspace('excalis');
   initial.scout=Array.from({length:500},(_,i)=>({id:`owner-${i}`,title:`Saved ${i}`}));
   const result={query:'wave energy',returned_count:20,total_available:135,source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'},opportunities:Array.from({length:20},(_,i)=>({title:`Listing ${i}`,url:`https://www.grants.gov/search-results-detail/${10000+i}`}))};
-  const h=backupHarness(initial,async()=>response({schedules:{},errors:{},scout:result,paper:null}));
+  const scheduled={...result,query:'Manufacturing',opportunities:[]};
+  const h=backupHarness(initial,async()=>response({schedules:{},errors:{},scout:scheduled,scout_manual:result,scout_scheduled:scheduled,paper:null}));
   h.context.document.querySelectorAll=()=>[];
   h.node('#runtime-activity').querySelectorAll=()=>[];
   await h.context.loadActivity();
@@ -120,6 +121,26 @@ test('scout leaves the workspace unchanged when the full backup would exceed its
   assert.equal(h.context.inspect().state.scout.length,0);
   assert.equal(h.context.inspect().state.measurements[0].notes.length,initial.measurements[0].notes.length);
   assert.match(h.node('#toast').textContent,/1 MB/);
+});
+
+test('Unicode expansion cannot change scout state before the local backup rejects its size',async()=>{
+  const initial=emptyWorkspace('excalis');initial.measurements=[{notes:'😀'.repeat(90000)}];
+  validateWorkspace(initial,'excalis'); // Legacy browser records remain readable.
+  const h=backupHarness(initial,async()=>response({opportunities:[{title:'New',url:'https://example.test/new'}],source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'}}));
+  h.node('#scout-query').value='wave';await vm.runInContext("action('scan-grants')",h.context);
+  assert.deepEqual(h.context.inspect().state,initial);
+  assert.match(h.node('#toast').textContent,/1 MB/);
+});
+
+test('workspace import rejects Unicode expansion and reserves the local request envelope before replacing records',async()=>{
+  for(const notes of ['😀'.repeat(90000),'x'.repeat(999800)]){
+    const incoming=emptyWorkspace('excalis');incoming.measurements=[{notes}];
+    const initial=emptyWorkspace('excalis');initial.scout=[{id:'keep',title:'Keep owner record'}];
+    const h=backupHarness(initial,async()=>{throw new Error('Unexpected network');});
+    h.context.importWorkspace();const raw=JSON.stringify(incoming);
+    await assert.rejects(h.context.dialog.onSubmit({get:()=>({size:Buffer.byteLength(raw),text:async()=>raw})}),/1 MB/);
+    assert.deepEqual(h.context.inspect().state,initial);
+  }
 });
 
 test('startup conflict performs no write and offers both versions before an owner chooses',async()=>{
