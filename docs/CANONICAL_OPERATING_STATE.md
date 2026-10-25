@@ -7,6 +7,25 @@
 
 ## One commercial sentence
 
+### October 25 Mission Control snapshot identity correction (local review)
+
+This correction advances outcome 2 by making the existing PR #261 meeting
+view traceable against current main. The inventory files had advanced while
+the view linked their asset digests to the older e706e91 commit. The view now
+pins inventory links to 2022d0c and verifies the exact SHA-256 of each of its
+three public JSON inputs before parsing or rendering it. A changed or missing
+input, unavailable browser digest support, or a digest failure leaves that
+inventory unavailable. The other independently verified snapshots can still
+render. Two exact-file LF rules retain the same source bytes on Windows.
+
+The historical forecast comparisons retain their original e706e91 sources and
+unchanged observations. Snapshot identity is not outcome validation. The view
+adds no polling, broker connection, operator control or external send. Both
+sides of the current-main operating-note conflict are preserved. Local behavior
+and browser checks are recorded privately; hosted checks and publication of
+this correction remain separate gates. No merge or deployment is authorized
+by this local record, and production remains HOLD.
+
 ### October 25 residual reviewer-gate and capacity hardening (draft)
 
 This bounded source change advances outcome 2: reproducible reviewer evidence.
@@ -1054,6 +1073,38 @@ The manual exact-snapshot VPS workflow, signed archive checks and rollback
 capture remain the deployment path. No runtime, DNS, credential, financial
 authority or live-order gate is changed by this source review. Exact hosted
 checks and merge receipts must be recorded for the resulting commit.
+
+### October 21 founder-requested Mission Control review view
+
+Outcome 2 remains one bounded external evaluation or paid scope. The founder
+requested a working Mission Control to show during a mentor meeting, including
+the earlier rolling baseline and dollar display. The recovered research layout
+is restored as a read-only review view; the retired public
+`mission_control.html` redirect remains distinct from the protected operator
+console. No broker, private API, live worker or order authority is activated.
+
+The legacy display could substitute Sharpe 4.2772, improvement 458.2% and
+$35,116/hour when source metrics were missing. Those fallback figures are not
+evidence of performance or money. Missing and invalid values must remain
+unavailable, reported historical numbers must retain their status, and listed
+hashes or order identifiers must not imply independent verification.
+
+The frozen September 21 forecast packets permit a narrower comparison: original
+January 1–July 12 mean absolute forecast error is 15,979.086850308855 MWh versus
+17,874.171755209874 for direct LightGBM; the later July 13–September 8 window is
+16,107.043528292354 versus 19,765.54376351574. These are approximately 10.60% and
+18.51% lower error in historical comparisons. Both promotion decisions remain
+HOLD. Neither comparison establishes prospective accuracy, operational savings,
+trading returns, money collected or a continuously operating live feed.
+
+The owner-private meeting view is published separately from the operator
+runtime. Its five workspace tabs, source search, evidence details, presentation
+layout and two historical baseline windows were checked in Chromium at desktop,
+tablet and phone widths. Malformed or incomplete snapshots leave unknown counts
+and clear partial records. The source checks passed 58 targeted tests; these
+checks establish display behavior and existing public boundaries, not financial
+performance or completed external review. The canonical public redirect is
+unchanged.
 
 ### October 14 authorized merges and paper-readiness repairs
 
