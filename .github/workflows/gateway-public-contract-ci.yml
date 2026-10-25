@@ -83,6 +83,21 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Verify native GNU timeout prerequisite
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout_bin="$(type -P timeout)" || timeout_bin=''
+          timeout_version=''
+          if [[ -z "$timeout_bin" || ! -x "$timeout_bin" ]] \
+            || ! timeout_version="$("$timeout_bin" --version)" \
+            || [[ "$timeout_version" != 'timeout (GNU coreutils)'* ]]; then
+            printf '::error::Native gateway fixtures require GNU timeout; resolved=%s version=%s\n' \
+              "${timeout_bin:-missing}" "${timeout_version:-unavailable}" >&2
+            exit 10
+          fi
+          printf 'Native gateway timeout: %s (%s)\n' "$timeout_bin" "${timeout_version%%$'\n'*}"
+
       - name: Compile gateway dependency closure
         run: |
           set -euo pipefail
