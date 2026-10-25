@@ -11,6 +11,7 @@ on:
       - 'code/lumalinkedin_resume_engine_v1.py'
       - 'code/ops/RUN_EMAIL_RESUME_DISPATCHER.ps1'
       - 'tests/test_repository_trust_policy.py'
+      - 'code/ops/VERIFY_CHANGED_WHITESPACE.py'
       - '.github/workflows/**'
   push:
     branches: [main]
@@ -23,6 +24,7 @@ on:
       - 'code/lumalinkedin_resume_engine_v1.py'
       - 'code/ops/RUN_EMAIL_RESUME_DISPATCHER.ps1'
       - 'tests/test_repository_trust_policy.py'
+      - 'code/ops/VERIFY_CHANGED_WHITESPACE.py'
       - '.github/workflows/**'
 
 permissions:
@@ -52,9 +54,4 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_repository_trust_policy.py' -v
 
       - name: Reject whitespace errors
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: |
-          set -euo pipefail
-          git cat-file -e "${BASE_SHA}^{commit}"
-          git diff --check "${BASE_SHA}...HEAD"
+        run: python code/ops/VERIFY_CHANGED_WHITESPACE.py

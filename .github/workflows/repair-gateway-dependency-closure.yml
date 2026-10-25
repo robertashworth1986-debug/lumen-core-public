@@ -196,28 +196,144 @@ jobs:
 
       - name: Verify public gateway contracts after repair
         shell: bash
+        env:
+          BUNDLE_SHA: ${{ steps.package.outputs.bundle_sha }}
+          HARDENING_SHA: ${{ steps.package.outputs.hardening_sha }}
         run: |
           set -euo pipefail
+          # These runner-side records never trigger or certify remote restoration.
+          POSTCHECK_STAGE=setup
+          STAGE_BEGAN=false
+          STAGE_COMPLETED=false
+          COMPLETED_STAGES=''
+          STARTED_SHA=''
+          POSTCHECK_INTERRUPTED=false
+          health_body='' status_body='' operator_body='' operator_headers=''
+          websocket_body='' operator_receipt=''
+          record_external_outcome() {
+            python3 - "$1" "$2" "$POSTCHECK_STAGE" "$STAGE_BEGAN" "$STAGE_COMPLETED" \
+              "$COMPLETED_STAGES" "$STARTED_SHA" "$POSTCHECK_INTERRUPTED" <<'PY'
+          import hashlib, json, os, re, stat, sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+          kind, code, stage, began, completed, stages, started_sha, interrupted = sys.argv[1:]
+          expected_stages = ['health_request', 'status_request', 'health_contract', 'status_contract',
+                             'metrics', 'openapi_json', 'docs', 'redoc', 'websocket', 'legacy_receipt']
+          assert kind in {'started', 'terminal'} and re.fullmatch(r'[0-9]{1,3}', code)
+          code = int(code)
+          assert 0 <= code <= 255 and stage in ['setup', 'complete', *expected_stages]
+          assert began in {'true', 'false'} and completed in {'true', 'false'} and interrupted in {'true', 'false'}
+          completed_stages = stages.splitlines()
+          assert completed_stages == expected_stages[:len(completed_stages)]
+          directory = Path('/tmp/gateway-repair')
+          assert directory.is_dir() and not directory.is_symlink()
+          def stable_bytes(path, limit=2*1024*1024):
+              before = path.lstat()
+              assert stat.S_ISREG(before.st_mode) and before.st_nlink == 1 and before.st_size <= limit
+              data = path.read_bytes()
+              after = path.lstat()
+              fields = ('st_dev', 'st_ino', 'st_mode', 'st_nlink', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+              assert all(getattr(before, key) == getattr(after, key) for key in fields)
+              assert len(data) == before.st_size
+              return data
+          digest = lambda data: hashlib.sha256(data).hexdigest()
+          binding = {key: os.environ[key] for key in
+                     ('RELEASE_COMMIT', 'BUNDLE_SHA', 'HARDENING_SHA', 'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT')}
+          assert re.fullmatch(r'[0-9a-f]{40}', binding['RELEASE_COMMIT'])
+          assert all(re.fullmatch(r'[0-9a-f]{64}', binding[key]) for key in ('BUNDLE_SHA', 'HARDENING_SHA'))
+          assert all(re.fullmatch(r'[1-9][0-9]*', binding[key]) for key in ('GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT'))
+          helper_bytes = stable_bytes(directory/'gateway-repair-receipt.txt')
+          helper_lines = helper_bytes.decode('utf-8').splitlines()
+          for marker in ('GATEWAY_RUNTIME_CLOSURE_REPAIR_OK',
+                         'Source commit: ' + binding['RELEASE_COMMIT'],
+                         'Bundle SHA-256: ' + binding['BUNDLE_SHA'],
+                         'Service hardening SHA-256: ' + binding['HARDENING_SHA']):
+              assert helper_lines.count(marker) == 1
+          prefix = 'Private helper outcome receipt SHA-256: '
+          outcome_hashes = [line[len(prefix):] for line in helper_lines if line.startswith(prefix)]
+          assert len(outcome_hashes) == 1 and re.fullmatch(r'[0-9a-f]{64}', outcome_hashes[0])
+          binding.update(helper_stdout_artifact_sha256=digest(helper_bytes),
+                         helper_outcome_reported_sha256=outcome_hashes[0])
+          result = dict(schema='lumencore.gateway_external_verification.v1', kind=kind,
+                        recorded_at=datetime.now(timezone.utc).isoformat(), binding=binding,
+                        binding_basis='Exact workflow inputs and retained helper stdout; private helper receipt not independently read back.',
+                        stage=stage, stage_began=began == 'true', stage_completed=completed == 'true',
+                        completed_stages=completed_stages, original_exit_code=code,
+                        interrupted=interrupted == 'true', restoration_attempted=False,
+                        restoration_verified=False, service_state_verified=False,
+                        production_readiness_verified=False)
+          passed = (code == 0 and stage == 'complete' and completed_stages == expected_stages
+                    and began == completed == 'true' and interrupted == 'false')
+          if kind == 'started':
+              assert code == 0 and stage == 'setup' and not completed_stages and not started_sha
+              result['status'] = 'EXTERNAL_VERIFICATION_STARTED_UNKNOWN'
+              name = 'public-verification-started.json'
+          else:
+              assert re.fullmatch(r'[0-9a-f]{64}', started_sha)
+              start_bytes = stable_bytes(directory/'public-verification-started.json')
+              assert digest(start_bytes) == started_sha
+              start = json.loads(start_bytes)
+              assert start['schema'] == result['schema'] and start['kind'] == 'started'
+              assert start['binding'] == binding and start['status'] == 'EXTERNAL_VERIFICATION_STARTED_UNKNOWN'
+              result['started_receipt_sha256'] = started_sha
+              result['status'] = ('EXTERNAL_CHECKS_PASSED' if passed else
+                                  'UNKNOWN_INTERRUPTED_EXTERNAL_VERIFICATION' if interrupted == 'true' else
+                                  'EXTERNAL_VERIFICATION_FAILED' if code else 'UNKNOWN_INCOMPLETE_EXTERNAL_VERIFICATION')
+              name = 'public-verification-outcome.json'
+          data = (json.dumps(result, sort_keys=True, indent=2) + '\n').encode()
+          fd = os.open(directory/name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_NOFOLLOW', 0), 0o600)
+          with os.fdopen(fd, 'wb') as stream:
+              stream.write(data); stream.flush(); os.fsync(stream.fileno())
+          assert stable_bytes(directory/name) == data
+          print(digest(data))
+          if kind == 'terminal' and code == 0 and not passed:
+              raise SystemExit(98)
+          PY
+          }
+          finish_external_verification() {
+            local original_rc=$? final_rc
+            final_rc=$original_rc
+            trap - EXIT
+            trap '' INT TERM
+            if ! record_external_outcome terminal "$original_rc"; then
+              echo '::error::External verification outcome persistence failed; helper recovery remains pending manual review.' >&2
+              if [[ "$original_rc" -eq 0 ]]; then final_rc=97; fi
+            fi
+            rm -f -- "$health_body" "$status_body" "$operator_body" "$operator_headers" "$websocket_body" "$operator_receipt" || true
+            exit "$final_rc"
+          }
+          start_stage() { POSTCHECK_STAGE="$1"; STAGE_BEGAN=true; STAGE_COMPLETED=false; }
+          complete_stage() { COMPLETED_STAGES+="$POSTCHECK_STAGE"$'\n'; STAGE_COMPLETED=true; }
+          trap finish_external_verification EXIT
+          trap 'POSTCHECK_INTERRUPTED=true; exit 130' INT
+          trap 'POSTCHECK_INTERRUPTED=true; exit 143' TERM
+          STARTED_SHA="$(record_external_outcome started 0)" || exit 96
           health_body=$(mktemp)
           status_body=$(mktemp)
           operator_body=$(mktemp)
           operator_headers=$(mktemp)
           websocket_body=$(mktemp)
           operator_receipt=$(mktemp)
-          trap 'rm -f -- "$health_body" "$status_body" "$operator_body" "$operator_headers" "$websocket_body" "$operator_receipt"' EXIT
+          start_stage health_request
           health_code=$(curl --fail-with-body -sS --max-time 15 \
             -o "$health_body" -w '%{http_code}' https://lumen-core.ai/health)
+          complete_stage
+          start_stage status_request
           status_code=$(curl --fail-with-body -sS --max-time 15 \
             -o "$status_body" -w '%{http_code}' https://lumen-core.ai/api/public/status)
-          [[ "$health_code" == 200 ]]
-          [[ "$status_code" == 200 ]]
-          for body in "$health_body" "$status_body"; do
+          complete_stage
+          for label in health status; do
+            start_stage "${label}_contract"
+            if [[ "$label" == health ]]; then body="$health_body"; code="$health_code";
+            else body="$status_body"; code="$status_code"; fi
+            [[ "$code" == 200 ]]
             jq -e '
             .status == "ok" and
             .service == "luma-experience-gateway" and
             .access_boundary == "operator_api_v1" and
             .public_surface == "minimal"
             ' "$body" >/dev/null
+            complete_stage
           done
 
           probe_anonymous_operator_http() {
@@ -228,6 +344,7 @@ jobs:
             local content_type
             local normalized_headers
             local expected_detail
+            start_stage "$label"
             : > "$operator_body"
             : > "$operator_headers"
             result=$(curl -sS --max-time 15 \
@@ -255,6 +372,7 @@ jobs:
             grep -Eiq '^pragma:[[:space:]]*no-cache([[:space:]]|$)' \
               <<< "$normalized_headers"
             printf 'anonymous_%s_http=%s\n' "$label" "$code" >> "$operator_receipt"
+            complete_stage
           }
 
           probe_anonymous_operator_http /metrics metrics
@@ -262,6 +380,7 @@ jobs:
           probe_anonymous_operator_http /docs docs
           probe_anonymous_operator_http /redoc redoc
 
+          start_stage websocket
           websocket_code=$(curl -sS --max-time 15 --http1.1 \
             --header 'Cache-Control: no-cache' \
             --header 'Connection: Upgrade' \
@@ -273,12 +392,18 @@ jobs:
             "https://lumen-core.ai/ws?verify=${RELEASE_COMMIT:0:12}")
           [[ "$websocket_code" == 403 || "$websocket_code" == 404 ]]
           printf 'anonymous_ws_upgrade_http=%s\n' "$websocket_code" >> "$operator_receipt"
+          complete_stage
 
+          start_stage legacy_receipt
           printf 'source_commit=%s\nbundle_sha256=%s\nservice_hardening_sha256=%s\nhealth_http=%s\npublic_status_http=%s\n' \
             "$RELEASE_COMMIT" '${{ steps.package.outputs.bundle_sha }}' \
             '${{ steps.package.outputs.hardening_sha }}' "$health_code" "$status_code" \
             > /tmp/gateway-repair/public-verification-receipt.txt
           cat "$operator_receipt" >> /tmp/gateway-repair/public-verification-receipt.txt
+          complete_stage
+          POSTCHECK_STAGE=complete
+          STAGE_BEGAN=true
+          STAGE_COMPLETED=true
 
       - name: Remove local private unlock staging
         if: always()
@@ -308,5 +433,7 @@ jobs:
             /tmp/gateway-repair/gateway-repair-manifest.txt
             /tmp/gateway-repair/gateway-repair-receipt.txt
             /tmp/gateway-repair/public-verification-receipt.txt
+            /tmp/gateway-repair/public-verification-started.json
+            /tmp/gateway-repair/public-verification-outcome.json
           if-no-files-found: warn
           retention-days: 30

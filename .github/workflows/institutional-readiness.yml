@@ -54,12 +54,7 @@ jobs:
           retention-days: 30
 
       - name: Reject whitespace errors
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: |
-          set -euo pipefail
-          git cat-file -e "${BASE_SHA}^{commit}"
-          git diff --check "${BASE_SHA}...HEAD"
+        run: python code/ops/VERIFY_CHANGED_WHITESPACE.py
 
   windows-paper-runner:
     name: Windows paper runner (mocked fixtures)

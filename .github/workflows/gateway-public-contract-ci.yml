@@ -71,8 +71,8 @@ permissions:
 
 jobs:
   public-contract:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -96,6 +96,55 @@ jobs:
             code/ops/probe_public_health.py \
             tests/test_public_health_probe.py \
             tests/test_vps_runtime_diagnostic_workflow.py
+
+      - name: Record timeout prerequisite diagnostics
+        continue-on-error: true
+        timeout-minutes: 1
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          import subprocess
+
+          selected = shutil.which("timeout")
+          resolved = os.path.realpath(selected) if selected else None
+          executable = bool(selected and os.path.isfile(selected) and os.access(selected, os.X_OK))
+          evidence = {
+              "selected_path": selected,
+              "resolved_path": resolved,
+              "executable": executable,
+              "version_timeout_seconds": 5,
+              "version_exit_status": None,
+              "version_stdout": "",
+              "version_stderr": "",
+              "version_output_complete": False,
+          }
+          # Observe the runner prerequisite, never execute an arbitrary PATH shadow.
+          if selected not in ("/usr/bin/timeout", "/bin/timeout") or not executable:
+              evidence["status"] = "SKIPPED_UNTRUSTED_OR_UNAVAILABLE_PATH"
+          else:
+              try:
+                  result = subprocess.run(
+                      [selected, "--version"], stdin=subprocess.DEVNULL,
+                      capture_output=True, timeout=5, check=False,
+                  )
+                  evidence.update(
+                      status="COMPLETED", version_exit_status=result.returncode,
+                      version_stdout=result.stdout.decode("utf-8", errors="backslashreplace"),
+                      version_stderr=result.stderr.decode("utf-8", errors="backslashreplace"),
+                      version_output_complete=True,
+                  )
+              except subprocess.TimeoutExpired as exc:
+                  evidence.update(
+                      status="TIMED_OUT",
+                      version_stdout=(exc.stdout or b"").decode("utf-8", errors="backslashreplace"),
+                      version_stderr=(exc.stderr or b"").decode("utf-8", errors="backslashreplace"),
+                  )
+              except OSError as exc:
+                  evidence.update(status="LAUNCH_FAILED", error=str(exc))
+          print(json.dumps(evidence, indent=2, sort_keys=True))
+          PY
 
       - name: Run public contract tests without third-party dependencies
         run: |
