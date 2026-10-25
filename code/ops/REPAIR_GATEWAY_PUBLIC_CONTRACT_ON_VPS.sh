@@ -474,10 +474,11 @@ record_recovery_evidence() {
   local kind="${1:-}" trigger_code="${2:-0}" requested_source="${3:-}"
   [[ $# -ge 1 && $# -le 3 ]] || return 14
   case "$kind" in
-    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result|control_state|control_metadata|restore_dropin) ;;
+    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result|control_state|control_metadata|restore_dropin|restore_source) ;;
     *) return 14 ;;
   esac
   [[ "$kind" != restore_dropin || ( $# -eq 2 && "$trigger_code" == 0 ) ]] || return 14
+  [[ "$kind" != restore_source || ( $# -eq 3 && "$trigger_code" == 0 ) ]] || return 14
   [[ "$kind" != dropin_result || $# -eq 2 ]] || return 14
   [[ "$kind" != runtime_directory_result || $# -eq 2 ]] || return 14
   [[ "$kind" != dropin_directory_result || $# -eq 2 ]] || return 14
@@ -534,7 +535,7 @@ mutation_failure, mutation_target, mutation_exit_code = sys.argv[31:34]
 admission_status, admission_origin, admission_deadline, admission_last = sys.argv[34:38]
 admission_operation, admission_target, admission_clock_code = sys.argv[38:41]
 relatives = sys.argv[41:]
-query_kinds = {"source_state", "source_result"}
+query_kinds = {"source_state", "source_result", "restore_source"}
 control_files = dict([
     (("control_state", "service_drop_in"), "service-drop-in.state"),
     (("control_state", "service_drop_in_directory"), "service-drop-in-dir.state"),
@@ -613,6 +614,34 @@ def restore_dropin_from_capture(prepared):
     state_entry, state_raw = inventory("service-drop-in.state", capture=True, capture_limit=128)
     if state_entry != state_expected or state_raw != b"present\n" or expected is None:
         raise SystemExit("dropin_capture_requires_prepared_present")
+    path = Path(dropin_target)
+    if path.parent != Path(dropin_directory_target):
+        raise SystemExit("unsafe_dropin_capture_destination")
+    restore_file_from_capture(expected, path, directory, "service-drop-in.before")
+
+
+def restore_source_from_capture(prepared):
+    # Only the fixed bundle selector is accepted. No caller provides paths/flags.
+    if (requested_source not in relatives
+            or not re.fullmatch(r"[A-Za-z0-9_/.-]+", requested_source)
+            or any(part in {"", ".", ".."} for part in requested_source.split("/"))
+            or requested_source in prepared["missing_source_files"]):
+        raise SystemExit("invalid_source_capture_selector")
+    name = "existing/" + requested_source
+    expected = next((item for item in prepared["files"] if item["path"] == name), None)
+    if expected is None:
+        raise SystemExit("source_capture_requires_prepared_present")
+    root = Path(target_root)
+    if not root.is_absolute() or any(part in {".", ".."} for part in root.parts):
+        raise SystemExit("unsafe_source_capture_root")
+    path = root / requested_source
+    backup = directory / name
+    restore_file_from_capture(expected, path, backup.parent, backup.name, source_root=root)
+
+
+def restore_file_from_capture(expected, path, source_parent, source_name, *, source_root=None):
+    # Internal mechanics shared by the fixed drop-in and allowlisted source
+    # adapters. Full pinned inventory validation precedes either adapter.
     if type(expected.get("bytes")) is not int or expected["bytes"] < 0:
         raise SystemExit("invalid_dropin_capture_length")
     required = ("O_NOFOLLOW", "O_DIRECTORY", "O_TMPFILE", "fchown", "fchmod",
@@ -621,10 +650,8 @@ def restore_dropin_from_capture(prepared):
             or os.open not in os.supports_dir_fd or os.stat not in os.supports_dir_fd
             or os.stat not in os.supports_follow_symlinks or os.utime not in os.supports_fd):
         raise SystemExit("dropin_capture_platform_capability_unavailable")
-    path = Path(dropin_target)
-    if (not path.is_absolute() or path.parent != Path(dropin_directory_target)
-            or any(part in {".", ".."} for part in path.parts)):
-        raise SystemExit("unsafe_dropin_capture_destination")
+    if (not path.is_absolute() or any(part in {".", ".."} for part in path.parts)):
+        raise SystemExit("unsafe_recovery_capture_destination")
     descriptors = []
 
     def held_open(*args, **kwargs):
@@ -693,22 +720,35 @@ def restore_dropin_from_capture(prepared):
 
     try:
         backup_fd, backup_chain = open_chain(directory)
+        source_parent_fd, source_chain = open_chain(source_parent)
         parent_fd, parent_chain = open_chain(path.parent)
-        for descriptor in (backup_fd, parent_fd, parent_chain[-2][0] if len(parent_chain) > 1 else parent_fd):
+        protected = [backup_fd, source_parent_fd, parent_fd,
+                     parent_chain[-2][0] if len(parent_chain) > 1 else parent_fd]
+        if source_root is not None:
+            # Protect every nested destination/source ancestor under the fixed
+            # roots, not only the immediate parent. System ancestors may have
+            # different owners; their no-follow identities are still checked.
+            for chain, parent, root in ((source_chain, source_parent, directory),
+                                        (parent_chain, path.parent, source_root)):
+                for index, ancestor in enumerate(list(reversed(parent.parents)) + [parent]):
+                    if ancestor == root or root in ancestor.parents:
+                        protected.append(chain[index][0])
+        for descriptor in protected:
             info = os.fstat(descriptor)
             if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
                 raise SystemExit("unsafe_dropin_capture_parent_permissions")
         # Anonymous, private descriptor staging: unsupported filesystems fail
         # before target creation; no named temporary file or fallback is used.
         staged = held_open(".", os.O_TMPFILE | os.O_RDWR, 0o600, dir_fd=backup_fd)
-        source_fd = held_open("service-drop-in.before", os.O_RDONLY | os.O_NOFOLLOW, dir_fd=backup_fd)
-        captured, attributes, source_info = read_descriptor(source_fd, "service-drop-in.before", staged)
-        if captured != expected or identity(os.stat("service-drop-in.before", dir_fd=backup_fd, follow_symlinks=False)) != identity(source_info):
+        source_fd = held_open(source_name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=source_parent_fd)
+        captured, attributes, source_info = read_descriptor(source_fd, expected["path"], staged)
+        if captured != expected or identity(os.stat(source_name, dir_fd=source_parent_fd, follow_symlinks=False)) != identity(source_info):
             raise SystemExit("dropin_capture_does_not_match_prepared")
         os.fsync(staged)
         # Revalidate descriptor/path ancestry immediately before exclusive create.
         # This is not a claim of atomic protection from privileged later renames.
         check_chain(backup_chain)
+        check_chain(source_chain)
         check_chain(parent_chain)
         target_fd = held_open(path.name, os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_RDWR, 0o600, dir_fd=parent_fd)
         target_identity = (os.fstat(target_fd).st_dev, os.fstat(target_fd).st_ino)
@@ -734,7 +774,7 @@ def restore_dropin_from_capture(prepared):
         # existing inventory; this is not a universal cp -a equivalence claim.
         os.utime(target_fd, ns=(source_info.st_atime_ns, source_info.st_mtime_ns))
         os.fsync(target_fd)
-        restored, _, _ = read_descriptor(target_fd, "service-drop-in.before")
+        restored, _, _ = read_descriptor(target_fd, expected["path"])
         if restored != expected:
             raise SystemExit("dropin_capture_result_mismatch")
         observed = os.stat(path.name, dir_fd=parent_fd, follow_symlinks=False)
@@ -1131,6 +1171,9 @@ else:
         raise SystemExit("recovery_backup_changed")
     if kind == "restore_dropin":
         restore_dropin_from_capture(prepared)
+        raise SystemExit(0)
+    if kind == "restore_source":
+        restore_source_from_capture(prepared)
         raise SystemExit(0)
     if kind in control_kinds:
         # Parse only the same captured bytes whose complete entry matches the
@@ -1966,6 +2009,17 @@ finish_rollback() {
   exit "$rc"
 }
 
+restore_recovery_source() {
+  [[ $# -eq 1 ]] || return 14
+  local relative matched=false
+  for relative in "${BUNDLE_FILES[@]}"; do
+    if [[ "$1" == "$relative" ]]; then matched=true; break; fi
+  done
+  [[ "$matched" == true && "$1" =~ ^[A-Za-z0-9_/.-]+$ && "$1" != /* && "$1" != */ && "$1" != *//* ]] || return 14
+  case "/$1/" in */./*|*/../*) return 14 ;; esac
+  record_recovery_evidence restore_source 0 "$1"
+}
+
 restore_recovery_dropin() {
   [[ $# -eq 0 ]] || return 14
   record_recovery_evidence restore_dropin 0
@@ -2205,7 +2259,7 @@ rollback() {
         # changed recovery bytes must not be copied or followed by service start.
         checked_restore_step source_state "$rel" read_recovery_source_state "$rel" present || finish_rollback "$rc"
         checked_restore_step target_absent "$rel" require_recovery_target_absent "$rel" || finish_rollback "$rc"
-        checked_restore_step source_copy "$rel" bounded_recovery_copy "$backup" "$target" || finish_rollback "$rc"
+        checked_restore_step source_copy "$rel" restore_recovery_source "$rel" || finish_rollback "$rc"
       fi
       checked_restore_step source_result "$rel" read_recovery_source_result "$rel" "$RECOVERY_SOURCE_STATE" || finish_rollback "$rc"
     done
@@ -2222,7 +2276,8 @@ rollback() {
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
         checked_restore_step dropin_parent_create service_drop_in_directory bounded_recovery_mutation dropin_parent_create service_drop_in_directory || finish_rollback "$rc"
         # Recheck prepared custody after removal/parent work. The following
-        # absence guard stays last; copy still reopens a pathname afterward.
+        # absence guard precedes admission; the writer then validates custody
+        # and creates exclusively from its verified descriptor capture.
         checked_restore_step dropin_state_read service_drop_in require_present_recovery_dropin || finish_rollback "$rc"
         checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
         checked_restore_step dropin_copy service_drop_in restore_recovery_dropin || finish_rollback "$rc"

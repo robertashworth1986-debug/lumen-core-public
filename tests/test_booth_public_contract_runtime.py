@@ -1132,6 +1132,8 @@ fixture_timeout() {
         just_before) value=1599999999999 ;;
         after) value=1600000000001 ;;
         backward) value=0 ;;
+        source_reappeared) printf 'intervening source writer\n' > "$TARGET_ROOT/entry.py" ;;
+        source_backup_changed) printf 'intervening source backup\n' > "$BACKUP_DIR/existing/entry.py" ;;
         malformed) printf 'MONOTONIC_NS=invalid\n'; return "$ADMISSION_CLOCK_CODE" ;;
         extra) printf 'MONOTONIC_NS=%s\nextra\n' "$value"; return "$ADMISSION_CLOCK_CODE" ;;
         no_newline) printf 'MONOTONIC_NS=%s' "$value"; return "$ADMISSION_CLOCK_CODE" ;;
@@ -1207,6 +1209,30 @@ fixture_timeout() {
         if [[ "$4" == control_state ]]; then printf 'present\n'; else printf '0 0 755\n'; fi
         return "$CONTROL_EXIT_CODE"
       fi
+    fi
+    if [[ "$4" == restore_source ]]; then
+      local source_target="$TARGET_ROOT/${16}" copy_target
+      case "${16}" in entry.py) copy_target=first_source ;; second.py) copy_target=second_source ;; *) return 99 ;; esac
+      printf '%s\n' "$copy_target" >> "$PWD/copy-timeout.calls"
+      if [[ "$COPY_DEADLINE_TARGET" == "$copy_target" ]]; then
+        if [[ "$COPY_DEADLINE_PARTIAL" == true ]]; then printf 'partial copy\n' > "$source_target"; fi
+        printf 'plausible success\n'
+        return "$COPY_DEADLINE_EXIT_CODE"
+      fi
+      printf 'cp\n' >> "$PWD/restore.calls"
+      fixture_operation cp "$source_target" || return $?
+      if [[ "$SIGNAL_DURING_COPY" == true ]]; then kill -TERM "$BASHPID"; printf 'FIXTURE_TERM_SENT\n' >&2; fi
+      if [[ "$COPY_FAILS" == true ]]; then printf 'FIXTURE_COPY_FAILURE\n' >&2; return 9; fi
+      if [[ "$RESULT_FAULT" == copy_noop && "$source_target" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then
+        printf no_op > "$PWD/result-fault-applied"; return 0
+      fi
+      "$@" || return $?
+      if [[ ( "$RESULT_FAULT" == copy_* || "$RESULT_FAULT" == manifest_changed || "$RESULT_FAULT" == backup_changed ) && "$source_target" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
+      if [[ "$source_target" == "$TARGET_ROOT/entry.py" ]]; then
+        fixture_source_drift after_first_copy || return $?; fixture_target_drift after_first_copy || return $?
+        fixture_dropin_target_drift after_first_copy || return $?; fixture_run_target_drift after_first_copy || return $?
+      fi
+      return 0
     fi
     if [[ "$4" == restore_dropin ]]; then
       printf 'dropin\n' >> "$PWD/copy-timeout.calls"
@@ -1370,6 +1396,7 @@ record_recovery_evidence() {
     "$TEST_PYTHON" -c 'import sys; from pathlib import Path; sys.stdout.buffer.write(Path(sys.argv[1]).read_bytes())' "$BACKUP_DIR/$control_name"
     return $?
   fi
+  if [[ "$1" == restore_source ]]; then cp -a -- "$BACKUP_DIR/existing/$3" "$TARGET_ROOT/$3"; return $?; fi
   if [[ "$1" == restore_dropin ]]; then cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN"; return $?; fi
   if [[ "$1" == source_state ]]; then printf 'present\n'; fi
   if [[ "$1" == source_result ]]; then printf 'observed_present\n'; fi
@@ -1588,7 +1615,7 @@ fi
         for name in ("read_recovery_monotonic_clock", "refuse_recovery_admission", "begin_recovery_admission", "admit_recovery_work"):
             harness += _bash_function(script, name) + "\n"
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
-        for name in ("restore_recovery_dropin", "bounded_recovery_copy", "bounded_recovery_mutation", "checked_restore_step", "read_recovery_state", "require_present_recovery_dropin", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
+        for name in ("restore_recovery_source", "restore_recovery_dropin", "bounded_recovery_copy", "bounded_recovery_mutation", "checked_restore_step", "read_recovery_state", "require_present_recovery_dropin", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "recorded_target_version", "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent",
                      "dropin_target_version", "capture_dropin_target_version", "install_gateway_dropin", "read_recovery_dropin_target_state", "require_recovery_dropin_absent",
                      "dropin_directory_target_version", "capture_dropin_directory_target_version", "install_gateway_dropin_directory", "read_recovery_dropin_directory_target_state",
@@ -2024,6 +2051,13 @@ rollback "$forward_lock_rc"
             # strict framing, rollback and failure propagation remain actual.
             marker = 'payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,'
             harness = harness.replace(marker, "def restore_dropin_from_capture(prepared):\n    # Windows-only disposable fixture substitute for unsupported POSIX fd APIs.\n    # Actual descriptor/xattr/exclusive parent behavior is exercised on Linux.\n    expected = next(item for item in prepared[\"files\"] if item[\"path\"] == \"service-drop-in.before\")\n    state_entry, state_raw = inventory(\"service-drop-in.state\", capture=True, capture_limit=128)\n    state_expected = next(item for item in prepared[\"files\"] if item[\"path\"] == \"service-drop-in.state\")\n    if state_entry != state_expected or state_raw != b\"present\\n\": raise SystemExit(14)\n    actual, raw = inventory(\"service-drop-in.before\", capture=True, capture_limit=expected[\"bytes\"])\n    if actual != expected: raise SystemExit(\"fixture_capture_mismatch\")\n    with open(dropin_target, \"xb\") as stream:\n        stream.write(raw)\n        stream.flush()\n        os.fsync(stream.fileno())\n    os.chmod(dropin_target, int(expected[\"mode\"], 8))\n    os.utime(dropin_target, ns=(expected[\"mtime_ns\"], expected[\"mtime_ns\"]))\n\n" + marker)
+            source_marker = 'def restore_source_from_capture(prepared):'
+            shared_marker = 'def restore_file_from_capture(expected, path, source_parent, source_name, *, source_root=None):'
+            assert source_marker in harness and shared_marker in harness
+            # Keep the actual source selector and custody checks, replacing only
+            # unsupported descriptor mechanics in this disposable Windows run.
+            substitute = "def restore_file_from_capture(expected, path, source_parent, source_name, *, source_root=None):\n    actual, raw = inventory(expected[\"path\"], capture=True, capture_limit=expected[\"bytes\"])\n    if actual != expected: raise SystemExit(\"fixture_source_capture_mismatch\")\n    with open(path, \"xb\") as stream:\n        stream.write(raw)\n        stream.flush()\n        os.fsync(stream.fileno())\n    os.chmod(path, int(expected[\"mode\"], 8))\n    os.utime(path, ns=(expected[\"mtime_ns\"], expected[\"mtime_ns\"]))\n\n"
+            harness = harness.replace(marker, substitute + marker)
         env = dict(os.environ)
         env.update(
             PREDICATE_PASSES=str(predicate_passes).lower(),
@@ -2510,7 +2544,8 @@ def test_gateway_copy_deadline_wrapper_has_fixed_policy_and_preserves_command_co
     script = _repair_script()
     function = _bash_function(script, "bounded_recovery_copy")
     assert function.count('--signal=TERM --kill-after=5s 60s') == 1
-    assert _bash_function(script, "rollback").count(" bounded_recovery_copy ") == 1
+    assert _bash_function(script, "rollback").count(" bounded_recovery_copy ") == 0
+    assert _bash_function(script, "rollback").count(" restore_recovery_source ") == 1
     with tempfile.TemporaryDirectory(prefix="gateway-copy-policy-") as directory:
         root = Path(directory)
         harness = '''set -u
@@ -2762,7 +2797,7 @@ def test_gateway_evidence_deadline_normal_receipts_and_queries_keep_existing_con
     assert set(evidence["evidence_timeout_calls"]) == {
         "prepared", "verify", "source_state", "source_result", "dropin_result",
         "runtime_directory_result", "dropin_directory_result", "rollback",
-        "control_state", "control_metadata", "restore_dropin"}
+        "control_state", "control_metadata", "restore_dropin", "restore_source"}
     assert evidence["control_query_calls"] == [
         "control_state:service_drop_in",
         "control_state:service_drop_in",
@@ -7925,7 +7960,7 @@ def test_gateway_dropin_capture_failed_launch_keeps_original_trigger_and_partial
             assert evidence["rollback"]["partial_state_possible"] and not evidence["rollback"]["service_restart_attempted"]
 
 
-def _run_dropin_capture_native_case(fault: str = "") -> dict:
+def _run_dropin_capture_native_case(fault: str = "", *, source_case: bool = False) -> dict:
     # Actual extracted inventory and writer; only disposable paths and injected
     # OS failures. No systemctl, process probe, live path or recovery execution.
     import stat
@@ -7934,20 +7969,31 @@ def _run_dropin_capture_native_case(fault: str = "") -> dict:
     body = body.split("\n", 1)[1].split("\nPY\n", 1)[0]
     tree = ast.parse(body)
     definitions = [item for item in tree.body if isinstance(item, ast.FunctionDef)
-                   and item.name in {"inventory", "restore_dropin_from_capture"}]
-    assert len(definitions) == 2
+                   and item.name in {"inventory", "restore_dropin_from_capture", "restore_source_from_capture", "restore_file_from_capture"}]
+    assert len(definitions) == 4
     with tempfile.TemporaryDirectory(prefix="dropin-capture-native-") as directory_name:
         root = Path(directory_name)
         backup, parent = root / "backup", root / "dropins"
         backup.mkdir(mode=0o700); parent.mkdir(mode=0o755)
         source, target = backup / "service-drop-in.before", parent / "hardening.conf"
+        if source_case:
+            source = backup / "existing/execution/entry.py"
+            source.parent.mkdir(parents=True, mode=0o700)
+            parent = root / "target/execution"
+            parent.mkdir(parents=True, mode=0o755)
+            target = parent / "entry.py"
         source.write_bytes(b"verified captured bytes\n"); source.chmod(0o640)
         os.setxattr(source, "user.fixture", b"verified attribute")
         (backup / "service-drop-in.state").write_bytes(b"present\n")
         namespace = dict(os=os, stat=stat, hashlib=hashlib, json=json, re=re, sys=sys, Path=Path,
-                         directory=backup, dropin_target=str(target), dropin_directory_target=str(parent))
+                         directory=backup, dropin_target=str(target), dropin_directory_target=str(parent),
+                         target_root=str(root / "target"), requested_source="execution/entry.py",
+                         relatives=["execution/entry.py"])
         exec(compile(ast.Module(body=definitions, type_ignores=[]), "<actual-dropin-capture>", "exec"), namespace)
-        prepared = {"files": [namespace["inventory"](name) for name in ("service-drop-in.before", "service-drop-in.state")]}
+        if source_case:
+            prepared = {"files": [namespace["inventory"]("existing/execution/entry.py")], "missing_source_files": []}
+        else:
+            prepared = {"files": [namespace["inventory"](name) for name in ("service-drop-in.before", "service-drop-in.state")]}
         source_expected = prepared["files"][0]
         source_identity = source.stat().st_ino
         ops = SimpleNamespace(**{name: getattr(os, name) for name in dir(os)})
@@ -8014,10 +8060,18 @@ def _run_dropin_capture_native_case(fault: str = "") -> dict:
         if fault == "time_failure":
             def failed_utime(*args, **kwargs): raise OSError("injected_utime")
             ops.utime = failed_utime; ops.supports_fd = set(os.supports_fd) | {failed_utime}
+        if source_case and fault == "source_parent_symlink":
+            source.parent.rename(root / "outside-source")
+            source.parent.symlink_to(root / "outside-source", target_is_directory=True)
+        if source_case and fault == "target_parent_symlink":
+            parent.rename(root / "outside-target")
+            parent.symlink_to(root / "outside-target", target_is_directory=True)
+        if source_case and fault == "source_ancestor_writable": (backup / "existing").chmod(0o777)
+        if source_case and fault == "target_ancestor_writable": (root / "target").chmod(0o777)
         error = None
-        try: namespace["restore_dropin_from_capture"](prepared)
+        try: namespace["restore_source_from_capture" if source_case else "restore_dropin_from_capture"](prepared)
         except (OSError, SystemExit) as caught: error = str(caught)
-        detached = root / "detached/hardening.conf"
+        detached = root / "detached" / target.name
         result = dict(error=error, created=target_created, events=events,
                       target=target.read_bytes() if target.is_file() and not target.is_symlink() else None,
                       target_symlink=target.is_symlink(), target_directory=target.is_dir(),
@@ -8071,8 +8125,7 @@ def test_gateway_dropin_capture_native_retains_partial_file_on_write_metadata_an
         assert result["events"] == ["exclusive_create"]
 
 
-@unittest.skipIf(sys.platform != "linux", "Native capture termination and ignored TERM require Linux")
-def test_gateway_dropin_capture_native_termination_retains_partial_target_without_retry() -> None:
+def _run_capture_native_termination(*, source_case: bool = False) -> None:
     import shutil
     timeout = shutil.which("timeout")
     assert timeout
@@ -8080,7 +8133,7 @@ def test_gateway_dropin_capture_native_termination_retains_partial_target_withou
     assert version.returncode == 0 and version.stdout.startswith("timeout (GNU coreutils)")
     body = _bash_function(_repair_script(), "record_recovery_evidence").split("<<'PY'", 1)[1].split("\n", 1)[1].split("\nPY\n", 1)[0]
     definitions = [item for item in ast.parse(body).body if isinstance(item, ast.FunctionDef)
-                   and item.name in {"inventory", "restore_dropin_from_capture"}]
+                   and item.name in {"inventory", "restore_dropin_from_capture", "restore_source_from_capture", "restore_file_from_capture"}]
     actual = ast.unparse(ast.Module(body=definitions, type_ignores=[]))
     for mode, expected in (("term", 124), ("ignore_term", 137)):
         with tempfile.TemporaryDirectory(prefix="dropin-capture-timeout-") as directory_name:
@@ -8108,6 +8161,14 @@ def paused_write(fd,data):
 os.write=paused_write
 restore_dropin_from_capture(prepared)
 '''
+            if source_case:
+                script = script.replace('dropin_target=str(parent/"hardening.conf"); dropin_directory_target=str(parent)',
+                    'dropin_target=str(parent/"hardening.conf"); dropin_directory_target=str(parent)\ntarget_root=str(parent); requested_source="nested/entry.py"; relatives=[requested_source]\n(parent/"nested").mkdir(); (directory/"existing/nested").mkdir(parents=True)')
+                script = script.replace('(directory/"service-drop-in.before").write_bytes(b"verified bytes")',
+                    '(directory/"existing/nested/entry.py").write_bytes(b"verified bytes")')
+                script = script.replace('prepared={"files":[inventory(name) for name in ("service-drop-in.before","service-drop-in.state")]}',
+                    'prepared={"files":[inventory("existing/nested/entry.py")],"missing_source_files":[]}')
+                script = script.replace("restore_dropin_from_capture(prepared)\n", "restore_source_from_capture(prepared)\n")
             (root / "fixture.py").write_text(script, encoding="utf-8", newline="\n")
             try:
                 completed = subprocess.run([timeout, "--signal=TERM", "--kill-after=0.2s", "0.5s",
@@ -8115,7 +8176,8 @@ restore_dropin_from_capture(prepared)
                 observed_code = 128 - completed.returncode if completed.returncode < 0 else completed.returncode
                 assert observed_code == expected, (mode, completed.returncode, completed.stdout, completed.stderr)
                 assert (root / "entered").read_text() == "once"
-                assert (root / "dropins/hardening.conf").read_bytes() == b"ver"
+                target_name = "dropins/nested/entry.py" if source_case else "dropins/hardening.conf"
+                assert (root / target_name).read_bytes() == b"ver"
             finally:
                 identity_path = root / "identity"
                 if identity_path.exists():
@@ -8142,3 +8204,129 @@ def test_gateway_dropin_capture_revalidates_full_custody_at_writer_boundary() ->
         assert "dropin_copy failed" in completed.stderr and "receipt persistence failed" in completed.stderr
         assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and "rollback" not in evidence
         assert evidence["evidence_timeout_calls"].count("restore_dropin") == 1
+
+
+@unittest.skipIf(sys.platform != "linux", "Native capture termination and ignored TERM require Linux")
+def test_gateway_dropin_capture_native_termination_retains_partial_target_without_retry() -> None:
+    _run_capture_native_termination()
+
+
+def test_gateway_source_capture_fixed_selector_and_failure_status() -> None:
+    wrapper = _bash_function(_repair_script(), "restore_recovery_source")
+    harness = r'''
+set -Eeuo pipefail
+BUNDLE_FILES=(entry.py execution/order_safety_gate.py)
+record_recovery_evidence() {
+  [[ "$#:$1:$2:$3" == "3:restore_source:0:$EXPECTED_SOURCE" ]] || return 99
+  printf 'plausible success\n'
+  return "$SOURCE_CODE"
+}
+''' + wrapper + '\nrestore_recovery_source "$@"\n'
+    for arguments in ([], ["outside.py"], ["../entry.py"], ["/entry.py"], ["entry.py", "extra"],
+                      ["execution/../entry.py"], ["entry.py/"], ["execution//order_safety_gate.py"]):
+        completed = subprocess.run([_gateway_rollback_test_bash(), "-c", harness, "fixture", *arguments],
+            env=dict(os.environ, SOURCE_CODE="0", EXPECTED_SOURCE="entry.py"), capture_output=True, text=True, timeout=5)
+        assert completed.returncode == 14 and not completed.stdout, (arguments, completed)
+    for relative in ("entry.py", "execution/order_safety_gate.py"):
+        for code in (0, 29, 124, 137):
+            completed = subprocess.run([_gateway_rollback_test_bash(), "-c", harness, "fixture", relative],
+                env=dict(os.environ, SOURCE_CODE=str(code), EXPECTED_SOURCE=relative), capture_output=True, text=True, timeout=5)
+            assert completed.returncode == code and completed.stdout == "plausible success\n", (relative, code, completed)
+
+
+def test_gateway_source_capture_python_selector_refuses_before_writer() -> None:
+    body = _bash_function(_repair_script(), "record_recovery_evidence").split("<<'PY'", 1)[1].split("\n", 1)[1].split("\nPY\n", 1)[0]
+    function = next(item for item in ast.parse(body).body if isinstance(item, ast.FunctionDef) and item.name == "restore_source_from_capture")
+    calls = []
+    fixed = Path.cwd() / "inert-selector-only"
+    namespace = dict(re=re, Path=Path, directory=fixed / "backup", target_root=str(fixed / "target"),
+        relatives=["entry.py", "execution/entry.py"], restore_file_from_capture=lambda *args, **kwargs: calls.append((args, kwargs)))
+    exec(compile(ast.Module(body=[function], type_ignores=[]), "<actual-source-selector>", "exec"), namespace)
+    expected = {"path": "existing/entry.py", "bytes": 4}
+    for value, missing, files in (("outside.py", [], [expected]), ("../entry.py", [], [expected]),
+                                 ("entry.py", ["entry.py"], [expected]), ("entry.py", [], [])):
+        namespace["requested_source"] = value
+        try: namespace["restore_source_from_capture"]({"files": files, "missing_source_files": missing})
+        except SystemExit: pass
+        else: raise AssertionError((value, missing, files))
+        assert not calls
+    namespace["requested_source"] = "entry.py"
+    namespace["restore_source_from_capture"]({"files": [expected], "missing_source_files": []})
+    assert calls == [((expected, fixed / "target/entry.py", fixed / "backup/existing", "entry.py"),
+                      {"source_root": fixed / "target"})]
+
+
+def test_gateway_source_capture_admission_refuses_changed_backup_and_preserves_new_target() -> None:
+    for fault in ("source_reappeared", "source_backup_changed"):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="source_capture", prior_dropin=True, evidence=evidence,
+            admission_fault="source_copy:entry.py", admission_clock_case=fault)
+        assert completed.returncode == 17, completed.stderr
+        assert current == (b"intervening source writer\n" if fault == "source_reappeared" else None)
+        assert evidence["evidence_timeout_calls"].count("restore_source") == 1
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert "source_copy failed (exit 1)" in completed.stderr
+        if fault == "source_reappeared":
+            receipt = evidence["rollback"]
+            assert receipt["failed_restoration_operation"]["operation"] == "source_copy"
+            assert receipt["work_admission"]["status"] == "ACTIVE" and receipt["trigger_exit_code"] == 17
+            assert not receipt["restoration_verified"] and not receipt["service_restart_attempted"]
+        else:
+            assert "recovery_backup_changed" in completed.stderr and "receipt persistence failed" in completed.stderr
+            assert "rollback" not in evidence
+
+
+def test_gateway_source_capture_failed_launch_keeps_original_trigger_and_partial_target() -> None:
+    for code, partial in ((29, False), (124, True), (137, True)):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="source_capture", evidence=evidence, copy_deadline_target="first_source",
+            copy_deadline_exit_code=code, copy_deadline_partial=partial)
+        assert completed.returncode == 17 and current == (b"partial copy\n" if partial else None), completed.stderr
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+        assert evidence["evidence_timeout_calls"].count("restore_source") == 1
+        failure = evidence["rollback"]["failed_restoration_operation"]
+        assert (failure["operation"], failure["target"], failure["exit_code"]) == ("source_copy", "entry.py", code)
+        assert not evidence["rollback"]["restoration_verified"] and not evidence["rollback"]["service_restart_attempted"]
+
+
+@unittest.skipIf(sys.platform != "linux", "Actual nested source descriptor capture and metadata require Linux")
+def test_gateway_source_capture_native_nested_metadata_and_stable_captured_bytes() -> None:
+    for fault in ("", "short_writes", "replace_backup_after_capture"):
+        result = _run_dropin_capture_native_case(fault, source_case=True)
+        assert result["error"] is None, (fault, result)
+        assert result["actual"] == result["expected"] and result["xattr"] == b"verified attribute"
+        assert result["target"] == b"verified captured bytes\n" and result["events"] == ["exclusive_create"]
+
+
+@unittest.skipIf(sys.platform != "linux", "Actual source capture bounds and no-follow ancestors require Linux")
+def test_gateway_source_capture_native_refuses_drift_and_unsafe_ancestors_before_create() -> None:
+    for fault in ("growth_during_capture", "truncation_during_capture", "metadata_during_capture",
+                  "missing_capability", "staging_fsync", "source_parent_symlink", "target_parent_symlink",
+                  "source_ancestor_writable", "target_ancestor_writable"):
+        result = _run_dropin_capture_native_case(fault, source_case=True)
+        assert result["error"] and not result["created"] and result["target"] is None, (fault, result)
+
+
+@unittest.skipIf(sys.platform != "linux", "Actual source exclusive-create and partial write controls require Linux")
+def test_gateway_source_capture_native_preserves_concurrent_and_partial_targets() -> None:
+    for fault in ("target_file", "target_directory", "target_symlink", "parent_replaced_before_create",
+                  "parent_symlink_before_create", "parent_replaced_after_create", "target_replaced_after_create",
+                  "write_failure", "ownership_failure", "mode_failure", "attribute_failure", "time_failure", "target_fsync"):
+        result = _run_dropin_capture_native_case(fault, source_case=True)
+        assert result["error"], (fault, result)
+        if fault == "target_file": assert result["target"] == b"concurrent target" and not result["created"]
+        elif fault == "target_directory": assert result["target_directory"] and not result["created"]
+        elif fault == "target_symlink": assert result["target_symlink"] and not result["created"]
+        elif fault.startswith("parent_"): assert result["detached"] == b"verified captured bytes\n"
+        elif fault == "target_replaced_after_create":
+            assert result["target"] == b"concurrent replacement" and result["detached_file"] == b"verified captured bytes\n"
+        else: assert result["created"] and result["target"] == (b"ver" if fault == "write_failure" else b"verified captured bytes\n")
+
+
+@unittest.skipIf(sys.platform != "linux", "Native source capture TERM/KILL behavior requires Linux")
+def test_gateway_source_capture_native_termination_retains_partial_target_without_retry() -> None:
+    _run_capture_native_termination(source_case=True)

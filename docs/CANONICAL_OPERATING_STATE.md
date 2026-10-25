@@ -30,6 +30,31 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 25 allowlisted source capture increment extends the same outcome-2
+private-review repair to prior-present members of the fixed gateway source bundle.
+After the final source-copy admission check, the bounded evidence process validates
+the pinned full inventory and selected present entry, captures source bytes and raw
+required metadata through a stable descriptor, then creates the derived destination
+exclusively through checked no-follow ancestors. Nested relative paths are derived
+from the allowlist; callers cannot supply arbitrary paths or copy options. The
+existing drop-in adapter shares the descriptor mechanics while preserving its
+fixed state/destination checks. Missing and untouched source branches retain their
+previous behavior, and source-result verification still follows each restoration.
+
+Failure preserves the first source_copy result, original rollback trigger, partial
+or detached files and the existing safe terminal-attempt rule. No retry or pathname
+cleanup follows a failed write, metadata operation, synchronization or timeout.
+The prepared inventory authenticates represented bytes, ownership, mode, mtime and
+xattrs; atime is not pinned and universal cp -a equivalence is not claimed. Earlier
+removal is not atomic with capture; privileged later replacement, partial earlier
+restoration, outer-postcheck recovery and a hard total recovery deadline remain
+unresolved. The 60-second process bound and 600-second admission origin are unchanged.
+Windows integration substitutes only unsupported descriptor mechanics; native
+capture/race/metadata and signal controls require Linux. At local preparation,
+independent source review and exact-new-head hosted validation were pending. This
+adds no production action or external validation. The separately retained two
+existing drop-in admission-clock regressions were not recreated in this increment.
+
 The October 25 fixed drop-in capture increment advances this same private-review
 repair. Only a prior-present service drop-in uses a fixed, no-argument operation
 inside the existing bounded recovery process. After the pinned full inventory is
@@ -44,8 +69,8 @@ inventory, so this is not a universal cp -a equivalence claim.
 
 The writer preserves partial files on write, metadata, synchronization or timeout
 failure, never retries or removes a possibly replaced pathname, and retains the
-original rollback trigger and first dropin_copy failure. Source-copy, missing and
-untouched branches remain unchanged. Exclusive creation prevents overwriting an
+original rollback trigger and first dropin_copy failure. At that preparation stage,
+source-copy, missing and untouched branches remained unchanged. Exclusive creation prevents overwriting an
 entry at that instant; privileged later replacement, detached-parent writes and
 in-place mutation remain possible and observable rechecks are not atomic locks.
 The 60-second process bound and 600-second admission policy do not establish a
@@ -70,8 +95,8 @@ validation. They also exercise failed responses, admission refusal and unavailab
 terminal evidence. Earlier source restoration and drop-in removal may already
 have occurred; refusal does not undo them. The safe terminal evidence attempt can
 itself fail when prepared custody changed. At that preparation stage, copy still reopened a pathname after validation.
-The later fixed capture increment above narrows this drop-in gap; source copies
-still reopen pathnames and privileged later or in-flight mutation remains unresolved. This
+The later fixed capture increments above narrow drop-in and prior-present source
+copy consumption; privileged later or in-flight mutation remains unresolved. This
 adds no atomic-copy, hard total-time, whole-service restoration or later external
 postcheck recovery guarantee. At local preparation, independent source review and
 exact-new-head hosted validation were pending. No production action or external
