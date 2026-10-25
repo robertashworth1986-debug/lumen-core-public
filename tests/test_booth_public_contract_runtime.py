@@ -2650,7 +2650,15 @@ def test_gateway_evidence_deadline_normal_receipts_and_queries_keep_existing_con
     assert dropin and evidence["dropin_bytes"] == b"previous hardening\n"
     assert set(evidence["evidence_timeout_calls"]) == {
         "prepared", "verify", "source_state", "source_result", "dropin_result",
-        "runtime_directory_result", "dropin_directory_result", "rollback"}
+        "runtime_directory_result", "dropin_directory_result", "rollback",
+        "control_state", "control_metadata"}
+    assert evidence["control_query_calls"] == [
+        "control_state:service_drop_in",
+        "control_state:service_drop_in_directory",
+        "control_metadata:service_drop_in_directory",
+        "control_state:run_directory",
+        "control_metadata:run_directory",
+    ]
     assert evidence["rollback"]["manifest_sha256"] == evidence["prepared_sha256"]
     assert evidence["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
     assert evidence["rollback"]["restoration_verified"] is False
