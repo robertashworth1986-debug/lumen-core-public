@@ -48,6 +48,16 @@ RECOVERY_RESTORE_TARGET=""
 RECOVERY_MUTATION_FAILURE=""
 RECOVERY_MUTATION_TARGET=""
 RECOVERY_MUTATION_EXIT_CODE=0
+RECOVERY_ADMISSION_STATUS=NOT_STARTED
+RECOVERY_ADMISSION_ORIGIN_NS=""
+RECOVERY_ADMISSION_DEADLINE_NS=""
+RECOVERY_ADMISSION_LAST_NS=""
+RECOVERY_ADMISSION_OPERATION=""
+RECOVERY_ADMISSION_TARGET=""
+RECOVERY_ADMISSION_CLOCK_EXIT_CODE=0
+RECOVERY_CLOCK_NOW_NS=""
+RECOVERY_EVIDENCE_VALIDATED=false
+RECOVERY_TERMINAL_ATTEMPTED=false
 RECOVERY_DROPIN_RESULT=NOT_CHECKED
 RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
 RECOVERY_DROPIN_DIRECTORY_RESULT=NOT_CHECKED
@@ -493,7 +503,11 @@ record_recovery_evidence() {
     "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" \
     "${RUN_WRITE_STATE:-UNKNOWN}" "${RUN_TARGET_VERSION:-}" "${RUN_CANDIDATE_METADATA:-}" \
     "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" "${DROPIN_DIR_TARGET_VERSION:-}" "${DROPIN_DIR_CANDIDATE_METADATA:-}" \
-    "${RECOVERY_MUTATION_FAILURE:-}" "${RECOVERY_MUTATION_TARGET:-}" "${RECOVERY_MUTATION_EXIT_CODE:-0}" "${BUNDLE_FILES[@]}" <<'PY' || evidence_rc=$?
+    "${RECOVERY_MUTATION_FAILURE:-}" "${RECOVERY_MUTATION_TARGET:-}" "${RECOVERY_MUTATION_EXIT_CODE:-0}" \
+    "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" "${RECOVERY_ADMISSION_ORIGIN_NS:-}" \
+    "${RECOVERY_ADMISSION_DEADLINE_NS:-}" "${RECOVERY_ADMISSION_LAST_NS:-}" \
+    "${RECOVERY_ADMISSION_OPERATION:-}" "${RECOVERY_ADMISSION_TARGET:-}" \
+    "${RECOVERY_ADMISSION_CLOCK_EXIT_CODE:-0}" "${BUNDLE_FILES[@]}" <<'PY' || evidence_rc=$?
 import hashlib
 import json
 import os
@@ -516,7 +530,9 @@ dropin_write_state, dropin_target_version = sys.argv[23:25]
 run_write_state, run_target_version, run_candidate_metadata = sys.argv[25:28]
 dropin_dir_write_state, dropin_dir_target_version, dropin_dir_candidate_metadata = sys.argv[28:31]
 mutation_failure, mutation_target, mutation_exit_code = sys.argv[31:34]
-relatives = sys.argv[34:]
+admission_status, admission_origin, admission_deadline, admission_last = sys.argv[34:38]
+admission_operation, admission_target, admission_clock_code = sys.argv[38:41]
+relatives = sys.argv[41:]
 query_kinds = {"source_state", "source_result"}
 control_files = dict([
     (("control_state", "service_drop_in"), "service-drop-in.state"),
@@ -1087,6 +1103,36 @@ if kind == "rollback":
                 payload["failed_restoration_operation"].update(partial_destination_possible=True)
     elif restore_exit_code != "0" or restore_target:
         raise SystemExit("unexpected_restoration_failure_fields")
+    if admission_status not in {"ACTIVE", "NOT_STARTED_BUDGET_REFUSAL", "CLOCK_UNAVAILABLE"}:
+        raise SystemExit("invalid_recovery_admission_status")
+    for value in (admission_origin, admission_deadline, admission_last):
+        if not re.fullmatch(r"0|[1-9][0-9]{0,18}", value):
+            raise SystemExit("invalid_recovery_admission_clock")
+    if (int(admission_deadline) != int(admission_origin) + 600_000_000_000
+            or int(admission_last) < int(admission_origin)
+            or not re.fullmatch(r"[0-9]{1,3}", admission_clock_code)
+            or not 0 <= int(admission_clock_code) <= 255):
+        raise SystemExit("invalid_recovery_admission_clock")
+    admission_targets = dict(restoration_targets)
+    admission_targets.update({"initial_validation": {"recovery_evidence"}, **{
+        "service_" + verb: {"gateway_service"} for verb in order}})
+    refused = admission_status != "ACTIVE"
+    if ((refused and (admission_operation not in admission_targets
+                     or admission_target not in admission_targets[admission_operation]))
+            or (not refused and (admission_operation or admission_target or admission_clock_code != "0"))
+            or (admission_status == "NOT_STARTED_BUDGET_REFUSAL"
+                and (int(admission_last) < int(admission_deadline) or admission_clock_code != "0"))
+            or (admission_status == "CLOCK_UNAVAILABLE" and admission_clock_code == "0")):
+        raise SystemExit("invalid_recovery_admission_refusal")
+    payload["work_admission"] = dict(
+        status=admission_status, budget_seconds=600, monotonic_origin_ns=int(admission_origin),
+        deadline_ns=int(admission_deadline), last_observed_ns=int(admission_last),
+        refused_operation=admission_operation or None, refused_target=admission_target or None,
+        clock_exit_code=int(admission_clock_code), refused_operation_started=False if refused else None,
+        total_recovery_deadline=False, terminal_safety_and_evidence_outside_budget=True)
+    if refused and not restore_failure and not service_failure:
+        payload.update(status="ROLLBACK_INCOMPLETE_WORK_ADMISSION_REFUSED", partial_state_possible=True,
+                       further_restoration_stopped=True, restoration_result="UNVERIFIED")
 raw = (json.dumps(payload, sort_keys=True, indent=2) + "\n").encode()
 destination = directory / (kind + ".json")
 fd, temporary = tempfile.mkstemp(prefix=".receipt-", dir=directory)
@@ -1681,9 +1727,84 @@ bounded_recovery_systemctl() {
   return "$command_rc"
 }
 
+read_recovery_monotonic_clock() {
+  [[ $# -eq 0 ]] || return 14
+  local response="" clock_rc=0 value
+  RECOVERY_CLOCK_NOW_NS=""
+  response="$(
+    "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - <<'PY'
+import time
+value = time.monotonic_ns()
+if not isinstance(value, int) or not 0 <= value < 10 ** 18:
+    raise SystemExit(14)
+print("MONOTONIC_NS=" + str(value))
+PY
+    clock_rc=$?
+    printf '%s' __RECOVERY_CLOCK_END__
+    exit "$clock_rc"
+  )" || clock_rc=$?
+  [[ "$clock_rc" -eq 0 ]] || return "$clock_rc"
+  [[ "$response" =~ ^MONOTONIC_NS=(0|[1-9][0-9]{0,17})$'\n'__RECOVERY_CLOCK_END__$ ]] || return 14
+  value="${BASH_REMATCH[1]}"
+  RECOVERY_CLOCK_NOW_NS="$value"
+}
+
+refuse_recovery_admission() {
+  # Separate a callback that never started from an actual operation failure.
+  if [[ "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" != NOT_STARTED_BUDGET_REFUSAL && "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" != CLOCK_UNAVAILABLE ]]; then
+    RECOVERY_ADMISSION_STATUS="$1"
+    RECOVERY_ADMISSION_OPERATION="$2"
+    RECOVERY_ADMISSION_TARGET="$3"
+    RECOVERY_ADMISSION_CLOCK_EXIT_CODE="$4"
+  fi
+  printf 'Recovery work not started: status=%s operation=%s target=%s clock_exit=%s original_failure_retained=true\n' \
+    "$RECOVERY_ADMISSION_STATUS" "$RECOVERY_ADMISSION_OPERATION" "$RECOVERY_ADMISSION_TARGET" "$RECOVERY_ADMISSION_CLOCK_EXIT_CODE" >&2
+  return 14
+}
+
+begin_recovery_admission() {
+  local clock_rc=0
+  # Parent state is initialized once, never by a callback or command substitution.
+  [[ "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" == NOT_STARTED ]] || {
+    refuse_recovery_admission CLOCK_UNAVAILABLE initial_validation recovery_evidence 14; return 14;
+  }
+  read_recovery_monotonic_clock || clock_rc=$?
+  [[ "$clock_rc" -eq 0 ]] || {
+    refuse_recovery_admission CLOCK_UNAVAILABLE initial_validation recovery_evidence "$clock_rc"; return 14;
+  }
+  RECOVERY_ADMISSION_ORIGIN_NS="$RECOVERY_CLOCK_NOW_NS"
+  RECOVERY_ADMISSION_LAST_NS="$RECOVERY_CLOCK_NOW_NS"
+  RECOVERY_ADMISSION_DEADLINE_NS=$((RECOVERY_CLOCK_NOW_NS + 600000000000))
+  RECOVERY_ADMISSION_STATUS=ACTIVE
+}
+
+admit_recovery_work() {
+  [[ $# -eq 2 ]] || return 14
+  local operation="$1" target_id="$2" clock_rc=0
+  [[ "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" == ACTIVE ]] || return 14
+  read_recovery_monotonic_clock || clock_rc=$?
+  if [[ "$clock_rc" -ne 0 ]]; then
+    refuse_recovery_admission CLOCK_UNAVAILABLE "$operation" "$target_id" "$clock_rc"; return 14
+  fi
+  if (( RECOVERY_CLOCK_NOW_NS < RECOVERY_ADMISSION_LAST_NS )); then
+    refuse_recovery_admission CLOCK_UNAVAILABLE "$operation" "$target_id" 14; return 14
+  fi
+  RECOVERY_ADMISSION_LAST_NS="$RECOVERY_CLOCK_NOW_NS"
+  if (( RECOVERY_CLOCK_NOW_NS >= RECOVERY_ADMISSION_DEADLINE_NS )); then
+    refuse_recovery_admission NOT_STARTED_BUDGET_REFUSAL "$operation" "$target_id" 0; return 14
+  fi
+}
+
 finish_rollback() {
   local rc="$1"
-  if ! record_recovery_evidence rollback "$rc"; then
+  # At most one safe terminal evidence attempt may exceed the work budget.
+  # It cannot authorize subsequent recovery work. No unsafe early receipt.
+  if [[ "${RECOVERY_EVIDENCE_VALIDATED:-false}" != true || "${RECOVERY_TERMINAL_ATTEMPTED:-false}" == true ]]; then
+    echo "ERROR: private rollback receipt unavailable; safety prerequisites not established or terminal attempt already made" >&2
+    exit "$rc"
+  fi
+  RECOVERY_TERMINAL_ATTEMPTED=true
+  if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence rollback "$rc"; then
     echo "ERROR: private rollback receipt persistence failed; retained backups require manual review" >&2
   fi
   exit "$rc"
@@ -1741,6 +1862,7 @@ bounded_recovery_mutation() {
 checked_restore_step() {
   local operation="$1" target_id="$2" operation_rc=0
   shift 2
+  admit_recovery_work "$operation" "$target_id" || return $?
   "$@" || operation_rc=$?
   if [[ "$operation_rc" -ne 0 ]]; then
     # Calls below use fixed operation IDs and bounded target identifiers. Keep
@@ -1881,16 +2003,21 @@ rollback() {
   trap '' INT TERM
   set +e
   if [[ "$REPAIR_COMPLETE" != true ]]; then
+    begin_recovery_admission || finish_rollback "$rc"
+    admit_recovery_work initial_validation recovery_evidence || finish_rollback "$rc"
     # Validate before the first service, lock or target-file mutation. This is a
     # point-in-time check, not protection against a subsequent concurrent edit.
     if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence verify "$rc"; then
       echo "ERROR: ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE; no restoration attempted; original failure retained" >&2
+      RECOVERY_TERMINAL_ATTEMPTED=true
       if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence rollback_refused "$rc"; then
         echo "ERROR: private rollback refusal receipt unavailable; retained evidence requires manual review" >&2
       fi
       exit "$rc"
     fi
+    RECOVERY_EVIDENCE_VALIDATED=true
     echo "Rolling back the complete gateway dependency closure and service identity..." >&2
+    admit_recovery_work service_stop gateway_service || finish_rollback "$rc"
     if ! bounded_recovery_systemctl stop; then
       finish_rollback "$rc"
     fi
@@ -1965,13 +2092,16 @@ rollback() {
       checked_restore_step runtime_directory_result run_directory read_recovery_runtime_directory_result "$prior_run_dir_state" || finish_rollback "$rc"
     fi
 
+    admit_recovery_work service_daemon-reload gateway_service || finish_rollback "$rc"
     if ! bounded_recovery_systemctl daemon-reload; then
       finish_rollback "$rc"
     fi
+    admit_recovery_work service_reset-failed gateway_service || finish_rollback "$rc"
     if ! bounded_recovery_systemctl reset-failed; then
       finish_rollback "$rc"
     fi
     if [[ "$SERVICE_WAS_ACTIVE" == true ]]; then
+      admit_recovery_work service_start gateway_service || finish_rollback "$rc"
       if ! bounded_recovery_systemctl start; then
         finish_rollback "$rc"
       fi

@@ -30,6 +30,35 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 25 shared rollback admission increment advances the same outcome-2
+reviewer-evidence repair. One parent-shell monotonic origin establishes a fixed
+600-second engineering budget for admitting new recovery work. A bounded clock
+process must finish successfully with strict framing; malformed, failed, backward
+or unavailable observations refuse further work. Admission is checked before
+initial validation, each checked restoration callback and each recovery service
+command. At or beyond the deadline, the next operation is explicitly not started.
+Original triggers and first actual operation failures retain their own status.
+
+This is a work-admission budget, not a hard total recovery deadline. An admitted
+compound callback may contain several individually bounded operations. Initial
+shell path I/O, in-flight kernel work, cleanup, and terminal safety/evidence work
+may exceed the budget. The parent is not killed or moved into a subshell. An
+expired or unreadable clock before initial evidence validation produces no unsafe
+terminal receipt. After validation, at most one terminal evidence-process attempt
+may run, still behind a fresh directory guard and prepared-inventory verification;
+persistence failure retains the original trigger. No later copy, service restart
+or cleanup of a partial destination is authorized after admission refusal. A
+result query that was not admitted leaves restoration unverified.
+
+Disposable regressions exercise the actual controller, boundary and cumulative
+clock cases, failed plausible output, each service gate, partial restoration and
+terminal uncertainty. Native clock controls use only an isolated fake interpreter
+with process-identity cleanup; local Linux skips do not establish signal behavior.
+At local preparation, independent review and exact-new-head hosted validation
+were pending. This does not solve concurrent writers, identity/check-to-use races,
+uninterruptible I/O, whole-service restoration or later external-postcheck recovery,
+and does not authorize production execution or claim external validation.
+
 The October 25 recovery-directory stat increment advances the same outcome-2
 reviewer-evidence repair. Its three owner/mode queries now use the preflight-checked
 TERM-after-60-seconds and KILL-after-five-more-seconds policy, and require a

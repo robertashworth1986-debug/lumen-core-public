@@ -805,6 +805,8 @@ def _run_gateway_rollback_guard(
     target_deadline_query: str = "", target_deadline_exit_code: int = 124,
     target_deadline_after: bool = True,
     control_query: str = "", control_fault: str = "", control_exit_code: int = 124,
+    admission_fault: str = "", admission_clock_case: str = "", admission_clock_code: int = 0,
+    admission_clock_step: int = 1_000_000_000,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -1088,6 +1090,34 @@ RECOVERY_TIMEOUT_BIN=fixture_timeout
 fixture_timeout() {
   [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
   shift 3
+  if [[ $# -eq 2 && "$1" == python3 && "$2" == - ]]; then
+    local clock_body="" read_rc=0 expected="" index=0 call value
+    IFS= read -r -d '' clock_body || read_rc=$?
+    [[ "$read_rc" -eq 1 ]] || return 99
+    IFS= read -r -d '' expected < "$PWD/clock-body.txt" || :
+    [[ "$clock_body" == "$expected" ]] || return 99
+    call="${operation:-origin}:${target_id:-clock}"
+    printf '%s\n' "$call" >> "$PWD/admission-clock.calls"
+    if [[ -e "$PWD/admission-clock.index" ]]; then IFS= read -r index < "$PWD/admission-clock.index"; fi
+    printf '%s\n' "$((index + 1))" > "$PWD/admission-clock.index"
+    value=$((1000000000000 + index * ADMISSION_CLOCK_STEP))
+    if [[ "$ADMISSION_FAULT" == "$call" ]]; then
+      case "$ADMISSION_CLOCK_CASE" in
+        expired) value=1600000000000 ;;
+        just_before) value=1599999999999 ;;
+        after) value=1600000000001 ;;
+        backward) value=0 ;;
+        malformed) printf 'MONOTONIC_NS=invalid\n'; return "$ADMISSION_CLOCK_CODE" ;;
+        extra) printf 'MONOTONIC_NS=%s\nextra\n' "$value"; return "$ADMISSION_CLOCK_CODE" ;;
+        no_newline) printf 'MONOTONIC_NS=%s' "$value"; return "$ADMISSION_CLOCK_CODE" ;;
+        *) ;;
+      esac
+      printf 'MONOTONIC_NS=%s\n' "$value"
+      return "$ADMISSION_CLOCK_CODE"
+    fi
+    printf 'MONOTONIC_NS=%s\n' "$value"
+    return 0
+  fi
   if [[ "$1" == stat ]]; then
     [[ $# -eq 4 && "$2" == -c && "$3" == '%U:%G:%a' ]] || return 99
     local stat_target
@@ -1491,6 +1521,10 @@ fi
             fake.chmod(0o755)
             harness += 'export PATH="/usr/bin:$PATH"\nFIXTURE_NATIVE_TIMEOUT_BIN="$(type -P timeout)"\n'
             harness += 'export PATH="$PWD/bin:$PATH"\n'
+        clock_function = _bash_function(script, "read_recovery_monotonic_clock")
+        (root / "clock-body.txt").write_text(clock_function.split("<<'PY'\n", 1)[1].split("\nPY\n", 1)[0] + "\n", encoding="utf-8", newline="\n")
+        for name in ("read_recovery_monotonic_clock", "refuse_recovery_admission", "begin_recovery_admission", "admit_recovery_work"):
+            harness += _bash_function(script, name) + "\n"
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
         for name in ("bounded_recovery_copy", "bounded_recovery_mutation", "checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "recorded_target_version", "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent",
@@ -1957,6 +1991,8 @@ rollback "$forward_lock_rc"
             ACTIVE_QUERY_EXIT_CODE="" if active_query_exit_code is None else str(active_query_exit_code),
             STAT_QUERY_FAULT=stat_query_fault, STAT_QUERY_EXIT_CODE=str(stat_query_exit_code),
             CONTROL_QUERY=control_query, CONTROL_FAULT=control_fault, CONTROL_EXIT_CODE=str(control_exit_code),
+            ADMISSION_FAULT=admission_fault, ADMISSION_CLOCK_CASE=admission_clock_case,
+            ADMISSION_CLOCK_CODE=str(admission_clock_code), ADMISSION_CLOCK_STEP=str(admission_clock_step),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -2011,6 +2047,7 @@ rollback "$forward_lock_rc"
         target = root / "target/entry.py"
         if evidence is not None:
             evidence["elapsed_seconds"] = time.monotonic() - started
+            evidence["admission_clock_calls"] = (root / "admission-clock.calls").read_text().splitlines() if (root / "admission-clock.calls").exists() else []
             evidence["control_query_calls"] = (root / "control-query.calls").read_text().splitlines() if (root / "control-query.calls").exists() else []
             evidence["control_interleaving_applied"] = (root / "control-interleaving-applied").read_text() if (root / "control-interleaving-applied").exists() else ""
             evidence["copy_timeout_calls"] = (root / "copy-timeout.calls").read_text().splitlines() if (root / "copy-timeout.calls").exists() else []
@@ -3012,6 +3049,9 @@ BUNDLE_FILES=()
 declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 PATH="$PWD/bin:$PATH"
 '''
+        # This isolated writer fixture starts after successful safety validation;
+        # it does not exercise or bypass the production directory guard.
+        harness += 'RECOVERY_EVIDENCE_VALIDATED=true\nrequire_safe_recovery_directory() { return 0; }\n'
         harness += function + "\n" + _bash_function(_repair_script(), "finish_rollback") + '\nfinish_rollback 17\n'
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
         env = dict(os.environ, FIXTURE_MODE=mode)
@@ -6208,6 +6248,11 @@ record_recovery_evidence() {
 bounded_recovery_systemctl() { printf 'UNEXPECTED_SERVICE\n' >> "$PWD/mutation.calls"; exit 99; }
 checked_restore_step() { printf 'UNEXPECTED_RESTORE\n' >> "$PWD/mutation.calls"; exit 99; }
 '''
+            # Keep this existing directory-guard fixture isolated from the new
+            # clock process; deterministic admission still uses the actual parent controller.
+            harness += 'read_recovery_monotonic_clock() { RECOVERY_CLOCK_NOW_NS=1000000000000; }\n'
+            for name in ("refuse_recovery_admission", "begin_recovery_admission", "admit_recovery_work", "finish_rollback"):
+                harness += _bash_function(script, name) + "\n"
             harness += _bash_function(script, "rollback") + "\nrollback 17\n"
         else:
             # Match the conditional context in rollback, including disabled errexit.
@@ -6223,6 +6268,246 @@ checked_restore_step() { printf 'UNEXPECTED_RESTORE\n' >> "$PWD/mutation.calls";
                 "evidence_calls": (root / "evidence.calls").read_text().splitlines() if (root / "evidence.calls").exists() else [],
                 "mutation_calls": (root / "mutation.calls").read_text() if (root / "mutation.calls").exists() else "",
                 "backup": (root / "backup/retained").read_bytes(), "target": (root / "target").read_bytes()}
+
+
+def _run_gateway_admission_case(**options) -> tuple:
+    evidence: dict = {}
+    recovery_case = options.pop("recovery_case", "admission")
+    completed, current, dropin = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case=recovery_case, evidence=evidence, **options)
+    assert completed.returncode == 17, (completed.stdout, completed.stderr, evidence)
+    expected_backup = b"previous source\nchanged" if recovery_case == "backup_changed" else b"previous source\n"
+    assert evidence["backup"] == expected_backup and evidence["backup_exists"]
+    assert evidence["admission_clock_calls"].count("origin:clock") == 1
+    return completed, current, dropin, evidence
+
+
+def test_gateway_admission_initial_refusal_never_writes_unsafe_terminal_or_mutates() -> None:
+    for fault, mode, code in (("initial_validation:recovery_evidence", "expired", 0),
+                              ("origin:clock", "", 124),
+                              ("initial_validation:recovery_evidence", "", 137)):
+        completed, current, dropin, facts = _run_gateway_admission_case(
+            admission_fault=fault, admission_clock_case=mode, admission_clock_code=code)
+        assert current == b"candidate source\n" and dropin
+        assert facts["service_calls"] == "" and facts["restore_calls"] == ""
+        assert facts["evidence_timeout_calls"] == ["prepared"]
+        assert "rollback" not in facts and "rollback_refused" not in facts
+        assert "safety prerequisites not established" in completed.stderr
+        assert "Recovery work not started:" in completed.stderr
+
+
+def test_gateway_admission_clock_failures_and_partial_stdout_never_start_callback() -> None:
+    for mode, code in (("", 29), ("", 124), ("", 137), ("malformed", 0),
+                       ("extra", 0), ("no_newline", 0), ("backward", 0)):
+        completed, current, _, facts = _run_gateway_admission_case(
+            admission_fault="source_remove:entry.py", admission_clock_case=mode,
+            admission_clock_code=code)
+        assert current == b"candidate source\n" and facts["restore_calls"] == "lock\n"
+        assert "rm:first_source" not in facts["operation_calls"]
+        assert facts["service_calls"] == "SYSTEMCTL:stop\n"
+        receipt = facts["rollback"]
+        admission = receipt["work_admission"]
+        assert admission["status"] == "CLOCK_UNAVAILABLE"
+        assert admission["clock_exit_code"] == (code or 14)
+        assert admission["refused_operation"] == "source_remove"
+        assert admission["refused_operation_started"] is False
+        assert "failed_restoration_operation" not in receipt
+        assert receipt["trigger_exit_code"] == 17 and not receipt["restoration_verified"]
+        assert facts["evidence_timeout_calls"].count("rollback") == 1
+
+
+def test_gateway_admission_cumulative_origin_and_exact_boundary_stop_new_work() -> None:
+    _, current, _, facts = _run_gateway_admission_case(admission_clock_step=100_000_000_000)
+    assert current == b"candidate source\n"
+    assert facts["admission_clock_calls"] == [
+        "origin:clock", "initial_validation:recovery_evidence", "service_stop:gateway_service",
+        "dead_lock:gateway_lock", "source_state:entry.py", "target_state:entry.py",
+        "source_remove:entry.py"]
+    admission = facts["rollback"]["work_admission"]
+    assert admission["monotonic_origin_ns"] == 1_000_000_000_000
+    assert admission["deadline_ns"] == admission["last_observed_ns"] == 1_600_000_000_000
+    assert admission["status"] == "NOT_STARTED_BUDGET_REFUSAL"
+    assert facts["restore_calls"] == "lock\n" and facts["service_calls"] == "SYSTEMCTL:stop\n"
+    assert "rm:first_source" not in facts["operation_calls"]
+    # The final service gate admits one nanosecond before the same deadline.
+    _, current, _, facts = _run_gateway_admission_case(
+        admission_fault="service_start:gateway_service", admission_clock_case="just_before")
+    assert current == b"previous source\n"
+    assert facts["rollback"]["work_admission"]["last_observed_ns"] == 1_599_999_999_999
+    assert facts["rollback"]["status"] == "ROLLBACK_ATTEMPTED_UNVERIFIED"
+    assert facts["service_calls"].endswith("SYSTEMCTL:start\n")
+
+
+def test_gateway_admission_expiry_retains_removed_target_and_unverified_result() -> None:
+    for operation, current in (("source_copy", None), ("source_result", b"previous source\n")):
+        _, actual, _, facts = _run_gateway_admission_case(
+            admission_fault=operation + ":entry.py", admission_clock_case="expired")
+        assert actual == current
+        assert facts["service_calls"] == "SYSTEMCTL:stop\n"
+        assert facts["admission_clock_calls"][-1] == operation + ":entry.py"
+        receipt = facts["rollback"]
+        assert receipt["status"] == "ROLLBACK_INCOMPLETE_WORK_ADMISSION_REFUSED"
+        assert receipt["restoration_result"] == "UNVERIFIED" and not receipt["restoration_verified"]
+        assert receipt["source_write_states"][0]["restoration_result_observation"] == "NOT_CHECKED"
+        assert "failed_restoration_operation" not in receipt
+        assert facts["evidence_timeout_calls"].count("rollback") == 1
+        if operation == "source_copy": assert facts["copy_timeout_calls"] == []
+
+
+def test_gateway_admission_each_service_gate_records_only_commands_that_started() -> None:
+    verbs = ["stop", "daemon-reload", "reset-failed", "start"]
+    for index, verb in enumerate(verbs):
+        _, current, _, facts = _run_gateway_admission_case(
+            admission_fault="service_" + verb + ":gateway_service", admission_clock_case="after")
+        assert facts["service_calls"].splitlines() == ["SYSTEMCTL:" + v for v in verbs[:index]]
+        receipt = facts["rollback"]
+        assert [row["verb"] for row in receipt["service_commands"]] == verbs[:index]
+        assert receipt["work_admission"]["refused_operation"] == "service_" + verb
+        assert receipt["status"] == "ROLLBACK_INCOMPLETE_WORK_ADMISSION_REFUSED"
+        assert receipt["restore_attempted"] == (index != 0)
+        assert current == (b"candidate source\n" if index == 0 else b"previous source\n")
+        assert facts["evidence_timeout_calls"].count("rollback") == 1
+
+
+def test_gateway_admission_keeps_actual_first_failure_and_terminal_uncertainty() -> None:
+    _, current, _, facts = _run_gateway_admission_case(
+        mutation_deadline_fault="rm:first_source", mutation_deadline_exit_code=29,
+        admission_fault="source_copy:entry.py", admission_clock_case="expired")
+    assert current == b"candidate source\n"
+    receipt = facts["rollback"]
+    assert receipt["failed_restoration_operation"]["operation"] == "source_remove"
+    assert receipt["failed_restoration_operation"]["exit_code"] == 29
+    assert receipt["work_admission"]["status"] == "ACTIVE"
+    assert "source_copy:entry.py" not in facts["admission_clock_calls"]
+    completed, current, _, facts = _run_gateway_admission_case(
+        admission_fault="source_copy:entry.py", admission_clock_case="expired",
+        evidence_deadline_kind="rollback", evidence_deadline_exit_code=137)
+    assert current is None and "receipt persistence failed" in completed.stderr
+    assert facts["evidence_timeout_calls"].count("rollback") == 1 and "rollback" not in facts
+    assert facts["service_calls"] == "SYSTEMCTL:stop\n"
+    # Invalid preparation retains the existing refusal path, before any mutation.
+    completed, current, _, facts = _run_gateway_admission_case(recovery_case="backup_changed")
+    assert facts["service_calls"] == "" and current == b"candidate source\n"
+    assert facts["evidence_timeout_calls"] == ["prepared", "verify", "rollback_refused"]
+    assert facts["rollback_refused"]["recovery_evidence_verified"] is False
+
+
+def test_gateway_admission_origin_cannot_be_reset_by_another_begin() -> None:
+    script = _repair_script()
+    harness = 'set -Eeuo pipefail\nRECOVERY_ADMISSION_STATUS=NOT_STARTED\n'
+    harness += 'read_recovery_monotonic_clock() { RECOVERY_CLOCK_NOW_NS=1000000000000; printf "clock\\n" >> calls; }\n'
+    for name in ("refuse_recovery_admission", "begin_recovery_admission"):
+        harness += _bash_function(script, name) + "\n"
+    harness += r'''
+begin_recovery_admission
+rc=0
+begin_recovery_admission || rc=$?
+[[ "$rc" == 14 && "$RECOVERY_ADMISSION_STATUS" == CLOCK_UNAVAILABLE ]] || exit 91
+[[ "$RECOVERY_ADMISSION_ORIGIN_NS" == 1000000000000 && "$RECOVERY_ADMISSION_DEADLINE_NS" == 1600000000000 ]] || exit 92
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-admission-origin-") as directory:
+        root = Path(directory)
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                capture_output=True, text=True, timeout=5, check=False)
+        assert result.returncode == 0, (result.stdout, result.stderr)
+        assert (root / "calls").read_text() == "clock\n"
+
+
+def test_gateway_admission_terminal_attempt_requires_safety_and_is_never_retried() -> None:
+    script = _repair_script()
+    for validated, attempted, guard_code, writer_code, calls in (
+        (False, False, 0, 0, []), (True, True, 0, 0, []),
+        (True, False, 13, 0, ["guard"]),
+        (True, False, 0, 0, ["guard", "writer:rollback:17"]),
+        (True, False, 0, 137, ["guard", "writer:rollback:17"]),
+    ):
+        harness = 'set -Eeuo pipefail\nBACKUP_DIR=fixture-backup\n'
+        harness += f'RECOVERY_EVIDENCE_VALIDATED={str(validated).lower()}\nRECOVERY_TERMINAL_ATTEMPTED={str(attempted).lower()}\n'
+        harness += f'require_safe_recovery_directory() {{ printf "guard\\n" >> calls; return {guard_code}; }}\n'
+        harness += f'record_recovery_evidence() {{ printf "writer:%s:%s\\n" "$1" "$2" >> calls; return {writer_code}; }}\n'
+        harness += _bash_function(script, "finish_rollback") + '\nfinish_rollback 17\nprintf UNREACHABLE\n'
+        with tempfile.TemporaryDirectory(prefix="gateway-admission-terminal-") as directory:
+            root = Path(directory)
+            (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+            result = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                    capture_output=True, text=True, timeout=5, check=False)
+            assert result.returncode == 17 and result.stdout == "", (result.stdout, result.stderr)
+            actual = (root / "calls").read_text().splitlines() if (root / "calls").exists() else []
+            assert actual == calls
+
+
+def _run_native_gateway_admission_clock(mode: str) -> dict:
+    # No rollback/service/filesystem functions: only the extracted bounded reader
+    # and an isolated fake Python process. Never signal a native Windows process.
+    script = _repair_script()
+    function = _bash_function(script, "read_recovery_monotonic_clock")
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    assert function.count(policy) == 1
+    function = function.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+    with tempfile.TemporaryDirectory(prefix="gateway-admission-clock-native-") as directory:
+        root = Path(directory)
+        command = root / "python3"
+        command.write_text(r'''#!/bin/bash
+set -eu
+[[ $# -eq 1 && "$1" == - ]] || exit 91
+if [[ "$FIXTURE_MODE" == ignore_term ]]; then trap '' TERM; fi
+/bin/cat "/proc/$BASHPID/stat" > "$PWD/clock.identity"
+printf 'MONOTONIC_NS=1000000000000\n'
+if [[ "$FIXTURE_MODE" == success ]]; then exit 0; fi
+while :; do :; done
+''', encoding="utf-8", newline="\n")
+        command.chmod(0o700)
+        harness = 'set -Eeuo pipefail\n' + _bash_function(script, "require_recovery_timeout")
+        harness += '\nrequire_recovery_timeout\nPATH="$PWD:$PATH"\n' + function
+        harness += '\nrc=0\nread_recovery_monotonic_clock || rc=$?\nprintf "RESULT:%s:%s\\n" "$rc" "$RECOVERY_CLOCK_NOW_NS"\nexit "$rc"\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, FIXTURE_MODE=mode), capture_output=True, text=True,
+                timeout=5, check=False)
+        finally:
+            identity = root / "clock.identity"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        facts = {"completed": completed, "elapsed_seconds": time.monotonic() - started,
+                 "live_after_command": len(live), "clock_entered": (root / "clock.identity").exists()}
+        return facts
+
+
+@unittest.skipIf(sys.platform != "linux", "Native admission clock success requires Linux CI")
+def test_gateway_native_admission_clock_success_control() -> None:
+    facts = _run_native_gateway_admission_clock("success")
+    assert facts["completed"].returncode == 0, facts
+    assert facts["completed"].stdout == "RESULT:0:1000000000000\n"
+    assert facts["clock_entered"] and facts["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native admission clock hang and ignored TERM require Linux CI")
+def test_gateway_native_admission_clock_hang_and_ignored_term() -> None:
+    for mode, code in (("hang", 124), ("ignore_term", 137)):
+        facts = _run_native_gateway_admission_clock(mode)
+        assert facts["completed"].returncode == code, facts
+        assert facts["completed"].stdout == f"RESULT:{code}:\n"
+        assert facts["clock_entered"] and facts["live_after_command"] == 0
+        assert facts["elapsed_seconds"] < 4
 
 
 def test_gateway_directory_stat_deadlines_refuse_failed_plausible_output() -> None:
