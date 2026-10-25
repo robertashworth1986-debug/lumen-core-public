@@ -35,6 +35,49 @@ function backupHarness(local,fetcher){
 const response=(value,status=200)=>({ok:status>=200&&status<300,status,json:async()=>structuredClone(value)});
 const statusResponse=()=>response({member:'excalis',ready:true,workspace_revision_check:true});
 
+function publicInstallerHarness(fetcher){
+  const h=backupHarness(emptyWorkspace('excalis'),fetcher);
+  vm.runInContext('runtime=false;',h.context);
+  h.context.document.querySelector=selector=>selector==='meta[name="luma-local-runtime"]'?null:h.node(selector);
+  h.node('#package-download').removeAttribute=()=>{};
+  return h;
+}
+test('returning visitors receive the current installer hash and a release-specific download URL',async()=>{
+  const stale='a'.repeat(64),current='b'.repeat(64),requests=[];
+  const h=publicInstallerHarness(async(url,options)=>{
+    requests.push({url,options});
+    // Simulate the observed disk cache: default fetch reuses the old manifest.
+    return response({packages:[{member:'excalis',sha256:options?.cache==='no-store'?current:stale}]});
+  });
+  await h.context.loadInstaller();
+  assert.equal(requests.length,1);
+  assert.match(h.node('#install-code').textContent,new RegExp(current.toUpperCase()));
+  assert.equal(h.node('#package-download').href,`./downloads/excalis.zip?sha256=${current}`);
+  assert.match(h.node('#install-code').textContent,new RegExp(`excalis.zip\\?sha256=${current}`));
+  assert.doesNotMatch(h.node('#install-code').textContent,new RegExp(stale.toUpperCase()));
+});
+test('a delayed installer response cannot replace the next member or a newly rendered package view',async()=>{
+  for(const transition of ['member','view']){
+    let finish;
+    const h=publicInstallerHarness(()=>new Promise(resolve=>{finish=resolve;}));
+    const pending=h.context.loadInstaller();
+    if(transition==='member')vm.runInContext("member={id:'next-member',name:'Next member'};",h.context);
+    else h.context.document.querySelector=selector=>selector==='#install-code'?null:selector==='meta[name="luma-local-runtime"]'?null:h.node(selector);
+    finish(response({packages:[{member:'excalis',sha256:'b'.repeat(64)},{member:'next-member',sha256:'c'.repeat(64)}]}));
+    await pending;
+    assert.equal(h.node('#install-code').textContent,'');
+    assert.equal(h.node('#package-download').href,undefined);
+  }
+});
+test('missing or malformed package fingerprints leave downloads unavailable',async()=>{
+  for(const packages of [[],[{member:'excalis',sha256:'not-a-sha'}]]){
+    const h=publicInstallerHarness(async()=>response({packages}));
+    await h.context.loadInstaller();
+    assert.equal(h.node('#package-download').href,undefined);
+    assert.match(h.node('#install-code').textContent,/being prepared/);
+  }
+});
+
 test('scout searches the owner project topic instead of silently using the industry',async()=>{
   const sent=[];
   const h=backupHarness(emptyWorkspace('excalis'),async(url,options)=>{
