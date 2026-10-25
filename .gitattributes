@@ -133,5 +133,5 @@ examples/proof_capsule/** text eol=lf
 /evidence/public-site-deployments/observations/20261021T021708Z/* -text
 
 # Stable served bytes for the Mission Control review snapshot identity checks.
-/dashboard/data/lumencore_engine_portfolio_audit.json text eol=lf
+/dashboard/assets/mission_control_review_snapshots/*.json text eol=lf
 /dashboard/portfolio/data/portfolio.json text eol=lf

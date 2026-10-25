@@ -7,6 +7,21 @@
 
 ## One commercial sentence
 
+### October 25 Mission Control release packaging (local preparation)
+
+Outcome 2 now includes the existing meeting view in the exact public-release
+package. Five additions expand the inventory from 246 to 251 files: the page,
+its stylesheet and script, and two frozen public inventory snapshots copied
+from commit 2022d0c into a dedicated static-asset folder. The third JSON input
+is the existing portfolio catalogue. Runtime data paths remain excluded.
+
+The home page links to the read-only view. Python and root-side release lists,
+directory membership, read-only audit triggers and review-test triggers are
+kept aligned. Historical 43-, 119-, 189- and 246-file releases retain their
+original manifests and evidence. No deployment authority is created by these
+changes. Local package and browser evidence must remain separate from hosted
+checks, a reviewed merge, signed main artifacts and a verified live release.
+
 ### October 25 Mission Control snapshot identity correction (local review)
 
 This correction advances outcome 2 by making the existing PR #261 meeting

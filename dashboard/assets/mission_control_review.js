@@ -7,8 +7,8 @@
   const SOURCE_COMMIT = "2022d0c319c7585ab4d35fbe97f1ba48e6f0e37d";
   const HISTORICAL_SOURCE_COMMIT = "e706e91de133e039cc16ed25ec5021a293edbf2b";
   const SNAPSHOT_SHA256 = Object.freeze({
-    "./data/external_technical_review_packet.json": "7ad3d6348874918dfcc55802193691da6e67182bcb2ba8a24764f28592c04596",
-    "./data/lumencore_engine_portfolio_audit.json": "a98aca8e529778040d9ccde9c13364d6f4a20b9539c4946c70b923d4492bef52",
+    "./assets/mission_control_review_snapshots/external_technical_review_packet.json": "7ad3d6348874918dfcc55802193691da6e67182bcb2ba8a24764f28592c04596",
+    "./assets/mission_control_review_snapshots/lumencore_engine_portfolio_audit.json": "a98aca8e529778040d9ccde9c13364d6f4a20b9539c4946c70b923d4492bef52",
     "./portfolio/data/portfolio.json": "dab1a8607e24aa5df00aaba1fc890784187e67fa4108ad1055e29bffd79d45c4"
   });
   const REPO_BASE = "https://github.com/robertashworth1986-debug/lumen-core-public/";
@@ -288,8 +288,8 @@
   }
 
   const tasks = [
-    { name: "Review packet", path: "./data/external_technical_review_packet.json", render: renderPacket, fail: () => { document.getElementById("packet-assets").replaceChildren(); document.getElementById("packet-asset-count").textContent = "UNAVAILABLE"; document.getElementById("packet-load-status").textContent = "The public packet could not be loaded or verified. Its asset count is unavailable."; } },
-    { name: "Engine audit", path: "./data/lumencore_engine_portfolio_audit.json", render: renderAudit, fail: () => { document.getElementById("engine-list").replaceChildren(); document.getElementById("engine-audit-count").textContent = "UNAVAILABLE"; document.getElementById("engine-load-status").textContent = "The tracked-file audit could not be loaded or verified. Its lane count is unavailable."; } },
+    { name: "Review packet", path: "./assets/mission_control_review_snapshots/external_technical_review_packet.json", render: renderPacket, fail: () => { document.getElementById("packet-assets").replaceChildren(); document.getElementById("packet-asset-count").textContent = "UNAVAILABLE"; document.getElementById("packet-load-status").textContent = "The public packet could not be loaded or verified. Its asset count is unavailable."; } },
+    { name: "Engine audit", path: "./assets/mission_control_review_snapshots/lumencore_engine_portfolio_audit.json", render: renderAudit, fail: () => { document.getElementById("engine-list").replaceChildren(); document.getElementById("engine-audit-count").textContent = "UNAVAILABLE"; document.getElementById("engine-load-status").textContent = "The tracked-file audit could not be loaded or verified. Its lane count is unavailable."; } },
     { name: "Catalogue", path: "./portfolio/data/portfolio.json", render: loadCatalogue, fail: () => { document.getElementById("search-status").textContent = "The public catalogue could not be loaded. Serve this page with its relative JSON files over HTTP to use search. No substitute records have been generated."; } }
   ];
   Promise.allSettled(tasks.map(async task => {

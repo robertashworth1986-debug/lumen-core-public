@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REVIEW_COMMIT = "2022d0c319c7585ab4d35fbe97f1ba48e6f0e37d"
 HISTORICAL_COMMIT = "e706e91de133e039cc16ed25ec5021a293edbf2b"
 PATHS = {
-    "packet": "dashboard/data/external_technical_review_packet.json",
-    "audit": "dashboard/data/lumencore_engine_portfolio_audit.json",
+    "packet": "dashboard/assets/mission_control_review_snapshots/external_technical_review_packet.json",
+    "audit": "dashboard/assets/mission_control_review_snapshots/lumencore_engine_portfolio_audit.json",
     "catalogue": "dashboard/portfolio/data/portfolio.json",
 }
 
@@ -56,8 +56,8 @@ const document = {
 const requests = [];
 async function fetch(path) {
   requests.push(path);
-  const file = path === './data/external_technical_review_packet.json' ? 'packet'
-    : path === './data/lumencore_engine_portfolio_audit.json' ? 'audit' : 'catalogue';
+  const file = path === './assets/mission_control_review_snapshots/external_technical_review_packet.json' ? 'packet'
+    : path === './assets/mission_control_review_snapshots/lumencore_engine_portfolio_audit.json' ? 'audit' : 'catalogue';
   let bytes = Buffer.from(input.sources[file], 'base64');
   if (input.changed === file) bytes = Buffer.concat([bytes, Buffer.from('\n')]);
   return {ok: input.missing !== file, status: input.missing === file ? 404 : 200,
@@ -115,12 +115,22 @@ def test_current_snapshots_render_with_their_exact_source_commit():
     assert result["displayed"]["catalogue-count"] == "64"
     assert len(result["packetLinks"]) == 44
     assert all(f"/blob/{REVIEW_COMMIT}/" in url for url in result["packetLinks"] + result["auditLinks"])
+    # The public serving path may move; reviewer links must still resolve to
+    # the original bytes at the stated historical source commit.
+    for url in set(result["auditLinks"]):
+        source_path = url.split(f"/blob/{REVIEW_COMMIT}/", 1)[1]
+        linked = subprocess.run(
+            ["git", "show", f"{REVIEW_COMMIT}:{source_path}"], cwd=ROOT,
+            capture_output=True, check=False,
+        )
+        assert linked.returncode == 0, linked.stderr.decode("utf-8", errors="replace")
+        assert linked.stdout == (ROOT / PATHS["audit"]).read_bytes()
     assert f"/blob/{REVIEW_COMMIT}/code/forecast_evaluation_v2.py" in result["sourceLink"]
     assert REVIEW_COMMIT in result["displayed"]["snapshot-status"]
     assert result["original"] == "10.60%"
     assert result["displayed"]["baseline-improvement"] == "18.51%"
     assert f"/blob/{HISTORICAL_COMMIT}/" in result["comparisonLink"]
-    assert set(result["requests"]) == {"./data/external_technical_review_packet.json", "./data/lumencore_engine_portfolio_audit.json", "./portfolio/data/portfolio.json"}
+    assert set(result["requests"]) == {"./assets/mission_control_review_snapshots/external_technical_review_packet.json", "./assets/mission_control_review_snapshots/lumencore_engine_portfolio_audit.json", "./portfolio/data/portfolio.json"}
 
 
 @pytest.mark.parametrize("name,count_id,container", [
