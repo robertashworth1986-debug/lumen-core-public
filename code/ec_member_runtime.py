@@ -218,6 +218,8 @@ def scout_grants(profile, query, fetcher=request_json):
     response, receipt = fetcher('https://api.grants.gov/v1/api/search2', payload)
     if not isinstance(response, dict) or ('data' in response and not isinstance(response['data'], dict)):
         raise UserError('Unexpected Grants.gov response. No opportunities were accepted.')
+    if 'errorcode' in response and (type(response['errorcode']) is not int or response['errorcode'] != 0):
+        raise UserError('Grants.gov reported a search error. No opportunities were accepted.')
     hits = extract_hits(response)
     if not isinstance(hits, list) or len(hits) > 100 or any(not isinstance(x, dict) for x in hits):
         raise UserError('Unexpected Grants.gov result list.')
@@ -229,7 +231,10 @@ def scout_grants(profile, query, fetcher=request_json):
         url = f'https://www.grants.gov/search-results-detail/{ident}' if re.fullmatch(r'[0-9]{1,12}', ident) else 'https://www.grants.gov/search-grants'
         rows.append({'title':str(result['title'])[:500], 'url':url, 'agency':str(result['agencyName'])[:200], 'deadline_as_reported':str(result['closeDate'])[:100], 'relevance_score':result['score'], 'reasons':result['reasons'], 'source_status':str(result['oppStatus'])[:100], 'eligibility':'UNVERIFIED'})
     rows.sort(key=lambda x:x['relevance_score'], reverse=True)
-    return {'member':profile['id'], 'opportunities':rows[:20], 'source_receipt':receipt, 'boundary':'Keyword relevance only. Official notices determine eligibility and current deadlines.'}
+    total = response.get('data', {}).get('hitCount')
+    if type(total) is not int or total < len(hits):
+        total = None
+    return {'member':profile['id'], 'query':query, 'total_available':total, 'returned_count':len(rows[:20]), 'opportunities':rows[:20], 'source_receipt':receipt, 'boundary':'Up to 20 source results, ranked by keyword occurrence within that returned set. This is not a complete catalog search or an eligibility determination. Official notices determine eligibility and current deadlines.'}
 
 def assistant_draft(profile, prompt, fetcher=request_json):
     key = os.environ.get('OPENAI_API_KEY', '')

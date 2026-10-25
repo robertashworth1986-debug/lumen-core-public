@@ -7,6 +7,24 @@ export function emptyWorkspace(member) {
   return {schema:SCHEMA, member, items:[], measurements:[], grants:[], scout:[], care:[], reviews:[], paper:null};
 }
 export function validText(value, max=2000) { return typeof value === 'string' && value.length <= max; }
+export function mergeScoutOpportunities(existing, incoming, {query, retrievedAt, createId=()=>crypto.randomUUID()}={}) {
+  if (!Array.isArray(existing) || existing.length > MAX_ITEMS || !Array.isArray(incoming) || incoming.length > 100) throw new Error('Invalid opportunity collection. Your saved records were not changed.');
+  if (!validText(query,120) || !query.trim() || !validText(retrievedAt,60)) throw new Error('The search topic or source receipt is missing. Your saved records were not changed.');
+  const items=existing.slice(), urls=new Set(existing.map(row=>row?.url));
+  let added=0, duplicates=0, capacitySkipped=0;
+  for (const row of incoming) {
+    if (!row || !validText(row.title,500) || !row.title.trim() || !validText(row.url,2000)) throw new Error('A source opportunity is incomplete. Your saved records were not changed.');
+    let url;
+    try { url=new URL(row.url); } catch { throw new Error('A source opportunity has an invalid link. Your saved records were not changed.'); }
+    if (!['http:','https:'].includes(url.protocol) || url.username || url.password) throw new Error('Use public http or https opportunity links. Your saved records were not changed.');
+    if (urls.has(row.url)) { duplicates++; continue; }
+    if (items.length >= MAX_ITEMS) { capacitySkipped++; continue; }
+    urls.add(row.url);
+    items.push({...structuredClone(row),id:createId(),next_step:'Verify current notice and applicant eligibility',status:'TO REVIEW',source_query:query.trim(),source_retrieved_utc:retrievedAt});
+    added++;
+  }
+  return {items,added,duplicates,capacitySkipped};
+}
 export function workspaceStartupChoice(local, saved) {
   validateWorkspace(local, local.member);
   if (saved === null) return 'browser';

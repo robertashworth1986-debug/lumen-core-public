@@ -78,7 +78,13 @@ WHAT THE TOOLS DO
   This review runs offline and needs no API credits.
 - Grant Factory: turn your supplied facts into Markdown drafts. Unknowns remain
   marked. No applicant attributes, eligibility, signatures or awards are invented.
-- LumaScout: retrieve public Grants.gov listings; rank keywords, not eligibility.
+- LumaScout: enter a project topic to retrieve up to 20 public Grants.gov results.
+  The source's total-match count is shown when available; ranking covers only
+  the returned set, not the full catalog. Each added record retains its topic
+  and retrieval time. Existing notes survive duplicate matches. At the
+  500-record limit, saved opportunities remain intact and new results are
+  reported as not imported. Download latest grant results to keep the full
+  returned set separately. Relevance is not applicant eligibility.
 - Paper Lab: simulate a 5/20 moving-average rule on fabricated or imported daily
   CSV prices. The optional local paper bot reads public BTC-USD quotes hourly,
   starts with 10,000 fictional USD, uses a 25% cash allocation, modeled 10 bps
@@ -89,7 +95,9 @@ WHAT THE TOOLS DO
 
 SCHEDULED WORK
 The assistant, scout and paper screens show local task controls. You can enable
-hourly public grant checks or the paper bot. The first scheduled run is one hour
+hourly public grant checks or the paper bot. Hourly grant checks use the member's
+industry label, shown in the controls; a manual project search does not change
+that scheduled topic. The first scheduled run is one hour
 after enabling. Tasks run only while this Python process stays open. Each run
 records a success or failure, source receipts where applicable and a local
 integrity-chain entry. Failed tasks do not become completed results.

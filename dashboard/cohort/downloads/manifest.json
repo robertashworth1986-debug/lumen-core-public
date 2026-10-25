@@ -1,420 +1,420 @@
 {
   "schema": "lumencore.ec_member_downloads.v1",
-  "source_catalog_sha256": "d0a244ee01017467c60bf9516c3fa6361075512db0deb45ab2c86b5bb8a30075",
+  "source_catalog_sha256": "2c2b14e983f0f65907899788b985346fbc77ba36cd906831a58c157490970cdf",
   "packages": [
     {
       "member": "aa-window-washing",
       "file": "aa-window-washing.zip",
-      "bytes": 251681,
-      "sha256": "7e7c1c403319c5fddf126ffb941e2cbd2a91a683eba60fb825899205a2b0af2e"
+      "bytes": 253522,
+      "sha256": "069ca98cef13a35476f45374bcca7539cab32b3cc97afc208b368bb9a558400b"
     },
     {
       "member": "advia-solutions",
       "file": "advia-solutions.zip",
-      "bytes": 251632,
-      "sha256": "62cf9f180f2d702592b217fd755c67d83079b4bd72bde8211e9a86d2790c4cc1"
+      "bytes": 253468,
+      "sha256": "8f0b7796460bcfd2f49f0f08348879a27d9c5d49a13908a105c88666112d3c18"
     },
     {
       "member": "aegiskeep",
       "file": "aegiskeep.zip",
-      "bytes": 251696,
-      "sha256": "0728680ea715295a5602e67a165df5a2423b4c601ea21f5b96120b4c9458a91d"
+      "bytes": 253537,
+      "sha256": "7f04a22b6a0cbcac011d3a39d4f76e5bc45c0495b837194021bf69961fa99122"
     },
     {
       "member": "aligned-strategy-partners",
       "file": "aligned-strategy-partners.zip",
-      "bytes": 251778,
-      "sha256": "d69575e73f3e915185bacd5cfca7444699b7f856d8c8c6f909b848e60127cb98"
+      "bytes": 253619,
+      "sha256": "dbae5dc079f18dae900488cd16f6dd4e7be56d747a0762eacaeb29aab9144d01"
     },
     {
       "member": "amara-bitters",
       "file": "amara-bitters.zip",
-      "bytes": 251685,
-      "sha256": "f16f002961c524c49003754e5f84ab1afd33a77a3d4f536db9e5569e6e3dfb85"
+      "bytes": 253530,
+      "sha256": "d2c682e9d0040a5ce7830156396f5d96979462037fd71b707d48e5057aa587e7"
     },
     {
       "member": "autarko",
       "file": "autarko.zip",
-      "bytes": 251725,
-      "sha256": "6aa16b3ccc4f9cebbfe1471576c4a3d8e82050b5435d77b95090663511617004"
+      "bytes": 253565,
+      "sha256": "b04f5b7b2f3ecf17bd8b260c1a7ccb54dc735502071515fa43a26e7e26eb86f4"
     },
     {
       "member": "bagel",
       "file": "bagel.zip",
-      "bytes": 251580,
-      "sha256": "d7320525d6173cb0c7472fc246f63193cbedcdd5b8dab486618e5d188a533fe7"
+      "bytes": 253421,
+      "sha256": "5024354796e34097cb63fa74c72d08d22c6743701f180ef2851027eb7fbba97a"
     },
     {
       "member": "buyunrepped",
       "file": "buyunrepped.zip",
-      "bytes": 251728,
-      "sha256": "647a89e13a1216bdcc7aae3a72a6c41074c0dc09367b7755eb1bf695326a32cc"
+      "bytes": 253567,
+      "sha256": "59bf8ef5c49307ec5d75dc81fa567918f195bcb9ddd5a485c950ecaf982204e0"
     },
     {
       "member": "c3-measures-registry",
       "file": "c3-measures-registry.zip",
-      "bytes": 252181,
-      "sha256": "f6e3825014776d5644ce4915fe0aac27223aa6ba4a07af9066a4532cef8b71f9"
+      "bytes": 254018,
+      "sha256": "c0f21c4acbda136c469456215079410fe75419b489d8ee7ad7dbab24312ba16e"
     },
     {
       "member": "claridense",
       "file": "claridense.zip",
-      "bytes": 251564,
-      "sha256": "8808a546edad23d0897c3afaccf3d935e8373c14b04d764b07f3fd886ad61c25"
+      "bytes": 253403,
+      "sha256": "5ac6474920924d99128ff3b21882a94ff876d6373b4f99c6b9ccb88f01f3ebdf"
     },
     {
       "member": "clark-wester-corporation",
       "file": "clark-wester-corporation.zip",
-      "bytes": 251673,
-      "sha256": "820f55dd58e414cc68b1f304a82813c4e47b7fd82e8412534a03020969fcafe0"
+      "bytes": 253514,
+      "sha256": "50885a7bcd67801af8ed2ccb47d4fd9ea4bebf1eed78002efb3bae0edb5b7760"
     },
     {
       "member": "cog-learning-inc",
       "file": "cog-learning-inc.zip",
-      "bytes": 251652,
-      "sha256": "f5056bb8ffcbb5517b8b3ee425dd94ee074bff7900969d522378351f993a9451"
+      "bytes": 253492,
+      "sha256": "af492f0d973fbd79cb04acbf45c1f6c56fe29052f9f8633b42a0cb341e290b2d"
     },
     {
       "member": "compounds-dev-inc",
       "file": "compounds-dev-inc.zip",
-      "bytes": 251783,
-      "sha256": "5dd7ddc3bf6a52b0a6628c09e2388648a414799b03926e2620a3f08ef472842c"
+      "bytes": 253622,
+      "sha256": "481580a872ce981bc8e07f9da0c221ec30e96584fbf0e0efeb175dc7387a5459"
     },
     {
       "member": "csh-hub",
       "file": "csh-hub.zip",
-      "bytes": 251564,
-      "sha256": "3014072d66066aad2db841ca662199de56d5172e00a70318934295fc769695f2"
+      "bytes": 253404,
+      "sha256": "b5adf2fe2723b7fc5c19f5bb075df65f61e513532edc9847907dd69fecad0195"
     },
     {
       "member": "decre",
       "file": "decre.zip",
-      "bytes": 251603,
-      "sha256": "025feedbf0bd7eb87093d8d8d68b0474e977ae4825749fde30c067a8eb8f67c6"
+      "bytes": 253441,
+      "sha256": "c5b77ef15eeef9cfc428778e33dcafc37112e988a3eb8793c041e84e49fdc752"
     },
     {
       "member": "double-r-strategies-and-consulting",
       "file": "double-r-strategies-and-consulting.zip",
-      "bytes": 251701,
-      "sha256": "c920b5f1e3d42f7b9ea94689f0a70feaf53d67f5d1d29cd2c95e536967811488"
+      "bytes": 253537,
+      "sha256": "ffeee58077438805e6b0e71ce3a49fbf76e0382f441dfb7187a53d7752f3177a"
     },
     {
       "member": "dust-to-dust-llc",
       "file": "dust-to-dust-llc.zip",
-      "bytes": 251829,
-      "sha256": "105e1619894b5b62f5bf3d32df7d48ffc842cb0406c1f3245ffd609e2df75d4f"
+      "bytes": 253671,
+      "sha256": "6f5d9bce145220b354fb24fa2f3f49f6074a9534becb882a1aacee013d616011"
     },
     {
       "member": "encompass-financial-services-inc",
       "file": "encompass-financial-services-inc.zip",
-      "bytes": 251714,
-      "sha256": "846fc0823357bf68f427306070521a736b2102ea0d3f9f233a29da96c6140b52"
+      "bytes": 253552,
+      "sha256": "9ba078504ea5c2565e26fe69f2fa79f8dc26df5232ab4ed12bca8fc222e52a28"
     },
     {
       "member": "excalis",
       "file": "excalis.zip",
-      "bytes": 252096,
-      "sha256": "9dee67e7be77038414a00bfb5db500fbdcefc91d1e22fc65c41e76c36cdf910a"
+      "bytes": 253934,
+      "sha256": "9a0300f6312a0adb0828b8665b916b70b51e074e20c1c12bc7d3c0dcc5c5de9a"
     },
     {
       "member": "firma-q-gaas",
       "file": "firma-q-gaas.zip",
-      "bytes": 251760,
-      "sha256": "96e779bcffb807bd006f8550eb635c39e5e2b52607280d13ec74dd39ec8db37d"
+      "bytes": 253595,
+      "sha256": "f43a06c45866de9a22475fe0715d9aa09f512fde5bce330788f58d2bfe1f1a2c"
     },
     {
       "member": "fizzy-mixology",
       "file": "fizzy-mixology.zip",
-      "bytes": 251619,
-      "sha256": "43bc3fa607d98a8951efc32fc1d98ca74d4ebd79088c20fbacf47c71cced50fa"
+      "bytes": 253458,
+      "sha256": "8ea36fdf80b292f5c673eac4b008af988bcbd94557545c02a82e2ca53a84ed55"
     },
     {
       "member": "fox-force",
       "file": "fox-force.zip",
-      "bytes": 251649,
-      "sha256": "15ce1c8247da9dea6fa79d8b7c9974bc8929a1e6057317a87c9e6ec78f213784"
+      "bytes": 253488,
+      "sha256": "cb05cf4126ff0c37ab026275f33b12ea8521d0a523d9a45f685fc4be54a8d91e"
     },
     {
       "member": "glow-up-sports",
       "file": "glow-up-sports.zip",
-      "bytes": 252155,
-      "sha256": "c500a72015744c1d16efc0fd74c990531d145be89ee05665ef74b8761d60fc54"
+      "bytes": 253997,
+      "sha256": "3417b4eb82cad3e8f0d0df5c667424eaf9ff61da876bb4a9196b51456de54d7c"
     },
     {
       "member": "govfetchr-ai",
       "file": "govfetchr-ai.zip",
-      "bytes": 251825,
-      "sha256": "a9056633af9c3849b2bf3452aabb95c238beb2f73bcb76b2df00667fc58cc7e6"
+      "bytes": 253659,
+      "sha256": "f7652d3beacd78863c34d200e0e81512c4f5ade3bc671112e3f4e1bdf6e8c852"
     },
     {
       "member": "gutless-topical-supplements",
       "file": "gutless-topical-supplements.zip",
-      "bytes": 252180,
-      "sha256": "f9662d92eb03900c4936e30c4cbf88bf4b3e8598295be052a35eac3aa332fa4a"
+      "bytes": 254022,
+      "sha256": "337c45e91daed15dbfd9506c17637a4831f6d4529228fca4ae92fa784f047f4d"
     },
     {
       "member": "happy-overall",
       "file": "happy-overall.zip",
-      "bytes": 252561,
-      "sha256": "e6cad9fb87511ce53e74466baac1d3ffb4b813f9e56215f2088e96284c48a322"
+      "bytes": 254401,
+      "sha256": "c099505551c19d7226e7364daca8a9b468ca18c335477d3179aadcf82d918a0e"
     },
     {
       "member": "holastra",
       "file": "holastra.zip",
-      "bytes": 251652,
-      "sha256": "b8e93dc100dee430a3a519cc731208773b8d7568c70f0092c67c03c52db9112e"
+      "bytes": 253496,
+      "sha256": "907b8135a72ed81651e37f5f3694c89945c26ffc85a0655a78309c2cba1f6b68"
     },
     {
       "member": "hopeconnect-health",
       "file": "hopeconnect-health.zip",
-      "bytes": 251849,
-      "sha256": "24710db70053cd85db75bb007c0f4423b833a04749b0fc7d929cbfa65560d953"
+      "bytes": 253690,
+      "sha256": "55852ad0a96633e5a6057a1778ecea1c7dafa7dbf7a23a2f8a4443807b7b79e1"
     },
     {
       "member": "hot-mess-inc",
       "file": "hot-mess-inc.zip",
-      "bytes": 252198,
-      "sha256": "6a54e4ec96f137a7104749a7482768ea49fe2348d3a6191fa1891b6c96bc4245"
+      "bytes": 254038,
+      "sha256": "1335b458579b27637214200b0b92ba1436bac0b476560ed16069258675283634"
     },
     {
       "member": "incourage-enterprises",
       "file": "incourage-enterprises.zip",
-      "bytes": 251970,
-      "sha256": "db1db81fb6d3559e71eda9338b54e5efebe02a0d4b6c54282cfb12fd10711558"
+      "bytes": 253811,
+      "sha256": "cf94d53976317ca8d21252a5ee864529a1fdc9b93f8fe2ef1d775485ff63bf86"
     },
     {
       "member": "itty-bitty-city",
       "file": "itty-bitty-city.zip",
-      "bytes": 251917,
-      "sha256": "53e49c1c1f6580d64cd0bc2f4f35efa1873feb07eaf5389cd447d86bac0e6e0a"
+      "bytes": 253759,
+      "sha256": "cb7e47e45ced17267c76234a2f2c0d4721cab7565d80142523087973bd1852c5"
     },
     {
       "member": "learnkairo",
       "file": "learnkairo.zip",
-      "bytes": 251854,
-      "sha256": "0124b7ce80b6bb5cddb558c1cf394b0238231cfe2cd150425898dd46ba68d83d"
+      "bytes": 253695,
+      "sha256": "c240cccb251585142a6dbd677f21075aa5f3e0d2117bfa3da0d7b0a637694f17"
     },
     {
       "member": "limer",
       "file": "limer.zip",
-      "bytes": 251744,
-      "sha256": "50040507d0074007e7d058e762b67fc0dbd32c43f48f07f32f6b18f7af7178fb"
+      "bytes": 253585,
+      "sha256": "d833822269ffafd38e4c96969d5fe53e587ba47dc7b07a069b636ca564e4e90b"
     },
     {
       "member": "lode-labs",
       "file": "lode-labs.zip",
-      "bytes": 251838,
-      "sha256": "75d48ebd18e83284b06f1e5c73686cab5799b3df5adaad4376a9d465ece1ad13"
+      "bytes": 253677,
+      "sha256": "9915457911dc4b4ec999716ad4c7c04cfdcab0456f17f889c86c65eb8dd234f8"
     },
     {
       "member": "lumencore",
       "file": "lumencore.zip",
-      "bytes": 252157,
-      "sha256": "43d6dd69a7652591a8a2483730870b36655d124e614b62779cf743c4bbe82ed0"
+      "bytes": 253995,
+      "sha256": "953990f47adddfc139b7b3ba4ba00937582b801901031d054272f410d042e5bd"
     },
     {
       "member": "maaven",
       "file": "maaven.zip",
-      "bytes": 251803,
-      "sha256": "1fc70ed442ee502d870d84de556984423b778d092e0561ee695c112be9950483"
+      "bytes": 253641,
+      "sha256": "8c7f2e0166e590febe941792681bfa9416d9852b5eb2cb740041363339ffcfac"
     },
     {
       "member": "margaret-ray-interiors",
       "file": "margaret-ray-interiors.zip",
-      "bytes": 251833,
-      "sha256": "bda79d7ea6ccbf616358d014d73c725cfef1aaf386068077ca24ff490e303e98"
+      "bytes": 253670,
+      "sha256": "a5f919e0e79416686fbc7e9a59c4c4a4c8197f002d4eab4f0f8b97a9f8ed8d76"
     },
     {
       "member": "moneybot",
       "file": "moneybot.zip",
-      "bytes": 251925,
-      "sha256": "7c7389aa0ab9d172382c901674378584ee96b67ce9f0b233523f83e8f084e0f5"
+      "bytes": 253762,
+      "sha256": "320e40d420fb762e83215897f9ba43488e7314cf6683e7968656dcab85d6b3ff"
     },
     {
       "member": "music-utility-network",
       "file": "music-utility-network.zip",
-      "bytes": 251982,
-      "sha256": "2629c3552e8043ce0eded8b4ddb4636ff5ba9996224ba76dcbd4fdad382f34f8"
+      "bytes": 253820,
+      "sha256": "e37a1417eaddfa81d0e9207fbf6b2ca648b633d708a7297af2911907b65fa538"
     },
     {
       "member": "obviecare",
       "file": "obviecare.zip",
-      "bytes": 251756,
-      "sha256": "42439f329bfb2c788a288446bba7441e16c3979750d5691ff575b55396b6beca"
+      "bytes": 253595,
+      "sha256": "1e6d544541623c34973d47321f5ccbb4b9bda38d1d02ba0a9bbc109262bf3fe0"
     },
     {
       "member": "paragon-parcels",
       "file": "paragon-parcels.zip",
-      "bytes": 252049,
-      "sha256": "e2db6f1c0295b091583a691c39662ddc13533fff1e6cfcb1aabcb68878a11ff6"
+      "bytes": 253886,
+      "sha256": "4602bc399b11ec086679cb575ae47af5f05ff600cfa6497d890f684994f4cb5a"
     },
     {
       "member": "petrarch-strategy",
       "file": "petrarch-strategy.zip",
-      "bytes": 252186,
-      "sha256": "d16bbac95fb32dd314463a7a0c60fdedcbcb453c5d7a27bbdb4d41651e066dec"
+      "bytes": 254030,
+      "sha256": "e736fa9293857aaa4ed1b5b3593c2821b13c5183ae1a4ca80485e5420d9a5787"
     },
     {
       "member": "proworx",
       "file": "proworx.zip",
-      "bytes": 252548,
-      "sha256": "b3c7504361081210072c5a799f9954a0f8a2daec791e31825f20e8f0dbd3ce61"
+      "bytes": 254390,
+      "sha256": "b56020348e756135e509a29c5a9d7623fe1288f1656c19a6d1cdca345b180090"
     },
     {
       "member": "prsnt",
       "file": "prsnt.zip",
-      "bytes": 251857,
-      "sha256": "edfbf9129733fdbe646be880398db0a54aeb4d71cd5574ff69c569b40ab16996"
+      "bytes": 253695,
+      "sha256": "260bca07473abcfd3b89fc7752d1a7cabe951208d7e286926f427d8842f182e0"
     },
     {
       "member": "ptln",
       "file": "ptln.zip",
-      "bytes": 251872,
-      "sha256": "8f89352f07011e53a6e6c3402a296ca283ff82792f06cfcd8d105b4747f02ee6"
+      "bytes": 253713,
+      "sha256": "d5bc30afc3bb80b43d11f955c61cdda4644a0abdcbbf19e94ace871d93f5ff5d"
     },
     {
       "member": "public-speaking-pros",
       "file": "public-speaking-pros.zip",
-      "bytes": 251913,
-      "sha256": "69631745822523bd7c1554fc84777dda9b4bbf05a220bced9c221c309be7b496"
+      "bytes": 253749,
+      "sha256": "5bc53f07a68b41f02602ff24f1c84f0b661c722df6e7d26612bfe88d879ccde6"
     },
     {
       "member": "recovery-matters",
       "file": "recovery-matters.zip",
-      "bytes": 251895,
-      "sha256": "b888b670182b509117f8a4b18ec2b0c52fd650de027f69ad40188a6bfb593f41"
+      "bytes": 253736,
+      "sha256": "70d581402e7ed3b84d085cadd38ab30548eb17512d61cbce334dc1eb0fb8ce4c"
     },
     {
       "member": "remedy-haus",
       "file": "remedy-haus.zip",
-      "bytes": 251796,
-      "sha256": "1015cafb53039664faa8ce341ce3f4b3a636456190c8288085d3ef452aa265ae"
+      "bytes": 253635,
+      "sha256": "e57a4c050c9e13de7c1d982cd5e042b8161ae6650c4c1750012aad9650a40040"
     },
     {
       "member": "renuiam",
       "file": "renuiam.zip",
-      "bytes": 251845,
-      "sha256": "325540447610236c76b43b1fe2d5cf197a63c8c661fd49f20b5d4a88afa743b7"
+      "bytes": 253684,
+      "sha256": "57fbadf0a7d3c34cbf1e10938dc3a0496c170fb55346aa4c2d45b3b2c803f9a3"
     },
     {
       "member": "scoreboardz-inc",
       "file": "scoreboardz-inc.zip",
-      "bytes": 251948,
-      "sha256": "dec927a280884fcc71af7daf5278412a031ebc76d99a3039b5214b4a0dee3fc0"
+      "bytes": 253788,
+      "sha256": "1b5bd42b13c91b1aa10e8cdf4bac6a5449e142531be0ed3c4ae495f135abe8c1"
     },
     {
       "member": "smr-pet-services",
       "file": "smr-pet-services.zip",
-      "bytes": 251740,
-      "sha256": "75b130f572975b309980a26f34066736f302913a1263735a8d36065959e02f67"
+      "bytes": 253578,
+      "sha256": "93664be8422986ecc8fce7f7c23af4dfe27e290129e265122ec98205f044f88a"
     },
     {
       "member": "specinate",
       "file": "specinate.zip",
-      "bytes": 251735,
-      "sha256": "a1388f409304ab1805e3be59c9fbd700413841429c28765226916d8f8d661a19"
+      "bytes": 253576,
+      "sha256": "9aab9ae1433ef5280091a9f66f7e3a762f29101b67314803079c5d5fbd5dbb4c"
     },
     {
       "member": "spilburg-solutions",
       "file": "spilburg-solutions.zip",
-      "bytes": 252212,
-      "sha256": "dc3b182f9e639825702171bdca73f03d8d886f2f138c11d2e02cb9babe31c861"
+      "bytes": 254050,
+      "sha256": "0428ebc585ca92e247dfca678e49ab2abe080d95c6767bff865167984da56643"
     },
     {
       "member": "starra-llc",
       "file": "starra-llc.zip",
-      "bytes": 252123,
-      "sha256": "2d1ae5e3f1da4c4fb61f1d6865b982c6cd8329a7b33800e8745f9891c9b35c75"
+      "bytes": 253959,
+      "sha256": "b55421d00ad132085013ade4965fe1a9ff732aa4a7272bc3271a3e32f162228a"
     },
     {
       "member": "tarapy-inc",
       "file": "tarapy-inc.zip",
-      "bytes": 252140,
-      "sha256": "1c4e788efccd17c72816b0343eeb163e91cc856c33a1aa94ae75e944aa1325b7"
+      "bytes": 253981,
+      "sha256": "0d3a7affadc4ae6bc07d416a68c91b2814d644a530da47ecaeb8a6f74e0917e9"
     },
     {
       "member": "the-37208",
       "file": "the-37208.zip",
-      "bytes": 252506,
-      "sha256": "92342e4ba0175724b381ea019f31ab7c6d9621e2a5ced81a06d8db18a1221912"
+      "bytes": 254345,
+      "sha256": "6f64d69087b819d705ba03e45b526c33d3cea92fb2118a6f69b97e9fe3d6adce"
     },
     {
       "member": "the-designery-nashville-south",
       "file": "the-designery-nashville-south.zip",
-      "bytes": 252164,
-      "sha256": "9b507f4e63d75e3e2b6bb7564fdf79c3f4103a02342c6fd4e162211a94bd8359"
+      "bytes": 254002,
+      "sha256": "328a828facb35faf9b83266f4a4397030a0219bb126d5dd5e72b20b4f7b148a3"
     },
     {
       "member": "the-nash-philanthropist",
       "file": "the-nash-philanthropist.zip",
-      "bytes": 252065,
-      "sha256": "cbe965a1f4d3c31eac8d33709c3eabf202d3160819de0345700bf1622ac9fcfe"
+      "bytes": 253903,
+      "sha256": "c6c9ca8381b4e5a2bda81309164c7d55af6f0c6a277414400771f46d7d560a44"
     },
     {
       "member": "the-tennessee-hospitality-group",
       "file": "the-tennessee-hospitality-group.zip",
-      "bytes": 252326,
-      "sha256": "8bc508965757a713a2ce99bb465578114bee4a668d387613022de3cac92c56a2"
+      "bytes": 254166,
+      "sha256": "d18e3207bda4340af081231fc2043bb7e1f2898186e854bd87ba7ef4eff5e0c0"
     },
     {
       "member": "threadwell-studio",
       "file": "threadwell-studio.zip",
-      "bytes": 252173,
-      "sha256": "10cc53097fa5f059dc6d8851839d9d7835e302d276272cfdab513da37901f18f"
+      "bytes": 254009,
+      "sha256": "a94bd7d080895e8b3fc6c992d43db6c5d3fa4e474bc070a12a793418737094ae"
     },
     {
       "member": "true-vena",
       "file": "true-vena.zip",
-      "bytes": 252276,
-      "sha256": "903dd8114cf037cea18c9f38d32a231149fdc84483b3becbe1f481052c2e7cd7"
+      "bytes": 254116,
+      "sha256": "35293d155a7d162d4d886bcc8db02239f7b0f98921427f62ae2bc623135f9354"
     },
     {
       "member": "ultra-beauty-supply-skin-and-nails",
       "file": "ultra-beauty-supply-skin-and-nails.zip",
-      "bytes": 252202,
-      "sha256": "5462f9a01ac93c11346de1c7ec0d06307b5bb2e9e5814ee795c612c35cd17596"
+      "bytes": 254048,
+      "sha256": "153f3fab4f7108ce96120828c71ce81cca3676eac3d7874fcc1d8cc9ae2fe2da"
     },
     {
       "member": "unapologetically-me",
       "file": "unapologetically-me.zip",
-      "bytes": 252338,
-      "sha256": "6159b5a2a3d40eaea954ce7a070b960f2b32ee23431a32f7c9d9e57fc1e6955e"
+      "bytes": 254180,
+      "sha256": "f1a8296e4be1e757793d4f0d280311df3e2a4c429b8f34d982d7985176301aa7"
     },
     {
       "member": "validflo",
       "file": "validflo.zip",
-      "bytes": 251747,
-      "sha256": "ab1a704255af91b9bf5bc6b721ae4ca8984edd73100f45261da81def3747af3a"
+      "bytes": 253588,
+      "sha256": "2524bd9b4ead62c3a942ab13e1fcb73ac0e63fab70d18684693a5941d08aa2e3"
     },
     {
       "member": "volume-one-nashville",
       "file": "volume-one-nashville.zip",
-      "bytes": 252000,
-      "sha256": "57f42ed65098669d61991426f099b558d54d6693115089cb88e2fe4980aa1fed"
+      "bytes": 253841,
+      "sha256": "0233a51efc38ac9f330f0da605a83db93b6a37afd873a7d3863ce5cc540a2381"
     },
     {
       "member": "voxring",
       "file": "voxring.zip",
-      "bytes": 251827,
-      "sha256": "6e8c3ab2928e1b34d3ab13e3dd72166e82159ee96c1f8e29ca0c657b9b0646de"
+      "bytes": 253663,
+      "sha256": "ea49e426d0ff17381930744ce29a82b1b7a6dda5deb859bd7d71c7f114089264"
     },
     {
       "member": "wednesday",
       "file": "wednesday.zip",
-      "bytes": 251732,
-      "sha256": "da0b6f5f39338c2cc7888e07308a751f84882cf742b28960d0fa07fca8e43e0b"
+      "bytes": 253566,
+      "sha256": "b7dcbbe826450471fcbb4d144fecd9f3fc25ad12312b9d4132330b5e5997df3d"
     },
     {
       "member": "xi",
       "file": "xi.zip",
-      "bytes": 251678,
-      "sha256": "10b2ec1b2fbd4c29302c9eff68b902c33aa36dfc7464c6a4bd46a0f2d425e86b"
+      "bytes": 253518,
+      "sha256": "4b053ec961d2c374687bd16b8b3dc2714af0333cd5c93df79d2e0e105f101405"
     },
     {
       "member": "yoamigo",
       "file": "yoamigo.zip",
-      "bytes": 251688,
-      "sha256": "fd598553ddb63b87e1ea75990db286a8bc5b4abe6768f13f43520acbc49cad5a"
+      "bytes": 253525,
+      "sha256": "ab71c2aac16af640b269a382017eb71d3c01d2af50accaf0a1c19c45fae15d01"
     }
   ]
 }

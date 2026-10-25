@@ -59,6 +59,28 @@ def test_scout_reuses_relevance_helpers_without_inventing_eligibility():
     assert result['opportunities'][0]['relevance_score']>0
     with pytest.raises(rt.UserError):rt.scout_grants(PROFILE,'x',lambda *_:({'data':[]},{}))
 
+def test_scout_retains_project_query_and_distinguishes_page_from_total_results():
+    calls=[]
+    def fetch(url,payload):
+        calls.append(payload)
+        return {'errorcode':0,'data':{'hitCount':135,'oppHits':[{'id':'12345','title':'Wave research','oppStatus':'posted'}]}},{'url':url,'retrieved_utc':'2026-10-25T12:00:00Z','sha256':'a'*64}
+    result=rt.scout_grants(PROFILE,'  wave energy  ',fetch)
+    assert calls[0]['keyword']=='wave energy'
+    assert result['query']=='wave energy'
+    assert result['returned_count']==1 and result['total_available']==135
+    assert result['opportunities'][0]['eligibility']=='UNVERIFIED'
+    for query in ('', ' '*3, 'x'*121, None):
+        with pytest.raises(rt.UserError):rt.scout_grants(PROFILE,query,fetch)
+    assert len(calls)==1
+
+def test_scout_does_not_turn_provider_errors_or_bad_counts_into_successful_coverage():
+    for code in (1,'0',False,None):
+        with pytest.raises(rt.UserError,match='search error'):
+            rt.scout_grants(PROFILE,'wave',lambda *_:({'errorcode':code,'data':{'oppHits':[]}},{'url':'source'}))
+    for total in (None,'135',True,-1):
+        result=rt.scout_grants(PROFILE,'wave',lambda *_:({'errorcode':0,'data':{'hitCount':total,'oppHits':[]}},{'url':'source'}))
+        assert result['total_available'] is None
+
 def feed(epoch, *, stale=False, gap=False):
     end=int(epoch//3600)*3600
     rows=[[end-(21-i)*3600,95,150,100,100+i,20] for i in range(21)]
