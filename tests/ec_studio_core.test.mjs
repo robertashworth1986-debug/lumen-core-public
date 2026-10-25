@@ -95,6 +95,21 @@ test('scout requires a nonempty explicit topic before requesting public data',as
   assert.equal(calls,0);assert.match(h.node('#toast').textContent,/Enter a project topic/);
 });
 
+test('latest scout download retains the complete returned set even when the workspace is full',async()=>{
+  const initial=emptyWorkspace('excalis');
+  initial.scout=Array.from({length:500},(_,i)=>({id:`owner-${i}`,title:`Saved ${i}`}));
+  const result={query:'wave energy',returned_count:20,total_available:135,source_receipt:{retrieved_utc:'2026-10-25T12:00:00Z'},opportunities:Array.from({length:20},(_,i)=>({title:`Listing ${i}`,url:`https://www.grants.gov/search-results-detail/${10000+i}`}))};
+  const h=backupHarness(initial,async()=>response({schedules:{},errors:{},scout:result,paper:null}));
+  h.context.document.querySelectorAll=()=>[];
+  h.node('#runtime-activity').querySelectorAll=()=>[];
+  await h.context.loadActivity();
+  h.node('#export-scout-results').onclick();
+  assert.equal(h.context.downloads.length,1);
+  assert.equal(h.context.downloads[0].name,'excalis-grant-search-results.json');
+  assert.deepEqual(JSON.parse(h.context.downloads[0].text),result);
+  assert.deepEqual(h.context.inspect().state.scout,initial.scout);
+});
+
 test('scout leaves the workspace unchanged when the full backup would exceed its size limit',async()=>{
   const initial=emptyWorkspace('excalis');initial.measurements=[{notes:''}];
   initial.measurements[0].notes='x'.repeat(999999-JSON.stringify(initial).length);
