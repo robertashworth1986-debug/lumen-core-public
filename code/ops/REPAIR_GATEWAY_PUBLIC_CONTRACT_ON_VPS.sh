@@ -463,12 +463,19 @@ record_recovery_evidence() {
   local kind="${1:-}" trigger_code="${2:-0}" requested_source="${3:-}"
   [[ $# -ge 1 && $# -le 3 ]] || return 14
   case "$kind" in
-    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result) ;;
+    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result|control_state|control_metadata) ;;
     *) return 14 ;;
   esac
   [[ "$kind" != dropin_result || $# -eq 2 ]] || return 14
   [[ "$kind" != runtime_directory_result || $# -eq 2 ]] || return 14
   [[ "$kind" != dropin_directory_result || $# -eq 2 ]] || return 14
+  if [[ "$kind" == control_state || "$kind" == control_metadata ]]; then
+    [[ $# -eq 3 && "$trigger_code" == 0 ]] || return 14
+    case "$kind:$requested_source" in
+      control_state:service_drop_in|control_state:service_drop_in_directory|control_state:run_directory|control_metadata:service_drop_in_directory|control_metadata:run_directory) ;;
+      *) return 14 ;;
+    esac
+  fi
   local source_states="" source_relative evidence_rc=0 evidence_outcome
   for source_relative in "${BUNDLE_FILES[@]}"; do
     source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}:${SOURCE_RESULT_STATES[$source_relative]:-NOT_CHECKED}"$'\n'
@@ -510,10 +517,19 @@ dropin_dir_write_state, dropin_dir_target_version, dropin_dir_candidate_metadata
 mutation_failure, mutation_target, mutation_exit_code = sys.argv[31:34]
 relatives = sys.argv[34:]
 query_kinds = {"source_state", "source_result"}
-if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds:
+control_files = dict([
+    (("control_state", "service_drop_in"), "service-drop-in.state"),
+    (("control_state", "service_drop_in_directory"), "service-drop-in-dir.state"),
+    (("control_state", "run_directory"), "run-dir.state"),
+    (("control_metadata", "service_drop_in_directory"), "service-drop-in-dir.metadata"),
+    (("control_metadata", "run_directory"), "run-dir.metadata"),
+])
+control_kinds = {"control_state", "control_metadata"}
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds | control_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
 if ((kind in query_kinds and requested_source not in relatives)
-        or (kind not in query_kinds and requested_source)):
+        or (kind in control_kinds and (kind, requested_source) not in control_files)
+        or (kind not in query_kinds | control_kinds and requested_source)):
     raise SystemExit("invalid_recovery_source_query")
 if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
     not re.fullmatch(r"[0-9a-f]{64}", value) for value in (bundle, hardening)
@@ -524,7 +540,7 @@ if (not directory.is_dir() or directory.is_symlink()
         or any(parent.is_symlink() for parent in directory.parents)):
     raise SystemExit("unsafe_recovery_directory")
 
-def inventory(relative, capture=False, *, root=directory):
+def inventory(relative, capture=False, *, root=directory, capture_limit=None):
     if not isinstance(relative, str) or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative) or any(
         part in {"", ".", ".."} for part in relative.split("/")
     ):
@@ -538,11 +554,14 @@ def inventory(relative, capture=False, *, root=directory):
     info = path.lstat()
     if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
         raise SystemExit("unsafe_recovery_file")
+    if capture_limit is not None and info.st_size > capture_limit:
+        raise SystemExit(14)
     def identity(value):
         return (value.st_dev, value.st_ino, value.st_mode, value.st_nlink,
                 value.st_uid, value.st_gid, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
     digest = hashlib.sha256()
     chunks = []
+    captured_bytes = 0
     descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
     with os.fdopen(descriptor, "rb") as stream:
         if identity(os.fstat(stream.fileno())) != identity(info):
@@ -550,6 +569,9 @@ def inventory(relative, capture=False, *, root=directory):
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
             if capture:
+                captured_bytes += len(chunk)
+                if capture_limit is not None and captured_bytes > capture_limit:
+                    raise SystemExit(14)
                 chunks.append(chunk)
         xattrs_sha256 = None
         if os.name == "posix" and hasattr(os, "listxattr"):
@@ -937,6 +959,21 @@ else:
     require_exact_inventory(names)
     if any(inventory(item["path"]) != item for item in prepared["files"]):
         raise SystemExit("recovery_backup_changed")
+    if kind in control_kinds:
+        # Parse only the same captured bytes whose complete entry matches the
+        # pinned preparation. Never validate a path and then reopen it raw.
+        name = control_files[(kind, requested_source)]
+        expected = next((item for item in prepared["files"] if item["path"] == name), None)
+        actual, raw = inventory(name, capture=True, capture_limit=128)
+        if expected is None or actual != expected:
+            raise SystemExit("recovery_control_changed")
+        if kind == "control_state":
+            if raw not in {b"present\n", b"missing\n"}:
+                raise SystemExit(14)
+        elif not re.fullmatch(rb"[0-9]+ [0-9]+ [0-7]{3,4}\n", raw):
+            raise SystemExit(14)
+        sys.stdout.buffer.write(raw)
+        raise SystemExit(0)
     if kind == "source_state":
         # Intent comes only from the same-read, hash-bound manifest. Complete
         # inventory validation above must pass again before each source mutation.
@@ -1718,8 +1755,15 @@ checked_restore_step() {
 }
 
 read_recovery_state() {
-  RECOVERY_STATE="$(< "$1")" || return $?
-  [[ "$RECOVERY_STATE" == present || "$RECOVERY_STATE" == missing ]] || return 14
+  local response
+  RECOVERY_STATE=""
+  [[ $# -eq 1 ]] || return 14
+  response="$(record_recovery_evidence control_state 0 "$1" && printf '.')" || return $?
+  case "$response" in
+    $'present\n.') RECOVERY_STATE=present ;;
+    $'missing\n.') RECOVERY_STATE=missing ;;
+    *) return 14 ;;
+  esac
 }
 
 read_recovery_source_state() {
@@ -1768,9 +1812,13 @@ read_recovery_dropin_result() {
 }
 
 read_recovery_metadata() {
-  local metadata
-  metadata="$(< "$1")" || return $?
-  [[ "$metadata" =~ ^([0-9]+)[[:blank:]]+([0-9]+)[[:blank:]]+([0-7]{3,4})$ ]] || return 14
+  local response metadata
+  RECOVERY_UID="" RECOVERY_GID="" RECOVERY_MODE=""
+  [[ $# -eq 1 ]] || return 14
+  response="$(record_recovery_evidence control_metadata 0 "$1" && printf '.')" || return $?
+  [[ "$response" == *$'\n.' ]] || return 14
+  metadata="${response%$'\n.'}"
+  [[ "$metadata" =~ ^([0-9]+)\ ([0-9]+)\ ([0-7]{3,4})$ ]] || return 14
   RECOVERY_UID="${BASH_REMATCH[1]}"
   RECOVERY_GID="${BASH_REMATCH[2]}"
   RECOVERY_MODE="${BASH_REMATCH[3]}"
@@ -1872,9 +1920,9 @@ rollback() {
     if [[ "$RECOVERY_DROPIN_TARGET_STATE" == untouched ]]; then
       RECOVERY_DROPIN_RESULT=UNCHECKED_UNTOUCHED
     else
-      checked_restore_step dropin_remove service_drop_in bounded_recovery_mutation dropin_remove service_drop_in || finish_rollback "$rc"
-      checked_restore_step dropin_state_read service_drop_in read_recovery_state "$BACKUP_DIR/service-drop-in.state" || finish_rollback "$rc"
+      checked_restore_step dropin_state_read service_drop_in read_recovery_state service_drop_in || finish_rollback "$rc"
       prior_drop_in_state="$RECOVERY_STATE"
+      checked_restore_step dropin_remove service_drop_in bounded_recovery_mutation dropin_remove service_drop_in || finish_rollback "$rc"
       if [[ "$prior_drop_in_state" == "present" ]]; then
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
         checked_restore_step dropin_parent_create service_drop_in_directory bounded_recovery_mutation dropin_parent_create service_drop_in_directory || finish_rollback "$rc"
@@ -1886,10 +1934,10 @@ rollback() {
     if [[ "$RECOVERY_DROPIN_DIRECTORY_TARGET_STATE" == untouched ]]; then
       RECOVERY_DROPIN_DIRECTORY_RESULT=UNCHECKED_UNTOUCHED
     else
-      checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state "$BACKUP_DIR/service-drop-in-dir.state" || finish_rollback "$rc"
+      checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state service_drop_in_directory || finish_rollback "$rc"
       prior_drop_in_dir_state="$RECOVERY_STATE"
       if [[ "$prior_drop_in_dir_state" == "present" ]]; then
-        checked_restore_step dropin_metadata_read service_drop_in_directory read_recovery_metadata "$BACKUP_DIR/service-drop-in-dir.metadata" || finish_rollback "$rc"
+        checked_restore_step dropin_metadata_read service_drop_in_directory read_recovery_metadata service_drop_in_directory || finish_rollback "$rc"
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
         checked_restore_step dropin_chown service_drop_in_directory bounded_recovery_mutation dropin_chown service_drop_in_directory || finish_rollback "$rc"
         checked_restore_step dropin_chmod service_drop_in_directory bounded_recovery_mutation dropin_chmod service_drop_in_directory || finish_rollback "$rc"
@@ -1904,10 +1952,10 @@ rollback() {
     if [[ "$RECOVERY_RUN_TARGET_STATE" == untouched ]]; then
       RECOVERY_RUNTIME_DIRECTORY_RESULT=UNCHECKED_UNTOUCHED
     else
-      checked_restore_step run_directory_state_read run_directory read_recovery_state "$BACKUP_DIR/run-dir.state" || finish_rollback "$rc"
+      checked_restore_step run_directory_state_read run_directory read_recovery_state run_directory || finish_rollback "$rc"
       prior_run_dir_state="$RECOVERY_STATE"
       if [[ "$prior_run_dir_state" == "present" ]]; then
-        checked_restore_step run_metadata_read run_directory read_recovery_metadata "$BACKUP_DIR/run-dir.metadata" || finish_rollback "$rc"
+        checked_restore_step run_metadata_read run_directory read_recovery_metadata run_directory || finish_rollback "$rc"
         checked_restore_step run_chown run_directory bounded_recovery_mutation run_chown run_directory || finish_rollback "$rc"
         checked_restore_step run_chmod run_directory bounded_recovery_mutation run_chmod run_directory || finish_rollback "$rc"
       else

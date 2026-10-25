@@ -804,6 +804,7 @@ def _run_gateway_rollback_guard(
     evidence_deadline_after: bool = False,
     target_deadline_query: str = "", target_deadline_exit_code: int = 124,
     target_deadline_after: bool = True,
+    control_query: str = "", control_fault: str = "", control_exit_code: int = 124,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
     script = _repair_script()
     # Execute the actual guard and actual rollback body. Every filesystem target
@@ -835,7 +836,7 @@ def _run_gateway_rollback_guard(
             (root / "target/second.py").write_bytes(b"second candidate\n")
             (root / "backup/existing/second.py").write_bytes(b"second previous\n")
         if prior_dropin:
-            (root / "backup/service-drop-in.state").write_text("present\n")
+            (root / "backup/service-drop-in.state").write_text("present\n", newline="\n")
             (root / "backup/service-drop-in.before").write_bytes(b"previous hardening\n")
         if directory_case:
             family = "service-drop-in-dir" if directory_case.endswith("dropin") else "run-dir"
@@ -1134,6 +1135,13 @@ fixture_timeout() {
     fi
   elif [[ "$1" == python3 && "$3" == "$BACKUP_DIR" ]]; then
     printf '%s\n' "$4" >> "$PWD/evidence-timeout.calls"
+    if [[ "$4" == control_state || "$4" == control_metadata ]]; then
+      printf '%s:%s\n' "$4" "${16}" >> "$PWD/control-query.calls"
+      if [[ "$CONTROL_QUERY" == "$4:${16}" && "$CONTROL_FAULT" == failed_output ]]; then
+        if [[ "$4" == control_state ]]; then printf 'present\n'; else printf '0 0 755\n'; fi
+        return "$CONTROL_EXIT_CODE"
+      fi
+    fi
     if [[ "$EVIDENCE_DEADLINE_KIND" == "$4" ]]; then
       # Simulate failure after real fixture publication/output as well as before
       # it. A valid-looking response must not turn a nonzero launch into success.
@@ -1268,6 +1276,18 @@ stat() {
 require_safe_recovery_directory() { :; }
 remove_verified_dead_lock() { printf 'lock\n' >> "$PWD/restore.calls"; }
 record_recovery_evidence() {
+  if [[ "$1" == control_state || "$1" == control_metadata ]]; then
+    local control_name
+    case "$3" in
+      service_drop_in) control_name=service-drop-in ;;
+      service_drop_in_directory) control_name=service-drop-in-dir ;;
+      run_directory) control_name=run-dir ;;
+      *) return 14 ;;
+    esac
+    if [[ "$1" == control_state ]]; then control_name+=.state; else control_name+=.metadata; fi
+    "$TEST_PYTHON" -c 'import sys; from pathlib import Path; sys.stdout.buffer.write(Path(sys.argv[1]).read_bytes())' "$BACKUP_DIR/$control_name"
+    return $?
+  fi
   if [[ "$1" == source_state ]]; then printf 'present\n'; fi
   if [[ "$1" == source_result ]]; then printf 'observed_present\n'; fi
   if [[ "$1" == dropin_result ]]; then
@@ -1359,6 +1379,7 @@ rm() {
   if [[ "$RESULT_FAULT" == remove_symlink && "${@: -1}" == "$TARGET_ROOT/$RESULT_RELATIVE" ]]; then fixture_result_fault || return $?; fi
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_remove || return $?; fixture_target_drift after_first_remove || return $?; fi
   if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_target_drift after_remove || return $?; fi
+  if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_dir_drift before_parent_install || return $?; fi
 }
 install() {
   if [[ "${RECOVERY_RESTORE_ATTEMPTED:-false}" != true && "$FIXTURE_DROPIN_DIR_FORWARD" == true ]]; then
@@ -1494,8 +1515,7 @@ fi
         harness += r'''
 read_recovery_state() {
   actual_read_recovery_state "$@" || return $?
-  if [[ "$1" == "$BACKUP_DIR/service-drop-in.state" ]]; then fixture_dropin_dir_drift before_parent_install || return $?; fi
-  if [[ "$1" == "$BACKUP_DIR/service-drop-in-dir.state" ]]; then fixture_dropin_dir_drift before_directory_restore || return $?; fi
+  if [[ "$1" == service_drop_in_directory ]]; then fixture_dropin_dir_drift before_directory_restore || return $?; fi
 }
 '''
         if run_target_boundary == "query":
@@ -1542,7 +1562,27 @@ fixture_lock_python() {
         if not service_was_active:
             harness += 'SERVICE_WAS_ACTIVE=false\n'
         if recovery_case:
-            harness += _bash_function(script, "record_recovery_evidence") + "\n"
+            evidence_function = _bash_function(script, "record_recovery_evidence")
+            if control_fault in {"changed_at_capture", "missing_at_capture", "directory_at_capture", "symlink_at_capture"}:
+                # Interleave AFTER the full inventory checks, immediately before
+                # the final selected capture. An earlier verifier cannot mask it.
+                needle = '        actual, raw = inventory(name, capture=True, capture_limit=128)'
+                assert evidence_function.count(needle) == 1
+                injection = '''        if kind + ":" + requested_source == os.environ["CONTROL_QUERY"]:
+            control_path = directory / name
+            fault = os.environ["CONTROL_FAULT"]
+            if fault == "changed_at_capture":
+                control_path.write_bytes(b"missing\\n" if kind == "control_state" else b"999 999 700\\n")
+            elif fault == "missing_at_capture": control_path.unlink()
+            elif fault == "directory_at_capture": control_path.unlink(); control_path.mkdir()
+            elif fault == "symlink_at_capture":
+                outside = directory.parent / "outside-control"
+                outside.write_bytes(control_path.read_bytes())
+                control_path.unlink(); control_path.symlink_to(outside)
+            (directory.parent / "control-interleaving-applied").write_text(kind + ":" + requested_source)
+'''
+                evidence_function = evidence_function.replace(needle, injection + needle)
+            harness += evidence_function + "\n"
             harness += _bash_function(script, "cleanup") + "\n"
             harness += 'cleanup_manifest() { :; }\npython3() { "$TEST_PYTHON" "$@"; }\n'
             if recovery_case == "prepared_write_failure":
@@ -1916,6 +1956,7 @@ rollback "$forward_lock_rc"
             FIXTURE_SERVICE_PHASE="forward" if forward_service_fault else "recovery",
             ACTIVE_QUERY_EXIT_CODE="" if active_query_exit_code is None else str(active_query_exit_code),
             STAT_QUERY_FAULT=stat_query_fault, STAT_QUERY_EXIT_CODE=str(stat_query_exit_code),
+            CONTROL_QUERY=control_query, CONTROL_FAULT=control_fault, CONTROL_EXIT_CODE=str(control_exit_code),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
                 "live", "permission", "unknown", "overflow", "value", "unclassified_lookup",
                 "unexpected", "launcher_failure"} else "dead",
@@ -1970,6 +2011,8 @@ rollback "$forward_lock_rc"
         target = root / "target/entry.py"
         if evidence is not None:
             evidence["elapsed_seconds"] = time.monotonic() - started
+            evidence["control_query_calls"] = (root / "control-query.calls").read_text().splitlines() if (root / "control-query.calls").exists() else []
+            evidence["control_interleaving_applied"] = (root / "control-interleaving-applied").read_text() if (root / "control-interleaving-applied").exists() else ""
             evidence["copy_timeout_calls"] = (root / "copy-timeout.calls").read_text().splitlines() if (root / "copy-timeout.calls").exists() else []
             evidence["mutation_timeout_calls"] = (root / "mutation-timeout.calls").read_text().splitlines() if (root / "mutation-timeout.calls").exists() else []
             evidence["evidence_timeout_calls"] = (root / "evidence-timeout.calls").read_text().splitlines() if (root / "evidence-timeout.calls").exists() else []
@@ -5403,7 +5446,12 @@ def test_gateway_state_parser_rejects_missing_or_noncanonical_values() -> None:
     function = _bash_function(_repair_script(), "read_recovery_state")
     with tempfile.TemporaryDirectory(prefix="gateway-state-read-") as directory:
         root = Path(directory)
-        (root / "fixture.sh").write_text('set -Eeuo pipefail\n' + function + '\nread_recovery_state "$1"\nprintf READ_OK\n', newline="\n")
+        stub = '''record_recovery_evidence() {
+  [[ "$1 $2 $3" == 'control_state 0 service_drop_in' ]] || return 99
+  "$TEST_PYTHON" -c 'import sys; from pathlib import Path; sys.stdout.buffer.write(Path("state").read_bytes())'
+}
+'''
+        (root / "fixture.sh").write_text('set -Eeuo pipefail\n' + stub + function + '\nread_recovery_state service_drop_in\nprintf READ_OK\n', newline="\n")
         for value, expected in (("present\n", 0), ("missing\n", 0), ("unexpected\n", 14),
                                 ("present\nmissing\n", 14), ("\n", 14), (None, 1)):
             state = root / "state"
@@ -5411,11 +5459,185 @@ def test_gateway_state_parser_rejects_missing_or_noncanonical_values() -> None:
                 state.unlink()
             else:
                 state.write_text(value, newline="\n")
-            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh", "state"], cwd=root,
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                       env=dict(os.environ, TEST_PYTHON=Path(sys.executable).as_posix()),
                                        capture_output=True, text=True, timeout=10, check=False)
             assert completed.returncode == expected, completed.stderr
             assert completed.stdout == ("READ_OK" if expected == 0 else "")
 
+
+
+_CONTROL_QUERY_CASES = (
+    ("control_state:service_drop_in", "dropin_state_read", "service_drop_in", []),
+    ("control_state:service_drop_in_directory", "dropin_directory_state_read", "service_drop_in_directory", ["rm:dropin", "install:dropin_dir", "cp:dropin"]),
+    ("control_metadata:service_drop_in_directory", "dropin_metadata_read", "service_drop_in_directory", ["rm:dropin", "install:dropin_dir", "cp:dropin"]),
+    ("control_state:run_directory", "run_directory_state_read", "run_directory", ["rm:dropin", "install:dropin_dir", "cp:dropin", "chown:dropin_dir", "chmod:dropin_dir"]),
+    ("control_metadata:run_directory", "run_metadata_read", "run_directory", ["rm:dropin", "install:dropin_dir", "cp:dropin", "chown:dropin_dir", "chmod:dropin_dir"]),
+)
+
+
+def test_gateway_control_queries_refuse_valid_changed_bytes_at_final_capture() -> None:
+    for query, operation, _, prior_operations in _CONTROL_QUERY_CASES:
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="control_query", prior_dropin=True, control_query=query,
+            control_fault="changed_at_capture", evidence=evidence)
+        assert completed.returncode == 17 and current == b"previous source\n", (query, completed)
+        assert evidence["control_interleaving_applied"] == query
+        assert evidence["control_query_calls"][-1] == query
+        assert "recovery_control_changed" in completed.stderr
+        assert f"restoration operation {operation} failed" in completed.stderr
+        assert evidence["operation_calls"].splitlines() == ["rm:first_source", "cp:first_source"] + prior_operations
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["backup_exists"]
+        assert "receipt persistence failed" in completed.stderr and "rollback" not in evidence
+        assert evidence["dropin_bytes"] == (b"candidate hardening\n" if not prior_operations else b"previous hardening\n")
+
+
+def test_gateway_control_queries_keep_original_code_after_failed_output_or_receipt() -> None:
+    for query, operation, target, prior_operations in _CONTROL_QUERY_CASES:
+        for code in (1, 29, 124, 137):
+            evidence: dict = {}
+            completed, current, _ = _run_gateway_rollback_guard(
+                _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+                recovery_case="control_query", prior_dropin=True, control_query=query,
+                control_fault="failed_output", control_exit_code=code, evidence=evidence)
+            assert completed.returncode == 17 and current == b"previous source\n", (query, code, completed)
+            assert evidence["operation_calls"].splitlines() == ["rm:first_source", "cp:first_source"] + prior_operations
+            receipt = evidence["rollback"]
+            assert receipt["failed_restoration_operation"] == dict(operation=operation, target=target, exit_code=code)
+            assert receipt["trigger_exit_code"] == 17 and receipt["partial_state_possible"]
+            assert not receipt["restoration_verified"] and not receipt["service_restart_attempted"]
+            assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    evidence = {}
+    completed, _, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure", prior_dropin=True,
+        control_query="control_state:service_drop_in", control_fault="failed_output",
+        control_exit_code=124, evidence=evidence)
+    assert completed.returncode == 17 and evidence["rollback"] is None
+    assert "dropin_state_read failed (exit 124)" in completed.stderr and "receipt persistence failed" in completed.stderr
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+
+
+def test_gateway_control_query_capture_refuses_missing_and_nonregular_files() -> None:
+    for fault in ("missing_at_capture", "directory_at_capture"):
+        evidence: dict = {}
+        completed, _, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="control_query", prior_dropin=True, control_query="control_state:service_drop_in",
+            control_fault=fault, evidence=evidence)
+        assert completed.returncode == 17 and evidence["control_interleaving_applied"]
+        assert "dropin_state_read failed" in completed.stderr
+        assert evidence["dropin_bytes"] == b"candidate hardening\n"
+        assert evidence["operation_calls"].splitlines() == ["rm:first_source", "cp:first_source"]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+
+
+@unittest.skipIf(os.name != "posix", "Final-capture symlink refusal requires POSIX")
+def test_gateway_control_query_capture_refuses_symlink() -> None:
+    evidence: dict = {}
+    completed, _, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="control_query", prior_dropin=True, control_query="control_state:service_drop_in",
+        control_fault="symlink_at_capture", evidence=evidence)
+    assert completed.returncode == 17 and "unsafe_recovery_file" in completed.stderr
+    assert evidence["control_interleaving_applied"] == "control_state:service_drop_in"
+    assert evidence["dropin_bytes"] == b"candidate hardening\n" and evidence["service_calls"] == "SYSTEMCTL:stop\n"
+
+
+def test_gateway_control_query_fixed_dispatch_and_response_framing() -> None:
+    # Only real shell wrappers plus an inert launcher: no process/service probe.
+    script = _repair_script()
+    harness = r'''
+set -uo pipefail
+BACKUP_DIR=backup SOURCE_COMMIT=source BUNDLE_SHA=bundle HARDENING_SHA=hardening
+RECOVERY_MANIFEST_SHA=manifest TARGET_ROOT=target SERVICE_DROP_IN=dropin RUN_DIR=run
+SERVICE_DROP_IN_DIR=dropins RECOVERY_TIMEOUT_BIN=fixture_timeout BUNDLE_FILES=()
+declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
+fixture_timeout() {
+  [[ "$1 $2 $3 $4 $5" == '--signal=TERM --kill-after=5s 60s python3 -' ]] || return 99
+  [[ "$7" == "$query_kind" && "${19}" == "$selector" ]] || return 98
+  printf call >> calls
+  printf '%s' "$fixture_response"
+  return "$injected_rc"
+}
+'''
+    harness += "\n".join(_bash_function(script, name) for name in (
+        "record_recovery_evidence", "read_recovery_state", "read_recovery_metadata"))
+    harness += r'''
+for pair in control_state:service_drop_in control_state:service_drop_in_directory control_state:run_directory control_metadata:service_drop_in_directory control_metadata:run_directory; do
+  query_kind="${pair%%:*}" selector="${pair#*:}"
+  if [[ "$query_kind" == control_state ]]; then reader=read_recovery_state; valid=$'present\n'; else reader=read_recovery_metadata; valid=$'1000 1001 0755\n'; fi
+  for injected_rc in 0 1 14 29 124 125 126 127 137; do
+    fixture_response="$valid" RECOVERY_STATE=stale RECOVERY_UID=stale RECOVERY_GID=stale RECOVERY_MODE=stale
+    "$reader" "$selector"; actual_rc=$?
+    [[ "$actual_rc" == "$injected_rc" ]] || exit 90
+    if [[ "$actual_rc" != 0 ]]; then
+      if [[ "$query_kind" == control_state ]]; then [[ -z "$RECOVERY_STATE" ]] || exit 89
+      else [[ -z "$RECOVERY_UID$RECOVERY_GID$RECOVERY_MODE" ]] || exit 88; fi
+    elif [[ "$query_kind" == control_state ]]; then [[ "$RECOVERY_STATE" == present ]] || exit 87
+    else [[ "$RECOVERY_UID:$RECOVERY_GID:$RECOVERY_MODE" == 1000:1001:0755 ]] || exit 86; fi
+  done
+  injected_rc=0
+  for fixture_response in '' "${valid%$'\n'}" "$valid"$'\n' "$valid"junk $'present\r\n' $'1000\t1001 0755\n'; do
+    "$reader" "$selector"; [[ $? == 14 ]] || exit 85
+  done
+  "$reader" "$selector" extra; [[ $? == 14 ]] || exit 84
+done
+for pair in control_state:../outside control_state:run-dir.state control_metadata:service_drop_in control_metadata:''; do
+  record_recovery_evidence "${pair%%:*}" 0 "${pair#*:}"; [[ $? == 14 ]] || exit 83
+done
+record_recovery_evidence control_state 0; [[ $? == 14 ]] || exit 82
+record_recovery_evidence control_state 1 service_drop_in; [[ $? == 14 ]] || exit 81
+record_recovery_evidence control_state 0 service_drop_in extra; [[ $? == 14 ]] || exit 80
+'''
+    with tempfile.TemporaryDirectory(prefix="gateway-control-query-frame-") as directory:
+        root = Path(directory)
+        (root / "fixture.sh").write_text(harness, newline="\n")
+        completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                                   capture_output=True, text=True, timeout=15, check=False)
+        assert completed.returncode == 0, completed
+        assert completed.stdout == "" and (root / "calls").read_text() == "call" * 75
+
+
+def test_gateway_control_query_parses_only_same_captured_entry_bytes() -> None:
+    import io
+    import textwrap
+    from types import SimpleNamespace
+    source = _bash_function(_repair_script(), "record_recovery_evidence")
+    body = source.split('    if kind in control_kinds:\n', 1)[1].split('    if kind == "source_state":', 1)[0]
+    code = compile(textwrap.dedent(body), "<actual-control-query>", "exec")
+    files = {
+        ("control_state", "service_drop_in"): "service-drop-in.state",
+        ("control_state", "service_drop_in_directory"): "service-drop-in-dir.state",
+        ("control_state", "run_directory"): "run-dir.state",
+        ("control_metadata", "service_drop_in_directory"): "service-drop-in-dir.metadata",
+        ("control_metadata", "run_directory"): "run-dir.metadata",
+    }
+    for (kind, selector), filename in files.items():
+        valid = b"present\n" if kind == "control_state" else b"1000 1001 0755\n"
+        malformed = (b"", valid[:-1], valid[:-1] + b"\r\n", valid + b"\n", valid + b"\x00", b"\xff\n", b"x" * 129,
+                     b"  " + valid, b"1000\t1001 0755\n", b"1000 1001 999\n")
+        for raw in (valid, *malformed):
+            for changed in (False, True):
+                expected = dict(path=filename, sha256="prepared-entry")
+                calls = []
+                def inventory(name, capture=False, *, capture_limit=None):
+                    calls.append((name, capture, capture_limit))
+                    if len(raw) > capture_limit:
+                        raise SystemExit(14)
+                    return (dict(expected, sha256="changed-entry") if changed else expected), raw
+                output = io.BytesIO()
+                namespace = dict(kind=kind, requested_source=selector, control_files=files,
+                                 prepared={"files": [expected]}, inventory=inventory, re=re,
+                                 sys=SimpleNamespace(stdout=SimpleNamespace(buffer=output)))
+                with unittest.TestCase().assertRaises(SystemExit) as result:
+                    exec(code, namespace)
+                assert calls == [(filename, True, 128)]
+                good = raw == valid and not changed
+                assert (result.exception.code == 0) is good, (kind, raw, changed, result.exception.code)
+                assert output.getvalue() == (valid if good else b"")
 
 def test_gateway_restoration_receipt_failure_and_second_signal_keep_trigger_code() -> None:
     evidence: dict = {}

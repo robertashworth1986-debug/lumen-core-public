@@ -30,6 +30,27 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 25 local control-read increment advances the same outcome-2
+reviewer-evidence repair. Five rollback state and ownership-metadata reads now
+use fixed selectors through the existing evidence process, with its validated
+TERM-after-60-seconds and KILL-after-five-more-seconds policy. The process checks
+the pinned prepared manifest and complete inventory, then compares the selected
+file's captured entry to that preparation and parses those same bytes. The
+selected capture is limited to 128 bytes; state and numeric metadata must use
+canonical single-line ASCII representations. No caller may supply a path.
+Shell readers clear prior output, require a successful query and exact response
+framing, and retain the existing first-failure operation and original rollback
+trigger. Drop-in state is now validated before its specific removal.
+
+Disposable regressions interleave valid changed control bytes after all earlier
+inventory checks, inject unsuccessful launches with plausible output, and retain
+receipt-persistence uncertainty and earlier partial restoration. They do not
+operate services or production paths. At local preparation, independent review
+and exact-new-head hosted validation were pending. Per-query bounds are not an
+aggregate deadline or a guarantee under uninterruptible I/O. Privileged writers
+can still change targets after observation; this is not atomic rollback or proof
+of complete restoration, later external-postcheck recovery or production readiness.
+
 The October 25 local CI comparison repair advances the existing outcome-2
 reviewer-evidence path. Readiness on head `aae77b54` successfully configured
 Python 3.11.9, ran its verifier and 16 tests, and uploaded its bounded receipt;
