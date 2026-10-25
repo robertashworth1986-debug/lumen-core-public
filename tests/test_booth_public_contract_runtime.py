@@ -7957,7 +7957,7 @@ def _run_dropin_capture_native_case(fault: str = "") -> dict:
         events = []
         original_open, original_pread, original_write, original_fsync = os.open, os.pread, os.write, os.fsync
 
-        def capture_open(path, flags, mode=0o777, *, dir_fd=None):
+        def capture_open(path, flags, mode=0o600, *, dir_fd=None):
             nonlocal target_created
             if flags & os.O_EXCL and flags & os.O_CREAT:
                 events.append("exclusive_create")
