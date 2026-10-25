@@ -5960,9 +5960,297 @@ def test_gateway_symbolic_recovery_root_is_never_repaired() -> None:
     _run_gateway_unsafe_recovery_root("0", "700", "0", symlink=True)
 
 
+def _gateway_json_validator_parts() -> dict[str, str]:
+    script = _repair_script()
+    parts = {name: _bash_function(script, name) for name in (
+        "probe_json", "probe_operator_http_boundary")}
+    for kind, names in (("status", "LOCAL_STATUS_BODY PUBLIC_STATUS_BODY"),
+                        ("health", "LOCAL_HEALTH_BODY PUBLIC_HEALTH_BODY")):
+        first, second = names.split()
+        marker = 'for body in "$' + first + '" "$' + second + '"; do\n'
+        parts[kind] = marker + script.split(marker, 1)[1].split("\ndone", 1)[0] + "\ndone\n"
+    for name in ("LOCAL_HEALTH_STATUS", "PUBLIC_HEALTH_STATUS", "LOCAL_PUBLIC_STATUS",
+                 "PUBLIC_PUBLIC_STATUS", "local_operator_status", "public_operator_status"):
+        match = re.search(r"(?m)^ *" + name + r'="\$\([\s\S]+?^ *\}', script)
+        assert match, name
+        parts[name] = match.group(0) + "\n"
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3'
+    assert sum(parts[name].count(policy) for name in (
+        "probe_json", "probe_operator_http_boundary", "status", "health")) == 4
+    return parts
+
+
+def _gateway_json_validator_fixture(*, fault_code: int = 0, fail_at: int = 1,
+                                    malformed: bool = False) -> str:
+    # These paths and stubs are disposable. Recovery Python calls delegate
+    # without consuming stdin; only the exact four validator shapes are routed.
+    parts = _gateway_json_validator_parts()
+    text = r'''
+export PATH="/usr/bin:$PATH"
+SOURCE_COMMIT=0123456789abcdef0123456789abcdef01234567
+LOCAL_HEALTH_BODY="$PWD/fixture-health-local.json"
+PUBLIC_HEALTH_BODY="$PWD/fixture-health-public.json"
+LOCAL_STATUS_BODY="$PWD/fixture-status-local.json"
+PUBLIC_STATUS_BODY="$PWD/fixture-status-public.json"
+OPERATOR_HTTP_BODY="$PWD/fixture-operator.json"
+OPERATOR_HTTP_HEADERS="$PWD/fixture-operator.headers"
+LOCAL_HEALTH_URL=https://fixture.invalid/local-health
+PUBLIC_HEALTH_URL=https://fixture.invalid/public-health
+LOCAL_STATUS_URL=https://fixture.invalid/local-status
+PUBLIC_STATUS_URL=https://fixture.invalid/public-status
+LOCAL_GATEWAY_BASE_URL=https://fixture.invalid/local
+PUBLIC_GATEWAY_BASE_URL=https://fixture.invalid/public
+path=/metrics
+RECOVERY_TIMEOUT_BIN=fixture_json_timeout
+JSON_VALIDATION_COUNT=0
+seq() { [[ "$1 $2" == '1 12' ]] || return 99; printf '%s\n' {1..12}; }
+sleep() { [[ "$1" == 3 ]] || return 99; printf 'retry\n' >> "$PWD/json-retry.calls"; }
+curl() {
+  local body="" headers=""
+  while (( $# )); do
+    case "$1" in
+      -o|--output) body=$2; shift 2 ;;
+      --dump-header) headers=$2; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  [[ -n "$body" ]] || return 99
+  printf 'request\n' >> "$PWD/json-http.calls"
+  if [[ "$body" == "$OPERATOR_HTTP_BODY" ]]; then
+    printf '{"detail":"operator API authentication required"}' > "$body"
+    printf 'Cache-Control: no-store\r\nPragma: no-cache\r\nWWW-Authenticate: Bearer\r\n' > "$headers"
+    printf '401\tapplication/json'
+  else
+    printf '{"status":"ok"}' > "$body"
+    printf 200
+  fi
+  if [[ "$JSON_MALFORMED" == true ]]; then printf '{"wrong":true}' > "$body"; fi
+}
+'''
+    text += f"JSON_FAULT_CODE={fault_code}\nJSON_FAIL_AT={fail_at}\nJSON_MALFORMED={str(malformed).lower()}\n"
+    for kind, part in (("operator", parts["probe_operator_http_boundary"]),
+                       ("status", parts["status"]), ("health", parts["health"])):
+        body = part.split("<<'PY'\n", 1)[1].split("\nPY", 1)[0] + "\n"
+        text += (f"if IFS= read -r -d '' JSON_EXPECTED_{kind.upper()} <<'FIXTURE_EXPECTED_BODY'\n"
+                 + body + "FIXTURE_EXPECTED_BODY\nthen exit 99; else [[ $? == 1 ]] || exit 99; fi\n")
+    text += r'''
+for body in "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY"; do
+  printf '{"status":"ok","service":"luma-experience-gateway","access_boundary":"operator_api_v1","public_surface":"minimal"}' > "$body"
+done
+for body in "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY"; do
+  printf '{"status":"ok","service":"luma-experience-gateway","access_boundary":"operator_api_v1","public_surface":"minimal","generated_utc":"2026-10-23T00:00:00Z"}' > "$body"
+done
+if [[ "$JSON_MALFORMED" == true ]]; then
+  for body in "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY" "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY"; do
+    printf '{"wrong":true}' > "$body"
+  done
+fi
+fixture_json_timeout() {
+  [[ "$1 $2 $3" == '--signal=TERM --kill-after=5s 60s' ]] || return 99
+  # Recovery calls have other fixed arguments; retain their existing dispatcher.
+  if [[ "$4" != python3 ]]; then fixture_timeout "$@"; return $?; fi
+  local kind="" body="" expected=""
+  if [[ $# -eq 7 && "$5 $6" == '-m json.tool' ]]; then
+    case "$7" in "$LOCAL_HEALTH_BODY"|"$PUBLIC_HEALTH_BODY"|"$LOCAL_STATUS_BODY"|"$PUBLIC_STATUS_BODY") kind=json ;; esac
+  elif [[ $# -eq 7 && "$5" == - && "$6" == "$OPERATOR_HTTP_BODY" && "$7" == 401 ]]; then
+    kind=operator; expected=$JSON_EXPECTED_OPERATOR
+  elif [[ $# -eq 6 && "$5" == - ]]; then
+    case "$6" in
+      "$LOCAL_STATUS_BODY"|"$PUBLIC_STATUS_BODY") kind=status; expected=$JSON_EXPECTED_STATUS ;;
+      "$LOCAL_HEALTH_BODY"|"$PUBLIC_HEALTH_BODY") kind=health; expected=$JSON_EXPECTED_HEALTH ;;
+    esac
+  fi
+  if [[ -z "$kind" ]]; then fixture_timeout "$@"; return $?; fi
+  if [[ "$kind" != json ]]; then
+    if IFS= read -r -d '' body; then return 99; else [[ $? == 1 ]] || return 99; fi
+    [[ "$body" == "$expected" ]] || return 99
+  fi
+  JSON_VALIDATION_COUNT=$((JSON_VALIDATION_COUNT + 1))
+  printf '%s\n' "$kind" >> "$PWD/json-validator.calls"
+  if [[ "$JSON_FAULT_CODE" != 0 && "$JSON_VALIDATION_COUNT" -ge "$JSON_FAIL_AT" ]]; then
+    printf '{"status":"ok","detail":"operator API authentication required"}\n'
+    return "$JSON_FAULT_CODE"
+  fi
+  shift 4
+  if [[ "$kind" == json ]]; then "$TEST_PYTHON" "$@"
+  else printf '%s' "$body" | "$TEST_PYTHON" "$@"; fi
+}
+'''
+    return text
+
+
+_JSON_VALIDATOR_CALLERS = {
+    "LOCAL_HEALTH_STATUS": ("json", 15), "PUBLIC_HEALTH_STATUS": ("json", 16),
+    "LOCAL_PUBLIC_STATUS": ("json", 17), "PUBLIC_PUBLIC_STATUS": ("json", 18),
+    "local_operator_status": ("operator", 19), "public_operator_status": ("operator", 20),
+    "status": ("status", None), "health": ("health", None),
+}
+
+
+def _run_gateway_json_validator_case(case: str, code: int = 0, *, fail_at: int = 1,
+                                     malformed: bool = False, native_mode: str = "",
+                                     body_override: bytes | None = None) -> dict:
+    script = _repair_script()
+    parts = _gateway_json_validator_parts()
+    with tempfile.TemporaryDirectory(prefix="gateway-json-validator-") as directory:
+        root = Path(directory)
+        harness = 'set -Eeuo pipefail\nfixture_timeout() { return 99; }\n'
+        harness += _gateway_json_validator_fixture(fault_code=code, fail_at=fail_at, malformed=malformed)
+        harness += r'''
+printf '%s\n' "$BASHPID" > harness-pid.calls
+rollback() {
+  trap - ERR
+  printf '%s\n' "$1" >> rollback.calls
+  printf '%s\n' "$BASHPID" >> rollback-pid.calls
+  exit "$1"
+}
+'''
+        harness += next(line for line in script.splitlines() if line.startswith("trap 'rc=$?;") and line.endswith(" ERR")) + "\n"
+        selected = parts["probe_json"] + "\n" + parts["probe_operator_http_boundary"] + "\n" + parts[case]
+        if native_mode:
+            selected = selected.replace('--kill-after=5s 60s', '--kill-after=0.2s 0.2s')
+            fake = root / "python3"
+            fake.write_text(r'''#!/bin/bash
+set -eu
+case "$*" in
+  "-m json.tool "*) kind=json ;;
+  "- "*fixture-operator.json" 401") kind=operator ;;
+  "- "*fixture-status-*.json) kind=status ;;
+  "- "*fixture-health-*.json) kind=health ;;
+  *) exit 99 ;;
+esac
+printf '%s\n' "$kind" >> "$PWD/json-validator.calls"
+printf '{"status":"ok"}\n'
+if [[ "$NATIVE_MODE" == success ]]; then exit 0; fi
+IFS= read -r identity < "/proc/$BASHPID/stat"
+printf '%s\n' "$identity" > "$PWD/json-process-$BASHPID.stat"
+if [[ "$NATIVE_MODE" == ignore_term ]]; then trap '' TERM; fi
+while :; do :; done
+''', encoding="utf-8", newline="\n")
+            fake.chmod(0o700)
+            harness += _bash_function(script, "require_recovery_timeout") + '\nrequire_recovery_timeout\nexport PATH="$PWD:$PATH"\n'
+        if body_override is not None:
+            (root / "altered-body.py").write_bytes(body_override)
+            selected = 'fixture_json_timeout --signal=TERM --kill-after=5s 60s python3 - "$LOCAL_STATUS_BODY" < altered-body.py\n'
+        harness += selected + '\nprintf VALIDATED > checkpoint\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, TEST_PYTHON=Path(sys.executable).as_posix(), NATIVE_MODE=native_mode),
+                capture_output=True, text=True, timeout=12, check=False)
+        finally:
+            # Only fake-interpreter PIDs recorded under this temporary root are
+            # eligible, and only while their kernel start identity still matches.
+            for identity in root.glob("json-process-*.stat"):
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    continue
+                fields = current[current.rfind(")") + 2:].split()
+                if fields[19] == original_fields[19] and fields[0] != "Z":
+                    live.append(pid)
+                    try: os.kill(pid, signal.SIGKILL)
+                    except ProcessLookupError: pass
+        result = dict(completed=completed, checkpoint=(root / "checkpoint").exists(),
+                      live_after_command=len(live), elapsed=time.monotonic() - started)
+        for name in ("json-validator", "json-retry", "json-http", "rollback", "rollback-pid", "harness-pid"):
+            file = root / (name + ".calls")
+            result[name] = file.read_text().splitlines() if file.exists() else []
+        return result
+
+
+def test_gateway_json_validator_deadlines_preserve_all_failure_mappings() -> None:
+    for case, (kind, mapped) in _JSON_VALIDATOR_CALLERS.items():
+        for code in (1, 29, 124, 137):
+            result = _run_gateway_json_validator_case(case, code)
+            expected = mapped or code
+            assert result["completed"].returncode == expected, result
+            assert result["rollback"] == [str(expected)] and not result["checkpoint"]
+            assert result["rollback-pid"] == result["harness-pid"]
+            assert result["json-validator"] == [kind] * (12 if mapped else 1)
+            assert result["json-retry"] == (["retry"] * 12 if mapped else [])
+            assert result["json-http"] == (["request"] * 12 if mapped else [])
+
+
+def test_gateway_json_validator_deadlines_valid_and_malformed_controls() -> None:
+    for case, (kind, mapped) in _JSON_VALIDATOR_CALLERS.items():
+        result = _run_gateway_json_validator_case(case)
+        assert result["completed"].returncode == 0 and result["checkpoint"], result
+        assert result["rollback"] == result["json-retry"] == []
+        assert result["json-validator"] == [kind] * (1 if mapped else 2)
+    # json.tool intentionally accepts arbitrary JSON. Semantic contracts are
+    # exercised by operator/status/health, not invented for generic probe_json.
+    for case in ("local_operator_status", "status", "health"):
+        result = _run_gateway_json_validator_case(case, malformed=True)
+        assert result["completed"].returncode == (19 if case == "local_operator_status" else 1), result
+        assert not result["checkpoint"] and len(result["rollback"]) == 1
+    for case in ("status", "health"):
+        result = _run_gateway_json_validator_case(case, 29, fail_at=2)
+        assert result["completed"].returncode == 29 and result["json-validator"] == [case, case], result
+        assert result["rollback-pid"] == result["harness-pid"] and not result["checkpoint"]
+
+
+def test_gateway_json_validator_deadlines_reject_unknown_stdin_bodies() -> None:
+    body = _gateway_json_validator_parts()["status"].split("<<'PY'\n", 1)[1].split("\nPY", 1)[0].encode() + b"\n"
+    for altered in (b"print('unknown')\n", body[:-1], body + b"\n", body + b"\x00"):
+        result = _run_gateway_json_validator_case("status", body_override=altered)
+        assert result["completed"].returncode == 99 and not result["checkpoint"], result
+        assert result["json-validator"] == [] and result["rollback"] == ["99"]
+
+
+def test_gateway_json_validator_deadlines_actual_rollback_and_uncertain_receipt() -> None:
+    parts = _gateway_json_validator_parts()
+    for case, code, expected, receipt_failure in (
+        ("LOCAL_HEALTH_STATUS", 124, 15, False),
+        ("public_operator_status", 137, 20, False),
+        ("status", 29, 29, False), ("health", 124, 124, False),
+        ("health", 137, 137, True)):
+        guard = (_gateway_json_validator_fixture(fault_code=code) + parts["probe_json"] + "\n" +
+                 parts["probe_operator_http_boundary"] + "\n" + parts[case])
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            guard, predicate_passes=True, recovery_case="json_validator",
+            service_failure="stop", service_exit_code=23,
+            evidence_deadline_kind="rollback" if receipt_failure else "",
+            evidence_deadline_exit_code=137, evidence_deadline_after=True, evidence=evidence)
+        assert completed.returncode == expected and current == b"candidate source\n", completed.stderr
+        assert completed.stderr.count("Rolling back the complete gateway") == 1
+        assert "GUARD_PASSED" not in completed.stdout and evidence["backup_exists"]
+        assert evidence["service_calls"] == "SYSTEMCTL:stop\n" and evidence["restore_calls"] == ""
+        assert evidence["rollback"]["trigger_exit_code"] == expected
+        assert evidence["rollback"]["status"] == "ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED"
+        if receipt_failure:
+            assert evidence["evidence_timeout_calls"].count("rollback") == 1
+            assert "kind=rollback exit=137" in completed.stderr and "completion=UNKNOWN" in completed.stderr
+
+
+@unittest.skipIf(sys.platform != "linux", "Native isolated JSON validator launch controls require Linux CI")
+def test_gateway_native_json_validator_deadlines_success_control() -> None:
+    for case in ("LOCAL_HEALTH_STATUS", "local_operator_status", "status", "health"):
+        result = _run_gateway_json_validator_case(case, native_mode="success")
+        assert result["completed"].returncode == 0 and result["checkpoint"], result
+        assert result["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native JSON validator hang and ignored TERM require Linux CI")
+def test_gateway_native_json_validator_deadlines_hang_and_ignored_term() -> None:
+    for mode in ("hang", "ignore_term"):
+        for case in ("LOCAL_HEALTH_STATUS", "local_operator_status", "status", "health"):
+            result = _run_gateway_json_validator_case(case, native_mode=mode)
+            expected = _JSON_VALIDATOR_CALLERS[case][1] or (124 if mode == "hang" else 137)
+            assert result["completed"].returncode == expected, result
+            assert result["rollback"] == [str(expected)] and not result["checkpoint"]
+            assert result["rollback-pid"] == result["harness-pid"]
+            assert result["live_after_command"] == 0 and result["elapsed"] < 10
+
+
+@unittest.skipIf(not Path("/bin/bash").is_file(), "Existing HTTP boundary fixture requires Linux Bash")
 def test_gateway_repair_http_boundary_probe_fails_closed() -> None:
-    if not Path("/bin/bash").is_file():
-        return
 
     function_source = _bash_function(
         _repair_script(), "probe_operator_http_boundary"
@@ -5970,6 +6258,12 @@ def test_gateway_repair_http_boundary_probe_fails_closed() -> None:
     harness = (
         """
 set -u
+RECOVERY_TIMEOUT_BIN=fixture_timeout
+fixture_timeout() {
+  [[ "$1 $2 $3 $4" == '--signal=TERM --kill-after=5s 60s python3' ]] || return 99
+  shift 3
+  "$@"
+}
 SOURCE_COMMIT=0123456789abcdef0123456789abcdef01234567
 seq() { printf '1\\n'; }
 sleep() { :; }
@@ -6023,6 +6317,7 @@ trap 'rm -f -- "$body_file" "$header_file"' EXIT
                 "FAKE_STATUS": status,
                 "FAKE_DETAIL": detail,
             },
+            timeout=10,
         )
         assert (completed.returncode == 0) is should_pass
         assert completed.stdout.strip() == status

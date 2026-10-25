@@ -2035,7 +2035,7 @@ probe_json() {
   for attempt in $(seq 1 12); do
     status="$(curl -sS --max-time 15 -o "$output" -w '%{http_code}' \
       "${url}?repair=${SOURCE_COMMIT:0:12}-${attempt}" || true)"
-    if [[ "$status" == "200" ]] && python3 -m json.tool "$output" >/dev/null 2>&1; then
+    if [[ "$status" == "200" ]] && "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 -m json.tool "$output" >/dev/null 2>&1; then
       printf '%s\n' "$status"
       return 0
     fi
@@ -2066,7 +2066,7 @@ probe_operator_http_boundary() {
     IFS=$'\t' read -r status content_type <<< "$curl_result"
     if [[ "$status" == "401" || "$status" == "503" ]]; then
       if [[ "${content_type,,}" == application/json* ]] && \
-        python3 - "$body_file" "$status" <<'PY'
+        "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - "$body_file" "$status" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -2153,7 +2153,7 @@ PUBLIC_PUBLIC_STATUS="$(probe_json "$PUBLIC_STATUS_URL" "$PUBLIC_STATUS_BODY")" 
 }
 
 for body in "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY"; do
-  python3 - "$body" <<'PY'
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - "$body" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -2169,7 +2169,7 @@ PY
 done
 
 for body in "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY"; do
-  python3 - "$body" <<'PY'
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - "$body" <<'PY'
 import json
 import re
 import sys

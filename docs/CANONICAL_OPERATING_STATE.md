@@ -30,6 +30,33 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 23 post-start JSON validator increment advances the existing
+outcome-2 private-review repair path. Only four Python launch sites gain the
+validated TERM-after-60-seconds and KILL-after-five-more-seconds policy:
+generic response JSON parsing, operator denial-body validation, public-status
+validation and health-body validation. Original interpreter arguments,
+heredoc bodies, output redirections and comparison rules are unchanged.
+
+The two conditional probes retain their existing twelve-attempt retries and
+caller mappings: generic probes exhaust into rollback 15/16/17/18; operator
+probes exhaust into rollback 19/20. Direct status and health validation retain
+their original nonzero status through the actual parent-shell ERR trap and
+one rollback. Plausible stdout with a failed validator cannot authorize
+readiness. Inert fixtures execute the actual bodies and callers, distinguish
+exact stdin and arguments, cover failure and malformed/successful payloads,
+and preserve original triggers when recovery stop or terminal evidence fails.
+Native controls use isolated fake interpreters, shortened test-copy budgets
+and process-identity cleanup; local Linux skips do not establish native signal
+behavior. At local preparation, independent review and exact-new-head hosted
+validation were pending.
+
+These four launch-site bounds are not a shared phase or total recovery
+deadline: conditional retries multiply the per-launch budget. Other input,
+hash, filesystem and HTTP operations, memory/output limits, uninterruptible
+I/O, privileged writers, validation-to-use races, partial restoration and
+recovery after the later external postcheck remain unresolved. No production
+action, deployment, external validation or readiness claim follows.
+
 The October 23 post-start metadata increment advances the existing outcome-2
 private-review repair path. Only the three fixed stat queries for the service
 drop-in file, runtime directory and singleton lock gain the validated TERM
