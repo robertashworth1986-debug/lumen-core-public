@@ -30,6 +30,27 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 25 drop-in pre-copy revalidation increment advances the same
+outcome-2 private-review repair. When the prepared drop-in was present, recovery
+now repeats the existing bounded, hash-bound state and full-inventory query after
+target removal and parent creation. A fixed no-argument wrapper requires the
+strictly parsed present state. The existing target-absence guard remains last
+before copy. Failed launches, timeout-like status with plausible output, malformed
+responses and custody drift refuse copy and later service work, retaining the
+original trigger, first failure and shared parent work-admission origin.
+
+Disposable fixtures inject backup bytes, metadata, links, type and manifest drift
+at the actual removal and parent-install boundaries, rather than before earlier
+validation. They also exercise failed responses, admission refusal and unavailable
+terminal evidence. Earlier source restoration and drop-in removal may already
+have occurred; refusal does not undo them. The safe terminal evidence attempt can
+itself fail when prepared custody changed. Copy still reopens a pathname after
+validation, so privileged later or in-flight mutation remains unresolved. This
+adds no atomic-copy, hard total-time, whole-service restoration or later external
+postcheck recovery guarantee. At local preparation, independent source review and
+exact-new-head hosted validation were pending. No production action or external
+validation is established.
+
 The October 25 shared rollback admission increment advances the same outcome-2
 reviewer-evidence repair. One parent-shell monotonic origin establishes a fixed
 600-second engineering budget for admitting new recovery work. A bounded clock

@@ -1889,6 +1889,12 @@ read_recovery_state() {
   esac
 }
 
+require_present_recovery_dropin() {
+  [[ $# -eq 0 ]] || return 14
+  read_recovery_state service_drop_in || return $?
+  [[ "$RECOVERY_STATE" == present ]] || return 14
+}
+
 read_recovery_source_state() {
   local response
   # The sentinel preserves trailing newlines so extra/empty output cannot be
@@ -2054,6 +2060,9 @@ rollback() {
       if [[ "$prior_drop_in_state" == "present" ]]; then
         checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
         checked_restore_step dropin_parent_create service_drop_in_directory bounded_recovery_mutation dropin_parent_create service_drop_in_directory || finish_rollback "$rc"
+        # Recheck prepared custody after removal/parent work. The following
+        # absence guard stays last; copy still reopens a pathname afterward.
+        checked_restore_step dropin_state_read service_drop_in require_present_recovery_dropin || finish_rollback "$rc"
         checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
         checked_restore_step dropin_copy service_drop_in bounded_recovery_copy "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
       fi

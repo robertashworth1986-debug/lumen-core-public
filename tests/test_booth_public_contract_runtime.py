@@ -805,6 +805,9 @@ def _run_gateway_rollback_guard(
     target_deadline_query: str = "", target_deadline_exit_code: int = 124,
     target_deadline_after: bool = True,
     control_query: str = "", control_fault: str = "", control_exit_code: int = 124,
+    dropin_precopy_fault: str = "", dropin_precopy_boundary: str = "after_parent",
+    dropin_precopy_query_case: str = "", dropin_precopy_exit_code: int = 124,
+    dropin_precopy_expire: bool = False,
     admission_fault: str = "", admission_clock_case: str = "", admission_clock_code: int = 0,
     admission_clock_step: int = 1_000_000_000,
 ) -> tuple[subprocess.CompletedProcess[str], bytes | None, bool]:
@@ -840,6 +843,28 @@ def _run_gateway_rollback_guard(
         if prior_dropin:
             (root / "backup/service-drop-in.state").write_text("present\n", newline="\n")
             (root / "backup/service-drop-in.before").write_bytes(b"previous hardening\n")
+        if dropin_precopy_fault:
+            # Only called by the actual removal/parent-install fixture hooks,
+            # after all preceding prepared-inventory checks have succeeded.
+            (root / "dropin-precopy-fault.py").write_text('''from pathlib import Path
+import os
+p = Path("backup/service-drop-in.before")
+kind = os.environ["DROPIN_PRECOPY_FAULT"]
+if kind == "bytes": p.write_bytes(b"intervening backup bytes")
+elif kind == "mtime":
+    s = p.stat(); os.utime(p, ns=(s.st_atime_ns, s.st_mtime_ns + 1000000000))
+elif kind == "mode": p.chmod(0o700 if p.stat().st_mode & 0o7777 != 0o700 else 0o600)
+elif kind == "missing": p.unlink()
+elif kind == "directory": p.unlink(); p.mkdir()
+elif kind == "symlink":
+    p.rename("outside-dropin-backup")
+    p.symlink_to(Path("outside-dropin-backup").resolve())
+elif kind == "hardlink": os.link(p, "outside-dropin-link")
+elif kind == "manifest":
+    p = Path("backup/prepared.json"); p.write_bytes(p.read_bytes() + b" ")
+else: raise ValueError("unsupported_dropin_precopy_fault")
+Path("dropin-precopy-fault-applied").write_text(kind)
+''', encoding="utf-8", newline="\n")
         if directory_case:
             family = "service-drop-in-dir" if directory_case.endswith("dropin") else "run-dir"
             folder = root / ("dropins" if directory_case.endswith("dropin") else "run")
@@ -1101,7 +1126,7 @@ fixture_timeout() {
     if [[ -e "$PWD/admission-clock.index" ]]; then IFS= read -r index < "$PWD/admission-clock.index"; fi
     printf '%s\n' "$((index + 1))" > "$PWD/admission-clock.index"
     value=$((1000000000000 + index * ADMISSION_CLOCK_STEP))
-    if [[ "$ADMISSION_FAULT" == "$call" ]]; then
+    if [[ "$ADMISSION_FAULT" == "$call" || ( "$DROPIN_PRECOPY_EXPIRE" == true && "$call" == dropin_state_read:service_drop_in && -e "$PWD/dropin-parent-created" ) ]]; then
       case "$ADMISSION_CLOCK_CASE" in
         expired) value=1600000000000 ;;
         just_before) value=1599999999999 ;;
@@ -1167,6 +1192,17 @@ fixture_timeout() {
     printf '%s\n' "$4" >> "$PWD/evidence-timeout.calls"
     if [[ "$4" == control_state || "$4" == control_metadata ]]; then
       printf '%s:%s\n' "$4" "${16}" >> "$PWD/control-query.calls"
+      if [[ "$4:${16}" == control_state:service_drop_in && -e "$PWD/dropin-parent-created" ]]; then
+        printf 'query\n' >> "$PWD/dropin-precopy-query.calls"
+        case "$DROPIN_PRECOPY_QUERY_CASE" in
+          failed_output) printf 'present\n'; return "$DROPIN_PRECOPY_EXIT_CODE" ;;
+          missing) printf 'missing\n'; return 0 ;;
+          extra) printf 'present\nextra\n'; return 0 ;;
+          no_newline) printf present; return 0 ;;
+          "") ;;
+          *) return 99 ;;
+        esac
+      fi
       if [[ "$CONTROL_QUERY" == "$4:${16}" && "$CONTROL_FAULT" == failed_output ]]; then
         if [[ "$4" == control_state ]]; then printf 'present\n'; else printf '0 0 755\n'; fi
         return "$CONTROL_EXIT_CODE"
@@ -1365,6 +1401,13 @@ fixture_dropin_dir_drift() {
     "$TEST_PYTHON" "$PWD/dropin-dir-drift.py" || return $?
   fi
 }
+fixture_dropin_precopy_boundary() {
+  printf '%s\n' "$1" >> "$PWD/dropin-precopy-boundary.calls"
+  if [[ "$1" == after_parent ]]; then printf ready > "$PWD/dropin-parent-created"; fi
+  if [[ -n "$DROPIN_PRECOPY_FAULT" && "$DROPIN_PRECOPY_BOUNDARY" == "$1" && ! -e "$PWD/dropin-precopy-fault-applied" ]]; then
+    "$TEST_PYTHON" "$PWD/dropin-precopy-fault.py" || return $?
+  fi
+}
 fixture_operation() {
   local command_name="$1" fixture_target=unknown
   case "$2" in
@@ -1410,6 +1453,7 @@ rm() {
   if [[ "${@: -1}" == "$TARGET_ROOT/entry.py" ]]; then fixture_source_drift after_first_remove || return $?; fixture_target_drift after_first_remove || return $?; fi
   if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_target_drift after_remove || return $?; fi
   if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_dir_drift before_parent_install || return $?; fi
+  if [[ "${@: -1}" == "$SERVICE_DROP_IN" ]]; then fixture_dropin_precopy_boundary after_remove || return $?; fi
 }
 install() {
   if [[ "${RECOVERY_RESTORE_ATTEMPTED:-false}" != true && "$FIXTURE_DROPIN_DIR_FORWARD" == true ]]; then
@@ -1445,7 +1489,8 @@ install() {
     command chmod 0644 -- "${@: -1}"
   else
     fixture_operation install "${@: -1}" || return $?
-    command mkdir -p -- "${@: -1}"
+    command mkdir -p -- "${@: -1}" || return $?
+    if [[ "${@: -1}" == "$SERVICE_DROP_IN_DIR" ]]; then fixture_dropin_precopy_boundary after_parent || return $?; fi
   fi
 }
 rmdir() {
@@ -1526,7 +1571,7 @@ fi
         for name in ("read_recovery_monotonic_clock", "refuse_recovery_admission", "begin_recovery_admission", "admit_recovery_work"):
             harness += _bash_function(script, name) + "\n"
         harness += bounded + "\n" + _bash_function(script, "finish_rollback") + "\n"
-        for name in ("bounded_recovery_copy", "bounded_recovery_mutation", "checked_restore_step", "read_recovery_state", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
+        for name in ("bounded_recovery_copy", "bounded_recovery_mutation", "checked_restore_step", "read_recovery_state", "require_present_recovery_dropin", "read_recovery_source_state", "read_recovery_source_result", "read_recovery_dropin_result", "read_recovery_runtime_directory_result", "read_recovery_dropin_directory_result", "read_recovery_metadata", "remove_recovery_directory",
                      "recorded_target_version", "source_target_version", "capture_source_target_version", "install_gateway_source", "read_recovery_target_state", "require_recovery_target_absent",
                      "dropin_target_version", "capture_dropin_target_version", "install_gateway_dropin", "read_recovery_dropin_target_state", "require_recovery_dropin_absent",
                      "dropin_directory_target_version", "capture_dropin_directory_target_version", "install_gateway_dropin_directory", "read_recovery_dropin_directory_target_state",
@@ -1991,6 +2036,9 @@ rollback "$forward_lock_rc"
             ACTIVE_QUERY_EXIT_CODE="" if active_query_exit_code is None else str(active_query_exit_code),
             STAT_QUERY_FAULT=stat_query_fault, STAT_QUERY_EXIT_CODE=str(stat_query_exit_code),
             CONTROL_QUERY=control_query, CONTROL_FAULT=control_fault, CONTROL_EXIT_CODE=str(control_exit_code),
+            DROPIN_PRECOPY_FAULT=dropin_precopy_fault, DROPIN_PRECOPY_BOUNDARY=dropin_precopy_boundary,
+            DROPIN_PRECOPY_QUERY_CASE=dropin_precopy_query_case, DROPIN_PRECOPY_EXIT_CODE=str(dropin_precopy_exit_code),
+            DROPIN_PRECOPY_EXPIRE=str(dropin_precopy_expire).lower(),
             ADMISSION_FAULT=admission_fault, ADMISSION_CLOCK_CASE=admission_clock_case,
             ADMISSION_CLOCK_CODE=str(admission_clock_code), ADMISSION_CLOCK_STEP=str(admission_clock_step),
             LOCK_PROBE_CASE=real_lock_case if real_lock_case in {
@@ -2049,6 +2097,9 @@ rollback "$forward_lock_rc"
             evidence["elapsed_seconds"] = time.monotonic() - started
             evidence["admission_clock_calls"] = (root / "admission-clock.calls").read_text().splitlines() if (root / "admission-clock.calls").exists() else []
             evidence["control_query_calls"] = (root / "control-query.calls").read_text().splitlines() if (root / "control-query.calls").exists() else []
+            evidence["dropin_precopy_boundaries"] = (root / "dropin-precopy-boundary.calls").read_text().splitlines() if (root / "dropin-precopy-boundary.calls").exists() else []
+            evidence["dropin_precopy_fault_applied"] = (root / "dropin-precopy-fault-applied").read_text() if (root / "dropin-precopy-fault-applied").exists() else ""
+            evidence["dropin_precopy_queries"] = (root / "dropin-precopy-query.calls").read_text().splitlines() if (root / "dropin-precopy-query.calls").exists() else []
             evidence["control_interleaving_applied"] = (root / "control-interleaving-applied").read_text() if (root / "control-interleaving-applied").exists() else ""
             evidence["copy_timeout_calls"] = (root / "copy-timeout.calls").read_text().splitlines() if (root / "copy-timeout.calls").exists() else []
             evidence["mutation_timeout_calls"] = (root / "mutation-timeout.calls").read_text().splitlines() if (root / "mutation-timeout.calls").exists() else []
@@ -2690,6 +2741,7 @@ def test_gateway_evidence_deadline_normal_receipts_and_queries_keep_existing_con
         "runtime_directory_result", "dropin_directory_result", "rollback",
         "control_state", "control_metadata"}
     assert evidence["control_query_calls"] == [
+        "control_state:service_drop_in",
         "control_state:service_drop_in",
         "control_state:service_drop_in_directory",
         "control_metadata:service_drop_in_directory",
@@ -5488,6 +5540,144 @@ def test_gateway_dropin_result_keeps_custody_and_receipt_failure_visible() -> No
         assert "dropin_result failed" in completed.stderr and "receipt persistence failed" in completed.stderr
         assert "rollback" not in evidence and evidence["service_calls"] == "SYSTEMCTL:stop\n"
         assert evidence["operation_calls"].splitlines()[-1] == "cp:dropin"
+
+
+def _assert_dropin_precopy_stopped(completed, current, evidence: dict) -> None:
+    assert completed.returncode == 17 and current == b"previous source\n", completed.stderr
+    assert evidence["dropin_bytes"] is None and evidence["backup_exists"]
+    assert evidence["dropin_precopy_boundaries"] == ["after_remove", "after_parent"]
+    assert evidence["operation_calls"].splitlines() == [
+        "rm:first_source", "cp:first_source", "rm:dropin", "install:dropin_dir"]
+    assert evidence["copy_timeout_calls"] == ["first_source"]
+    assert evidence["service_calls"] == "SYSTEMCTL:stop\n"
+    assert evidence["evidence_timeout_calls"].count("rollback") == 1
+    assert "dropin_result" not in evidence["evidence_timeout_calls"]
+
+
+def test_gateway_dropin_precopy_revalidation_refuses_late_bytes_and_manifest_drift() -> None:
+    for boundary in ("after_remove", "after_parent"):
+        for fault in ("bytes", "manifest"):
+            evidence: dict = {}
+            completed, current, _ = _run_gateway_rollback_guard(
+                _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+                recovery_case="dropin_precopy", prior_dropin=True, evidence=evidence,
+                dropin_precopy_fault=fault, dropin_precopy_boundary=boundary)
+            _assert_dropin_precopy_stopped(completed, current, evidence)
+            assert evidence["dropin_precopy_fault_applied"] == fault
+            assert evidence["dropin_precopy_queries"] == ["query"]
+            assert evidence["control_query_calls"] == ["control_state:service_drop_in"] * 2
+            assert "dropin_state_read failed (exit 1)" in completed.stderr
+            assert "receipt persistence failed" in completed.stderr and "rollback" not in evidence
+
+
+def test_gateway_dropin_precopy_revalidation_refuses_missing_type_and_timestamp_drift() -> None:
+    for fault in ("missing", "directory", "mtime"):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_precopy", prior_dropin=True, evidence=evidence,
+            dropin_precopy_fault=fault)
+        _assert_dropin_precopy_stopped(completed, current, evidence)
+        assert evidence["dropin_precopy_fault_applied"] == fault
+        assert evidence["dropin_precopy_queries"] == ["query"]
+        assert "dropin_state_read failed (exit 1)" in completed.stderr
+        assert "receipt persistence failed" in completed.stderr and "rollback" not in evidence
+
+
+@unittest.skipIf(os.name != "posix", "Backup mode/link identity requires POSIX")
+def test_gateway_dropin_precopy_revalidation_refuses_posix_mode_and_links() -> None:
+    for fault in ("mode", "symlink", "hardlink"):
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_precopy", prior_dropin=True, evidence=evidence,
+            dropin_precopy_fault=fault)
+        _assert_dropin_precopy_stopped(completed, current, evidence)
+        assert evidence["dropin_precopy_fault_applied"] == fault
+        assert "dropin_state_read failed (exit 1)" in completed.stderr
+        assert "receipt persistence failed" in completed.stderr and "rollback" not in evidence
+
+
+def test_gateway_dropin_precopy_revalidation_rejects_failed_and_malformed_query_output() -> None:
+    cases = [("failed_output", code) for code in (29, 124, 137)]
+    cases += [(case, 14) for case in ("missing", "extra", "no_newline")]
+    for case, expected in cases:
+        evidence: dict = {}
+        completed, current, _ = _run_gateway_rollback_guard(
+            _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+            recovery_case="dropin_precopy", prior_dropin=True, evidence=evidence,
+            dropin_precopy_query_case=case, dropin_precopy_exit_code=expected)
+        _assert_dropin_precopy_stopped(completed, current, evidence)
+        assert evidence["dropin_precopy_queries"] == ["query"]
+        receipt = evidence["rollback"]
+        assert receipt["failed_restoration_operation"] == dict(
+            operation="dropin_state_read", target="service_drop_in", exit_code=expected)
+        assert receipt["trigger_exit_code"] == 17 and receipt["partial_state_possible"]
+        assert not receipt["restoration_verified"] and not receipt["service_restart_attempted"]
+        assert receipt["dropin_result_observation"] == "NOT_CHECKED"
+
+
+def test_gateway_dropin_precopy_revalidation_preserves_receipt_and_admission_refusal() -> None:
+    evidence: dict = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="rollback_write_failure", prior_dropin=True, evidence=evidence,
+        dropin_precopy_query_case="failed_output", dropin_precopy_exit_code=124)
+    _assert_dropin_precopy_stopped(completed, current, evidence)
+    assert evidence["rollback"] is None and "receipt persistence failed" in completed.stderr
+    assert "dropin_state_read failed (exit 124)" in completed.stderr
+    evidence = {}
+    completed, current, _ = _run_gateway_rollback_guard(
+        _gateway_post_mutation_guards(_repair_script())[0], predicate_passes=False,
+        recovery_case="dropin_precopy", prior_dropin=True, evidence=evidence,
+        dropin_precopy_expire=True, admission_clock_case="expired")
+    _assert_dropin_precopy_stopped(completed, current, evidence)
+    assert evidence["dropin_precopy_queries"] == []
+    assert evidence["control_query_calls"] == ["control_state:service_drop_in"]
+    assert evidence["admission_clock_calls"].count("origin:clock") == 1
+    assert evidence["admission_clock_calls"][-1] == "dropin_state_read:service_drop_in"
+    receipt = evidence["rollback"]
+    assert receipt["status"] == "ROLLBACK_INCOMPLETE_WORK_ADMISSION_REFUSED"
+    assert receipt["work_admission"]["status"] == "NOT_STARTED_BUDGET_REFUSAL"
+    assert receipt["work_admission"]["monotonic_origin_ns"] == 1_000_000_000_000
+    assert receipt["work_admission"]["deadline_ns"] == receipt["work_admission"]["last_observed_ns"] == 1_600_000_000_000
+    assert "failed_restoration_operation" not in receipt
+    assert receipt["trigger_exit_code"] == 17 and not receipt["restoration_verified"]
+
+
+def test_gateway_dropin_precopy_revalidation_fixed_wrapper_preserves_reader_contract() -> None:
+    script = _repair_script()
+    harness = r'''set -uo pipefail
+record_recovery_evidence() {
+  [[ "$*" == 'control_state 0 service_drop_in' ]] || return 99
+  printf call >> calls
+  printf '%s' "$fixture_response"
+  return "$query_rc"
+}
+'''
+    harness += "\n".join(_bash_function(script, name) for name in (
+        "read_recovery_state", "require_present_recovery_dropin"))
+    harness += r'''
+RECOVERY_STATE=stale
+if [[ "$extra" == true ]]; then require_present_recovery_dropin forbidden; else require_present_recovery_dropin; fi
+rc=$?
+printf '%s:%s' "$rc" "$RECOVERY_STATE"
+'''
+    cases = [("present\n", 0, False, "0:present", True),
+             ("missing\n", 0, False, "14:missing", True),
+             ("present\nextra\n", 0, False, "14:", True),
+             ("present\n", 0, True, "14:stale", False)]
+    cases += [("present\n", code, False, f"{code}:", True) for code in (29, 124, 137)]
+    with tempfile.TemporaryDirectory(prefix="gateway-dropin-precopy-reader-") as directory:
+        root = Path(directory)
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        for response, code, extra, expected, called in cases:
+            (root / "calls").unlink(missing_ok=True)
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, fixture_response=response, query_rc=str(code), extra=str(extra).lower()),
+                capture_output=True, text=True, timeout=10, check=False)
+            assert completed.returncode == 0 and completed.stdout == expected, completed
+            assert (root / "calls").exists() is called
 
 
 def test_gateway_state_parser_rejects_missing_or_noncanonical_values() -> None:
