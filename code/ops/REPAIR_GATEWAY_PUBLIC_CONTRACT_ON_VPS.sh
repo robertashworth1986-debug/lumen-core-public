@@ -474,9 +474,10 @@ record_recovery_evidence() {
   local kind="${1:-}" trigger_code="${2:-0}" requested_source="${3:-}"
   [[ $# -ge 1 && $# -le 3 ]] || return 14
   case "$kind" in
-    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result|control_state|control_metadata) ;;
+    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result|control_state|control_metadata|restore_dropin) ;;
     *) return 14 ;;
   esac
+  [[ "$kind" != restore_dropin || ( $# -eq 2 && "$trigger_code" == 0 ) ]] || return 14
   [[ "$kind" != dropin_result || $# -eq 2 ]] || return 14
   [[ "$kind" != runtime_directory_result || $# -eq 2 ]] || return 14
   [[ "$kind" != dropin_directory_result || $# -eq 2 ]] || return 14
@@ -542,7 +543,7 @@ control_files = dict([
     (("control_metadata", "run_directory"), "run-dir.metadata"),
 ])
 control_kinds = {"control_state", "control_metadata"}
-if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result"} | query_kinds | control_kinds:
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result", "restore_dropin"} | query_kinds | control_kinds:
     raise SystemExit("invalid_recovery_receipt_kind")
 if ((kind in query_kinds and requested_source not in relatives)
         or (kind in control_kinds and (kind, requested_source) not in control_files)
@@ -603,6 +604,158 @@ def inventory(relative, capture=False, *, root=directory, capture_limit=None):
                  uid=info.st_uid, gid=info.st_gid, mode=format(stat.S_IMODE(info.st_mode), "04o"),
                  mtime_ns=info.st_mtime_ns, xattrs_sha256=xattrs_sha256)
     return (entry, b"".join(chunks)) if capture else entry
+
+def restore_dropin_from_capture(prepared):
+    # Fixed prior-present object only. The prepared manifest was authenticated
+    # above; no caller can supply a source/destination or copy flags.
+    expected = next((item for item in prepared["files"] if item["path"] == "service-drop-in.before"), None)
+    state_expected = next((item for item in prepared["files"] if item["path"] == "service-drop-in.state"), None)
+    state_entry, state_raw = inventory("service-drop-in.state", capture=True, capture_limit=128)
+    if state_entry != state_expected or state_raw != b"present\n" or expected is None:
+        raise SystemExit("dropin_capture_requires_prepared_present")
+    if type(expected.get("bytes")) is not int or expected["bytes"] < 0:
+        raise SystemExit("invalid_dropin_capture_length")
+    required = ("O_NOFOLLOW", "O_DIRECTORY", "O_TMPFILE", "fchown", "fchmod",
+                "listxattr", "getxattr", "setxattr", "removexattr", "pread")
+    if (os.name != "posix" or any(not hasattr(os, name) for name in required)
+            or os.open not in os.supports_dir_fd or os.stat not in os.supports_dir_fd
+            or os.stat not in os.supports_follow_symlinks or os.utime not in os.supports_fd):
+        raise SystemExit("dropin_capture_platform_capability_unavailable")
+    path = Path(dropin_target)
+    if (not path.is_absolute() or path.parent != Path(dropin_directory_target)
+            or any(part in {".", ".."} for part in path.parts)):
+        raise SystemExit("unsafe_dropin_capture_destination")
+    descriptors = []
+
+    def held_open(*args, **kwargs):
+        descriptor = os.open(*args, **kwargs)
+        descriptors.append(descriptor)
+        return descriptor
+
+    def directory_identity(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid)
+
+    def open_chain(parent):
+        if not parent.is_absolute() or any(part in {".", ".."} for part in parent.parts):
+            raise SystemExit("unsafe_dropin_capture_parent")
+        descriptor = held_open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        chain = [(descriptor, None, "/", directory_identity(os.fstat(descriptor)))]
+        for component in parent.parts[1:]:
+            previous = descriptor
+            descriptor = held_open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=previous)
+            chain.append((descriptor, previous, component, directory_identity(os.fstat(descriptor))))
+        return descriptor, chain
+
+    def check_chain(chain):
+        for descriptor, parent_fd, component, identity in chain:
+            current = os.stat(component, dir_fd=parent_fd, follow_symlinks=False)
+            if directory_identity(current) != identity or directory_identity(os.fstat(descriptor)) != identity:
+                raise SystemExit("dropin_capture_parent_changed")
+
+    def identity(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+                info.st_gid, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+    def write_all(descriptor, data):
+        view = memoryview(data)
+        while view:
+            written = os.write(descriptor, view)
+            if written <= 0:
+                raise OSError("dropin_capture_short_write")
+            view = view[written:]
+
+    def read_descriptor(descriptor, relative, sink=None):
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size != expected["bytes"]:
+            raise SystemExit("dropin_capture_size_or_type_changed")
+        digest = hashlib.sha256()
+        offset = 0
+        while True:
+            chunk = os.pread(descriptor, min(1024 * 1024, expected["bytes"] - offset + 1), offset)
+            if not chunk:
+                break
+            offset += len(chunk)
+            if offset > expected["bytes"]:
+                raise SystemExit("dropin_capture_overflow")
+            digest.update(chunk)
+            if sink is not None:
+                write_all(sink, chunk)
+        if offset != expected["bytes"]:
+            raise SystemExit("dropin_capture_truncated")
+        attributes = [(name, os.getxattr(descriptor, name)) for name in sorted(os.listxattr(descriptor))]
+        attr_digest = hashlib.sha256(json.dumps([(name, value.hex()) for name, value in attributes]).encode()).hexdigest()
+        if identity(os.fstat(descriptor)) != identity(before):
+            raise SystemExit("dropin_capture_changed_during_read")
+        entry = dict(path=relative, sha256=digest.hexdigest(), bytes=offset, uid=before.st_uid,
+                     gid=before.st_gid, mode=format(stat.S_IMODE(before.st_mode), "04o"),
+                     mtime_ns=before.st_mtime_ns, xattrs_sha256=attr_digest)
+        return entry, attributes, before
+
+    try:
+        backup_fd, backup_chain = open_chain(directory)
+        parent_fd, parent_chain = open_chain(path.parent)
+        for descriptor in (backup_fd, parent_fd, parent_chain[-2][0] if len(parent_chain) > 1 else parent_fd):
+            info = os.fstat(descriptor)
+            if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
+                raise SystemExit("unsafe_dropin_capture_parent_permissions")
+        # Anonymous, private descriptor staging: unsupported filesystems fail
+        # before target creation; no named temporary file or fallback is used.
+        staged = held_open(".", os.O_TMPFILE | os.O_RDWR, 0o600, dir_fd=backup_fd)
+        source_fd = held_open("service-drop-in.before", os.O_RDONLY | os.O_NOFOLLOW, dir_fd=backup_fd)
+        captured, attributes, source_info = read_descriptor(source_fd, "service-drop-in.before", staged)
+        if captured != expected or identity(os.stat("service-drop-in.before", dir_fd=backup_fd, follow_symlinks=False)) != identity(source_info):
+            raise SystemExit("dropin_capture_does_not_match_prepared")
+        os.fsync(staged)
+        # Revalidate descriptor/path ancestry immediately before exclusive create.
+        # This is not a claim of atomic protection from privileged later renames.
+        check_chain(backup_chain)
+        check_chain(parent_chain)
+        target_fd = held_open(path.name, os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_RDWR, 0o600, dir_fd=parent_fd)
+        target_identity = (os.fstat(target_fd).st_dev, os.fstat(target_fd).st_ino)
+        offset = 0
+        while offset < expected["bytes"]:
+            chunk = os.pread(staged, min(1024 * 1024, expected["bytes"] - offset), offset)
+            if not chunk:
+                raise SystemExit("dropin_staging_truncated")
+            write_all(target_fd, chunk)
+            offset += len(chunk)
+        # Ownership first (it may clear security attributes), then mode and the
+        # exact captured xattr set, including ACL/security namespaces. Any missing
+        # capability or failed operation is fatal; never silently degrade metadata.
+        os.fchown(target_fd, source_info.st_uid, source_info.st_gid)
+        os.fchmod(target_fd, stat.S_IMODE(source_info.st_mode))
+        wanted = dict(attributes)
+        for name in os.listxattr(target_fd):
+            if name not in wanted:
+                os.removexattr(target_fd, name)
+        for name, value in attributes:
+            os.setxattr(target_fd, name, value)
+        # atime is observed here for preservation, but is not authenticated by the
+        # existing inventory; this is not a universal cp -a equivalence claim.
+        os.utime(target_fd, ns=(source_info.st_atime_ns, source_info.st_mtime_ns))
+        os.fsync(target_fd)
+        restored, _, _ = read_descriptor(target_fd, "service-drop-in.before")
+        if restored != expected:
+            raise SystemExit("dropin_capture_result_mismatch")
+        observed = os.stat(path.name, dir_fd=parent_fd, follow_symlinks=False)
+        if ((observed.st_dev, observed.st_ino) != target_identity
+                or identity(observed) != identity(os.fstat(target_fd))):
+            raise SystemExit("dropin_capture_target_replaced")
+        check_chain(parent_chain)
+        os.fsync(parent_fd)
+    finally:
+        # Never unlink a destination on failure: it may be partial or replaced.
+        # Closing held descriptors also discards only the anonymous staging inode.
+        active_failure = sys.exc_info()[0] is not None
+        close_failure = None
+        for descriptor in reversed(descriptors):
+            try:
+                os.close(descriptor)
+            except OSError as error:
+                if close_failure is None:
+                    close_failure = error
+        if close_failure is not None and not active_failure:
+            raise close_failure
 
 payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,
                generated_utc=datetime.now(timezone.utc).isoformat(), source_commit=source,
@@ -976,6 +1129,9 @@ else:
     require_exact_inventory(names)
     if any(inventory(item["path"]) != item for item in prepared["files"]):
         raise SystemExit("recovery_backup_changed")
+    if kind == "restore_dropin":
+        restore_dropin_from_capture(prepared)
+        raise SystemExit(0)
     if kind in control_kinds:
         # Parse only the same captured bytes whose complete entry matches the
         # pinned preparation. Never validate a path and then reopen it raw.
@@ -1810,6 +1966,11 @@ finish_rollback() {
   exit "$rc"
 }
 
+restore_recovery_dropin() {
+  [[ $# -eq 0 ]] || return 14
+  record_recovery_evidence restore_dropin 0
+}
+
 bounded_recovery_copy() {
   [[ $# -eq 2 ]] || return 125
   # Bound only this copy process group. A failed/terminated copy can leave a
@@ -2064,7 +2225,7 @@ rollback() {
         # absence guard stays last; copy still reopens a pathname afterward.
         checked_restore_step dropin_state_read service_drop_in require_present_recovery_dropin || finish_rollback "$rc"
         checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
-        checked_restore_step dropin_copy service_drop_in bounded_recovery_copy "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN" || finish_rollback "$rc"
+        checked_restore_step dropin_copy service_drop_in restore_recovery_dropin || finish_rollback "$rc"
       fi
       checked_restore_step dropin_result service_drop_in read_recovery_dropin_result "$prior_drop_in_state" || finish_rollback "$rc"
     fi

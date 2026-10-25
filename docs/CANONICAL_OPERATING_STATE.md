@@ -30,6 +30,31 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 25 fixed drop-in capture increment advances this same private-review
+repair. Only a prior-present service drop-in uses a fixed, no-argument operation
+inside the existing bounded recovery process. After the pinned full inventory is
+validated, it captures bytes and raw extended attributes from one stable source
+descriptor into anonymous private staging, limited by the prepared byte length.
+It compares that capture with the prepared entry before creating the fixed target
+exclusively through a no-follow directory-descriptor chain. Ownership, mode,
+mtime and represented extended metadata must match on the destination descriptor;
+missing platform/filesystem capabilities or any failed metadata operation refuse
+success. Atime is observed for preservation but was not pinned by the prior
+inventory, so this is not a universal cp -a equivalence claim.
+
+The writer preserves partial files on write, metadata, synchronization or timeout
+failure, never retries or removes a possibly replaced pathname, and retains the
+original rollback trigger and first dropin_copy failure. Source-copy, missing and
+untouched branches remain unchanged. Exclusive creation prevents overwriting an
+entry at that instant; privileged later replacement, detached-parent writes and
+in-place mutation remain possible and observable rechecks are not atomic locks.
+The 60-second process bound and 600-second admission policy do not establish a
+hard total deadline or later external-postcheck recovery. Windows fixtures retain
+actual custody/control flow but substitute unsupported writer mechanics; native
+descriptor, xattr and race controls require Linux. At local preparation, source
+review and exact-new-head hosted validation were pending. No production action or
+external validation is established.
+
 The October 25 drop-in pre-copy revalidation increment advances the same
 outcome-2 private-review repair. When the prepared drop-in was present, recovery
 now repeats the existing bounded, hash-bound state and full-inventory query after
@@ -44,8 +69,9 @@ at the actual removal and parent-install boundaries, rather than before earlier
 validation. They also exercise failed responses, admission refusal and unavailable
 terminal evidence. Earlier source restoration and drop-in removal may already
 have occurred; refusal does not undo them. The safe terminal evidence attempt can
-itself fail when prepared custody changed. Copy still reopens a pathname after
-validation, so privileged later or in-flight mutation remains unresolved. This
+itself fail when prepared custody changed. At that preparation stage, copy still reopened a pathname after validation.
+The later fixed capture increment above narrows this drop-in gap; source copies
+still reopen pathnames and privileged later or in-flight mutation remains unresolved. This
 adds no atomic-copy, hard total-time, whole-service restoration or later external
 postcheck recovery guarantee. At local preparation, independent source review and
 exact-new-head hosted validation were pending. No production action or external
