@@ -184,7 +184,7 @@ LumenCore returns replay receipts, negative results, hashes, an offline verifier
 
 - Strategic packet SHA-256: `358855ad9d44ee72ef460ad70b46448a82f327a0c536d9253d3fad84590c4ad7`
 - Evidence graph SHA-256: `cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05`
-- Portfolio payload SHA-256: `d61dd9e19a8942705de7489fc7479b01d4ac4f5c7340d7e93135f08794cb0df2`
+- Portfolio payload SHA-256: `9449e92fb1f4e663e8e49a03bcfc5aa9683845431502592c6ed3285aef5c2c6a`
 - Public contact: <https://lumen-core.ai/proof_to_pilot.html>
 
 ## Boundaries

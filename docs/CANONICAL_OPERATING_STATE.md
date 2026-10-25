@@ -30,6 +30,13 @@ accepted. Seventeen regression cases cover rejection ordering, CLI refusal,
 maximum target count and the inclusive row limit. This is bounded input
 admission, not a throughput, forecasting-quality or performance claim.
 
+The initial integration's full hosted suite passed 2,282 tests and 367 subtests,
+with eight skips, but failed two generated-artifact consistency checks. The
+forecast edits require the existing portfolio and reviewer-packet fingerprints
+to be regenerated with their unchanged builders. Preserve original timestamps,
+claims and historical test receipts; these refreshed hashes are not new external
+validation. The corrected commit requires a fresh complete hosted run.
+
 Local focused tests and exact-head hosted checks are separate evidence gates.
 Publication is draft-only; current-main compatibility must be established by
 the hosted synthetic merge and its recorded parents. No merge, deployment,

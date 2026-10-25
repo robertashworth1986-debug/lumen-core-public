@@ -137,8 +137,8 @@
     {
       "path": "docs/REVIEWER_START_HERE.md",
       "purpose": "Current-source reproduction route, dated repair scope and remaining gates.",
-      "bytes": 30109,
-      "sha256": "7035f56a1d6ff8ee02e4184f90b235ff795156c44b892b9b2a89aff36d63cd03",
+      "bytes": 31209,
+      "sha256": "36581b6a7ff09238bf77cca6a7c003676264cc9ebd5e578aa235bb3cd5eeed4e",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -191,8 +191,8 @@
     {
       "path": "code/forecast_evaluation_v2.py",
       "purpose": "Bounded forecast evaluator with structured malformed/oversized CSV rejection.",
-      "bytes": 18499,
-      "sha256": "be6db9104cc2928b86bc9ad7de8118eefbef48c55127d6c9e4bb632a4f8bc39d",
+      "bytes": 18888,
+      "sha256": "bd91cacc1212b6f93944333b3ff535990d3c41966a7ec8568f98433e58e863c5",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -236,8 +236,8 @@
     {
       "path": "tests/test_forecast_evaluation_v2.py",
       "purpose": "Calendar/as-of review and malformed CSV CLI/API rejection fixtures.",
-      "bytes": 25106,
-      "sha256": "c589aee975b7a1bc5b02b4b8c55daa7ca848ca0fa1cb0cae3b308189438b3b0a",
+      "bytes": 31859,
+      "sha256": "e5fe13e9477e0fc2b5223ad0b8e0c0694d543ca0d272d806d9416e89189f4e6a",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
