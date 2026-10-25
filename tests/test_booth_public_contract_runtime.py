@@ -2845,6 +2845,86 @@ def test_gateway_hung_target_reader_and_ignored_term_are_bounded_without_adoptio
         assert outcome in completed.stderr and "observation=UNKNOWN retry=false" in completed.stderr
 
 
+def _native_gateway_evidence_artifact_facts(
+    root: Path, completed: subprocess.CompletedProcess[str], *, mode: str,
+    elapsed_seconds: float, live_after_command: int,
+) -> dict:
+    # Capture process diagnostics before required artifact reads can fail. An
+    # absent/unreadable artifact remains a failure, never an empty success value.
+    facts = {"mode": mode, "returncode": completed.returncode,
+             "stdout": completed.stdout, "stderr": completed.stderr,
+             "elapsed_seconds": elapsed_seconds, "live_after_command": live_after_command,
+             "artifact_read_errors": {}}
+    readers = {
+        "calls": lambda: (root / "writer.calls").read_text().splitlines(),
+        "receipt": lambda: (root / "backup/rollback.json").read_bytes(),
+        "backup_files": lambda: sorted(p.name for p in (root / "backup").iterdir()),
+    }
+    for name, read in readers.items():
+        try:
+            facts[name] = read()
+        except OSError as exc:
+            facts[name] = None
+            facts["artifact_read_errors"][name] = {
+                "type": type(exc).__name__, "errno": exc.errno,
+            }
+    if facts["artifact_read_errors"]:
+        raise AssertionError(f"native evidence fixture artifact read failed: {facts!r}")
+    return facts
+
+
+def test_gateway_native_evidence_artifact_diagnostics_preserve_missing_process_result() -> None:
+    with tempfile.TemporaryDirectory(prefix="gateway-evidence-diagnostics-") as directory:
+        root = Path(directory)
+        (root / "backup").mkdir()
+        for code in (17, 91, 124, 137):
+            completed = subprocess.CompletedProcess(
+                ["inert-fixture"], code, "captured partial stdout\n", "captured launcher stderr\n")
+            with unittest.TestCase().assertRaises(AssertionError) as failure:
+                _native_gateway_evidence_artifact_facts(
+                    root, completed, mode="synthetic-missing", elapsed_seconds=0.1, live_after_command=0)
+            detail = str(failure.exception)
+            assert f"'returncode': {code}" in detail, detail
+            assert repr(completed.stdout) in detail and repr(completed.stderr) in detail, detail
+            assert "'calls': None" in detail and "'receipt': None" in detail, detail
+            assert detail.count("'type': 'FileNotFoundError'") == 2, detail
+            assert "'backup_files': []" in detail and "'mode': 'synthetic-missing'" in detail, detail
+
+
+def test_gateway_native_evidence_artifact_diagnostics_preserve_unreadable_artifact() -> None:
+    with tempfile.TemporaryDirectory(prefix="gateway-evidence-diagnostics-") as directory:
+        root = Path(directory)
+        (root / "writer.calls").mkdir()  # An invalid artifact type, without permission/root assumptions.
+        (root / "backup").mkdir()
+        (root / "backup/rollback.json").write_bytes(b"possibly published receipt\n")
+        completed = subprocess.CompletedProcess(["inert-fixture"], 17, "partial\n", "read control\n")
+        with unittest.TestCase().assertRaises(AssertionError) as failure:
+            _native_gateway_evidence_artifact_facts(
+                root, completed, mode="synthetic-unreadable", elapsed_seconds=0.1, live_after_command=0)
+        detail = str(failure.exception)
+        assert "'calls': None" in detail and "'returncode': 17" in detail, detail
+        assert "'type': 'IsADirectoryError'" in detail or "'type': 'PermissionError'" in detail, detail
+        assert "FileNotFoundError" not in detail, detail
+        assert repr(completed.stdout) in detail and repr(completed.stderr) in detail, detail
+        assert repr(b"possibly published receipt\n") in detail, detail
+
+
+def test_gateway_native_evidence_artifact_diagnostics_valid_control() -> None:
+    with tempfile.TemporaryDirectory(prefix="gateway-evidence-diagnostics-") as directory:
+        root = Path(directory)
+        (root / "writer.calls").write_text("rollback\n")
+        (root / "backup").mkdir()
+        (root / "backup/rollback.json").write_bytes(b"possibly published receipt\n")
+        completed = subprocess.CompletedProcess(["inert-fixture"], 17, "valid-looking-hash\n", "")
+        facts = _native_gateway_evidence_artifact_facts(
+            root, completed, mode="synthetic-valid", elapsed_seconds=0.1, live_after_command=0)
+        assert facts == {
+            "mode": "synthetic-valid", "returncode": 17, "stdout": "valid-looking-hash\n", "stderr": "",
+            "elapsed_seconds": 0.1, "live_after_command": 0, "artifact_read_errors": {},
+            "calls": ["rollback"], "receipt": b"possibly published receipt\n", "backup_files": ["rollback.json"],
+        }
+
+
 def _run_native_gateway_evidence_deadline(mode: str) -> tuple[subprocess.CompletedProcess[str], dict]:
     # Execute the real wrapper with native GNU timeout and a fake Python writer.
     # Only the extracted test copy's two durations are shortened. The fake writer
@@ -2909,21 +2989,19 @@ PATH="$PWD/bin:$PATH"
                             os.kill(pid, signal.SIGKILL)
                         except ProcessLookupError:
                             pass
-        facts = {"elapsed_seconds": time.monotonic() - started, "live_after_command": len(live),
-                 "calls": (root / "writer.calls").read_text().splitlines(),
-                 "receipt": (root / "backup/rollback.json").read_bytes(),
-                 "backup_files": sorted(p.name for p in (root / "backup").iterdir())}
+        facts = _native_gateway_evidence_artifact_facts(
+            root, result, mode=mode, elapsed_seconds=time.monotonic() - started, live_after_command=len(live))
         return result, facts
 
 
 @unittest.skipIf(sys.platform != "linux", "Native evidence launcher isolation requires Linux CI")
 def test_gateway_native_evidence_launcher_isolated_success_control() -> None:
     completed, facts = _run_native_gateway_evidence_deadline("success")
-    assert completed.returncode == 17, completed.stderr
-    assert completed.stdout == "valid-looking-hash\n" and completed.stderr == ""
-    assert facts["calls"] == ["rollback"] and facts["live_after_command"] == 0
-    assert facts["backup_files"] == ["rollback.json"]
-    assert facts["receipt"] == b"possibly published receipt\n"
+    assert completed.returncode == 17, facts
+    assert completed.stdout == "valid-looking-hash\n" and completed.stderr == "", facts
+    assert facts["calls"] == ["rollback"] and facts["live_after_command"] == 0, facts
+    assert facts["backup_files"] == ["rollback.json"], facts
+    assert facts["receipt"] == b"possibly published receipt\n", facts
 
 
 @unittest.skipIf(sys.platform != "linux", "Native evidence deadline and ignored TERM require Linux CI")
@@ -2931,13 +3009,13 @@ def test_gateway_hung_evidence_writer_and_ignored_term_are_bounded_without_retry
     for mode, outcome in (("hang", "DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124"),
                           ("ignore_term", "FORCED_TERMINATION_OR_SIGKILL")):
         completed, facts = _run_native_gateway_evidence_deadline(mode)
-        assert completed.returncode == 17, completed.stderr
-        assert facts["elapsed_seconds"] < 4 and facts["live_after_command"] == 0
-        assert facts["calls"] == ["rollback"] and facts["backup_files"] == ["rollback.json"]
-        assert facts["receipt"] == b"possibly published receipt\n"
-        assert outcome in completed.stderr and "completion=UNKNOWN" in completed.stderr
-        assert "receipt persistence failed" in completed.stderr
-        assert completed.stdout == "valid-looking-hash\n"
+        assert completed.returncode == 17, facts
+        assert facts["elapsed_seconds"] < 4 and facts["live_after_command"] == 0, facts
+        assert facts["calls"] == ["rollback"] and facts["backup_files"] == ["rollback.json"], facts
+        assert facts["receipt"] == b"possibly published receipt\n", facts
+        assert outcome in completed.stderr and "completion=UNKNOWN" in completed.stderr, facts
+        assert "receipt persistence failed" in completed.stderr, facts
+        assert completed.stdout == "valid-looking-hash\n", facts
 
 
 @unittest.skipIf(sys.platform != "linux", "Native service launcher isolation requires Linux CI")
