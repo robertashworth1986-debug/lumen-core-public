@@ -433,12 +433,13 @@ fi
 require_safe_recovery_directory() {
   local directory="$1" private="${2:-false}" owner mode
   [[ -d "$directory" && ! -L "$directory" ]] || return 13
-  owner="$(stat -c '%u' "$directory")"
-  mode="$(stat -c '%a' "$directory")"
+  owner="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%u' "$directory")" || return 13
+  mode="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%a' "$directory")" || return 13
   [[ "$owner" == 0 && "$mode" =~ ^[0-7]{3,4}$ ]] || return 13
   (( (8#$mode & 0022) == 0 )) || return 13
   if [[ "$private" == true ]]; then
-    [[ "$(stat -c '%u:%g:%a' "$directory")" == "0:0:700" ]] || return 13
+    owner="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%u:%g:%a' "$directory")" || return 13
+    [[ "$owner" == "0:0:700" ]] || return 13
   fi
 }
 

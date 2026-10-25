@@ -6161,6 +6161,190 @@ def test_gateway_dropin_target_guard_keeps_approved_pin_before_forward_mutation(
     assert rollback.index("require_recovery_dropin_absent") < rollback.index("dropin_copy")
 
 
+def _gateway_directory_stat_fixture_timeout() -> str:
+    # A native timeout execs an external stat, not this deterministic shell stub.
+    # Keep this exact dispatch separate from the isolated Linux executable tests.
+    return r'''RECOVERY_TIMEOUT_BIN=fixture_directory_timeout
+fixture_directory_timeout() {
+  [[ $# -eq 7 && "$1 $2 $3 $4 $5" == '--signal=TERM --kill-after=5s 60s stat -c' ]] || return 91
+  case "$6" in '%u'|'%a'|'%u:%g:%a') ;; *) return 92 ;; esac
+  shift 3
+  "$@"
+}
+'''
+
+
+def _run_gateway_directory_stat_case(query: str = "", code: int = 0, *, private: bool = True,
+                                     bad_output: bool = False, rollback: bool = False,
+                                     fail_once: bool = False, receipt_code: int = 0) -> dict:
+    script = _repair_script()
+    with tempfile.TemporaryDirectory(prefix="gateway-directory-stat-") as directory:
+        root = Path(directory)
+        (root / "backup").mkdir()
+        (root / "backup/retained").write_bytes(b"previous evidence\n")
+        (root / "target").write_bytes(b"candidate\n")
+        harness = 'set -Eeuo pipefail\n' + _gateway_directory_stat_fixture_timeout() + r'''
+stat() {
+  [[ $# -eq 3 && "$1" == -c && "$3" == "$PWD/backup" ]] || return 93
+  printf '%s\n' "$2" >> "$PWD/stat.calls"
+  local value
+  case "$2" in '%u') value=0 ;; '%a') value=700 ;; '%u:%g:%a') value=0:0:700 ;; *) return 94 ;; esac
+  if [[ "$2" == "$FIXTURE_QUERY" && ( "$FIXTURE_ONCE" != true || ! -e "$PWD/failed.once" ) ]]; then
+    printf failed > "$PWD/failed.once"
+    if [[ "$FIXTURE_BAD_OUTPUT" == true ]]; then value=malformed; fi
+    printf '%s\n' "$value"
+    return "$FIXTURE_CODE"
+  fi
+  printf '%s\n' "$value"
+}
+'''
+        harness += _bash_function(script, "require_safe_recovery_directory") + "\n"
+        if rollback:
+            harness += r'''BACKUP_DIR="$PWD/backup" REPAIR_COMPLETE=false
+record_recovery_evidence() {
+  printf '%s:%s\n' "$1" "$2" >> "$PWD/evidence.calls"
+  return "$FIXTURE_RECEIPT_CODE"
+}
+bounded_recovery_systemctl() { printf 'UNEXPECTED_SERVICE\n' >> "$PWD/mutation.calls"; exit 99; }
+checked_restore_step() { printf 'UNEXPECTED_RESTORE\n' >> "$PWD/mutation.calls"; exit 99; }
+'''
+            harness += _bash_function(script, "rollback") + "\nrollback 17\n"
+        else:
+            # Match the conditional context in rollback, including disabled errexit.
+            harness += 'set +e\nif require_safe_recovery_directory "$PWD/backup" "$FIXTURE_PRIVATE"; then printf "ACCEPTED\\n"; else rc=$?; exit "$rc"; fi\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+            env=dict(os.environ, FIXTURE_QUERY=query, FIXTURE_CODE=str(code),
+                     FIXTURE_PRIVATE=str(private).lower(), FIXTURE_BAD_OUTPUT=str(bad_output).lower(),
+                     FIXTURE_ONCE=str(fail_once).lower(), FIXTURE_RECEIPT_CODE=str(receipt_code)),
+            capture_output=True, text=True, timeout=10, check=False)
+        return {"completed": completed,
+                "stat_calls": (root / "stat.calls").read_text().splitlines(),
+                "evidence_calls": (root / "evidence.calls").read_text().splitlines() if (root / "evidence.calls").exists() else [],
+                "mutation_calls": (root / "mutation.calls").read_text() if (root / "mutation.calls").exists() else "",
+                "backup": (root / "backup/retained").read_bytes(), "target": (root / "target").read_bytes()}
+
+
+def test_gateway_directory_stat_deadlines_refuse_failed_plausible_output() -> None:
+    queries = ["%u", "%a", "%u:%g:%a"]
+    for index, query in enumerate(queries):
+        for code in (1, 29, 124, 137):
+            facts = _run_gateway_directory_stat_case(query, code)
+            completed = facts["completed"]
+            assert completed.returncode == 13 and completed.stdout == "", (query, code, facts)
+            assert facts["stat_calls"] == queries[:index + 1]
+
+
+def test_gateway_directory_stat_deadlines_keep_positive_and_malformed_checks() -> None:
+    for private, calls in ((False, ["%u", "%a"]), (True, ["%u", "%a", "%u:%g:%a"])):
+        facts = _run_gateway_directory_stat_case(private=private)
+        assert facts["completed"].returncode == 0 and facts["completed"].stdout == "ACCEPTED\n", facts
+        assert facts["stat_calls"] == calls
+    for query in ("%u", "%a", "%u:%g:%a"):
+        facts = _run_gateway_directory_stat_case(query, bad_output=True)
+        assert facts["completed"].returncode == 13 and facts["completed"].stdout == "", facts
+
+
+def test_gateway_directory_stat_deadlines_preserve_rollback_trigger_and_no_mutation() -> None:
+    for query in ("%u", "%a", "%u:%g:%a"):
+        for code in (1, 29, 124, 137):
+            facts = _run_gateway_directory_stat_case(query, code, rollback=True)
+            assert facts["completed"].returncode == 17, facts
+            assert "ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE" in facts["completed"].stderr
+            assert "refusal receipt unavailable" in facts["completed"].stderr
+            assert facts["evidence_calls"] == [] and facts["mutation_calls"] == ""
+            assert facts["backup"] == b"previous evidence\n" and facts["target"] == b"candidate\n"
+
+
+def test_gateway_directory_stat_deadlines_refusal_receipt_does_not_replace_trigger() -> None:
+    for receipt_code in (0, 29, 137):
+        facts = _run_gateway_directory_stat_case("%a", 124, rollback=True, fail_once=True,
+                                                 receipt_code=receipt_code)
+        assert facts["completed"].returncode == 17 and facts["mutation_calls"] == "", facts
+        assert facts["stat_calls"] == ["%u", "%a", "%u", "%a", "%u:%g:%a"]
+        assert facts["evidence_calls"] == ["rollback_refused:17"]
+        assert ("refusal receipt unavailable" in facts["completed"].stderr) == bool(receipt_code)
+        assert facts["backup"] == b"previous evidence\n" and facts["target"] == b"candidate\n"
+
+
+def _run_native_gateway_directory_stat_deadline(query: str, mode: str) -> dict:
+    # Only the real guard and timeout preflight run; stat is a disposable fake.
+    script = _repair_script()
+    function = _bash_function(script, "require_safe_recovery_directory")
+    policy = '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s'
+    assert function.count(policy) == 3
+    function = function.replace(policy, '"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=0.2s 0.2s')
+    with tempfile.TemporaryDirectory(prefix="gateway-directory-stat-native-") as directory:
+        root = Path(directory)
+        (root / "backup").mkdir()
+        command = root / "stat"
+        command.write_text(r'''#!/bin/bash
+set -eu
+[[ $# -eq 3 && "$1" == -c && "$3" == "$PWD/backup" ]] || exit 91
+printf '%s\n' "$2" >> "$PWD/stat.calls"
+case "$2" in '%u') value=0 ;; '%a') value=700 ;; '%u:%g:%a') value=0:0:700 ;; *) exit 92 ;; esac
+if [[ "$2" == "$FIXTURE_QUERY" ]]; then
+  if [[ "$FIXTURE_MODE" == ignore_term ]]; then trap '' TERM; fi
+  /bin/cat "/proc/$BASHPID/stat" > "$PWD/stat.identity"
+  printf '%s\n' "$value"
+  if [[ "$FIXTURE_MODE" == success ]]; then exit 0; fi
+  while :; do :; done
+fi
+printf '%s\n' "$value"
+''', encoding="utf-8", newline="\n")
+        command.chmod(0o700)
+        harness = 'set -Eeuo pipefail\n' + _bash_function(script, "require_recovery_timeout") + '\nrequire_recovery_timeout\nPATH="$PWD:$PATH"\n'
+        harness += function + '\nset +e\nif require_safe_recovery_directory "$PWD/backup" true; then printf "ACCEPTED\\n"; else rc=$?; exit "$rc"; fi\n'
+        (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
+        started = time.monotonic()
+        live = []
+        try:
+            completed = subprocess.run([_gateway_rollback_test_bash(), "fixture.sh"], cwd=root,
+                env=dict(os.environ, FIXTURE_QUERY=query, FIXTURE_MODE=mode), capture_output=True,
+                text=True, timeout=5, check=False)
+        finally:
+            identity = root / "stat.identity"
+            if identity.exists():
+                original = identity.read_text()
+                pid = int(original.split(" ", 1)[0])
+                original_fields = original[original.rfind(")") + 2:].split()
+                try:
+                    current = Path(f"/proc/{pid}/stat").read_text()
+                except FileNotFoundError:
+                    current = ""
+                if current:
+                    fields = current[current.rfind(")") + 2:].split()
+                    if fields[19] == original_fields[19] and fields[0] != "Z":
+                        live.append(pid)
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+        facts = {"completed": completed, "elapsed_seconds": time.monotonic() - started,
+                 "live_after_command": len(live), "stat_calls": None}
+        assert (root / "stat.calls").exists(), facts
+        facts["stat_calls"] = (root / "stat.calls").read_text().splitlines()
+        return facts
+
+
+@unittest.skipIf(sys.platform != "linux", "Native directory stat success isolation requires Linux CI")
+def test_gateway_native_directory_stat_deadlines_success_control() -> None:
+    facts = _run_native_gateway_directory_stat_deadline("%u", "success")
+    assert facts["completed"].returncode == 0 and facts["completed"].stdout == "ACCEPTED\n", facts
+    assert facts["stat_calls"] == ["%u", "%a", "%u:%g:%a"] and facts["live_after_command"] == 0
+
+
+@unittest.skipIf(sys.platform != "linux", "Native directory stat hang and ignored TERM require Linux CI")
+def test_gateway_native_directory_stat_deadlines_hang_and_ignored_term() -> None:
+    queries = ["%u", "%a", "%u:%g:%a"]
+    for index, query in enumerate(queries):
+        for mode in ("hang", "ignore_term"):
+            facts = _run_native_gateway_directory_stat_deadline(query, mode)
+            assert facts["completed"].returncode == 13 and facts["completed"].stdout == "", facts
+            assert facts["stat_calls"] == queries[:index + 1] and facts["live_after_command"] == 0
+            assert facts["elapsed_seconds"] < 4
+
+
 def test_gateway_recovery_directory_requires_root_and_private_permissions() -> None:
     function = _bash_function(_repair_script(), "require_safe_recovery_directory")
     # The actual guard checks real fixture file types. Controlled stat responses
@@ -6186,7 +6370,7 @@ stat() {
   esac
 }
 '''
-        harness += function + '\nrequire_safe_recovery_directory "$1" "$2"\n'
+        harness += _gateway_directory_stat_fixture_timeout() + function + '\nrequire_safe_recovery_directory "$1" "$2"\n'
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
         for owner, mode, group, private, expected in cases:
             env = dict(os.environ, FIXTURE_UID=owner, FIXTURE_MODE=mode, FIXTURE_GID=group)
@@ -6241,7 +6425,7 @@ require_safe_recovery_directory() {
 install() { printf 'UNEXPECTED_INSTALL\n'; return 99; }
 mktemp() { printf 'UNEXPECTED_MKTEMP\n'; return 99; }
 '''
-        harness += directory_guard + "\n" + function + '\nprepare_recovery_directory\n'
+        harness += _gateway_directory_stat_fixture_timeout() + directory_guard + "\n" + function + '\nprepare_recovery_directory\n'
         (root / "fixture.sh").write_text(harness, encoding="utf-8", newline="\n")
         env = dict(os.environ, FIXTURE_UID=owner, FIXTURE_MODE=mode, FIXTURE_GID=group,
                    FIXTURE_ROOT="linked-root" if symlink else "unsafe-root")

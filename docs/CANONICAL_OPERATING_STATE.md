@@ -30,6 +30,25 @@ gate remains historical evidence. It does not resolve the separate backend holds
 
 ### October 21 local gateway recovery correction
 
+The October 25 recovery-directory stat increment advances the same outcome-2
+reviewer-evidence repair. Its three owner/mode queries now use the preflight-checked
+TERM-after-60-seconds and KILL-after-five-more-seconds policy, and require a
+successful command before comparing output. A failed query with plausible output
+cannot authorize the guard. Existing refusal code 13 and the original rollback
+trigger remain separate; initial refusal prevents service, lock and restoration
+mutations. A failed second directory guard can also prevent a refusal receipt;
+the helper retains the original failure and reports that evidence is unavailable.
+
+Disposable tests exercise the real conditional guard and rollback refusal path,
+including timeout-like failed output and refusal-receipt failure. Native controls
+use only an isolated fake stat executable, never production paths or services.
+At local preparation, independent review and exact-new-head hosted validation
+were pending. The initial shell directory/link observations remain outside the
+subprocess budget. Three metadata reads are not one atomic identity snapshot;
+privileged/check-to-use races, aggregate recovery timing, uninterruptible I/O,
+earlier partial restoration and later external-postcheck recovery remain limits.
+This does not establish production readiness or external validation.
+
 The October 25 local control-read increment advances the same outcome-2
 reviewer-evidence repair. Five rollback state and ownership-metadata reads now
 use fixed selectors through the existing evidence process, with its validated
