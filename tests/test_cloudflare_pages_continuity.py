@@ -51,7 +51,10 @@ def make_release_repo(tmp_path: Path):
         path = repo / repo_path
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(f"committed-{index}\n".encode("ascii"))
-    git(repo, "add", "--", *BUILDER.release.RELEASE_PATHS)
+    packager = repo / "code/deploy/package_public_site_release.py"
+    packager.parent.mkdir(parents=True, exist_ok=True)
+    packager.write_text("RELEASE_PATHS = " + repr(BUILDER.release.RELEASE_PATHS) + "\n")
+    git(repo, "add", "--", *BUILDER.release.RELEASE_PATHS, str(packager))
     git(repo, "commit", "--quiet", "-m", "pages fixture")
     commit = git(repo, "rev-parse", "HEAD").decode("ascii").strip()
     return repo, commit
@@ -86,10 +89,19 @@ def test_preview_uses_pinned_blobs_and_byte_identical_route_aliases(tmp_path):
     assert payload["schema"] == "lumencore.cloudflare_pages_preview_manifest.v1"
     assert payload["deployment_state"] == "NOT_DEPLOYED"
     assert payload["source_commit"] == commit
-    assert payload["source_file_count"] == 43
+    assert payload["source_file_count"] == len(BUILDER.release.RELEASE_PATHS)
     assert payload["alias_count"] == 2
-    assert payload["file_count"] == 45
+    assert payload["file_count"] == len(expected_paths)
     assert payload == json.loads(manifest.read_text(encoding="utf-8"))
+    assert len(payload["files"]) == payload["source_file_count"]
+    assert {entry["repo_path"] for entry in payload["files"]} == set(BUILDER.release.RELEASE_PATHS)
+    for entry in payload["files"]:
+        body = git(repo, "show", f"{commit}:{entry['repo_path']}")
+        assert (output / entry["path"]).read_bytes() == body
+        assert entry["bytes"] == len(body)
+        assert entry["sha256"] == hashlib.sha256(body).hexdigest()
+        assert entry["git_blob_oid"] == git(repo, "rev-parse", f"{commit}:{entry['repo_path']}").decode().strip()
+        assert entry["source"] == "git_blob"
     for alias in payload["aliases"]:
         assert alias["sha256"] == hashlib.sha256(
             (output / alias["path"]).read_bytes()
@@ -143,3 +155,37 @@ def test_continuity_guide_keeps_dns_and_deployment_as_separate_approval_steps():
     assert "Cloudflare Pages continuity package" in guide
     assert "does not deploy" in guide
     assert "preserve the existing Zoho mail records" in guide
+
+
+def test_preview_membership_is_pinned_not_loaded_or_dirty_allowlist(tmp_path, monkeypatch):
+    repo, commit = make_release_repo(tmp_path)
+    (repo / "code/deploy/package_public_site_release.py").write_text("raise RuntimeError('do not execute')\n")
+    monkeypatch.setattr(BUILDER.release, "RELEASE_PATHS", ("dashboard/not-in-source.html",))
+    payload = BUILDER.build_pages_preview(
+        repo_root=repo, source_commit=commit,
+        output_dir=tmp_path / "pages", manifest_path=tmp_path / "manifest.json",
+    )
+    pinned = BUILDER.release.release_paths_at_commit(repo, commit)
+    assert {entry["repo_path"] for entry in payload["files"]} == set(pinned)
+    assert payload["source_file_count"] == len(pinned)
+
+
+@pytest.mark.parametrize("definition", [
+    "RELEASE_PATHS = tuple(['dashboard/operator_home.html'])",
+    "RELEASE_PATHS = ('dashboard/operator_home.html',)\nRELEASE_PATHS = ()",
+    "RELEASE_PATHS = ('dashboard/../private.txt',)",
+    "RELEASE_PATHS = ('dashboard/missing.html',)",
+])
+def test_preview_rejects_invalid_pinned_membership_without_partial_output(tmp_path, definition):
+    repo, _ = make_release_repo(tmp_path)
+    packager = repo / "code/deploy/package_public_site_release.py"
+    packager.write_text(definition + "\n")
+    git(repo, "add", str(packager))
+    git(repo, "commit", "--quiet", "-m", "invalid membership")
+    commit = git(repo, "rev-parse", "HEAD").decode().strip()
+    output, manifest = tmp_path / "pages", tmp_path / "manifest.json"
+    with pytest.raises(BUILDER.PagesPreviewError):
+        BUILDER.build_pages_preview(repo_root=repo, source_commit=commit,
+                                    output_dir=output, manifest_path=manifest)
+    assert not output.exists()
+    assert not manifest.exists()

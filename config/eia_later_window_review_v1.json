@@ -1,0 +1,19 @@
+{
+  "schema": "eia_later_window_review_plan.v1",
+  "recorded_before_scoring": "2026-09-21",
+  "original_plan": "config/eia_constraint_replay_review_v1.json",
+  "new_input": "evidence/reproducibility/eia_daily_20260713_20260908_selected.json.gz",
+  "new_input_sha256": "edafa88d9e6e3ac336a36768d0f929d04814c5813d9f8f79fc48085d5489812c",
+  "uncompressed_sha256": "0efacdb1ded9a08dfa11b7fb6041679f4abc37b0e5bd2cdbfb4e4c57ffde913b",
+  "input_origin": "Recovered September9 official EIA API snapshot from existing LumenCore frozen-delta site; no new network collection.",
+  "holdout_start": "2026-07-13",
+  "holdout_end": "2026-09-08",
+  "selection": "Repeat exact original training/development selection and final training+development fit; no refit on 2026labels. Keep selected candidate unchanged. Only extend historical input and change holdout reporting window.",
+  "reporting": "Retain all six baselines, every available authority and month, original primary MASE comparisons and all original promotion gates. Supplemental MAE/WAPE/p95 are descriptive. No new subgroup tuning or claims of multiplicity-corrected independent evidence.",
+  "interpretation": [
+    "Additional historical temporal test of fixed original model, not untouched evidence: this same later archive was previously analyzed using other models.",
+    "EIA DF is a descriptive archival comparator. Official instructions page9 permit business forecasts that differ from physical-demand scope; no matched operational-incumbent claim.",
+    "Calendar-before-target features do not prove publication-before-issue availability. Values can be revised.",
+    "No energy, cost, revenue, field-validation, independent-validation or production-promotion claim."
+  ]
+}

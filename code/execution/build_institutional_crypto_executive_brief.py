@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -32,12 +33,24 @@ def _f(value, default: float = 0.0) -> float:
         return float(default)
 
 
-def _fmt_usd(value: float) -> str:
-    return f"${value:,.0f}"
+def _optional_number(value) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return number if not isinstance(value, bool) and math.isfinite(number) else None
 
 
-def _fmt_pct(value: float) -> str:
-    return f"{value * 100.0:,.2f}%"
+def _fmt_usd(value: float | None) -> str:
+    number = _optional_number(value)
+    return "Unknown" if number is None else f"${number:,.0f}"
+
+
+def _fmt_pct(value: float | None) -> str:
+    number = _optional_number(value)
+    if number is None or not math.isfinite(number * 100.0):
+        return "Unknown"
+    return f"{number * 100.0:,.2f}%"
 
 
 def build_markdown(report: dict, status: dict, hashes: dict) -> str:
@@ -46,7 +59,7 @@ def build_markdown(report: dict, status: dict, hashes: dict) -> str:
     event = audit.get("last_event", {})
     seed = _f(report.get("seed_request", {}).get("active_initial_cash_usd"), 0.0)
     equity = _f(portfolio.get("equity_usd"), 0.0)
-    ret = _f(portfolio.get("return_pct"), 0.0)
+    ret = portfolio.get("return_pct")
 
     lines = [
         "# Institutional Crypto Paper - Executive Brief",
@@ -61,8 +74,10 @@ def build_markdown(report: dict, status: dict, hashes: dict) -> str:
         f"- Cash: {_fmt_usd(_f(portfolio.get('cash_usd'), 0.0))}",
         f"- Gross Position Value: {_fmt_usd(_f(portfolio.get('gross_position_value_usd'), 0.0))}",
         f"- Realized PnL: {_fmt_usd(_f(portfolio.get('realized_pnl_usd'), 0.0))}",
-        f"- Unrealized PnL: {_fmt_usd(_f(portfolio.get('unrealized_pnl_usd'), 0.0))}",
+        f"- Unrealized PnL: {_fmt_usd(portfolio.get('unrealized_pnl_usd'))}",
         f"- Return Since Seed: {_fmt_pct(ret)}",
+        "- Paper/model results. Return is Unknown when external cash flows are unreconciled.",
+        "- Unrealized PnL is Unknown when it was not captured in the account snapshot.",
         "",
         "## Decision Audit",
         f"- Regime: {audit.get('regime', 'n/a')}",
@@ -129,12 +144,18 @@ def build_pdf(report: dict, status: dict, hashes: dict) -> str:
         f"Cash: {_fmt_usd(_f(portfolio.get('cash_usd'), 0.0))}",
         f"Gross Position Value: {_fmt_usd(_f(portfolio.get('gross_position_value_usd'), 0.0))}",
         f"Realized PnL: {_fmt_usd(_f(portfolio.get('realized_pnl_usd'), 0.0))}",
-        f"Unrealized PnL: {_fmt_usd(_f(portfolio.get('unrealized_pnl_usd'), 0.0))}",
-        f"Return Since Seed: {_fmt_pct(_f(portfolio.get('return_pct'), 0.0))}",
+        f"Unrealized PnL: {_fmt_usd(portfolio.get('unrealized_pnl_usd'))}",
+        f"Return Since Seed: {_fmt_pct(portfolio.get('return_pct'))}",
     ]
     for row in rows:
         c.drawString(48, y, row)
         y -= 14
+
+    c.setFont("Helvetica", 8)
+    c.drawString(48, y, "Paper/model results; return is Unknown when external cash flows are unreconciled.")
+    y -= 12
+    c.drawString(48, y, "Unrealized PnL is Unknown when it was not captured in the account snapshot.")
+    y -= 12
 
     y -= 10
     c.setFillColor(colors.HexColor("#D8B46B"))

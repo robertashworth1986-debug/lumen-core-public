@@ -1,6 +1,6 @@
 {
   "schema": "geometry_championship_v1_registry",
-  "version": 1,
+  "version": 2,
   "evidence_boundary": "Research registry only. A family is not a finding until its lane-specific promotion gate passes on frozen validation scenarios.",
   "core_rule": "No geometry is sacred until it wins. Every pattern must compete. Every champion must be frozen. Every claim must be measurable.",
   "cross_lane_ranking_allowed": false,
@@ -134,6 +134,32 @@
         "condition_delta",
         "output_sensitivity"
       ]
+    },
+    "ideal_gravity_descent": {
+      "baselines": [
+        "straight_incline",
+        "circular_arc",
+        "numerical_time_optimization"
+      ],
+      "metrics": [
+        "descent_time",
+        "endpoint_residual",
+        "quadrature_convergence",
+        "runtime_ms"
+      ]
+    },
+    "visualization_and_evidence_navigation": {
+      "baselines": [
+        "plain_points",
+        "uniform_sphere",
+        "flat_table_or_list"
+      ],
+      "metrics": [
+        "formula_residual",
+        "render_cost",
+        "export_integrity",
+        "reviewer_task_completion"
+      ]
     }
   },
   "families": [
@@ -143,7 +169,12 @@
       "lane": "mission_network_routing",
       "status": "legacy_analogue_only",
       "located_source": "C:/LumaQuantLab/CANONICAL_RESEARCH_STACK_20260324T043204Z/current/scripts/luma_v2_pipeline.py",
-      "located_result": "Negative portfolio result; ranked last in V2, V3, and V4. No routing implementation."
+      "located_result": "Negative portfolio result; ranked last in V2, V3, and V4. No routing implementation.",
+      "aliases": [
+        "mycelium",
+        "fungus network",
+        "fungal network"
+      ]
     },
     {
       "id": "slime_mold_routing",
@@ -173,7 +204,12 @@
       "id": "flower_of_life_hexagonal_packing",
       "label": "Flower of Life or hexagonal packing",
       "lane": "packing_topology",
-      "status": "concept_only"
+      "status": "concept_only",
+      "aliases": [
+        "honeycomb",
+        "hexagonal tiling",
+        "Flower of Life circle-packing motif"
+      ]
     },
     {
       "id": "non_euclidean_geodesics",
@@ -228,7 +264,13 @@
       "id": "vascular_lung_branching",
       "label": "Vascular or lung branching",
       "lane": "branching_transport",
-      "status": "specification_only"
+      "status": "specification_only",
+      "aliases": [
+        "branching tree",
+        "tree-inspired transport",
+        "bronchial branching"
+      ],
+      "claim_boundary": "Branching-network research. The symbolic Tree of Life has no single universally governing equation."
     },
     {
       "id": "termite_mound_ventilation",
@@ -248,6 +290,82 @@
       "lane": "time_series_model_routing",
       "status": "legacy_transform_only",
       "located_result": "Exploratory flowform transforms exist, but no leakage-resistant lane-specific promotion run has passed."
+    },
+    {
+      "id": "brachistochrone_cycloid",
+      "label": "Brachistochrone / cycloidal descent",
+      "lane": "ideal_gravity_descent",
+      "status": "specification_only",
+      "claim_boundary": "Cycloid minimizes descent time only for the declared ideal uniform-gravity, frictionless point-mass problem; not a universal shortest or fastest signal route.",
+      "added_utc": "2026-10-04",
+      "legacy_name_reference": "code/institutional_harmonic_suite.py: ff_brachistochrone is a time-series weighting transform, not a gravity-descent or signal-transport implementation."
+    },
+    {
+      "id": "sunflower_phyllotaxis",
+      "label": "Sunflower / phyllotactic packing",
+      "lane": "packing_topology",
+      "status": "specification_only",
+      "claim_boundary": "A point-placement rule inspired by phyllotaxis; no automatic transport, energy or communications advantage.",
+      "added_utc": "2026-10-04"
+    },
+    {
+      "id": "voronoi_partition",
+      "label": "Voronoi partitions",
+      "lane": "packing_topology",
+      "status": "specification_only",
+      "claim_boundary": "Nearest-site partition under a specified metric; performance depends on task and site placement.",
+      "added_utc": "2026-10-04"
+    },
+    {
+      "id": "platonic_solids",
+      "label": "Platonic solids",
+      "lane": "packing_topology",
+      "status": "visualization_only",
+      "claim_boundary": "Five regular convex polyhedra, not a complete or experimentally established list of shapes making up reality.",
+      "added_utc": "2026-10-04",
+      "members": [
+        "tetrahedron",
+        "cube",
+        "octahedron",
+        "dodecahedron",
+        "icosahedron"
+      ]
+    },
+    {
+      "id": "gyroid_nodal_surface",
+      "label": "Gyroid nodal approximation",
+      "lane": "packing_topology",
+      "status": "visualization_only",
+      "claim_boundary": "The trigonometric zero level set is an approximation, not an exact minimal gyroid or a flow/thermal result.",
+      "added_utc": "2026-10-04",
+      "located_source": "dashboard/bounded-light/observatory/geometry.mjs"
+    },
+    {
+      "id": "hopf_fibers",
+      "label": "Projected Hopf fibers",
+      "lane": "visualization_and_evidence_navigation",
+      "status": "visualization_only",
+      "claim_boundary": "Finite stereographic projections of selected S3 fibers; linking does not establish signal transmission or quantum behavior.",
+      "added_utc": "2026-10-04",
+      "located_source": "dashboard/bounded-light/observatory/geometry.mjs"
+    },
+    {
+      "id": "trefoil_tube",
+      "label": "Trefoil tube",
+      "lane": "visualization_and_evidence_navigation",
+      "status": "visualization_only",
+      "claim_boundary": "A sampled tube around a (2,3) torus knot; shape construction is separate from physical flow.",
+      "added_utc": "2026-10-04",
+      "located_source": "dashboard/bounded-light/observatory/geometry.mjs"
+    },
+    {
+      "id": "superformula_shell",
+      "label": "Superformula shell",
+      "lane": "visualization_and_evidence_navigation",
+      "status": "visualization_only",
+      "claim_boundary": "Parametric shell derived from Gielis curves; no mechanics or material optimization is established.",
+      "added_utc": "2026-10-04",
+      "located_source": "dashboard/bounded-light/observatory/geometry.mjs"
     }
   ],
   "promotion_gate": {
@@ -262,5 +380,7 @@
     "sha256_manifest": true,
     "negative_results_retained": true,
     "independent_or_representative_validation_required_for_operational_claim": true
-  }
+  },
+  "updated_utc": "2026-10-04",
+  "catalog_boundary": "26 candidate families across 11 task lanes; this is a catalog expansion, not 26 validated geometries or a new performance champion. Five Platonic solids are members of one family, not five additional experiments."
 }

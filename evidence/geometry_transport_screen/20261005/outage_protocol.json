@@ -1,0 +1,23 @@
+{
+  "schema": "lumencore.synthetic_resistor_outage_continuation.v1",
+  "source_commit_before_change": "e7e16954f27308c19f308e2e78a74eee0edb3bb0",
+  "historical_result": "evidence/geometry_transport_screen/20261004/results.json",
+  "historical_result_sha256": "640509d22c7347826b5ac931a2135d60679fcca8981a648c5fa708352835910d",
+  "claim_level": "internal_synthetic_screening_only",
+  "promotion_gate_passed": false,
+  "purpose": "Complete the existing screen's missing post-single-wire-outage conductance calculation; verify numerical optimization against direct grounded solves.",
+  "primary_metric_unchanged": "original all-pairs mean effective conductance before faults; new outage metrics remain secondary",
+  "graph_policy": "All eight prior graph definitions and coordinates unchanged; randomized Kruskal seed 20261005; no topology selection or tuning.",
+  "physical_policy": "Steady ideal DC with original wire cross-section/resistivity fixed after removal. Deleted conductor material lost; no reallocation.",
+  "denominator": "All 2016 original unordered terminal pairs for every deletion; disconnected pairs contribute zero conductance.",
+  "fault_weighting": "Exhaust each original edge once; equal deletion weight is descriptive, not a physical failure probability.",
+  "comparison_policy": "Six identical-terminal layouts compared only within that group. Honeycomb/sunflower remain different-embedding exploratory records.",
+  "validation": "Every outage compared to independent direct grounded component solves; absolute mean-conductance error <=1e-9; each pair non-increasing conductance within numerical tolerance; exact small-circuit and scale-law tests.",
+  "runtime_policy": "Three paired passes of full eight-layout outage analysis including baseline solves, graph construction excluded equally; retain each duration and descriptive median ratio. Same machine, no hardware-general speed claim.",
+  "stopping_rule": "One exhaustive run over fixed eight layouts, correctness tests and three timing passes; no outcome-driven additional geometry search.",
+  "limitations": [
+    "Retrospective continuation of a known synthetic scenario, not a new holdout or independent preregistration.",
+    "No frequency, time propagation, signal loss, thermal effects, finite wire/junction geometry, node/correlated failures, healing or reliability probability.",
+    "Does not complete 26-family performance championship or validate physical hardware."
+  ]
+}

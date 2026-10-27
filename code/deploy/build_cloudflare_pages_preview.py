@@ -59,6 +59,7 @@ def build_pages_preview(
 
     try:
         resolved_commit = release._resolve_commit(repo_root, source_commit)
+        release_paths = release.release_paths_at_commit(repo_root, resolved_commit)
     except release.ReleasePackageError as exc:
         raise PagesPreviewError(str(exc)) from exc
 
@@ -69,7 +70,7 @@ def build_pages_preview(
     files: list[dict[str, object]] = []
     bodies: dict[str, bytes] = {}
     try:
-        for repo_path in release.RELEASE_PATHS:
+        for repo_path in release_paths:
             archive_name = release.archive_name(repo_path)
             try:
                 blob_oid, body = release._read_commit_blob(

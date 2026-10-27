@@ -141,6 +141,14 @@ The standard-library verifier additionally fails closed when:
 Default resource budgets are 1 MiB for the capsule JSON, 512 MiB per referenced
 artifact, and 1 GiB across the complete manifest. They may be raised explicitly by
 a reviewer; they are resource-safety limits, not evidence-quality thresholds.
+API byte budgets must be positive integers; booleans and non-finite or fractional
+numbers are rejected before file reads. Each artifact is checked against the
+remaining aggregate budget before opening and while hashing. Read requests are
+limited to the remaining allowance plus one byte to detect growth; an empty
+artifact remains valid when the aggregate allowance is exactly exhausted.
+Malformed Unicode surrogate text fails with a structured validation error.
+These checks do not provide an operating-system sandbox or an atomic snapshot
+of a filesystem being modified by another process.
 
 The v3 manifest hash is the SHA-256 digest of canonical JSON containing
 `manifest_format`, `input_hashes`, and `output_hashes`. Input/output roles are therefore

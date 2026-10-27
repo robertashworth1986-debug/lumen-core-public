@@ -1,9 +1,9 @@
 {
   "schema": "lumencore.external_technical_review_packet.v1",
-  "generated_at_utc": "2026-08-12T05:14:44Z",
+  "generated_at_utc": "2026-10-14T16:50:04Z",
   "status": "MEETING_PREP_READY_NO_DUPLICATE_SEND",
   "source_config": "config/external_technical_review_packet_v1.json",
-  "source_config_sha256": "3e54119174134d4953b8d43e3322f48a7aefdfb46a6efbf6b600e3ab8f73e4e4",
+  "source_config_sha256": "a9d2a6e385f227e387adc9d88d1d77e71d474b2878492c8a6a5cb14fd32ad71f",
   "template_config_sha256": "0cfbda7dfd68aff39eab6a07676b0b44b13fb4455a0530fb3b3663f05a19e148",
   "claim_boundary": "This packet supports a bounded technical review. It does not establish attendance, endorsement, investment interest, independent validation, field performance, realized savings, product acceptance, partnership, funding, or valuation.",
   "controls": {
@@ -24,14 +24,14 @@
     "requested_outcome": "A written recommendation naming the strongest first buyer, the narrowest valuable problem, the incumbent baseline, the acceptance metric, the evidence still missing, and one practical next introduction or experiment."
   },
   "summary": {
-    "evidence_asset_count": 11,
+    "evidence_asset_count": 44,
     "public_surface_count": 7,
     "demo_surface_count": 1,
     "degraded_surface_count": 0,
     "reviewer_question_count": 7,
     "assurance_scenario_count": 6,
     "active_targeting_allowed": false,
-    "known_gap_count": 6,
+    "known_gap_count": 10,
     "duplicate_invite_blocked": true
   },
   "evidence_assets": [
@@ -47,8 +47,8 @@
     {
       "path": "docs/PROOF_CAPSULE_SCHEMA.md",
       "purpose": "Proof Capsule field, hash, and verification contract.",
-      "bytes": 8389,
-      "sha256": "a9a6aeafbcef4a7386070c069a9bc71b0a9891e16372c8df0beda81cbc09f973",
+      "bytes": 8981,
+      "sha256": "c291967c831818ee490a8d2bbe8aadb45610b7b4688f3f9847245d492b4b928a",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -65,8 +65,8 @@
     {
       "path": "code/proof_capsule_verifier.py",
       "purpose": "Local verifier used to inspect capsule integrity.",
-      "bytes": 37092,
-      "sha256": "1213f995ab87bb371452296e95f9213a64e5d5e3cb8b52d61979563c35997351",
+      "bytes": 38540,
+      "sha256": "49e263e5e577870cf2362ff7c389c935f6daa968177834c5d015758c66c98be8",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -119,8 +119,8 @@
     {
       "path": "dashboard/build_week/prooflock_console/THREAT_MODEL.md",
       "purpose": "ProofLock trust assumptions, covered attacks, authority boundary, and non-guarantees.",
-      "bytes": 2548,
-      "sha256": "13995a40cf5e1ef7dfcee3d9995a31cb4fa9c07ec9a86c5334079473bda16388",
+      "bytes": 3436,
+      "sha256": "fe03218ebe40a3125028e973eff854267d51cc0d21ed21ac666968eae12a9a8f",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -130,6 +130,303 @@
       "purpose": "Retained first-party deployment, rollback, 43-of-43 exact live-byte, and read-only audit receipt for the named static release only.",
       "bytes": 4548,
       "sha256": "d70224cc048de288540f1b04bb75ca5cef3ec01756ef9e965e559269f2ae1930",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "docs/REVIEWER_START_HERE.md",
+      "purpose": "Current-source reproduction route, dated repair scope and remaining gates.",
+      "bytes": 31209,
+      "sha256": "36581b6a7ff09238bf77cca6a7c003676264cc9ebd5e578aa235bb3cd5eeed4e",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "docs/FORECAST_EVALUATION_V2_REVIEW.md",
+      "purpose": "Versioned calendar-keyed review of precomputed forecasts; synthetic fixture remains HOLD.",
+      "bytes": 4376,
+      "sha256": "a3c2a0e1602c0af062e6355b8abe5e6370277f5ac372286a19967c1e1ba66c4d",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_execution_accounting_regressions.py",
+      "purpose": "Synthetic trading causality, risk sizing and append-only ledger regressions.",
+      "bytes": 28990,
+      "sha256": "32daff111d1e6dd841f225c4a528abe3ef1e48e190d84e1f7c40f7267d2fa84f",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_prooflock_canonicalization_parity.py",
+      "purpose": "Actual JavaScript/Python receipt serialization parity and strict raw-input checks.",
+      "bytes": 9435,
+      "sha256": "3b6acfb15c2df4443897668737f8653f34a8bad1caaae1f8828f022de125d903",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/order_safety_gate.py",
+      "purpose": "Closed private-endpoint policy; unknown and mutating routes reject before signed transport.",
+      "bytes": 3731,
+      "sha256": "e86074d6b1b3c76817103fd36250d461c518abf24d3152202272da8bae8ab30f",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/alpaca_paper_executor.py",
+      "purpose": "Paper-only facade; ambiguous mutation failures are not automatically replayed.",
+      "bytes": 7293,
+      "sha256": "51460b6c0870b1f173d47c1680884ce88b3323f65a199f0115cba8cbc0069401",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/forecast_evaluation_v2.py",
+      "purpose": "Bounded forecast evaluator with structured malformed/oversized CSV rejection.",
+      "bytes": 18888,
+      "sha256": "bd91cacc1212b6f93944333b3ff535990d3c41966a7ec8568f98433e58e863c5",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/operator_api_access.py",
+      "purpose": "HTTP/WebSocket operator authorization with malformed-token rejection.",
+      "bytes": 9944,
+      "sha256": "9079694f63a235c5cf8e007d7dd263c1ca05854f669c237b6c8ff7ac5e135854",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_order_safety_gate.py",
+      "purpose": "Private endpoint and validate-only policy adversarial fixtures.",
+      "bytes": 7650,
+      "sha256": "29eeb6393d5ee29b07025bb8cc3257a61acd96d98d23a1aeb9406fbbe9d5ab2a",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_order_safety_facades.py",
+      "purpose": "Mocked Kraken facade tests proving disallowed requests do not reach transport.",
+      "bytes": 8764,
+      "sha256": "92801e7fc8fda30ada38b47d7b468d8a6274315666547e35216fdb91745ca530",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_order_safety_alpaca_paper_boundary.py",
+      "purpose": "Paper-only host boundary and lost-response mutation-retry fixtures.",
+      "bytes": 7377,
+      "sha256": "9fc28549279515195fe1686635ec225d1c8058683fb77e965bd7b4dfd5132e2a",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_forecast_evaluation_v2.py",
+      "purpose": "Calendar/as-of review and malformed CSV CLI/API rejection fixtures.",
+      "bytes": 31859,
+      "sha256": "e5fe13e9477e0fc2b5223ad0b8e0c0694d543ca0d272d806d9416e89189f4e6a",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/dashboard_unified_refresh.py",
+      "purpose": "Local dashboard provenance, explicit enablement, modeled economics and process-owner lock checks.",
+      "bytes": 47289,
+      "sha256": "12ac84f58169b03c49129fd69aa0a485cd2c413d78b229aada54da40f2eedf3f",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "dashboard/js/live_registry_bridge.js",
+      "purpose": "Browser bridge distinguishes report values and poll attempts from unverified source freshness.",
+      "bytes": 5508,
+      "sha256": "e67dd705ea93b03e580bab4fd52d66da1060758217ce1ad323fa0a83bbae035f",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/trade_ledger.py",
+      "purpose": "Canonical append-only ledger with verified CSV projection recovery.",
+      "bytes": 10418,
+      "sha256": "ebdfff90601ff21e71224c2c0736e6bcf42c88825738c4fb0a6c7a67f8ef8001",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/capital_engine_core.py",
+      "purpose": "Causal spot-return accounting, impossible-return rejection and shared closed-candle validation.",
+      "bytes": 10547,
+      "sha256": "3a76fc57f7d370d1f856350b9864b039dc3a6724749d23a60c732a02bb56ce81",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_dashboard_metric_provenance.py",
+      "purpose": "Offline wrapper, modeled-value, unknown-liveness and lock-ownership counterexamples.",
+      "bytes": 10642,
+      "sha256": "3e4efbe4b2b630bf71dc7bcf6e52b4b1df0ac4165fe3d84bf94ca95f64bcbc66",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_live_registry_bridge.py",
+      "purpose": "Delivered browser JavaScript exercised using Node VM and mocked fetch/DOM.",
+      "bytes": 8125,
+      "sha256": "84aacacbb12fc9468ff6f07480a9c2b0ca931fd8461860880e56087483ca5bd4",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/rolling_capital_engine.py",
+      "purpose": "Closed-candle and receipt-time freshness checks before the rolling research screen.",
+      "bytes": 3063,
+      "sha256": "a816b91aae3566efae058f0a6a9b8021e634edda6d6683eb155fc1885d1b97c2",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/rolling_capital_engine_multi.py",
+      "purpose": "Shared closed-candle validation and stale recommendation clearing in the multi-source research screen.",
+      "bytes": 4339,
+      "sha256": "c5fe62572892baf5bcd79b182079f69efb8576ed937a188dd7a82b3221e9280b",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/multi_exchange_paper_ticker.py",
+      "purpose": "Confirmed paper-fill accounting and persisted unresolved-intent submission block; no real-order authority.",
+      "bytes": 148173,
+      "sha256": "437f73c47549ca2f2d3a625fbc4c38b1d5d6b9c5bce654fce51177edfd95bffe",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_alpaca_paper_fill_accounting.py",
+      "purpose": "Offline accepted/unfilled, ambiguous transport, restart and accounting failure counterexamples.",
+      "bytes": 19974,
+      "sha256": "1a4689cf947a25f695fed9c3e62fe7200e68392c7fe94c4727b1de1ed24f6e2b",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/ops/assert_runtime_safety.py",
+      "purpose": "Literal paper-mode and explicit boolean flags with strict JSON loading.",
+      "bytes": 2201,
+      "sha256": "dd6339d1521666e435fcc601fc4badb4a5be470b2d6b366ab54fc0e086235528",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_production_repairs.py",
+      "purpose": "Runtime startup and existing paper execution repair regressions.",
+      "bytes": 15923,
+      "sha256": "145985c953cd2df370b1c26e2974461f2169309906c1123fdcf014a2f9fda716",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/ops/audit_paper_accounting.py",
+      "purpose": "Strict microsecond UTC ledger timestamps and typed event validation.",
+      "bytes": 6019,
+      "sha256": "04479fc0ca472ba94503f7f19f0e720d86a701bd08a9abd864887c56874a6948",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_evidence_denominator_and_paper_audits.py",
+      "purpose": "Paper cash/position reconciliation fixtures and timestamp precision counterexamples.",
+      "bytes": 11305,
+      "sha256": "a612eb9aa781b950dda6529617576e1002837f0828c109f7d029724f0fd68948",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/ops/probe_public_health.py",
+      "purpose": "Exact minimal public JSON contract and bounded health timestamp validation.",
+      "bytes": 17472,
+      "sha256": "3cca61428ba8127d2baa41f8e145089cd4db320cabb38a54dd4d4151230d1ad2",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_public_health_probe.py",
+      "purpose": "Offline malformed, stale, future, duplicate and extra-field observer tests.",
+      "bytes": 18718,
+      "sha256": "aaa8b008d4cfa79af4a1ba0d03c6f3347601a29fba8155a0dcf05d63cba8d5ed",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_rolling_research_boundary.py",
+      "purpose": "Offline fixtures proving fresh, stale, legacy and HOLD rolling files do not promote execution preferences.",
+      "bytes": 5057,
+      "sha256": "185c0b75778d9c210f70bdb59c30bb76092ff744f4c808b2be9bf816b9ff2c9f",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/build_institutional_crypto_paper_dashboard.py",
+      "purpose": "Unknown or unreconciled return values remain unknown in the existing paper dashboard.",
+      "bytes": 76545,
+      "sha256": "d000c02eb9d97075e2569bdc0134ddd5e0ceb9424520e864694d8ec37c6c95a6",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/build_institutional_crypto_executive_brief.py",
+      "purpose": "Unknown unrealized profit and unreconciled return values remain unknown in the paper brief.",
+      "bytes": 8491,
+      "sha256": "ca7eaa6ca1670bd68c7c320d76ebabce18209f8999724e79d3d91aff14edebea",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "tests/test_paper_report_display.py",
+      "purpose": "Offline display checks preserving unknown and negative paper accounting values.",
+      "bytes": 5658,
+      "sha256": "300e9b0add7c7d6062cebb01ad3c9e38628f1849b61e290535758b6d3b0dc8bb",
+      "required_status": null,
+      "observed_status": null,
+      "claim_boundary": null
+    },
+    {
+      "path": "code/execution/live_executor.py",
+      "purpose": "Active fail-closed facade prevents rolling research preferences while preserving the historical implementation bytes.",
+      "bytes": 3494,
+      "sha256": "7397f09caa498de532edae75ea4666bba47ecff875b776e4a10b623050e5211b",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -298,8 +595,8 @@
         "expected_blue_control": "Strict parsing, allowlisted roles, path containment, and resource budgets fail closed.",
         "pass_condition": "Every adversarial fixture is rejected without converting malformed input into a passing capsule.",
         "boundary": "Parser rejection is software assurance, not field validation, authorship proof, or safety certification.",
-        "test_bytes": 19388,
-        "test_sha256": "aaa4c04dfb724ee524aa0fd6eaec8efc0911fb6ea22acb5ad6dcec3733272ce3",
+        "test_bytes": 28337,
+        "test_sha256": "25f517ccbb35947b61ffdb1263cf3aea6ced3f0bf129bd8a423bbb0d99930463",
         "verification_command": "python -m pytest -q tests/test_proof_capsule_verifier.py"
       },
       {
@@ -334,8 +631,8 @@
         "expected_blue_control": "The gateway defaults to deny, validates the runtime bearer, minimizes public status, and rejects ambiguous credentials.",
         "pass_condition": "Unauthorized requests cannot reach protected operator functionality.",
         "boundary": "Local integration tests do not establish production identity-provider integration, penetration-test completion, or certification.",
-        "test_bytes": 13216,
-        "test_sha256": "30b86823394959e1be55aff899116e6e67939b25a7816689deba8e66c342052a",
+        "test_bytes": 30189,
+        "test_sha256": "0bf13d5e7dac168d061dd83198944f85c3a927e1790bc9decb0118739ee27e96",
         "verification_command": "python -m pytest -q tests/test_operator_api_access.py"
       },
       {
@@ -376,6 +673,10 @@
     "No fit is found; record why and close the lane without implying endorsement."
   ],
   "known_gaps": [
+    "The October 14 continuation binds source and test hashes for private-order, ambiguous-retry, mounted authorization, timestamp/scale, ledger recovery, dashboard provenance, closed-candle screening, literal paper startup, strict health observation and paper-fill intent repairs. It does not refresh separately dated live observations, create an outside review result or authorize paid review terms. Frozen scientific results and historical deployment receipts remain unchanged.",
+    "Historical infrastructure builders use assumed gains and dollar rates, and the provider simulator uses assumed failures. Current local dashboard outputs now retain modeled/report-only labels and unverified source observations; this does not convert historical displays into measured savings or revenue. Historical tournaments outside repaired engines retain selection/accounting limitations.",
+    "Current-source tests use offline synthetic controls. Pending, partial and ambiguous paper orders require operator reconciliation; immediate confirmed fills remain gross of fees. Actual broker records, fees/spread/slippage, partial-order recovery, net account reconciliation, daily risk, sustained data freshness, external producer coordination and buyer workload scalability still require bounded evidence before promotion.",
+    "The versioned forecast-review fixture is synthetic and diagnostic/HOLD. Trading repairs have local synthetic checks only; after-fee prospective paper reconciliation and accepted risk controls remain required. The minimal gateway profile does not establish full legacy provider closure or production runtime parity.",
     "Only point-in-time HTTP 200 and minimal-contract observations exist for /health and /api/public/status; the recovery cause, sustained uptime, end-to-end dependency health, and parity for gateway, runtime, and later repository commits remain unestablished.",
     "The earlier August 10 legacy-route observation is superseded for named static release 1ce7c35975a4011fa844e8b39ccbc950c8c0f398 by its retained first-party deployment and audit receipt, which recorded all 43 allowlisted files including the eight noindex HOLD stubs as exact live-byte matches. That receipt is bounded to the named static release and does not establish external validation, runtime parity, sustained availability, or broader production authorization.",
     "The reproducibility receipts are first-party or operator-controlled, not independent external validation.",

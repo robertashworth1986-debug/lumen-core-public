@@ -19,6 +19,8 @@ LOCAL_HEALTH_URL="${LUMENCORE_LOCAL_HEALTH_URL:-http://127.0.0.1:8787/health}"
 PUBLIC_HEALTH_URL="${LUMENCORE_PUBLIC_HEALTH_URL:-https://lumen-core.ai/health}"
 LOCAL_STATUS_URL="${LUMENCORE_LOCAL_STATUS_URL:-http://127.0.0.1:8787/api/public/status}"
 PUBLIC_STATUS_URL="${LUMENCORE_PUBLIC_STATUS_URL:-https://lumen-core.ai/api/public/status}"
+LOCAL_GATEWAY_BASE_URL="${LUMENCORE_LOCAL_GATEWAY_BASE_URL:-http://127.0.0.1:8787}"
+PUBLIC_GATEWAY_BASE_URL="${LUMENCORE_PUBLIC_GATEWAY_BASE_URL:-https://lumen-core.ai}"
 EXPECTED_BUNDLE_SHA="${LUMENCORE_EXPECTED_GATEWAY_BUNDLE_SHA256:-}"
 EXPECTED_HARDENING_SHA="${LUMENCORE_EXPECTED_GATEWAY_HARDENING_SHA256:-}"
 SOURCE_COMMIT="${LUMENCORE_GATEWAY_SOURCE_COMMIT:-}"
@@ -34,6 +36,40 @@ REPAIR_COMPLETE=false
 STAGE_DIR=""
 BACKUP_DIR=""
 HARDENING_FILE=""
+RECOVERY_ROOT="/var/backups/lumencore-gateway-repair"
+RECOVERY_MANIFEST_SHA=""
+RECOVERY_TIMEOUT_BIN=""
+RECOVERY_SERVICE_RESULTS=""
+RECOVERY_SERVICE_FAILURE=""
+RECOVERY_RESTORE_ATTEMPTED=false
+RECOVERY_RESTORE_FAILURE=""
+RECOVERY_RESTORE_EXIT_CODE=0
+RECOVERY_RESTORE_TARGET=""
+RECOVERY_MUTATION_FAILURE=""
+RECOVERY_MUTATION_TARGET=""
+RECOVERY_MUTATION_EXIT_CODE=0
+RECOVERY_ADMISSION_STATUS=NOT_STARTED
+RECOVERY_ADMISSION_ORIGIN_NS=""
+RECOVERY_ADMISSION_DEADLINE_NS=""
+RECOVERY_ADMISSION_LAST_NS=""
+RECOVERY_ADMISSION_OPERATION=""
+RECOVERY_ADMISSION_TARGET=""
+RECOVERY_ADMISSION_CLOCK_EXIT_CODE=0
+RECOVERY_CLOCK_NOW_NS=""
+RECOVERY_EVIDENCE_VALIDATED=false
+RECOVERY_TERMINAL_ATTEMPTED=false
+RECOVERY_DROPIN_RESULT=NOT_CHECKED
+RECOVERY_RUNTIME_DIRECTORY_RESULT=NOT_CHECKED
+RECOVERY_DROPIN_DIRECTORY_RESULT=NOT_CHECKED
+DROPIN_WRITE_STATE=UNTOUCHED
+DROPIN_TARGET_VERSION=""
+DROPIN_DIR_WRITE_STATE=UNTOUCHED
+DROPIN_DIR_TARGET_VERSION=""
+DROPIN_DIR_CANDIDATE_METADATA="0:0:755"
+RUN_WRITE_STATE=UNTOUCHED
+RUN_TARGET_VERSION=""
+RUN_CANDIDATE_METADATA=""
+declare -A SOURCE_WRITE_STATES=() SOURCE_CANDIDATE_SHA=() SOURCE_TARGET_VERSION=() SOURCE_RESULT_STATES=()
 
 # This list is the recursively resolved local-Python import closure of the
 # reviewed gateway entrypoint. Keep it explicit so a partial copy cannot be
@@ -61,6 +97,16 @@ BUNDLE_FILES=(
   "universe_v2_fetchers.py"
 )
 
+# These exact anonymous probes close the reviewer-visible introspection surface.
+# Query-string cache busters do not affect path matching in the ASGI boundary.
+PROTECTED_OPERATOR_HTTP_PATHS=(
+  "/metrics"
+  "/openapi.json"
+  "/docs"
+  "/redoc"
+)
+PROTECTED_OPERATOR_WEBSOCKET_PATH="/ws"
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -81,8 +127,12 @@ stops only luma-gateway, installs the exact files and a bounded systemd drop-in,
 migrates only the gateway run directory to lumencore:lumencore mode 750,
 removes only a verified dead-PID singleton lock, and restores source files,
 service configuration, runtime-directory metadata, and prior service state on
-failure unless identity, lock, source parity, and all four public/local JSON
-contracts pass.
+failure unless identity, lock, source parity, all four public/local JSON
+contracts, every anonymous HTTP introspection boundary, and the anonymous
+WebSocket upgrade boundary pass.
+Private recovery files and hash-bound receipts remain under
+/var/backups/lumencore-gateway-repair after every exit, including helper success.
+Their presence does not establish verified restoration or external verification.
 EOF
 }
 
@@ -280,13 +330,26 @@ fi
   exit 9
 }
 for required_command in \
-  systemctl curl install cp stat mktemp id getent chown chmod dirname rmdir \
-  awk seq sleep tr; do
+  systemctl curl install cp rm stat mktemp id getent chown chmod dirname rmdir \
+  awk grep seq sleep tr; do
   command -v "$required_command" >/dev/null 2>&1 || {
     echo "ERROR: $required_command is required" >&2
     exit 10
   }
 done
+require_recovery_timeout() {
+  # Resolve a real GNU executable before any forward runtime mutation. The
+  # recovery deadline is fixed code policy, never an environment override.
+  RECOVERY_TIMEOUT_BIN="$(type -P timeout)" || return 10
+  [[ -x "$RECOVERY_TIMEOUT_BIN" ]] || return 10
+  local version
+  version="$("$RECOVERY_TIMEOUT_BIN" --version)" || return 10
+  [[ "$version" == 'timeout (GNU coreutils)'* ]] || return 10
+}
+require_recovery_timeout || {
+  echo "ERROR: GNU timeout is required before gateway mutation" >&2
+  exit 10
+}
 [[ "$TARGET_ROOT" == "/opt/lumencore/code" \
   && "$STACK_ROOT" == "/opt/lumencore" \
   && "$PYTHON_BIN" == "/opt/lumencore/.venv/bin/python" \
@@ -300,7 +363,9 @@ done
   && "$LOCAL_HEALTH_URL" == "http://127.0.0.1:8787/health" \
   && "$PUBLIC_HEALTH_URL" == "https://lumen-core.ai/health" \
   && "$LOCAL_STATUS_URL" == "http://127.0.0.1:8787/api/public/status" \
-  && "$PUBLIC_STATUS_URL" == "https://lumen-core.ai/api/public/status" ]] || {
+  && "$PUBLIC_STATUS_URL" == "https://lumen-core.ai/api/public/status" \
+  && "$LOCAL_GATEWAY_BASE_URL" == "http://127.0.0.1:8787" \
+  && "$PUBLIC_GATEWAY_BASE_URL" == "https://lumen-core.ai" ]] || {
   echo "ERROR: apply target, service, lock, runtime, or probe identity is not approved" >&2
   exit 11
 }
@@ -338,6 +403,9 @@ getent group "$SERVICE_GROUP" >/dev/null || {
   echo "ERROR: required gateway service group does not exist" >&2
   exit 13
 }
+RUN_CANDIDATE_METADATA="${service_uid}:$(id -g "$SERVICE_USER"):750"
+[[ "$RUN_CANDIDATE_METADATA" =~ ^[0-9]+:[0-9]+:750$ ]] || exit 13
+
 [[ -x "$PYTHON_BIN" ]] || {
   echo "ERROR: gateway Python runtime is not executable" >&2
   exit 13
@@ -372,9 +440,1252 @@ else
   }
 fi
 
+require_safe_recovery_directory() {
+  local directory="$1" private="${2:-false}" owner mode
+  [[ -d "$directory" && ! -L "$directory" ]] || return 13
+  owner="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%u' "$directory")" || return 13
+  mode="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%a' "$directory")" || return 13
+  [[ "$owner" == 0 && "$mode" =~ ^[0-7]{3,4}$ ]] || return 13
+  (( (8#$mode & 0022) == 0 )) || return 13
+  if [[ "$private" == true ]]; then
+    owner="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%u:%g:%a' "$directory")" || return 13
+    [[ "$owner" == "0:0:700" ]] || return 13
+  fi
+}
+
+prepare_recovery_directory() {
+  local directory
+  for directory in / /var /var/backups; do
+    require_safe_recovery_directory "$directory" || return 13
+  done
+  if [[ -e "$RECOVERY_ROOT" || -L "$RECOVERY_ROOT" ]]; then
+    require_safe_recovery_directory "$RECOVERY_ROOT" true || return 13
+  else
+    install -d -o root -g root -m 0700 -- "$RECOVERY_ROOT"
+  fi
+  [[ "$(realpath -e -- "$RECOVERY_ROOT")" == "$RECOVERY_ROOT" ]] || return 13
+  require_safe_recovery_directory "$RECOVERY_ROOT" true || return 13
+  BACKUP_DIR="$(mktemp -d "$RECOVERY_ROOT/recovery.XXXXXXXXXX")"
+  require_safe_recovery_directory "$BACKUP_DIR" true || return 13
+  printf 'Private gateway recovery directory: %s\n' "$BACKUP_DIR"
+}
+
+record_recovery_evidence() {
+  local kind="${1:-}" trigger_code="${2:-0}" requested_source="${3:-}"
+  [[ $# -ge 1 && $# -le 3 ]] || return 14
+  case "$kind" in
+    prepared|helper|rollback|verify|rollback_refused|source_state|source_result|dropin_result|runtime_directory_result|dropin_directory_result|control_state|control_metadata|restore_dropin|restore_source) ;;
+    *) return 14 ;;
+  esac
+  [[ "$kind" != restore_dropin || ( $# -eq 2 && "$trigger_code" == 0 ) ]] || return 14
+  [[ "$kind" != restore_source || ( $# -eq 3 && "$trigger_code" == 0 ) ]] || return 14
+  [[ "$kind" != dropin_result || $# -eq 2 ]] || return 14
+  [[ "$kind" != runtime_directory_result || $# -eq 2 ]] || return 14
+  [[ "$kind" != dropin_directory_result || $# -eq 2 ]] || return 14
+  if [[ "$kind" == control_state || "$kind" == control_metadata ]]; then
+    [[ $# -eq 3 && "$trigger_code" == 0 ]] || return 14
+    case "$kind:$requested_source" in
+      control_state:service_drop_in|control_state:service_drop_in_directory|control_state:run_directory|control_metadata:service_drop_in_directory|control_metadata:run_directory) ;;
+      *) return 14 ;;
+    esac
+  fi
+  local source_states="" source_relative evidence_rc=0 evidence_outcome
+  for source_relative in "${BUNDLE_FILES[@]}"; do
+    source_states+="$source_relative:${SOURCE_WRITE_STATES[$source_relative]:-UNKNOWN}:${SOURCE_CANDIDATE_SHA[$source_relative]:-}:${SOURCE_TARGET_VERSION[$source_relative]:-}:${SOURCE_RESULT_STATES[$source_relative]:-NOT_CHECKED}"$'\n'
+  done
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    python3 - "$BACKUP_DIR" "$kind" "$trigger_code" "$SOURCE_COMMIT" \
+    "$BUNDLE_SHA" "$HARDENING_SHA" "$RECOVERY_MANIFEST_SHA" \
+    "${RECOVERY_SERVICE_RESULTS:-}" "${RECOVERY_SERVICE_FAILURE:-}" \
+    "${RECOVERY_RESTORE_ATTEMPTED:-false}" "${RECOVERY_RESTORE_FAILURE:-}" \
+    "${RECOVERY_RESTORE_EXIT_CODE:-0}" "${RECOVERY_RESTORE_TARGET:-}" "$requested_source" "$source_states" "$TARGET_ROOT" \
+    "$SERVICE_DROP_IN" "${RECOVERY_DROPIN_RESULT:-NOT_CHECKED}" \
+    "$RUN_DIR" "${RECOVERY_RUNTIME_DIRECTORY_RESULT:-NOT_CHECKED}" \
+    "$SERVICE_DROP_IN_DIR" "${RECOVERY_DROPIN_DIRECTORY_RESULT:-NOT_CHECKED}" \
+    "${DROPIN_WRITE_STATE:-UNKNOWN}" "${DROPIN_TARGET_VERSION:-}" \
+    "${RUN_WRITE_STATE:-UNKNOWN}" "${RUN_TARGET_VERSION:-}" "${RUN_CANDIDATE_METADATA:-}" \
+    "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" "${DROPIN_DIR_TARGET_VERSION:-}" "${DROPIN_DIR_CANDIDATE_METADATA:-}" \
+    "${RECOVERY_MUTATION_FAILURE:-}" "${RECOVERY_MUTATION_TARGET:-}" "${RECOVERY_MUTATION_EXIT_CODE:-0}" \
+    "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" "${RECOVERY_ADMISSION_ORIGIN_NS:-}" \
+    "${RECOVERY_ADMISSION_DEADLINE_NS:-}" "${RECOVERY_ADMISSION_LAST_NS:-}" \
+    "${RECOVERY_ADMISSION_OPERATION:-}" "${RECOVERY_ADMISSION_TARGET:-}" \
+    "${RECOVERY_ADMISSION_CLOCK_EXIT_CODE:-0}" "${BUNDLE_FILES[@]}" <<'PY' || evidence_rc=$?
+import hashlib
+import json
+import os
+import re
+import stat
+import sys
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+directory = Path(sys.argv[1])
+kind, trigger_code, source, bundle, hardening, expected_manifest = sys.argv[2:8]
+service_results, service_failure, restore_attempted = sys.argv[8:11]
+restore_failure, restore_exit_code, restore_target = sys.argv[11:14]
+requested_source, source_states, target_root = sys.argv[14:17]
+dropin_target, dropin_result = sys.argv[17:19]
+runtime_directory_target, runtime_directory_result = sys.argv[19:21]
+dropin_directory_target, dropin_directory_result = sys.argv[21:23]
+dropin_write_state, dropin_target_version = sys.argv[23:25]
+run_write_state, run_target_version, run_candidate_metadata = sys.argv[25:28]
+dropin_dir_write_state, dropin_dir_target_version, dropin_dir_candidate_metadata = sys.argv[28:31]
+mutation_failure, mutation_target, mutation_exit_code = sys.argv[31:34]
+admission_status, admission_origin, admission_deadline, admission_last = sys.argv[34:38]
+admission_operation, admission_target, admission_clock_code = sys.argv[38:41]
+relatives = sys.argv[41:]
+query_kinds = {"source_state", "source_result", "restore_source"}
+control_files = dict([
+    (("control_state", "service_drop_in"), "service-drop-in.state"),
+    (("control_state", "service_drop_in_directory"), "service-drop-in-dir.state"),
+    (("control_state", "run_directory"), "run-dir.state"),
+    (("control_metadata", "service_drop_in_directory"), "service-drop-in-dir.metadata"),
+    (("control_metadata", "run_directory"), "run-dir.metadata"),
+])
+control_kinds = {"control_state", "control_metadata"}
+if kind not in {"prepared", "helper", "rollback", "verify", "rollback_refused", "dropin_result", "runtime_directory_result", "dropin_directory_result", "restore_dropin"} | query_kinds | control_kinds:
+    raise SystemExit("invalid_recovery_receipt_kind")
+if ((kind in query_kinds and requested_source not in relatives)
+        or (kind in control_kinds and (kind, requested_source) not in control_files)
+        or (kind not in query_kinds | control_kinds and requested_source)):
+    raise SystemExit("invalid_recovery_source_query")
+if not re.fullmatch(r"[0-9a-f]{40}", source) or any(
+    not re.fullmatch(r"[0-9a-f]{64}", value) for value in (bundle, hardening)
+):
+    raise SystemExit("invalid_recovery_source_binding")
+if (not directory.is_dir() or directory.is_symlink()
+        or directory.resolve(strict=True) != directory.absolute()
+        or any(parent.is_symlink() for parent in directory.parents)):
+    raise SystemExit("unsafe_recovery_directory")
+
+def inventory(relative, capture=False, *, root=directory, capture_limit=None):
+    if not isinstance(relative, str) or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative) or any(
+        part in {"", ".", ".."} for part in relative.split("/")
+    ):
+        raise SystemExit("unsafe_recovery_inventory_path")
+    path = root / relative
+    for parent in path.parents:
+        if parent == root:
+            break
+        if parent.is_symlink() or not parent.is_dir():
+            raise SystemExit("unsafe_recovery_parent")
+    info = path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+        raise SystemExit("unsafe_recovery_file")
+    if capture_limit is not None and info.st_size > capture_limit:
+        raise SystemExit(14)
+    def identity(value):
+        return (value.st_dev, value.st_ino, value.st_mode, value.st_nlink,
+                value.st_uid, value.st_gid, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
+    digest = hashlib.sha256()
+    chunks = []
+    captured_bytes = 0
+    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    with os.fdopen(descriptor, "rb") as stream:
+        if identity(os.fstat(stream.fileno())) != identity(info):
+            raise SystemExit("recovery_file_changed_during_read")
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+            if capture:
+                captured_bytes += len(chunk)
+                if capture_limit is not None and captured_bytes > capture_limit:
+                    raise SystemExit(14)
+                chunks.append(chunk)
+        xattrs_sha256 = None
+        if os.name == "posix" and hasattr(os, "listxattr"):
+            attributes = [(name, os.getxattr(stream.fileno(), name).hex())
+                          for name in sorted(os.listxattr(stream.fileno()))]
+            xattrs_sha256 = hashlib.sha256(json.dumps(attributes).encode()).hexdigest()
+        if os.name == "posix":
+            os.fsync(stream.fileno())
+        if identity(os.fstat(stream.fileno())) != identity(info) or identity(path.lstat()) != identity(info):
+            raise SystemExit("recovery_file_changed_during_read")
+    entry = dict(path=relative, sha256=digest.hexdigest(), bytes=info.st_size,
+                 uid=info.st_uid, gid=info.st_gid, mode=format(stat.S_IMODE(info.st_mode), "04o"),
+                 mtime_ns=info.st_mtime_ns, xattrs_sha256=xattrs_sha256)
+    return (entry, b"".join(chunks)) if capture else entry
+
+def restore_dropin_from_capture(prepared):
+    # Fixed prior-present object only. The prepared manifest was authenticated
+    # above; no caller can supply a source/destination or copy flags.
+    expected = next((item for item in prepared["files"] if item["path"] == "service-drop-in.before"), None)
+    state_expected = next((item for item in prepared["files"] if item["path"] == "service-drop-in.state"), None)
+    state_entry, state_raw = inventory("service-drop-in.state", capture=True, capture_limit=128)
+    if state_entry != state_expected or state_raw != b"present\n" or expected is None:
+        raise SystemExit("dropin_capture_requires_prepared_present")
+    path = Path(dropin_target)
+    if path.parent != Path(dropin_directory_target):
+        raise SystemExit("unsafe_dropin_capture_destination")
+    restore_file_from_capture(expected, path, directory, "service-drop-in.before")
+
+
+def restore_source_from_capture(prepared):
+    # Only the fixed bundle selector is accepted. No caller provides paths/flags.
+    if (requested_source not in relatives
+            or not re.fullmatch(r"[A-Za-z0-9_/.-]+", requested_source)
+            or any(part in {"", ".", ".."} for part in requested_source.split("/"))
+            or requested_source in prepared["missing_source_files"]):
+        raise SystemExit("invalid_source_capture_selector")
+    name = "existing/" + requested_source
+    expected = next((item for item in prepared["files"] if item["path"] == name), None)
+    if expected is None:
+        raise SystemExit("source_capture_requires_prepared_present")
+    root = Path(target_root)
+    if not root.is_absolute() or any(part in {".", ".."} for part in root.parts):
+        raise SystemExit("unsafe_source_capture_root")
+    path = root / requested_source
+    backup = directory / name
+    restore_file_from_capture(expected, path, backup.parent, backup.name, source_root=root)
+
+
+def restore_file_from_capture(expected, path, source_parent, source_name, *, source_root=None):
+    # Internal mechanics shared by the fixed drop-in and allowlisted source
+    # adapters. Full pinned inventory validation precedes either adapter.
+    if type(expected.get("bytes")) is not int or expected["bytes"] < 0:
+        raise SystemExit("invalid_dropin_capture_length")
+    required = ("O_NOFOLLOW", "O_DIRECTORY", "O_TMPFILE", "fchown", "fchmod",
+                "listxattr", "getxattr", "setxattr", "removexattr", "pread")
+    if (os.name != "posix" or any(not hasattr(os, name) for name in required)
+            or os.open not in os.supports_dir_fd or os.stat not in os.supports_dir_fd
+            or os.stat not in os.supports_follow_symlinks or os.utime not in os.supports_fd):
+        raise SystemExit("dropin_capture_platform_capability_unavailable")
+    if (not path.is_absolute() or any(part in {".", ".."} for part in path.parts)):
+        raise SystemExit("unsafe_recovery_capture_destination")
+    descriptors = []
+
+    def held_open(*args, **kwargs):
+        descriptor = os.open(*args, **kwargs)
+        descriptors.append(descriptor)
+        return descriptor
+
+    def directory_identity(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid)
+
+    def open_chain(parent):
+        if not parent.is_absolute() or any(part in {".", ".."} for part in parent.parts):
+            raise SystemExit("unsafe_dropin_capture_parent")
+        descriptor = held_open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        chain = [(descriptor, None, "/", directory_identity(os.fstat(descriptor)))]
+        for component in parent.parts[1:]:
+            previous = descriptor
+            descriptor = held_open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=previous)
+            chain.append((descriptor, previous, component, directory_identity(os.fstat(descriptor))))
+        return descriptor, chain
+
+    def check_chain(chain):
+        for descriptor, parent_fd, component, identity in chain:
+            current = os.stat(component, dir_fd=parent_fd, follow_symlinks=False)
+            if directory_identity(current) != identity or directory_identity(os.fstat(descriptor)) != identity:
+                raise SystemExit("dropin_capture_parent_changed")
+
+    def identity(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+                info.st_gid, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+    def write_all(descriptor, data):
+        view = memoryview(data)
+        while view:
+            written = os.write(descriptor, view)
+            if written <= 0:
+                raise OSError("dropin_capture_short_write")
+            view = view[written:]
+
+    def read_descriptor(descriptor, relative, sink=None):
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size != expected["bytes"]:
+            raise SystemExit("dropin_capture_size_or_type_changed")
+        digest = hashlib.sha256()
+        offset = 0
+        while True:
+            chunk = os.pread(descriptor, min(1024 * 1024, expected["bytes"] - offset + 1), offset)
+            if not chunk:
+                break
+            offset += len(chunk)
+            if offset > expected["bytes"]:
+                raise SystemExit("dropin_capture_overflow")
+            digest.update(chunk)
+            if sink is not None:
+                write_all(sink, chunk)
+        if offset != expected["bytes"]:
+            raise SystemExit("dropin_capture_truncated")
+        attributes = [(name, os.getxattr(descriptor, name)) for name in sorted(os.listxattr(descriptor))]
+        attr_digest = hashlib.sha256(json.dumps([(name, value.hex()) for name, value in attributes]).encode()).hexdigest()
+        if identity(os.fstat(descriptor)) != identity(before):
+            raise SystemExit("dropin_capture_changed_during_read")
+        entry = dict(path=relative, sha256=digest.hexdigest(), bytes=offset, uid=before.st_uid,
+                     gid=before.st_gid, mode=format(stat.S_IMODE(before.st_mode), "04o"),
+                     mtime_ns=before.st_mtime_ns, xattrs_sha256=attr_digest)
+        return entry, attributes, before
+
+    try:
+        backup_fd, backup_chain = open_chain(directory)
+        source_parent_fd, source_chain = open_chain(source_parent)
+        parent_fd, parent_chain = open_chain(path.parent)
+        protected = [backup_fd, source_parent_fd, parent_fd,
+                     parent_chain[-2][0] if len(parent_chain) > 1 else parent_fd]
+        if source_root is not None:
+            # Protect every nested destination/source ancestor under the fixed
+            # roots, not only the immediate parent. System ancestors may have
+            # different owners; their no-follow identities are still checked.
+            for chain, parent, root in ((source_chain, source_parent, directory),
+                                        (parent_chain, path.parent, source_root)):
+                for index, ancestor in enumerate(list(reversed(parent.parents)) + [parent]):
+                    if ancestor == root or root in ancestor.parents:
+                        protected.append(chain[index][0])
+        for descriptor in protected:
+            info = os.fstat(descriptor)
+            if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
+                raise SystemExit("unsafe_dropin_capture_parent_permissions")
+        # Anonymous, private descriptor staging: unsupported filesystems fail
+        # before target creation; no named temporary file or fallback is used.
+        staged = held_open(".", os.O_TMPFILE | os.O_RDWR, 0o600, dir_fd=backup_fd)
+        source_fd = held_open(source_name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=source_parent_fd)
+        captured, attributes, source_info = read_descriptor(source_fd, expected["path"], staged)
+        if captured != expected or identity(os.stat(source_name, dir_fd=source_parent_fd, follow_symlinks=False)) != identity(source_info):
+            raise SystemExit("dropin_capture_does_not_match_prepared")
+        os.fsync(staged)
+        # Revalidate descriptor/path ancestry immediately before exclusive create.
+        # This is not a claim of atomic protection from privileged later renames.
+        check_chain(backup_chain)
+        check_chain(source_chain)
+        check_chain(parent_chain)
+        target_fd = held_open(path.name, os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_RDWR, 0o600, dir_fd=parent_fd)
+        target_identity = (os.fstat(target_fd).st_dev, os.fstat(target_fd).st_ino)
+        offset = 0
+        while offset < expected["bytes"]:
+            chunk = os.pread(staged, min(1024 * 1024, expected["bytes"] - offset), offset)
+            if not chunk:
+                raise SystemExit("dropin_staging_truncated")
+            write_all(target_fd, chunk)
+            offset += len(chunk)
+        # Ownership first (it may clear security attributes), then mode and the
+        # exact captured xattr set, including ACL/security namespaces. Any missing
+        # capability or failed operation is fatal; never silently degrade metadata.
+        os.fchown(target_fd, source_info.st_uid, source_info.st_gid)
+        os.fchmod(target_fd, stat.S_IMODE(source_info.st_mode))
+        wanted = dict(attributes)
+        for name in os.listxattr(target_fd):
+            if name not in wanted:
+                os.removexattr(target_fd, name)
+        for name, value in attributes:
+            os.setxattr(target_fd, name, value)
+        # atime is observed here for preservation, but is not authenticated by the
+        # existing inventory; this is not a universal cp -a equivalence claim.
+        os.utime(target_fd, ns=(source_info.st_atime_ns, source_info.st_mtime_ns))
+        os.fsync(target_fd)
+        restored, _, _ = read_descriptor(target_fd, expected["path"])
+        if restored != expected:
+            raise SystemExit("dropin_capture_result_mismatch")
+        observed = os.stat(path.name, dir_fd=parent_fd, follow_symlinks=False)
+        if ((observed.st_dev, observed.st_ino) != target_identity
+                or identity(observed) != identity(os.fstat(target_fd))):
+            raise SystemExit("dropin_capture_target_replaced")
+        check_chain(parent_chain)
+        os.fsync(parent_fd)
+    finally:
+        # Never unlink a destination on failure: it may be partial or replaced.
+        # Closing held descriptors also discards only the anonymous staging inode.
+        active_failure = sys.exc_info()[0] is not None
+        close_failure = None
+        for descriptor in reversed(descriptors):
+            try:
+                os.close(descriptor)
+            except OSError as error:
+                if close_failure is None:
+                    close_failure = error
+        if close_failure is not None and not active_failure:
+            raise close_failure
+
+payload = dict(schema="lumencore.gateway_private_recovery.v1", kind=kind,
+               generated_utc=datetime.now(timezone.utc).isoformat(), source_commit=source,
+               bundle_sha256=bundle, hardening_sha256=hardening,
+               trigger_exit_code=int(trigger_code), restoration_verified=False,
+               external_verification="NOT_RECORDED_BY_HELPER")
+if kind in {"helper", "rollback", "rollback_refused"}:
+    if dropin_result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        raise SystemExit("invalid_dropin_result_observation")
+    if (dropin_write_state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+            or (dropin_target_version and not re.fullmatch(r"[0-9a-f]{64}", dropin_target_version))
+            or (dropin_result == "UNCHECKED_UNTOUCHED" and dropin_write_state != "UNTOUCHED")
+            or (dropin_result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                and dropin_write_state != "INSTALLED")):
+        raise SystemExit("invalid_dropin_write_state_record")
+    payload["dropin_write_state"] = dict(state=dropin_write_state, candidate_sha256=hardening,
+                                        installed_version_sha256=dropin_target_version or None)
+    payload["dropin_result_observation"] = dropin_result
+    if runtime_directory_result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        raise SystemExit("invalid_runtime_directory_result_observation")
+    if (run_write_state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+            or (run_target_version and not re.fullmatch(r"[0-9a-f]{64}", run_target_version))
+            or (run_candidate_metadata and not re.fullmatch(r"[0-9]+:[0-9]+:750", run_candidate_metadata))
+            or (runtime_directory_result == "UNCHECKED_UNTOUCHED" and run_write_state != "UNTOUCHED")
+            or (runtime_directory_result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                and run_write_state != "INSTALLED")):
+        raise SystemExit("invalid_runtime_directory_write_state_record")
+    payload["runtime_directory_write_state"] = dict(state=run_write_state,
+        candidate_metadata=run_candidate_metadata or None, installed_version_sha256=run_target_version or None)
+    payload["runtime_directory_result_observation"] = runtime_directory_result
+    if dropin_directory_result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        raise SystemExit("invalid_dropin_directory_result_observation")
+    if (dropin_dir_write_state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+            or (dropin_dir_target_version and not re.fullmatch(r"[0-9a-f]{64}", dropin_dir_target_version))
+            or dropin_dir_candidate_metadata != "0:0:755"
+            or (dropin_directory_result == "UNCHECKED_UNTOUCHED" and dropin_dir_write_state != "UNTOUCHED")
+            or (dropin_directory_result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                and dropin_dir_write_state != "INSTALLED")):
+        raise SystemExit("invalid_dropin_directory_write_state_record")
+    payload["dropin_directory_write_state"] = dict(state=dropin_dir_write_state,
+        candidate_metadata=dropin_dir_candidate_metadata, installed_version_sha256=dropin_dir_target_version or None)
+    payload["dropin_directory_result_observation"] = dropin_directory_result
+    states = []
+    for row in source_states.splitlines():
+        fields = row.split(":")
+        if len(fields) != 5 or fields[0] not in relatives:
+            raise SystemExit("invalid_source_write_state_record")
+        relative, state, candidate, version, result = fields
+        if (state not in {"UNTOUCHED", "WRITE_PENDING", "INSTALLED", "UNKNOWN"}
+                or (candidate and not re.fullmatch(r"[0-9a-f]{64}", candidate))
+                or (version and not re.fullmatch(r"[0-9a-f]{64}", version))
+                or result not in {"NOT_CHECKED", "UNCHECKED_UNTOUCHED", "FAILED",
+                                  "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}
+                or (result in {"FAILED", "MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"} and state != "INSTALLED")
+                or (result == "UNCHECKED_UNTOUCHED" and state != "UNTOUCHED")):
+            raise SystemExit("invalid_source_write_state_record")
+        states.append(dict(path=relative, state=state, candidate_sha256=candidate or None,
+                           installed_version_sha256=version or None,
+                           restoration_result_observation=result))
+    if [item["path"] for item in states] != relatives:
+        raise SystemExit("invalid_source_write_state_inventory")
+    payload["source_write_states"] = states
+def expected_backup_inventory():
+    if len(set(relatives)) != len(relatives) or any(
+        not re.fullmatch(r"[A-Za-z0-9_/.-]+", item) or
+        any(part in {"", ".", ".."} for part in item.split("/")) for item in relatives
+    ):
+        raise SystemExit("invalid_recovery_file_allowlist")
+    missing_file = directory / "missing-before.txt"
+    missing_rows = inventory("missing-before.txt", capture=True)[1].decode().splitlines() if missing_file.exists() else []
+    missing = set(missing_rows)
+    if len(missing) != len(missing_rows) or not missing.issubset(relatives):
+        raise SystemExit("invalid_missing_file_inventory")
+    names = ["service-drop-in.state", "service-drop-in-dir.state", "run-dir.state", "service.state"]
+    for relative in relatives:
+        backup = directory / "existing" / relative
+        if relative in missing:
+            if backup.exists() or backup.is_symlink():
+                raise SystemExit("contradictory_missing_file_inventory")
+        else:
+            names.append("existing/" + relative)
+    if missing_file.exists():
+        names.append("missing-before.txt")
+    for state_name, snapshot in (
+        ("service-drop-in", "service-drop-in.before"),
+        ("service-drop-in-dir", "service-drop-in-dir.metadata"),
+        ("run-dir", "run-dir.metadata"),
+    ):
+        state = inventory(state_name + ".state", capture=True)[1].decode().strip()
+        if state not in {"present", "missing"}:
+            raise SystemExit("invalid_recovery_state")
+        if state == "present":
+            names.append(snapshot)
+    return names, missing
+
+def require_exact_inventory(names):
+    allowed_files = set(names) | {"prepared.json", "helper.json", "rollback.json", "rollback_refused.json"}
+    allowed_dirs = {"existing"}
+    for name in names:
+        allowed_dirs.update(str(parent).replace(os.sep, "/") for parent in Path(name).parents if str(parent) != ".")
+    for current, directories, files in os.walk(directory, followlinks=False):
+        for name in directories + files:
+            path = Path(current) / name
+            relative = path.relative_to(directory).as_posix()
+            info = path.lstat()
+            if stat.S_ISDIR(info.st_mode):
+                if relative not in allowed_dirs:
+                    raise SystemExit("unexpected_recovery_directory")
+            elif not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+                raise SystemExit("unsafe_recovery_file")
+            elif relative not in allowed_files:
+                raise SystemExit("unexpected_recovery_file")
+
+def observe_source_result(prepared):
+    root = Path(target_root)
+    if not root.is_absolute() or root.resolve(strict=True) != root:
+        raise SystemExit("unsafe_source_result_root")
+    path = root / requested_source
+
+    def parents():
+        observed = []
+        for parent in path.parents:
+            info = parent.lstat()
+            if not stat.S_ISDIR(info.st_mode):
+                raise SystemExit("unsafe_source_result_parent")
+            if parent == root or root in parent.parents:
+                if os.name == "posix" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022):
+                    raise SystemExit("unsafe_source_result_parent_permissions")
+                # Sibling changes alter directory timestamps, not its identity.
+                observed.append((str(parent), info.st_dev, info.st_ino, info.st_uid, info.st_gid, info.st_mode))
+        return observed
+
+    before = parents()
+    if requested_source in prepared["missing_source_files"]:
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            result = b"observed_absent\n"
+        else:
+            raise SystemExit("source_result_expected_absence")
+    else:
+        expected = next(item for item in prepared["files"] if item["path"] == "existing/" + requested_source)
+        actual = inventory(requested_source, root=root)
+        # A valid copy changes inode and ctime. Inventory checks their stability
+        # during this read, but compares only prepared bytes/preserved metadata.
+        if actual != dict(expected, path=requested_source):
+            raise SystemExit("source_result_mismatch")
+        result = b"observed_present\n"
+    if parents() != before:
+        raise SystemExit("source_result_parent_changed")
+    sys.stdout.buffer.write(result)
+
+def observe_dropin_result(prepared):
+    # This fixed configuration object is not a member of the Python source set.
+    # Apply mode already pins its exact production path; no query path is accepted.
+    path = Path(dropin_target)
+    if not path.is_absolute() or path.resolve(strict=False) != path:
+        raise SystemExit("unsafe_dropin_result_path")
+    safe_root = path.parent.parent
+
+    def parents():
+        observed = []
+        for parent in path.parents:
+            try:
+                info = parent.lstat()
+            except FileNotFoundError:
+                # A missing immediate service drop-in directory can be legitimate.
+                if parent != path.parent:
+                    raise SystemExit("unsafe_dropin_result_parent")
+                observed.append((str(parent), "missing"))
+                continue
+            if not stat.S_ISDIR(info.st_mode):
+                raise SystemExit("unsafe_dropin_result_parent")
+            if parent in {path.parent, safe_root} and os.name == "posix":
+                if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
+                    raise SystemExit("unsafe_dropin_result_parent_permissions")
+            observed.append((str(parent), info.st_dev, info.st_ino, info.st_uid, info.st_gid, info.st_mode))
+        return observed
+
+    before = parents()
+    expected = next((item for item in prepared["files"] if item["path"] == "service-drop-in.before"), None)
+    if expected is None:
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            result = b"dropin_absent\n"
+        else:
+            raise SystemExit("dropin_result_expected_absence")
+    else:
+        actual = inventory(path.name, root=path.parent)
+        # Copied inode/ctime need not match the backup; read stability still must.
+        if actual != dict(expected, path=path.name):
+            raise SystemExit("dropin_result_mismatch")
+        result = b"dropin_present\n"
+    if parents() != before:
+        raise SystemExit("dropin_result_parent_changed")
+    sys.stdout.buffer.write(result)
+
+def expected_runtime_directory(prepared):
+    # Parse exactly the captured bytes whose inventory matches the pinned entry.
+    def captured(name):
+        expected = next((item for item in prepared["files"] if item["path"] == name), None)
+        actual, raw = inventory(name, capture=True)
+        if expected is None or actual != expected:
+            raise SystemExit("runtime_directory_preparation_changed")
+        return raw
+    state = captured("run-dir.state")
+    if state == b"missing\n":
+        if any(item["path"] == "run-dir.metadata" for item in prepared["files"]):
+            raise SystemExit("runtime_directory_preparation_contradiction")
+        return None
+    if state != b"present\n":
+        raise SystemExit("invalid_runtime_directory_prepared_state")
+    match = re.fullmatch(rb"([0-9]+) ([0-9]+) ([0-7]{3,4})\n", captured("run-dir.metadata"))
+    if not match:
+        raise SystemExit("invalid_runtime_directory_prepared_metadata")
+    return int(match[1]), int(match[2]), int(match[3], 8)
+
+def observe_runtime_directory_result(prepared):
+    # Fixed apply-mode object; this query accepts no caller-selected path.
+    expected = expected_runtime_directory(prepared)
+    path = Path(runtime_directory_target)
+    if not path.is_absolute() or path.resolve(strict=False) != path:
+        raise SystemExit("unsafe_runtime_directory_result_path")
+
+    def identity(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+                info.st_gid, info.st_mtime_ns, info.st_ctime_ns)
+
+    def parents():
+        observed = []
+        for parent in path.parents:
+            info = parent.lstat()
+            if not stat.S_ISDIR(info.st_mode):
+                raise SystemExit("unsafe_runtime_directory_result_parent")
+            if parent == path.parent and os.name == "posix":
+                if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
+                    raise SystemExit("unsafe_runtime_directory_result_parent_permissions")
+            observed.append((str(parent), info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid))
+        return observed
+
+    before = parents()
+    if expected is None:
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            result = b"runtime_directory_absent\n"
+        else:
+            raise SystemExit("runtime_directory_result_expected_absence")
+    else:
+        info = path.lstat()
+        if not stat.S_ISDIR(info.st_mode):
+            raise SystemExit("runtime_directory_result_not_directory")
+        if (info.st_uid, info.st_gid, stat.S_IMODE(info.st_mode)) != expected:
+            raise SystemExit("runtime_directory_result_metadata_mismatch")
+        # Keep identity stable during observation, without claiming equality to
+        # an old inode or restoration of contents, timestamps, ACLs or xattrs.
+        if os.name == "posix":
+            descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0))
+            try:
+                if identity(os.fstat(descriptor)) != identity(info) or identity(path.lstat()) != identity(info):
+                    raise SystemExit("runtime_directory_result_changed")
+            finally:
+                os.close(descriptor)
+        elif identity(path.lstat()) != identity(info):
+            raise SystemExit("runtime_directory_result_changed")
+        result = b"runtime_directory_present\n"
+    if parents() != before:
+        raise SystemExit("runtime_directory_result_parent_changed")
+    sys.stdout.buffer.write(result)
+
+def expected_dropin_directory(prepared):
+    # Parse exactly the captured bytes whose inventory matches the pinned entry.
+    def captured(name):
+        expected = next((item for item in prepared["files"] if item["path"] == name), None)
+        actual, raw = inventory(name, capture=True)
+        if expected is None or actual != expected:
+            raise SystemExit("dropin_directory_preparation_changed")
+        return raw
+    state = captured("service-drop-in-dir.state")
+    if state == b"missing\n":
+        if any(item["path"] == "service-drop-in-dir.metadata" for item in prepared["files"]):
+            raise SystemExit("dropin_directory_preparation_contradiction")
+        return None
+    if state != b"present\n":
+        raise SystemExit("invalid_dropin_directory_prepared_state")
+    match = re.fullmatch(rb"([0-9]+) ([0-9]+) ([0-7]{3,4})\n", captured("service-drop-in-dir.metadata"))
+    if not match:
+        raise SystemExit("invalid_dropin_directory_prepared_metadata")
+    return int(match[1]), int(match[2]), int(match[3], 8)
+
+def observe_dropin_directory_result(prepared):
+    # Fixed apply-mode object; this query accepts no caller-selected path.
+    expected = expected_dropin_directory(prepared)
+    path = Path(dropin_directory_target)
+    if not path.is_absolute() or path.resolve(strict=False) != path:
+        raise SystemExit("unsafe_dropin_directory_result_path")
+
+    def identity(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+                info.st_gid, info.st_mtime_ns, info.st_ctime_ns)
+
+    def parents():
+        observed = []
+        for parent in path.parents:
+            info = parent.lstat()
+            if not stat.S_ISDIR(info.st_mode):
+                raise SystemExit("unsafe_dropin_directory_result_parent")
+            if parent == path.parent and os.name == "posix":
+                if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022:
+                    raise SystemExit("unsafe_dropin_directory_result_parent_permissions")
+            observed.append((str(parent), info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid))
+        return observed
+
+    before = parents()
+    if expected is None:
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            result = b"dropin_directory_absent\n"
+        else:
+            raise SystemExit("dropin_directory_result_expected_absence")
+    else:
+        info = path.lstat()
+        if not stat.S_ISDIR(info.st_mode):
+            raise SystemExit("dropin_directory_result_not_directory")
+        if (info.st_uid, info.st_gid, stat.S_IMODE(info.st_mode)) != expected:
+            raise SystemExit("dropin_directory_result_metadata_mismatch")
+        # Keep identity stable during observation, without claiming equality to
+        # an old inode or restoration of contents, timestamps, ACLs or xattrs.
+        if os.name == "posix":
+            descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0))
+            try:
+                if identity(os.fstat(descriptor)) != identity(info) or identity(path.lstat()) != identity(info):
+                    raise SystemExit("dropin_directory_result_changed")
+            finally:
+                os.close(descriptor)
+        elif identity(path.lstat()) != identity(info):
+            raise SystemExit("dropin_directory_result_changed")
+        result = b"dropin_directory_present\n"
+    if parents() != before:
+        raise SystemExit("dropin_directory_result_parent_changed")
+    sys.stdout.buffer.write(result)
+
+if kind == "rollback_refused":
+    # This receipt describes refusal only; it does not authenticate invalid input.
+    payload.update(status="ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE", restore_attempted=False,
+                   expected_manifest_sha256=expected_manifest, recovery_evidence_verified=False)
+elif kind == "prepared":
+    names, missing = expected_backup_inventory()
+    require_exact_inventory(names)
+    payload.update(status="PREPARED_BEFORE_MUTATION", files=[inventory(name) for name in names],
+                   missing_source_files=sorted(missing))
+else:
+    entry, manifest_raw = inventory("prepared.json", capture=True)
+    if entry["sha256"] != expected_manifest:
+        raise SystemExit("recovery_manifest_hash_mismatch")
+    prepared = json.loads(manifest_raw)
+    if (prepared.get("schema") != payload["schema"] or prepared.get("kind") != "prepared"
+            or prepared.get("status") != "PREPARED_BEFORE_MUTATION"):
+        raise SystemExit("invalid_prepared_manifest")
+    if any(prepared.get(key) != payload[key] for key in
+           ("source_commit", "bundle_sha256", "hardening_sha256")):
+        raise SystemExit("recovery_manifest_binding_mismatch")
+    names, missing = expected_backup_inventory()
+    entries = prepared.get("files", [])
+    if (not isinstance(entries, list) or len(entries) != len(names)
+            or sorted(item["path"] for item in entries) != sorted(names)
+            or prepared.get("missing_source_files") != sorted(missing)):
+        raise SystemExit("recovery_inventory_mismatch")
+    require_exact_inventory(names)
+    if any(inventory(item["path"]) != item for item in prepared["files"]):
+        raise SystemExit("recovery_backup_changed")
+    if kind == "restore_dropin":
+        restore_dropin_from_capture(prepared)
+        raise SystemExit(0)
+    if kind == "restore_source":
+        restore_source_from_capture(prepared)
+        raise SystemExit(0)
+    if kind in control_kinds:
+        # Parse only the same captured bytes whose complete entry matches the
+        # pinned preparation. Never validate a path and then reopen it raw.
+        name = control_files[(kind, requested_source)]
+        expected = next((item for item in prepared["files"] if item["path"] == name), None)
+        actual, raw = inventory(name, capture=True, capture_limit=128)
+        if expected is None or actual != expected:
+            raise SystemExit("recovery_control_changed")
+        if kind == "control_state":
+            if raw not in {b"present\n", b"missing\n"}:
+                raise SystemExit(14)
+        elif not re.fullmatch(rb"[0-9]+ [0-9]+ [0-7]{3,4}\n", raw):
+            raise SystemExit(14)
+        sys.stdout.buffer.write(raw)
+        raise SystemExit(0)
+    if kind == "source_state":
+        # Intent comes only from the same-read, hash-bound manifest. Complete
+        # inventory validation above must pass again before each source mutation.
+        sys.stdout.buffer.write(b"missing\n" if requested_source in prepared["missing_source_files"] else b"present\n")
+        raise SystemExit(0)
+    if kind == "source_result":
+        observe_source_result(prepared)
+        raise SystemExit(0)
+    if kind == "dropin_result":
+        observe_dropin_result(prepared)
+        raise SystemExit(0)
+    if kind == "runtime_directory_result":
+        observe_runtime_directory_result(prepared)
+        raise SystemExit(0)
+    if kind == "dropin_directory_result":
+        observe_dropin_directory_result(prepared)
+        raise SystemExit(0)
+    if kind == "verify":
+        print("RECOVERY_EVIDENCE_VERIFIED_BEFORE_RESTORATION")
+        raise SystemExit(0)
+    dropin_present = any(item["path"] == "service-drop-in.before" for item in prepared["files"])
+    if ((dropin_result == "MATCHED_PREPARED_PRESENT" and not dropin_present)
+            or (dropin_result == "MATCHED_PREPARED_ABSENCE" and dropin_present)):
+        raise SystemExit("dropin_result_inventory_mismatch")
+    if runtime_directory_result in {"MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        runtime_present = expected_runtime_directory(prepared) is not None
+        if (runtime_directory_result == "MATCHED_PREPARED_PRESENT") != runtime_present:
+            raise SystemExit("runtime_directory_result_inventory_mismatch")
+    if dropin_directory_result in {"MATCHED_PREPARED_PRESENT", "MATCHED_PREPARED_ABSENCE"}:
+        dropin_directory_present = expected_dropin_directory(prepared) is not None
+        if (dropin_directory_result == "MATCHED_PREPARED_PRESENT") != dropin_directory_present:
+            raise SystemExit("dropin_directory_result_inventory_mismatch")
+    payload.update(manifest_sha256=expected_manifest,
+                   status="HELPER_CHECKS_PASSED_EXTERNAL_VERIFICATION_PENDING" if kind == "helper"
+                   else "ROLLBACK_ATTEMPTED_UNVERIFIED")
+if kind == "rollback":
+    commands = []
+    for row in service_results.splitlines():
+        match = re.fullmatch(r"(stop|daemon-reload|reset-failed|start):([0-9]{1,3})", row)
+        if not match or int(match[2]) > 255:
+            raise SystemExit("invalid_recovery_service_result")
+        verb, code = match[1], int(match[2])
+        outcome = ("COMPLETED" if code == 0 else "DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124" if code == 124
+                   else "FORCED_TERMINATION_OR_SIGKILL" if code == 137
+                   else "LAUNCHER_OR_COMMAND_FAILURE" if code in {125, 126, 127} else "COMMAND_FAILED")
+        commands.append(dict(verb=verb, exit_code=code, outcome=outcome,
+                             timeout_seconds=60, kill_after_seconds=5))
+    order = ["stop", "daemon-reload", "reset-failed", "start"]
+    if ([item["verb"] for item in commands] != order[:len(commands)]
+            or len(commands) > 4 or restore_attempted not in {"true", "false"}
+            or any(item["exit_code"] != 0 for item in commands[:-1])
+            or service_failure != (commands[-1]["verb"] if commands and commands[-1]["exit_code"] else "")):
+        raise SystemExit("invalid_recovery_service_sequence")
+    payload.update(service_commands=commands, restore_attempted=restore_attempted == "true",
+                   service_state_verified=False, systemd_job_cancellation_verified=False)
+    if service_failure:
+        payload["status"] = ("ROLLBACK_ABORTED_SERVICE_STOP_UNCONFIRMED" if service_failure == "stop"
+                             else "ROLLBACK_INCOMPLETE_SERVICE_COMMAND_FAILED")
+    restoration_targets = {
+        "dead_lock": {"gateway_lock"}, "source_state": set(relatives),
+        "target_state": set(relatives), "target_absent": set(relatives),
+        "source_remove": set(relatives), "source_copy": set(relatives), "source_result": set(relatives),
+        "dropin_remove": {"service_drop_in"}, "dropin_state_read": {"service_drop_in"}, "dropin_result": {"service_drop_in"},
+        "dropin_target_state": {"service_drop_in"}, "dropin_target_absent": {"service_drop_in"},
+        "dropin_directory_target_state": {"service_drop_in_directory"},
+        "dropin_parent_create": {"service_drop_in_directory"}, "dropin_copy": {"service_drop_in"},
+        "dropin_directory_state_read": {"service_drop_in_directory"},
+        "dropin_metadata_read": {"service_drop_in_directory"},
+        "dropin_chown": {"service_drop_in_directory"}, "dropin_chmod": {"service_drop_in_directory"},
+        "dropin_directory_remove": {"service_drop_in_directory"},
+        "dropin_directory_result": {"service_drop_in_directory"},
+        "run_directory_state_read": {"run_directory"}, "run_metadata_read": {"run_directory"},
+        "run_chown": {"run_directory"}, "run_chmod": {"run_directory"},
+        "run_target_state": {"run_directory"},
+        "run_directory_remove": {"run_directory"}, "runtime_directory_result": {"run_directory"},
+    }
+    mutation_operations = {
+        "dead_lock", "source_remove", "dropin_remove", "dropin_parent_create",
+        "dropin_chown", "dropin_chmod", "dropin_directory_remove",
+        "run_chown", "run_chmod", "run_directory_remove",
+    }
+    if mutation_failure:
+        if (mutation_failure not in mutation_operations
+                or mutation_failure != restore_failure or mutation_target != restore_target
+                or mutation_exit_code != restore_exit_code):
+            raise SystemExit("invalid_mutation_deadline_failure_record")
+    elif mutation_target or mutation_exit_code != "0":
+        raise SystemExit("unexpected_mutation_deadline_fields")
+    if restore_failure:
+        if (restore_failure not in restoration_targets or restore_target not in restoration_targets[restore_failure]
+                or not re.fullmatch(r"[0-9]{1,3}", restore_exit_code) or not 1 <= int(restore_exit_code) <= 255
+                or restore_attempted != "true" or service_failure
+                or [(item["verb"], item["exit_code"]) for item in commands] != [("stop", 0)]):
+            raise SystemExit("invalid_restoration_failure_record")
+        payload.update(status="ROLLBACK_INCOMPLETE_RESTORATION_COMMAND_FAILED", partial_state_possible=True,
+                       further_restoration_stopped=True, service_restart_attempted=False,
+                       failed_restoration_operation=dict(operation=restore_failure, target=restore_target,
+                                                         exit_code=int(restore_exit_code)))
+        if restore_failure in {"source_copy", "dropin_copy"} or mutation_failure:
+            code = int(restore_exit_code)
+            outcome = ("DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124" if code == 124
+                       else "FORCED_TERMINATION_OR_SIGKILL" if code == 137
+                       else "LAUNCHER_OR_COMMAND_FAILURE" if code in {125, 126, 127}
+                       else "COMMAND_FAILED")
+            payload["failed_restoration_operation"].update(
+                outcome=outcome, timeout_seconds=60, kill_after_seconds=5)
+            if mutation_failure:
+                payload["failed_restoration_operation"].update(mutation_effect_verified=False)
+            else:
+                payload["failed_restoration_operation"].update(partial_destination_possible=True)
+    elif restore_exit_code != "0" or restore_target:
+        raise SystemExit("unexpected_restoration_failure_fields")
+    if admission_status not in {"ACTIVE", "NOT_STARTED_BUDGET_REFUSAL", "CLOCK_UNAVAILABLE"}:
+        raise SystemExit("invalid_recovery_admission_status")
+    for value in (admission_origin, admission_deadline, admission_last):
+        if not re.fullmatch(r"0|[1-9][0-9]{0,18}", value):
+            raise SystemExit("invalid_recovery_admission_clock")
+    if (int(admission_deadline) != int(admission_origin) + 600_000_000_000
+            or int(admission_last) < int(admission_origin)
+            or not re.fullmatch(r"[0-9]{1,3}", admission_clock_code)
+            or not 0 <= int(admission_clock_code) <= 255):
+        raise SystemExit("invalid_recovery_admission_clock")
+    admission_targets = dict(restoration_targets)
+    admission_targets.update({"initial_validation": {"recovery_evidence"}, **{
+        "service_" + verb: {"gateway_service"} for verb in order}})
+    refused = admission_status != "ACTIVE"
+    if ((refused and (admission_operation not in admission_targets
+                     or admission_target not in admission_targets[admission_operation]))
+            or (not refused and (admission_operation or admission_target or admission_clock_code != "0"))
+            or (admission_status == "NOT_STARTED_BUDGET_REFUSAL"
+                and (int(admission_last) < int(admission_deadline) or admission_clock_code != "0"))
+            or (admission_status == "CLOCK_UNAVAILABLE" and admission_clock_code == "0")):
+        raise SystemExit("invalid_recovery_admission_refusal")
+    payload["work_admission"] = dict(
+        status=admission_status, budget_seconds=600, monotonic_origin_ns=int(admission_origin),
+        deadline_ns=int(admission_deadline), last_observed_ns=int(admission_last),
+        refused_operation=admission_operation or None, refused_target=admission_target or None,
+        clock_exit_code=int(admission_clock_code), refused_operation_started=False if refused else None,
+        total_recovery_deadline=False, terminal_safety_and_evidence_outside_budget=True)
+    if refused and not restore_failure and not service_failure:
+        payload.update(status="ROLLBACK_INCOMPLETE_WORK_ADMISSION_REFUSED", partial_state_possible=True,
+                       further_restoration_stopped=True, restoration_result="UNVERIFIED")
+raw = (json.dumps(payload, sort_keys=True, indent=2) + "\n").encode()
+destination = directory / (kind + ".json")
+fd, temporary = tempfile.mkstemp(prefix=".receipt-", dir=directory)
+try:
+    with os.fdopen(fd, "wb") as stream:
+        os.chmod(temporary, 0o600)
+        stream.write(raw)
+        stream.flush()
+        os.fsync(stream.fileno())
+    # Publish without replacing an earlier receipt or following an existing link.
+    os.link(temporary, destination)
+finally:
+    os.unlink(temporary)
+if destination.read_bytes() != raw:
+    raise SystemExit("recovery_receipt_readback_failed")
+if os.name == "posix":
+    directory_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
+print(hashlib.sha256(raw).hexdigest())
+PY
+  if [[ "$evidence_rc" -ne 0 ]]; then
+    case "$evidence_rc" in
+      124) evidence_outcome=DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124 ;;
+      137) evidence_outcome=FORCED_TERMINATION_OR_SIGKILL ;;
+      125|126|127) evidence_outcome=LAUNCHER_OR_COMMAND_FAILURE ;;
+      *) evidence_outcome=COMMAND_FAILED ;;
+    esac
+    # Publication may precede timeout/failure. Retain all evidence; never retry
+    # or infer a missing receipt from nonzero status (including partial stdout).
+    printf 'Recovery evidence failed: kind=%s exit=%s outcome=%s timeout_seconds=60 kill_after_seconds=5 completion=UNKNOWN possibly_published=true retained=true retry=false\n' \
+      "$kind" "$evidence_rc" "$evidence_outcome" >&2
+  fi
+  return "$evidence_rc"
+}
+
+recorded_target_version() {
+  [[ $# -eq 4 ]] || return 14
+  local reader_rc=0 reader_outcome
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    python3 - "$TARGET_ROOT" "$SERVICE_DROP_IN" "$RUN_DIR" "$1" "$2" "$3" "$4" "${BUNDLE_FILES[@]}" <<'PY' || reader_rc=$?
+import hashlib
+import json
+import os
+import re
+import stat
+import sys
+from pathlib import Path
+
+root, dropin, runtime = map(Path, sys.argv[1:4])
+object_kind, mode, relative, expected = sys.argv[4:8]
+allowlist = sys.argv[8:]
+if object_kind == "dropin":
+    # Apply pins this exact configuration path. The fixed-object wrapper accepts
+    # no caller-selected path; sharing the reader does not expand source authority.
+    if relative or not dropin.is_absolute():
+        raise SystemExit("invalid_dropin_version_query")
+    root, relative = dropin.parent.parent, dropin.parent.name + "/" + dropin.name
+    allowlist = [relative]
+elif object_kind == "runtime":
+    if relative or mode != "capture" or not runtime.is_absolute():
+        raise SystemExit("invalid_runtime_directory_version_query")
+    root, relative = runtime.parent, runtime.name
+    allowlist = [relative]
+elif object_kind == "dropin_directory":
+    if relative or mode != "capture" or not dropin.is_absolute() or expected != "0:0:755":
+        raise SystemExit("invalid_dropin_directory_version_query")
+    root, relative = dropin.parent.parent, dropin.parent.name
+    allowlist = [relative]
+elif object_kind != "source":
+    raise SystemExit("invalid_target_object")
+if (mode not in {"capture", "absent"} or relative not in allowlist
+        or not re.fullmatch(r"[A-Za-z0-9_/.-]+", relative)
+        or any(part in {"", ".", ".."} for part in relative.split("/"))
+        or (mode == "capture" and not re.fullmatch(r"[0-9]+:[0-9]+:750" if object_kind == "runtime" else r"0:0:755" if object_kind == "dropin_directory" else r"[0-9a-f]{64}", expected))
+        or (mode == "absent" and expected)):
+    raise SystemExit("invalid_target_version_query")
+if not root.is_absolute() or root.resolve(strict=True) != root:
+    raise SystemExit("unsafe_target_root")
+path = root / relative
+
+def parents():
+    result = []
+    for parent in path.parents:
+        info = parent.lstat()
+        if not stat.S_ISDIR(info.st_mode):
+            raise SystemExit("unsafe_target_parent")
+        # Apply already requires root. Fixture processes may run unprivileged;
+        # within-root parents must belong to this same caller and reject writes
+        # by other accounts. No permission repair is performed here.
+        if parent == root or root in parent.parents:
+            if os.name == "posix" and (info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o022):
+                raise SystemExit("unsafe_target_parent_permissions")
+        if object_kind != "source" or parent == root or root in parent.parents:
+            result.append([str(parent) if object_kind != "source" else str(parent.relative_to(root)), info.st_dev, info.st_ino,
+                           info.st_uid, info.st_gid, info.st_mode])
+    return result
+
+parent_version = parents()
+if mode == "absent":
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        if parents() != parent_version:
+            raise SystemExit("target_parent_changed")
+        sys.stdout.buffer.write(b"absent\n")
+        raise SystemExit(0)
+    raise SystemExit("target_reappeared")
+
+def identity(info):
+    return [info.st_dev, info.st_ino, info.st_mode, info.st_nlink, info.st_uid,
+            info.st_gid, info.st_size, info.st_mtime_ns, info.st_ctime_ns]
+
+before = path.lstat()
+if object_kind in {"runtime", "dropin_directory"}:
+    if not stat.S_ISDIR(before.st_mode):
+        raise SystemExit("unsafe_runtime_directory_target")
+    uid, gid, permissions = (int(part, 8 if i == 2 else 10) for i, part in enumerate(expected.split(":")))
+    if (before.st_uid, before.st_gid, stat.S_IMODE(before.st_mode)) != (uid, gid, permissions):
+        raise SystemExit("runtime_directory_candidate_mismatch")
+    # Child/lock operations legitimately change directory timestamps and link
+    # counts. Bind stable ownership/type/identity, not contents or ACLs/xattrs.
+    def directory_identity(info):
+        return [info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid]
+    if os.name == "posix":
+        descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0))
+        try:
+            if directory_identity(os.fstat(descriptor)) != directory_identity(before):
+                raise SystemExit("runtime_directory_changed_during_read")
+        finally:
+            os.close(descriptor)
+    if directory_identity(path.lstat()) != directory_identity(before) or parents() != parent_version:
+        raise SystemExit("runtime_directory_changed_during_read")
+    version = dict(identity=directory_identity(before), parents=parent_version, candidate_metadata=expected)
+    sys.stdout.buffer.write(hashlib.sha256(json.dumps(version, sort_keys=True).encode()).hexdigest().encode() + b"\n")
+    raise SystemExit(0)
+if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+    raise SystemExit("unsafe_target_file")
+digest = hashlib.sha256()
+descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+with os.fdopen(descriptor, "rb") as stream:
+    if identity(os.fstat(stream.fileno())) != identity(before):
+        raise SystemExit("target_changed_during_read")
+    for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+        digest.update(chunk)
+    attributes = None
+    if os.name == "posix" and hasattr(os, "listxattr"):
+        attributes = [(name, os.getxattr(stream.fileno(), name).hex())
+                      for name in sorted(os.listxattr(stream.fileno()))]
+    if (identity(os.fstat(stream.fileno())) != identity(before)
+            or identity(path.lstat()) != identity(before) or parents() != parent_version):
+        raise SystemExit("target_changed_during_read")
+if digest.hexdigest() != expected:
+    raise SystemExit("target_candidate_mismatch")
+version = dict(sha256=digest.hexdigest(), identity=identity(before), parents=parent_version,
+               xattrs_sha256=hashlib.sha256(json.dumps(attributes).encode()).hexdigest())
+sys.stdout.buffer.write(hashlib.sha256(json.dumps(version, sort_keys=True).encode()).hexdigest().encode() + b"\n")
+PY
+  if [[ "$reader_rc" -ne 0 ]]; then
+    case "$reader_rc" in
+      124) reader_outcome=DEADLINE_EXCEEDED_OR_COMMAND_EXIT_124 ;;
+      137) reader_outcome=FORCED_TERMINATION_OR_SIGKILL ;;
+      125|126|127) reader_outcome=LAUNCHER_OR_COMMAND_FAILURE ;;
+      *) reader_outcome=COMMAND_FAILED ;;
+    esac
+    # Even a valid-looking partial response is not a completed observation.
+    # Callers retain pending/partial state and must not adopt output after failure.
+    printf 'Target version reader failed: exit=%s outcome=%s timeout_seconds=60 kill_after_seconds=5 observation=UNKNOWN retry=false\n' \
+      "$reader_rc" "$reader_outcome" >&2
+  fi
+  return "$reader_rc"
+}
+
+source_target_version() {
+  [[ $# -eq 3 ]] || return 14
+  recorded_target_version source "$@"
+}
+
+dropin_target_version() {
+  [[ $# -eq 1 ]] || return 14
+  case "$1" in
+    capture) recorded_target_version dropin capture '' "$HARDENING_SHA" ;;
+    absent) recorded_target_version dropin absent '' '' ;;
+    *) return 14 ;;
+  esac
+}
+
+capture_dropin_target_version() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(dropin_target_version capture && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_DROPIN_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_dropin() {
+  [[ $# -eq 0 && "$DROPIN_WRITE_STATE" == UNTOUCHED
+    && "$HARDENING_SHA" =~ ^[0-9a-f]{64}$ ]] || return 14
+  DROPIN_WRITE_STATE=WRITE_PENDING
+  install -o root -g root -m 0644 -- "$STAGE_DIR/20-lumencore-runtime-hardening.conf" "$SERVICE_DROP_IN" || return $?
+  capture_dropin_target_version || return $?
+  DROPIN_TARGET_VERSION="$CAPTURED_DROPIN_TARGET_VERSION"
+  DROPIN_WRITE_STATE=INSTALLED
+}
+
+read_recovery_dropin_target_state() {
+  [[ $# -eq 0 && "$HARDENING_SHA" =~ ^[0-9a-f]{64}$ ]] || return 14
+  case "${DROPIN_WRITE_STATE:-UNKNOWN}" in
+    UNTOUCHED)
+      [[ -z "${DROPIN_TARGET_VERSION:-}" ]] || return 14
+      RECOVERY_DROPIN_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${DROPIN_TARGET_VERSION:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_dropin_target_version || return $?
+      [[ "$CAPTURED_DROPIN_TARGET_VERSION" == "$DROPIN_TARGET_VERSION" ]] || return 14
+      RECOVERY_DROPIN_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
+}
+
+require_recovery_dropin_absent() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(dropin_target_version absent && printf '.')" || return $?
+  [[ "$response" == $'absent\n.' ]] || return 14
+}
+
+dropin_directory_target_version() {
+  [[ $# -eq 0 && "$DROPIN_DIR_CANDIDATE_METADATA" == 0:0:755 ]] || return 14
+  recorded_target_version dropin_directory capture '' "$DROPIN_DIR_CANDIDATE_METADATA"
+}
+
+capture_dropin_directory_target_version() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(dropin_directory_target_version && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_DROPIN_DIR_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_dropin_directory() {
+  [[ $# -eq 0 && "$DROPIN_DIR_WRITE_STATE" == UNTOUCHED
+    && "$DROPIN_DIR_CANDIDATE_METADATA" == 0:0:755 ]] || return 14
+  DROPIN_DIR_WRITE_STATE=WRITE_PENDING
+  install -d -o 0 -g 0 -m 0755 -- "$SERVICE_DROP_IN_DIR" || return $?
+  capture_dropin_directory_target_version || return $?
+  DROPIN_DIR_TARGET_VERSION="$CAPTURED_DROPIN_DIR_TARGET_VERSION"
+  DROPIN_DIR_WRITE_STATE=INSTALLED
+}
+
+read_recovery_dropin_directory_target_state() {
+  [[ $# -eq 0 && "$DROPIN_DIR_CANDIDATE_METADATA" == 0:0:755 ]] || return 14
+  case "${DROPIN_DIR_WRITE_STATE:-UNKNOWN}" in
+    UNTOUCHED)
+      # A child write cannot be authorized through an untouched parent. Skip
+      # both only when the actual forward sequence reached neither install.
+      [[ -z "${DROPIN_DIR_TARGET_VERSION:-}" && "${DROPIN_WRITE_STATE:-UNKNOWN}" == UNTOUCHED
+        && -z "${DROPIN_TARGET_VERSION:-}" ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${DROPIN_DIR_TARGET_VERSION:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_dropin_directory_target_version || return $?
+      [[ "$CAPTURED_DROPIN_DIR_TARGET_VERSION" == "$DROPIN_DIR_TARGET_VERSION" ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
+}
+
+runtime_directory_target_version() {
+  [[ $# -eq 0 ]] || return 14
+  recorded_target_version runtime capture '' "$RUN_CANDIDATE_METADATA"
+}
+
+capture_runtime_directory_target_version() {
+  local response
+  [[ $# -eq 0 ]] || return 14
+  response="$(runtime_directory_target_version && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_RUN_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_runtime_directory() {
+  [[ $# -eq 0 && "$RUN_WRITE_STATE" == UNTOUCHED
+    && "$RUN_CANDIDATE_METADATA" =~ ^[0-9]+:[0-9]+:750$ ]] || return 14
+  RUN_WRITE_STATE=WRITE_PENDING
+  local run_uid run_gid run_mode
+  IFS=: read -r run_uid run_gid run_mode <<< "$RUN_CANDIDATE_METADATA"
+  install -d -o "$run_uid" -g "$run_gid" -m "$run_mode" -- "$RUN_DIR" || return $?
+  capture_runtime_directory_target_version || return $?
+  RUN_TARGET_VERSION="$CAPTURED_RUN_TARGET_VERSION"
+  RUN_WRITE_STATE=INSTALLED
+}
+
+read_recovery_runtime_directory_target_state() {
+  [[ $# -eq 0 && "$RUN_CANDIDATE_METADATA" =~ ^[0-9]+:[0-9]+:750$ ]] || return 14
+  case "${RUN_WRITE_STATE:-UNKNOWN}" in
+    UNTOUCHED)
+      [[ -z "${RUN_TARGET_VERSION:-}" ]] || return 14
+      RECOVERY_RUN_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${RUN_TARGET_VERSION:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_runtime_directory_target_version || return $?
+      [[ "$CAPTURED_RUN_TARGET_VERSION" == "$RUN_TARGET_VERSION" ]] || return 14
+      RECOVERY_RUN_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
+}
+
+capture_source_target_version() {
+  local response
+  response="$(source_target_version capture "$1" "$2" && printf '.')" || return $?
+  [[ "$response" =~ ^([0-9a-f]{64})$'\n.'$ ]] || return 14
+  CAPTURED_TARGET_VERSION="${BASH_REMATCH[1]}"
+}
+
+install_gateway_source() {
+  local relative="$1"
+  [[ $# -eq 1 && "${SOURCE_WRITE_STATES[$relative]:-}" == UNTOUCHED
+    && "${SOURCE_CANDIDATE_SHA[$relative]:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+  # Pending is set before the write. Any failed/partial install or readback
+  # remains unknown and must not authorize overwriting that target in recovery.
+  SOURCE_WRITE_STATES[$relative]=WRITE_PENDING
+  install -D -o root -g root -m 0644 -- "$STAGE_DIR/$relative" "$TARGET_ROOT/$relative" || return $?
+  capture_source_target_version "$relative" "${SOURCE_CANDIDATE_SHA[$relative]}" || return $?
+  SOURCE_TARGET_VERSION[$relative]="$CAPTURED_TARGET_VERSION"
+  SOURCE_WRITE_STATES[$relative]=INSTALLED
+}
+
+read_recovery_target_state() {
+  local relative="$1"
+  [[ $# -eq 1 && "${SOURCE_CANDIDATE_SHA[$relative]:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+  case "${SOURCE_WRITE_STATES[$relative]:-}" in
+    UNTOUCHED)
+      [[ -z "${SOURCE_TARGET_VERSION[$relative]:-}" ]] || return 14
+      RECOVERY_TARGET_STATE=untouched ;;
+    INSTALLED)
+      [[ "${SOURCE_TARGET_VERSION[$relative]:-}" =~ ^[0-9a-f]{64}$ ]] || return 14
+      capture_source_target_version "$relative" "${SOURCE_CANDIDATE_SHA[$relative]:-}" || return $?
+      [[ "$CAPTURED_TARGET_VERSION" == "${SOURCE_TARGET_VERSION[$relative]}" ]] || return 14
+      RECOVERY_TARGET_STATE=installed ;;
+    *) return 14 ;;
+  esac
+}
+
+require_recovery_target_absent() {
+  local response
+  response="$(source_target_version absent "$1" '' && printf '.')" || return $?
+  [[ "$response" == $'absent\n.' ]] || return 14
+}
+
 STAGE_DIR="$(mktemp -d /tmp/lumencore-gateway-stage.XXXXXX)"
-BACKUP_DIR="$(mktemp -d /tmp/lumencore-gateway-rollback.XXXXXX)"
-chmod 0700 "$STAGE_DIR" "$BACKUP_DIR"
+chmod 0700 "$STAGE_DIR"
 
 cleanup() {
   if [[ -n "$STAGE_DIR" ]]; then
@@ -386,16 +1697,14 @@ cleanup() {
     STAGE_DIR=""
   fi
   if [[ -n "$BACKUP_DIR" ]]; then
-    [[ "$BACKUP_DIR" =~ ^/tmp/lumencore-gateway-rollback\.[A-Za-z0-9]+$ ]] || {
-      echo "ERROR: refusing unexpected gateway-rollback cleanup target" >&2
-      return 1
-    }
-    rm -rf -- "$BACKUP_DIR"
-    BACKUP_DIR=""
+    printf 'Private gateway recovery evidence retained: %s\n' "$BACKUP_DIR"
+    printf 'Prepared recovery manifest SHA-256: %s\n' "${RECOVERY_MANIFEST_SHA:-PREPARATION_INCOMPLETE}"
   fi
   cleanup_manifest
 }
 trap cleanup EXIT
+prepare_recovery_directory
+install -d -m 0700 -- "$BACKUP_DIR/existing"
 
 for rel in "${BUNDLE_FILES[@]}"; do
   source="$SOURCE_ROOT/$rel"
@@ -412,6 +1721,10 @@ for rel in "${BUNDLE_FILES[@]}"; do
   }
   install -D -m 0644 -- "$source" "$staged"
   [[ "$(sha256sum "$staged" | awk '{print $1}')" == "$(sha256sum "$source" | awk '{print $1}')" ]]
+  SOURCE_WRITE_STATES[$rel]=UNTOUCHED
+  SOURCE_CANDIDATE_SHA[$rel]="$(awk -v relative="$rel" '$2 == relative { print $1 }' "$MANIFEST_FILE")"
+  [[ "${SOURCE_CANDIDATE_SHA[$rel]}" =~ ^[0-9a-f]{64}$ ]]
+  [[ "$(sha256sum "$staged" | awk '{print $1}')" == "${SOURCE_CANDIDATE_SHA[$rel]}" ]]
   if [[ -f "$target" ]]; then
     install -d -m 0700 -- "$(dirname -- "$BACKUP_DIR/existing/$rel")"
     cp -a -- "$target" "$BACKUP_DIR/existing/$rel"
@@ -449,6 +1762,10 @@ if systemctl is-active --quiet "$SERVICE"; then
 fi
 printf 'service_was_active=%s\n' "$SERVICE_WAS_ACTIVE" > "$BACKUP_DIR/service.state"
 
+# This private manifest and its readback must complete before service mutation.
+RECOVERY_MANIFEST_SHA="$(record_recovery_evidence prepared 0)"
+[[ "$RECOVERY_MANIFEST_SHA" =~ ^[0-9a-f]{64}$ ]]
+
 # Import the staged entrypoint against an isolated writable stack root before
 # touching the running service. Target-root fallback supplies non-local assets,
 # while every source-controlled local import in the explicit closure resolves
@@ -469,161 +1786,635 @@ assert decision.allowed is False
 assert decision.mode == "blocked_live_order"
 PY
 
+read_gateway_lock_pid() {
+  [[ $# -eq 0 ]] || return 14
+  # Keep original file bytes out of shell substitution until their grammar is
+  # validated. Never collapse internal whitespace or discard NUL bytes.
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
+import os
+import re
+import stat
+import sys
+
+if len(sys.argv) != 2:
+    raise SystemExit(14)
+try:
+    before = os.lstat(sys.argv[1])
+    if not stat.S_ISREG(before.st_mode):
+        raise SystemExit(14)
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    with os.fdopen(os.open(sys.argv[1], flags), "rb") as stream:
+        opened = os.fstat(stream.fileno())
+        if not stat.S_ISREG(opened.st_mode) or (opened.st_dev, opened.st_ino) != (before.st_dev, before.st_ino):
+            raise SystemExit(14)
+        raw = stream.read(13)  # Ten digits plus one CRLF; the extra byte rejects oversize.
+        after = os.fstat(stream.fileno())
+    current = os.lstat(sys.argv[1])
+    def version(info):
+        return (info.st_dev, info.st_ino, info.st_mode, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+    if version(before) != version(opened) or version(opened) != version(after) or version(after) != version(current):
+        raise SystemExit(14)
+    if len(raw) != opened.st_size or re.fullmatch(rb"[1-9][0-9]{0,9}(?:\r?\n)?", raw) is None:
+        raise SystemExit(14)
+    pid = int(raw)
+    if pid > 2147483647:
+        raise SystemExit(14)
+except OSError:
+    raise SystemExit(14)
+sys.stdout.write(str(pid))
+PY
+}
+
+require_absent_lock_owner() {
+  [[ $# -eq 1 ]] || return 14
+  # A failed signal-zero probe is not proof of absence. Authorize removal only
+  # for explicit ESRCH; permission, range and unknown errors must fail closed.
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "$PYTHON_BIN" - "$1" <<'PY'
+import errno
+import os
+import re
+import sys
+
+if len(sys.argv) != 2 or re.fullmatch(r"[1-9][0-9]{0,9}", sys.argv[1]) is None:
+    raise SystemExit(14)
+pid = int(sys.argv[1])
+if pid > 2147483647:
+    raise SystemExit(14)
+try:
+    os.kill(pid, 0)
+except OSError as exc:
+    raise SystemExit(0 if exc.errno == errno.ESRCH else 14)
+except (OverflowError, ValueError):
+    raise SystemExit(14)
+raise SystemExit(14)
+PY
+}
+
+read_gateway_lock_presence() {
+  [[ $# -eq 0 ]] || return 14
+  local observation
+  # Only explicit ENOENT establishes absence. Preserve the interpreter status
+  # and exact output, including unexpected trailing newlines, before trusting it.
+  observation="$(
+    "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "$PYTHON_BIN" - "$LOCK_FILE" <<'PY'
+import errno
+import os
+import sys
+
+if len(sys.argv) != 2:
+    raise SystemExit(14)
+try:
+    os.lstat(sys.argv[1])
+except OSError as exc:
+    if exc.errno != errno.ENOENT:
+        raise SystemExit(14)
+    sys.stdout.write("ABSENT")
+else:
+    sys.stdout.write("PRESENT")
+PY
+    observation_rc=$?
+    [[ "$observation_rc" -eq 0 ]] || exit "$observation_rc"
+    printf ':LOCK_PRESENCE_END'
+  )" || return $?
+  case "$observation" in
+    ABSENT:LOCK_PRESENCE_END) printf ABSENT ;;
+    PRESENT:LOCK_PRESENCE_END) printf PRESENT ;;
+    *) return 14 ;;
+  esac
+}
+
 remove_verified_dead_lock() {
-  if [[ ! -e "$LOCK_FILE" ]]; then
+  local lock_presence lock_pid
+  lock_presence="$(read_gateway_lock_presence)" || return $?
+  if [[ "$lock_presence" == ABSENT ]]; then
     return 0
   fi
   [[ -f "$LOCK_FILE" && ! -L "$LOCK_FILE" ]] || {
     echo "ERROR: singleton lock is not a regular file" >&2
     return 14
   }
-  local lock_pid
-  lock_pid="$(tr -d '[:space:]' < "$LOCK_FILE")"
-  [[ "$lock_pid" =~ ^[1-9][0-9]*$ ]] || {
-    echo "ERROR: singleton lock PID is not a positive integer" >&2
-    return 14
+  lock_pid="$(read_gateway_lock_pid)" || return $?
+  require_absent_lock_owner "$lock_pid" || {
+    local probe_rc=$?
+    echo "ERROR: singleton lock owner absence was not confirmed; refusing removal" >&2
+    return "$probe_rc"
   }
-  if kill -0 "$lock_pid" 2>/dev/null; then
-    echo "ERROR: singleton lock owner is still alive; refusing removal" >&2
-    return 14
-  fi
-  rm -f -- "$LOCK_FILE"
+  bounded_recovery_mutation dead_lock gateway_lock || return $?
+  lock_presence="$(read_gateway_lock_presence)" || return $?
+  [[ "$lock_presence" == ABSENT ]] || return 14
   echo "Removed verified dead-PID gateway singleton lock."
+}
+
+bounded_recovery_systemctl() {
+  local verb="${1:-}" command_rc=0
+  local -a arguments=()
+  [[ $# -eq 1 ]] || return 125
+  case "$verb" in
+    stop|reset-failed|start) arguments=("$SERVICE") ;;
+    daemon-reload) ;;
+    *) return 125 ;;
+  esac
+  # A separate process group lets timeout terminate its command, not this
+  # recovery shell. KILL is required when inherited/child TERM is ignored.
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    systemctl "$verb" "${arguments[@]}" >/dev/null 2>&1 || command_rc=$?
+  RECOVERY_SERVICE_RESULTS+="$verb:$command_rc"$'\n'
+  if [[ "$command_rc" -ne 0 ]]; then
+    RECOVERY_SERVICE_FAILURE="$verb"
+    echo "ERROR: recovery systemctl $verb failed (exit $command_rc); service state and manager job completion remain unverified" >&2
+  fi
+  return "$command_rc"
+}
+
+read_recovery_monotonic_clock() {
+  [[ $# -eq 0 ]] || return 14
+  local response="" clock_rc=0 value
+  RECOVERY_CLOCK_NOW_NS=""
+  response="$(
+    "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - <<'PY'
+import time
+value = time.monotonic_ns()
+if not isinstance(value, int) or not 0 <= value < 10 ** 18:
+    raise SystemExit(14)
+print("MONOTONIC_NS=" + str(value))
+PY
+    clock_rc=$?
+    printf '%s' __RECOVERY_CLOCK_END__
+    exit "$clock_rc"
+  )" || clock_rc=$?
+  [[ "$clock_rc" -eq 0 ]] || return "$clock_rc"
+  [[ "$response" =~ ^MONOTONIC_NS=(0|[1-9][0-9]{0,17})$'\n'__RECOVERY_CLOCK_END__$ ]] || return 14
+  value="${BASH_REMATCH[1]}"
+  RECOVERY_CLOCK_NOW_NS="$value"
+}
+
+refuse_recovery_admission() {
+  # Separate a callback that never started from an actual operation failure.
+  if [[ "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" != NOT_STARTED_BUDGET_REFUSAL && "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" != CLOCK_UNAVAILABLE ]]; then
+    RECOVERY_ADMISSION_STATUS="$1"
+    RECOVERY_ADMISSION_OPERATION="$2"
+    RECOVERY_ADMISSION_TARGET="$3"
+    RECOVERY_ADMISSION_CLOCK_EXIT_CODE="$4"
+  fi
+  printf 'Recovery work not started: status=%s operation=%s target=%s clock_exit=%s original_failure_retained=true\n' \
+    "$RECOVERY_ADMISSION_STATUS" "$RECOVERY_ADMISSION_OPERATION" "$RECOVERY_ADMISSION_TARGET" "$RECOVERY_ADMISSION_CLOCK_EXIT_CODE" >&2
+  return 14
+}
+
+begin_recovery_admission() {
+  local clock_rc=0
+  # Parent state is initialized once, never by a callback or command substitution.
+  [[ "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" == NOT_STARTED ]] || {
+    refuse_recovery_admission CLOCK_UNAVAILABLE initial_validation recovery_evidence 14; return 14;
+  }
+  read_recovery_monotonic_clock || clock_rc=$?
+  [[ "$clock_rc" -eq 0 ]] || {
+    refuse_recovery_admission CLOCK_UNAVAILABLE initial_validation recovery_evidence "$clock_rc"; return 14;
+  }
+  RECOVERY_ADMISSION_ORIGIN_NS="$RECOVERY_CLOCK_NOW_NS"
+  RECOVERY_ADMISSION_LAST_NS="$RECOVERY_CLOCK_NOW_NS"
+  RECOVERY_ADMISSION_DEADLINE_NS=$((RECOVERY_CLOCK_NOW_NS + 600000000000))
+  RECOVERY_ADMISSION_STATUS=ACTIVE
+}
+
+admit_recovery_work() {
+  [[ $# -eq 2 ]] || return 14
+  local operation="$1" target_id="$2" clock_rc=0
+  [[ "${RECOVERY_ADMISSION_STATUS:-NOT_STARTED}" == ACTIVE ]] || return 14
+  read_recovery_monotonic_clock || clock_rc=$?
+  if [[ "$clock_rc" -ne 0 ]]; then
+    refuse_recovery_admission CLOCK_UNAVAILABLE "$operation" "$target_id" "$clock_rc"; return 14
+  fi
+  if (( RECOVERY_CLOCK_NOW_NS < RECOVERY_ADMISSION_LAST_NS )); then
+    refuse_recovery_admission CLOCK_UNAVAILABLE "$operation" "$target_id" 14; return 14
+  fi
+  RECOVERY_ADMISSION_LAST_NS="$RECOVERY_CLOCK_NOW_NS"
+  if (( RECOVERY_CLOCK_NOW_NS >= RECOVERY_ADMISSION_DEADLINE_NS )); then
+    refuse_recovery_admission NOT_STARTED_BUDGET_REFUSAL "$operation" "$target_id" 0; return 14
+  fi
+}
+
+finish_rollback() {
+  local rc="$1"
+  # At most one safe terminal evidence attempt may exceed the work budget.
+  # It cannot authorize subsequent recovery work. No unsafe early receipt.
+  if [[ "${RECOVERY_EVIDENCE_VALIDATED:-false}" != true || "${RECOVERY_TERMINAL_ATTEMPTED:-false}" == true ]]; then
+    echo "ERROR: private rollback receipt unavailable; safety prerequisites not established or terminal attempt already made" >&2
+    exit "$rc"
+  fi
+  RECOVERY_TERMINAL_ATTEMPTED=true
+  if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence rollback "$rc"; then
+    echo "ERROR: private rollback receipt persistence failed; retained backups require manual review" >&2
+  fi
+  exit "$rc"
+}
+
+restore_recovery_source() {
+  [[ $# -eq 1 ]] || return 14
+  local relative matched=false
+  for relative in "${BUNDLE_FILES[@]}"; do
+    if [[ "$1" == "$relative" ]]; then matched=true; break; fi
+  done
+  [[ "$matched" == true && "$1" =~ ^[A-Za-z0-9_/.-]+$ && "$1" != /* && "$1" != */ && "$1" != *//* ]] || return 14
+  case "/$1/" in */./*|*/../*) return 14 ;; esac
+  record_recovery_evidence restore_source 0 "$1"
+}
+
+restore_recovery_dropin() {
+  [[ $# -eq 0 ]] || return 14
+  record_recovery_evidence restore_dropin 0
+}
+
+bounded_recovery_copy() {
+  [[ $# -eq 2 ]] || return 125
+  # Bound only this copy process group. A failed/terminated copy can leave a
+  # partial destination; the caller stops recovery without retry or cleanup.
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s \
+    cp -a -- "$1" "$2"
+}
+
+bounded_recovery_mutation() {
+  local operation="${1:-}" target_id="${2:-}" command_rc=0 relative matched=false
+  local -a arguments=()
+  [[ $# -eq 2 ]] || return 125
+  # Callers supply only allowlisted identifiers. Paths and command options are
+  # derived here; no caller can add recursive removal or override the deadline.
+  case "$operation:$target_id" in
+    dead_lock:gateway_lock) arguments=(rm -f -- "$LOCK_FILE") ;;
+    source_remove:*)
+      for relative in "${BUNDLE_FILES[@]}"; do
+        if [[ "$target_id" == "$relative" ]]; then matched=true; break; fi
+      done
+      [[ "$matched" == true && "$target_id" != /* && "$target_id" != *..* ]] || return 125
+      arguments=(rm -f -- "$TARGET_ROOT/$target_id") ;;
+    dropin_remove:service_drop_in) arguments=(rm -f -- "$SERVICE_DROP_IN") ;;
+    dropin_parent_create:service_drop_in_directory)
+      arguments=(install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR") ;;
+    dropin_chown:service_drop_in_directory|run_chown:run_directory)
+      [[ "${RECOVERY_UID:-}" =~ ^[0-9]+$ && "${RECOVERY_GID:-}" =~ ^[0-9]+$ ]] || return 125
+      if [[ "$operation" == dropin_chown ]]; then
+        arguments=(chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$SERVICE_DROP_IN_DIR")
+      else
+        arguments=(chown --no-dereference "$RECOVERY_UID:$RECOVERY_GID" "$RUN_DIR")
+      fi ;;
+    dropin_chmod:service_drop_in_directory|run_chmod:run_directory)
+      [[ "${RECOVERY_MODE:-}" =~ ^[0-7]{3,4}$ ]] || return 125
+      if [[ "$operation" == dropin_chmod ]]; then arguments=(chmod "$RECOVERY_MODE" "$SERVICE_DROP_IN_DIR")
+      else arguments=(chmod "$RECOVERY_MODE" "$RUN_DIR"); fi ;;
+    dropin_directory_remove:service_drop_in_directory) arguments=(rmdir -- "$SERVICE_DROP_IN_DIR") ;;
+    run_directory_remove:run_directory) arguments=(rmdir -- "$RUN_DIR") ;;
+    *) return 125 ;;
+  esac
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s "${arguments[@]}" || command_rc=$?
+  if [[ "$command_rc" -ne 0 && -z "${RECOVERY_MUTATION_FAILURE:-}" ]]; then
+    RECOVERY_MUTATION_FAILURE="$operation"
+    RECOVERY_MUTATION_TARGET="$target_id"
+    RECOVERY_MUTATION_EXIT_CODE="$command_rc"
+  fi
+  return "$command_rc"
+}
+
+checked_restore_step() {
+  local operation="$1" target_id="$2" operation_rc=0
+  shift 2
+  admit_recovery_work "$operation" "$target_id" || return $?
+  "$@" || operation_rc=$?
+  if [[ "$operation_rc" -ne 0 ]]; then
+    # Calls below use fixed operation IDs and bounded target identifiers. Keep
+    # the first failure, never raw output, separately from the triggering rc.
+    if [[ -z "$RECOVERY_RESTORE_FAILURE" ]]; then
+      RECOVERY_RESTORE_FAILURE="$operation"
+      RECOVERY_RESTORE_TARGET="$target_id"
+      RECOVERY_RESTORE_EXIT_CODE="$operation_rc"
+    fi
+    echo "ERROR: restoration operation $operation failed (exit $operation_rc); partial state requires review" >&2
+  fi
+  return "$operation_rc"
+}
+
+read_recovery_state() {
+  local response
+  RECOVERY_STATE=""
+  [[ $# -eq 1 ]] || return 14
+  response="$(record_recovery_evidence control_state 0 "$1" && printf '.')" || return $?
+  case "$response" in
+    $'present\n.') RECOVERY_STATE=present ;;
+    $'missing\n.') RECOVERY_STATE=missing ;;
+    *) return 14 ;;
+  esac
+}
+
+require_present_recovery_dropin() {
+  [[ $# -eq 0 ]] || return 14
+  read_recovery_state service_drop_in || return $?
+  [[ "$RECOVERY_STATE" == present ]] || return 14
+}
+
+read_recovery_source_state() {
+  local response
+  # The sentinel preserves trailing newlines so extra/empty output cannot be
+  # accepted accidentally. Query failure propagates even if it printed a state.
+  response="$(record_recovery_evidence source_state 0 "$1" && printf '.')" || return $?
+  case "$response" in
+    $'present\n.') RECOVERY_SOURCE_STATE=present ;;
+    $'missing\n.') RECOVERY_SOURCE_STATE=missing ;;
+    *) return 14 ;;
+  esac
+  [[ -z "${2:-}" || "$RECOVERY_SOURCE_STATE" == "$2" ]] || return 14
+}
+
+read_recovery_source_result() {
+  local relative="${1:-}" expected="${2:-}" response
+  [[ $# -eq 2 && -n "$relative" && ( "$expected" == present || "$expected" == missing ) ]] || return 14
+  SOURCE_RESULT_STATES[$relative]=FAILED
+  response="$(record_recovery_evidence source_result 0 "$relative" && printf '.')" || return $?
+  case "$response" in
+    $'observed_present\n.')
+      [[ "$expected" == present ]] || return 14
+      SOURCE_RESULT_STATES[$relative]=MATCHED_PREPARED_PRESENT ;;
+    $'observed_absent\n.')
+      [[ "$expected" == missing ]] || return 14
+      SOURCE_RESULT_STATES[$relative]=MATCHED_PREPARED_ABSENCE ;;
+    *) return 14 ;;
+  esac
+}
+
+read_recovery_dropin_result() {
+  local expected="${1:-}" response
+  [[ $# -eq 1 && ( "$expected" == present || "$expected" == missing ) ]] || return 14
+  RECOVERY_DROPIN_RESULT=FAILED
+  response="$(record_recovery_evidence dropin_result 0 && printf '.')" || return $?
+  case "$response" in
+    $'dropin_present\n.')
+      [[ "$expected" == present ]] || return 14
+      RECOVERY_DROPIN_RESULT=MATCHED_PREPARED_PRESENT ;;
+    $'dropin_absent\n.')
+      [[ "$expected" == missing ]] || return 14
+      RECOVERY_DROPIN_RESULT=MATCHED_PREPARED_ABSENCE ;;
+    *) return 14 ;;
+  esac
+}
+
+read_recovery_metadata() {
+  local response metadata
+  RECOVERY_UID="" RECOVERY_GID="" RECOVERY_MODE=""
+  [[ $# -eq 1 ]] || return 14
+  response="$(record_recovery_evidence control_metadata 0 "$1" && printf '.')" || return $?
+  [[ "$response" == *$'\n.' ]] || return 14
+  metadata="${response%$'\n.'}"
+  [[ "$metadata" =~ ^([0-9]+)\ ([0-9]+)\ ([0-7]{3,4})$ ]] || return 14
+  RECOVERY_UID="${BASH_REMATCH[1]}"
+  RECOVERY_GID="${BASH_REMATCH[2]}"
+  RECOVERY_MODE="${BASH_REMATCH[3]}"
+}
+
+read_recovery_runtime_directory_result() {
+  local expected="${1:-}" response
+  [[ $# -eq 1 && ( "$expected" == present || "$expected" == missing ) ]] || return 14
+  RECOVERY_RUNTIME_DIRECTORY_RESULT=FAILED
+  response="$(record_recovery_evidence runtime_directory_result 0 && printf '.')" || return $?
+  case "$response" in
+    $'runtime_directory_present\n.')
+      [[ "$expected" == present ]] || return 14
+      RECOVERY_RUNTIME_DIRECTORY_RESULT=MATCHED_PREPARED_PRESENT ;;
+    $'runtime_directory_absent\n.')
+      [[ "$expected" == missing ]] || return 14
+      RECOVERY_RUNTIME_DIRECTORY_RESULT=MATCHED_PREPARED_ABSENCE ;;
+    *) return 14 ;;
+  esac
+}
+
+read_recovery_dropin_directory_result() {
+  local expected="${1:-}" response
+  [[ $# -eq 1 && ( "$expected" == present || "$expected" == missing ) ]] || return 14
+  RECOVERY_DROPIN_DIRECTORY_RESULT=FAILED
+  response="$(record_recovery_evidence dropin_directory_result 0 && printf '.')" || return $?
+  case "$response" in
+    $'dropin_directory_present\n.')
+      [[ "$expected" == present ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_RESULT=MATCHED_PREPARED_PRESENT ;;
+    $'dropin_directory_absent\n.')
+      [[ "$expected" == missing ]] || return 14
+      RECOVERY_DROPIN_DIRECTORY_RESULT=MATCHED_PREPARED_ABSENCE ;;
+    *) return 14 ;;
+  esac
+}
+
+remove_recovery_directory() {
+  local operation target_id
+  [[ $# -eq 1 ]] || return 125
+  case "$1" in
+    "$SERVICE_DROP_IN_DIR") operation=dropin_directory_remove; target_id=service_drop_in_directory ;;
+    "$RUN_DIR") operation=run_directory_remove; target_id=run_directory ;;
+    *) return 125 ;;
+  esac
+  # Missing is the intended state; the existing result query still verifies it.
+  if [[ ! -e "$1" && ! -L "$1" ]]; then return 0; fi
+  bounded_recovery_mutation "$operation" "$target_id" || return $?
 }
 
 rollback() {
   local rc="${1:-1}"
+  # A forward dead-lock cleanup failure is distinct from this recovery attempt.
+  RECOVERY_MUTATION_FAILURE=""
+  RECOVERY_MUTATION_TARGET=""
+  RECOVERY_MUTATION_EXIT_CODE=0
+  # Recovery failures must not re-enter rollback or replace the triggering code.
+  trap - ERR
+  trap '' INT TERM
   set +e
   if [[ "$REPAIR_COMPLETE" != true ]]; then
+    begin_recovery_admission || finish_rollback "$rc"
+    admit_recovery_work initial_validation recovery_evidence || finish_rollback "$rc"
+    # Validate before the first service, lock or target-file mutation. This is a
+    # point-in-time check, not protection against a subsequent concurrent edit.
+    if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence verify "$rc"; then
+      echo "ERROR: ROLLBACK_REFUSED_INVALID_RECOVERY_EVIDENCE; no restoration attempted; original failure retained" >&2
+      RECOVERY_TERMINAL_ATTEMPTED=true
+      if ! require_safe_recovery_directory "$BACKUP_DIR" true || ! record_recovery_evidence rollback_refused "$rc"; then
+        echo "ERROR: private rollback refusal receipt unavailable; retained evidence requires manual review" >&2
+      fi
+      exit "$rc"
+    fi
+    RECOVERY_EVIDENCE_VALIDATED=true
     echo "Rolling back the complete gateway dependency closure and service identity..." >&2
-    systemctl stop "$SERVICE" >/dev/null 2>&1 || true
-    remove_verified_dead_lock || true
+    admit_recovery_work service_stop gateway_service || finish_rollback "$rc"
+    if ! bounded_recovery_systemctl stop; then
+      finish_rollback "$rc"
+    fi
+    RECOVERY_RESTORE_ATTEMPTED=true
+    checked_restore_step dead_lock gateway_lock remove_verified_dead_lock || finish_rollback "$rc"
     for rel in "${BUNDLE_FILES[@]}"; do
       target="$TARGET_ROOT/$rel"
       backup="$BACKUP_DIR/existing/$rel"
-      if [[ -f "$backup" ]]; then
-        rm -f -- "$target"
-        cp -a -- "$backup" "$target"
-      else
-        rm -f -- "$target"
+      checked_restore_step source_state "$rel" read_recovery_source_state "$rel" || finish_rollback "$rc"
+      checked_restore_step target_state "$rel" read_recovery_target_state "$rel" || finish_rollback "$rc"
+      if [[ "$RECOVERY_TARGET_STATE" == untouched ]]; then
+        SOURCE_RESULT_STATES[$rel]=UNCHECKED_UNTOUCHED
+        continue
       fi
+      checked_restore_step source_remove "$rel" bounded_recovery_mutation source_remove "$rel" || finish_rollback "$rc"
+      if [[ "$RECOVERY_SOURCE_STATE" == present ]]; then
+        # Recheck before copy as well: a removal may already have happened, but
+        # changed recovery bytes must not be copied or followed by service start.
+        checked_restore_step source_state "$rel" read_recovery_source_state "$rel" present || finish_rollback "$rc"
+        checked_restore_step target_absent "$rel" require_recovery_target_absent "$rel" || finish_rollback "$rc"
+        checked_restore_step source_copy "$rel" restore_recovery_source "$rel" || finish_rollback "$rc"
+      fi
+      checked_restore_step source_result "$rel" read_recovery_source_result "$rel" "$RECOVERY_SOURCE_STATE" || finish_rollback "$rc"
     done
 
-    rm -f -- "$SERVICE_DROP_IN"
-    prior_drop_in_state="$(< "$BACKUP_DIR/service-drop-in.state")"
-    if [[ "$prior_drop_in_state" == "present" ]]; then
-      install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR"
-      cp -a -- "$BACKUP_DIR/service-drop-in.before" "$SERVICE_DROP_IN"
-    fi
-    prior_drop_in_dir_state="$(< "$BACKUP_DIR/service-drop-in-dir.state")"
-    if [[ "$prior_drop_in_dir_state" == "present" ]]; then
-      read -r prior_drop_in_uid prior_drop_in_gid prior_drop_in_mode < \
-        "$BACKUP_DIR/service-drop-in-dir.metadata"
-      chown --no-dereference "$prior_drop_in_uid:$prior_drop_in_gid" "$SERVICE_DROP_IN_DIR"
-      chmod "$prior_drop_in_mode" "$SERVICE_DROP_IN_DIR"
+    checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
+    checked_restore_step dropin_target_state service_drop_in read_recovery_dropin_target_state || finish_rollback "$rc"
+    if [[ "$RECOVERY_DROPIN_TARGET_STATE" == untouched ]]; then
+      RECOVERY_DROPIN_RESULT=UNCHECKED_UNTOUCHED
     else
-      rmdir -- "$SERVICE_DROP_IN_DIR" >/dev/null 2>&1 || true
+      checked_restore_step dropin_state_read service_drop_in read_recovery_state service_drop_in || finish_rollback "$rc"
+      prior_drop_in_state="$RECOVERY_STATE"
+      checked_restore_step dropin_remove service_drop_in bounded_recovery_mutation dropin_remove service_drop_in || finish_rollback "$rc"
+      if [[ "$prior_drop_in_state" == "present" ]]; then
+        checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
+        checked_restore_step dropin_parent_create service_drop_in_directory bounded_recovery_mutation dropin_parent_create service_drop_in_directory || finish_rollback "$rc"
+        # Recheck prepared custody after removal/parent work. The following
+        # absence guard precedes admission; the writer then validates custody
+        # and creates exclusively from its verified descriptor capture.
+        checked_restore_step dropin_state_read service_drop_in require_present_recovery_dropin || finish_rollback "$rc"
+        checked_restore_step dropin_target_absent service_drop_in require_recovery_dropin_absent || finish_rollback "$rc"
+        checked_restore_step dropin_copy service_drop_in restore_recovery_dropin || finish_rollback "$rc"
+      fi
+      checked_restore_step dropin_result service_drop_in read_recovery_dropin_result "$prior_drop_in_state" || finish_rollback "$rc"
+    fi
+    if [[ "$RECOVERY_DROPIN_DIRECTORY_TARGET_STATE" == untouched ]]; then
+      RECOVERY_DROPIN_DIRECTORY_RESULT=UNCHECKED_UNTOUCHED
+    else
+      checked_restore_step dropin_directory_state_read service_drop_in_directory read_recovery_state service_drop_in_directory || finish_rollback "$rc"
+      prior_drop_in_dir_state="$RECOVERY_STATE"
+      if [[ "$prior_drop_in_dir_state" == "present" ]]; then
+        checked_restore_step dropin_metadata_read service_drop_in_directory read_recovery_metadata service_drop_in_directory || finish_rollback "$rc"
+        checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
+        checked_restore_step dropin_chown service_drop_in_directory bounded_recovery_mutation dropin_chown service_drop_in_directory || finish_rollback "$rc"
+        checked_restore_step dropin_chmod service_drop_in_directory bounded_recovery_mutation dropin_chmod service_drop_in_directory || finish_rollback "$rc"
+      else
+        checked_restore_step dropin_directory_target_state service_drop_in_directory read_recovery_dropin_directory_target_state || finish_rollback "$rc"
+        checked_restore_step dropin_directory_remove service_drop_in_directory remove_recovery_directory "$SERVICE_DROP_IN_DIR" || finish_rollback "$rc"
+      fi
+      checked_restore_step dropin_directory_result service_drop_in_directory read_recovery_dropin_directory_result "$prior_drop_in_dir_state" || finish_rollback "$rc"
     fi
 
-    prior_run_dir_state="$(< "$BACKUP_DIR/run-dir.state")"
-    if [[ "$prior_run_dir_state" == "present" ]]; then
-      read -r prior_run_uid prior_run_gid prior_run_mode < "$BACKUP_DIR/run-dir.metadata"
-      chown --no-dereference "$prior_run_uid:$prior_run_gid" "$RUN_DIR"
-      chmod "$prior_run_mode" "$RUN_DIR"
+    checked_restore_step run_target_state run_directory read_recovery_runtime_directory_target_state || finish_rollback "$rc"
+    if [[ "$RECOVERY_RUN_TARGET_STATE" == untouched ]]; then
+      RECOVERY_RUNTIME_DIRECTORY_RESULT=UNCHECKED_UNTOUCHED
     else
-      rmdir -- "$RUN_DIR" >/dev/null 2>&1 || true
+      checked_restore_step run_directory_state_read run_directory read_recovery_state run_directory || finish_rollback "$rc"
+      prior_run_dir_state="$RECOVERY_STATE"
+      if [[ "$prior_run_dir_state" == "present" ]]; then
+        checked_restore_step run_metadata_read run_directory read_recovery_metadata run_directory || finish_rollback "$rc"
+        checked_restore_step run_chown run_directory bounded_recovery_mutation run_chown run_directory || finish_rollback "$rc"
+        checked_restore_step run_chmod run_directory bounded_recovery_mutation run_chmod run_directory || finish_rollback "$rc"
+      else
+        checked_restore_step run_directory_remove run_directory remove_recovery_directory "$RUN_DIR" || finish_rollback "$rc"
+      fi
+      checked_restore_step runtime_directory_result run_directory read_recovery_runtime_directory_result "$prior_run_dir_state" || finish_rollback "$rc"
     fi
 
-    systemctl daemon-reload >/dev/null 2>&1 || true
-    systemctl reset-failed "$SERVICE" >/dev/null 2>&1 || true
+    admit_recovery_work service_daemon-reload gateway_service || finish_rollback "$rc"
+    if ! bounded_recovery_systemctl daemon-reload; then
+      finish_rollback "$rc"
+    fi
+    admit_recovery_work service_reset-failed gateway_service || finish_rollback "$rc"
+    if ! bounded_recovery_systemctl reset-failed; then
+      finish_rollback "$rc"
+    fi
     if [[ "$SERVICE_WAS_ACTIVE" == true ]]; then
-      systemctl start "$SERVICE" >/dev/null 2>&1 || true
+      admit_recovery_work service_start gateway_service || finish_rollback "$rc"
+      if ! bounded_recovery_systemctl start; then
+        finish_rollback "$rc"
+      fi
     fi
     SERVICE_STOPPED=false
   fi
-  exit "$rc"
+  finish_rollback "$rc"
 }
 
 trap 'rc=$?; echo "ERROR: gateway closure repair stopped on line $LINENO" >&2; rollback "$rc"' ERR
 trap 'echo "Gateway closure repair interrupted." >&2; rollback 130' INT TERM
 
-systemctl stop "$SERVICE"
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl stop "$SERVICE"
 SERVICE_STOPPED=true
 remove_verified_dead_lock
 
-install -d -o root -g root -m 0755 -- "$SERVICE_DROP_IN_DIR"
-install -o root -g root -m 0644 -- \
-  "$STAGE_DIR/20-lumencore-runtime-hardening.conf" "$SERVICE_DROP_IN"
+install_gateway_dropin_directory
+install_gateway_dropin
 [[ "$(sha256sum "$SERVICE_DROP_IN" | awk '{print $1}')" == "$HARDENING_SHA" ]] || {
   echo "ERROR: installed gateway service hardening SHA-256 mismatch" >&2
-  exit 17
+  rollback 17
 }
-install -d -o "$SERVICE_USER" -g "$SERVICE_GROUP" -m 0750 -- "$RUN_DIR"
-systemctl daemon-reload
+install_gateway_runtime_directory
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl daemon-reload
 
 POST_APPLY_HASH_MATCHES=0
 printf '%-64s  %-64s  %s\n' "POST_APPLY_SOURCE_SHA256" "POST_APPLY_TARGET_SHA256" "RELATIVE_PATH"
 for rel in "${BUNDLE_FILES[@]}"; do
-  install -D -o root -g root -m 0644 -- "$STAGE_DIR/$rel" "$TARGET_ROOT/$rel"
+  install_gateway_source "$rel"
   post_apply_source_sha="$(sha256sum "$SOURCE_ROOT/$rel" | awk '{print $1}')"
   post_apply_target_sha="$(sha256sum "$TARGET_ROOT/$rel" | awk '{print $1}')"
   printf '%-64s  %-64s  %s\n' "$post_apply_source_sha" "$post_apply_target_sha" "$rel"
   [[ "$post_apply_source_sha" == "$post_apply_target_sha" ]] || {
     echo "ERROR: post-apply source/target SHA-256 mismatch: $rel" >&2
-    exit 17
+    rollback 17
   }
   POST_APPLY_HASH_MATCHES=$((POST_APPLY_HASH_MATCHES + 1))
 done
 printf 'POST_APPLY_HASH_PARITY=%s/%s\n' "$POST_APPLY_HASH_MATCHES" "${#BUNDLE_FILES[@]}"
 
-systemctl reset-failed "$SERVICE" >/dev/null 2>&1 || true
-systemctl start "$SERVICE"
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl reset-failed "$SERVICE" >/dev/null 2>&1 || true
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl start "$SERVICE"
 SERVICE_STOPPED=false
 
-systemctl is-active --quiet "$SERVICE" || {
+"$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl is-active --quiet "$SERVICE" || {
   echo "ERROR: gateway service did not become active" >&2
-  exit 18
+  rollback 18
 }
-effective_user="$(systemctl show "$SERVICE" --property=User --value)"
-effective_group="$(systemctl show "$SERVICE" --property=Group --value)"
-effective_restart="$(systemctl show "$SERVICE" --property=Restart --value)"
-effective_umask="$(systemctl show "$SERVICE" --property=UMask --value)"
-effective_no_new_privileges="$(systemctl show "$SERVICE" --property=NoNewPrivileges --value)"
-effective_private_tmp="$(systemctl show "$SERVICE" --property=PrivateTmp --value)"
+effective_user="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=User --value)" || rollback "$?"
+effective_group="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=Group --value)" || rollback "$?"
+effective_restart="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=Restart --value)" || rollback "$?"
+effective_umask="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=UMask --value)" || rollback "$?"
+effective_no_new_privileges="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=NoNewPrivileges --value)" || rollback "$?"
+effective_private_tmp="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=PrivateTmp --value)" || rollback "$?"
 [[ "$effective_user" == "$SERVICE_USER" && "$effective_group" == "$SERVICE_GROUP" ]] || {
   echo "ERROR: effective gateway service identity is not lumencore:lumencore" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_restart" == "on-failure" ]] || {
   echo "ERROR: effective gateway restart policy is not bounded to on-failure" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_umask" == "0027" ]] || {
   echo "ERROR: effective gateway umask is not 0027" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_no_new_privileges" == "yes" || "$effective_no_new_privileges" == "true" ]] || {
   echo "ERROR: effective gateway NoNewPrivileges control is not enabled" >&2
-  exit 18
+  rollback 18
 }
 [[ "$effective_private_tmp" == "yes" || "$effective_private_tmp" == "true" ]] || {
   echo "ERROR: effective gateway PrivateTmp control is not enabled" >&2
-  exit 18
+  rollback 18
 }
-[[ "$(stat -c '%U:%G:%a' "$SERVICE_DROP_IN")" == "root:root:644" ]] || {
+effective_dropin_metadata="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%U:%G:%a' "$SERVICE_DROP_IN")" && [[ "$effective_dropin_metadata" == "root:root:644" ]] || {
   echo "ERROR: gateway service hardening file ownership or mode is unsafe" >&2
-  exit 18
+  rollback 18
 }
-[[ "$(stat -c '%U:%G:%a' "$RUN_DIR")" == "${SERVICE_USER}:${SERVICE_GROUP}:750" ]] || {
+effective_run_metadata="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%U:%G:%a' "$RUN_DIR")" && [[ "$effective_run_metadata" == "${SERVICE_USER}:${SERVICE_GROUP}:750" ]] || {
   echo "ERROR: gateway run directory identity is not bounded" >&2
-  exit 18
+  rollback 18
 }
 
 lock_ready=false
 for attempt in $(seq 1 12); do
   if [[ -f "$LOCK_FILE" && ! -L "$LOCK_FILE" ]]; then
-    main_pid="$(systemctl show "$SERVICE" --property=MainPID --value)"
-    lock_pid="$(tr -d '[:space:]' < "$LOCK_FILE")"
+    main_pid="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s systemctl show "$SERVICE" --property=MainPID --value)" || rollback "$?"
+    lock_pid="$(read_gateway_lock_pid)" || rollback 18
     if [[ "$main_pid" =~ ^[1-9][0-9]*$ && "$lock_pid" == "$main_pid" ]]; then
       lock_ready=true
       break
@@ -633,11 +2424,11 @@ for attempt in $(seq 1 12); do
 done
 [[ "$lock_ready" == true ]] || {
   echo "ERROR: gateway singleton lock did not bind to the systemd main PID" >&2
-  exit 18
+  rollback 18
 }
-[[ "$(stat -c '%U:%G:%a' "$LOCK_FILE")" == "${SERVICE_USER}:${SERVICE_GROUP}:640" ]] || {
+effective_lock_metadata="$("$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s stat -c '%U:%G:%a' "$LOCK_FILE")" && [[ "$effective_lock_metadata" == "${SERVICE_USER}:${SERVICE_GROUP}:640" ]] || {
   echo "ERROR: gateway singleton lock identity is not bounded" >&2
-  exit 18
+  rollback 18
 }
 
 probe_json() {
@@ -648,7 +2439,88 @@ probe_json() {
   for attempt in $(seq 1 12); do
     status="$(curl -sS --max-time 15 -o "$output" -w '%{http_code}' \
       "${url}?repair=${SOURCE_COMMIT:0:12}-${attempt}" || true)"
-    if [[ "$status" == "200" ]] && python3 -m json.tool "$output" >/dev/null 2>&1; then
+    if [[ "$status" == "200" ]] && "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 -m json.tool "$output" >/dev/null 2>&1; then
+      printf '%s\n' "$status"
+      return 0
+    fi
+    sleep 3
+  done
+  printf '%s\n' "$status"
+  return 1
+}
+
+probe_operator_http_boundary() {
+  local url="$1"
+  local body_file="$2"
+  local header_file="$3"
+  local status="000"
+  local content_type=""
+  local curl_result
+  local normalized_headers
+  local attempt
+  for attempt in $(seq 1 12); do
+    : > "$body_file"
+    : > "$header_file"
+    curl_result="$(curl -sS --max-time 15 \
+      --header 'Cache-Control: no-cache' \
+      --output "$body_file" \
+      --dump-header "$header_file" \
+      --write-out '%{http_code}\t%{content_type}' \
+      "${url}?repair=${SOURCE_COMMIT:0:12}-${attempt}" || true)"
+    IFS=$'\t' read -r status content_type <<< "$curl_result"
+    if [[ "$status" == "401" || "$status" == "503" ]]; then
+      if [[ "${content_type,,}" == application/json* ]] && \
+        "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - "$body_file" "$status" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+expected_detail = (
+    "operator API authentication required"
+    if sys.argv[2] == "401"
+    else "operator API access unavailable"
+)
+assert payload == {"detail": expected_detail}
+PY
+      then
+        normalized_headers="$(tr -d '\r' < "$header_file")"
+        if grep -Eiq '^cache-control:[[:space:]]*no-store([[:space:]]|$)' \
+          <<< "$normalized_headers" && \
+          grep -Eiq '^pragma:[[:space:]]*no-cache([[:space:]]|$)' \
+          <<< "$normalized_headers"; then
+          if [[ "$status" != "401" ]] || \
+            grep -Eiq '^www-authenticate:[[:space:]]*Bearer([[:space:]]|$)' \
+              <<< "$normalized_headers"; then
+            printf '%s\n' "$status"
+            return 0
+          fi
+        fi
+      fi
+    fi
+    sleep 3
+  done
+  printf '%s\n' "${status:-000}"
+  return 1
+}
+
+probe_operator_websocket_boundary() {
+  local url="$1"
+  local output="$2"
+  local allow_not_found="${3:-false}"
+  local status="000"
+  local attempt
+  for attempt in $(seq 1 12); do
+    status="$(curl -sS --max-time 15 --http1.1 \
+      --header 'Cache-Control: no-cache' \
+      --header 'Connection: Upgrade' \
+      --header 'Upgrade: websocket' \
+      --header 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
+      --header 'Sec-WebSocket-Version: 13' \
+      --output "$output" \
+      --write-out '%{http_code}' \
+      "${url}?repair=${SOURCE_COMMIT:0:12}-${attempt}" || true)"
+    if [[ "$status" == "403" || ( "$allow_not_found" == "true" && "$status" == "404" ) ]]; then
       printf '%s\n' "$status"
       return 0
     fi
@@ -662,7 +2534,10 @@ LOCAL_HEALTH_BODY="$(mktemp)"
 PUBLIC_HEALTH_BODY="$(mktemp)"
 LOCAL_STATUS_BODY="$(mktemp)"
 PUBLIC_STATUS_BODY="$(mktemp)"
-trap 'rm -f -- "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY" "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY"; cleanup' EXIT
+OPERATOR_HTTP_BODY="$(mktemp)"
+OPERATOR_HTTP_HEADERS="$(mktemp)"
+OPERATOR_WEBSOCKET_BODY="$(mktemp)"
+trap 'rm -f -- "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY" "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY" "$OPERATOR_HTTP_BODY" "$OPERATOR_HTTP_HEADERS" "$OPERATOR_WEBSOCKET_BODY"; cleanup' EXIT
 
 LOCAL_HEALTH_STATUS="$(probe_json "$LOCAL_HEALTH_URL" "$LOCAL_HEALTH_BODY")" || {
   echo "ERROR: local gateway health failed (HTTP ${LOCAL_HEALTH_STATUS:-000})" >&2
@@ -682,7 +2557,7 @@ PUBLIC_PUBLIC_STATUS="$(probe_json "$PUBLIC_STATUS_URL" "$PUBLIC_STATUS_BODY")" 
 }
 
 for body in "$LOCAL_STATUS_BODY" "$PUBLIC_STATUS_BODY"; do
-  python3 - "$body" <<'PY'
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - "$body" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -698,7 +2573,7 @@ PY
 done
 
 for body in "$LOCAL_HEALTH_BODY" "$PUBLIC_HEALTH_BODY"; do
-  python3 - "$body" <<'PY'
+  "$RECOVERY_TIMEOUT_BIN" --signal=TERM --kill-after=5s 60s python3 - "$body" <<'PY'
 import json
 import re
 import sys
@@ -720,6 +2595,56 @@ assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", payload["generated_
 PY
 done
 
+LOCAL_OPERATOR_HTTP_STATUSES=()
+PUBLIC_OPERATOR_HTTP_STATUSES=()
+for path in "${PROTECTED_OPERATOR_HTTP_PATHS[@]}"; do
+  route_label="${path#/}"
+  route_label="${route_label//\//_}"
+  route_label="${route_label//./_}"
+  local_operator_status="$(
+    probe_operator_http_boundary \
+      "${LOCAL_GATEWAY_BASE_URL}${path}" \
+      "$OPERATOR_HTTP_BODY" \
+      "$OPERATOR_HTTP_HEADERS"
+  )" || {
+    echo "ERROR: local anonymous operator boundary failed for ${path} (HTTP ${local_operator_status:-000})" >&2
+    rollback 19
+  }
+  public_operator_status="$(
+    probe_operator_http_boundary \
+      "${PUBLIC_GATEWAY_BASE_URL}${path}" \
+      "$OPERATOR_HTTP_BODY" \
+      "$OPERATOR_HTTP_HEADERS"
+  )" || {
+    echo "ERROR: public anonymous operator boundary failed for ${path} (HTTP ${public_operator_status:-000})" >&2
+    rollback 20
+  }
+  LOCAL_OPERATOR_HTTP_STATUSES+=("${route_label}:${local_operator_status}")
+  PUBLIC_OPERATOR_HTTP_STATUSES+=("${route_label}:${public_operator_status}")
+done
+
+LOCAL_OPERATOR_WEBSOCKET_STATUS="$(
+  probe_operator_websocket_boundary \
+    "${LOCAL_GATEWAY_BASE_URL}${PROTECTED_OPERATOR_WEBSOCKET_PATH}" \
+    "$OPERATOR_WEBSOCKET_BODY"
+)" || {
+  echo "ERROR: local anonymous WebSocket boundary failed (HTTP ${LOCAL_OPERATOR_WEBSOCKET_STATUS:-000})" >&2
+  rollback 21
+}
+PUBLIC_OPERATOR_WEBSOCKET_STATUS="$(
+  probe_operator_websocket_boundary \
+    "${PUBLIC_GATEWAY_BASE_URL}${PROTECTED_OPERATOR_WEBSOCKET_PATH}" \
+    "$OPERATOR_WEBSOCKET_BODY" \
+    true
+)" || {
+  echo "ERROR: public anonymous WebSocket boundary failed (HTTP ${PUBLIC_OPERATOR_WEBSOCKET_STATUS:-000})" >&2
+  rollback 22
+}
+
+if ! helper_receipt_sha="$(record_recovery_evidence helper 0)"; then
+  echo "ERROR: private helper receipt persistence failed after mutation" >&2
+  rollback 23
+fi
 REPAIR_COMPLETE=true
 trap - ERR INT TERM
 echo "GATEWAY_RUNTIME_CLOSURE_REPAIR_OK"
@@ -727,9 +2652,14 @@ echo "GATEWAY_DEPENDENCY_CLOSURE_REPAIR_OK"
 echo "Source commit: $SOURCE_COMMIT"
 echo "Bundle SHA-256: $BUNDLE_SHA"
 echo "Service hardening SHA-256: $HARDENING_SHA"
+echo "Private helper outcome receipt SHA-256: $helper_receipt_sha"
 echo "Effective service identity: ${effective_user}:${effective_group}"
 echo "Effective restart/umask/no-new-privileges/private-tmp: ${effective_restart}/${effective_umask}/${effective_no_new_privileges}/${effective_private_tmp}"
 echo "Run directory identity: $(stat -c '%U:%G:%a' "$RUN_DIR")"
 echo "Singleton lock identity: $(stat -c '%U:%G:%a' "$LOCK_FILE") pid_matches_main=true"
 echo "Local health HTTP: $LOCAL_HEALTH_STATUS | Public health HTTP: $PUBLIC_HEALTH_STATUS"
 echo "Local status HTTP: $LOCAL_PUBLIC_STATUS | Public status HTTP: $PUBLIC_PUBLIC_STATUS"
+echo "Local anonymous operator HTTP boundaries: ${LOCAL_OPERATOR_HTTP_STATUSES[*]}"
+echo "Public anonymous operator HTTP boundaries: ${PUBLIC_OPERATOR_HTTP_STATUSES[*]}"
+echo "Local anonymous WebSocket boundary: ws:${LOCAL_OPERATOR_WEBSOCKET_STATUS}"
+echo "Public anonymous WebSocket boundary: ws:${PUBLIC_OPERATOR_WEBSOCKET_STATUS}"

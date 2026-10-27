@@ -6,6 +6,25 @@ invoice, commitment, validation result, or authorization to transfer data.
 Use this page to determine whether one buyer-owned decision can be converted
 into a bounded validation scope. Mark unknown facts `UNKNOWN`; do not guess.
 
+## Start the conversation
+
+For a first email, three short answers are enough:
+
+1. **Your business and decision:** What recent task or technical decision would
+   you like to improve?
+2. **What you use today:** What process, tool or baseline would a useful
+   improvement need to beat?
+3. **Owner and timing:** Who reviews the result, and when would it be useful?
+
+Use the [three-question email on the public offer](https://lumen-core.ai/proof_to_pilot.html#start-conversation),
+or copy those questions into your own email to the contact shown there. Share
+only a non-confidential description; keep datasets, personal records and
+credentials out of the first email. `UNKNOWN` is an acceptable answer.
+
+These answers start a fit conversation. They do not book a sprint, transfer
+data rights, accept terms or authorize evaluation. Complete the facts below
+before treating an inquiry as a scope candidate.
+
 ## First-fit facts
 
 1. **Buyer:** legal organization name, public website, and buyer contact role.
@@ -19,6 +38,20 @@ into a bounded validation scope. Mark unknown facts `UNKNOWN`; do not guess.
 7. **Decision owner and timing:** named role, useful-by date, and timezone.
 8. **Commercial route:** known budget range, purchase-order or vendor-onboarding
    requirements, and contracting contact. Use `UNKNOWN` when not confirmed.
+9. **Read-only shadow boundary:** choose `offline_replay` or
+   `read_only_shadow`; confirm no production write access, live actuation, or
+   production credentials; and name the incumbent source/version, stable row
+   and event keys, outcome-availability delay, allowed egress, decision latency,
+   fallback behavior, retention/deletion rule, matched comparison conditions,
+   and human approval owner.
+   Identify the records that can establish when both arms' predictions and
+   the protocol were committed, their model identities, and what information
+   was available at issuance. Supplied timestamps or SHA-256 hashes alone do
+   not establish pre-outcome custody; unknown custody keeps promotion on hold.
+10. **Economic conversion inputs, if requested:** buyer-owned addressable
+    denominator; currency, unit, and time window; eligible share; measured
+    technical delta; realization factor; implementation and run costs; and a
+    stable non-overlap group. Any `UNKNOWN` keeps dollar conversion disabled.
 
 ## Do not send during the first fit check
 

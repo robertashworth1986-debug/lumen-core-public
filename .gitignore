@@ -27,6 +27,7 @@ luma_live_keys.env
 *.csv
 *.jsonl
 *.zip
+!/dashboard/downloads/eia-two-window-review-20260922.zip
 *.tar.gz
 *.parquet
 
@@ -37,6 +38,7 @@ dashboard/*.html
 !dashboard/quant_lab.html
 !dashboard/kraken_execution_dashboard.html
 !dashboard/grants.html
+!dashboard/capital_research_lab.html
 !dashboard/forecast.html
 !dashboard/explain.html
 !dashboard/operator_home.html

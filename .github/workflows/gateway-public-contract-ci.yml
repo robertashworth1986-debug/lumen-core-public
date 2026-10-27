@@ -25,6 +25,8 @@ on:
       - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'code/ops/probe_public_health.py'
+      - 'tests/test_public_health_probe.py'
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
@@ -55,6 +57,8 @@ on:
       - 'code/deploy/deploy_vps.sh'
       - 'code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh'
       - 'tests/test_booth_public_contract_runtime.py'
+      - 'code/ops/probe_public_health.py'
+      - 'tests/test_public_health_probe.py'
       - '.github/workflows/repair-gateway-dependency-closure.yml'
       - '.github/workflows/gateway-public-contract-ci.yml'
       - '.github/workflows/health-probe.yml'
@@ -67,8 +71,8 @@ permissions:
 
 jobs:
   public-contract:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -78,6 +82,21 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
+
+      - name: Verify native GNU timeout prerequisite
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout_bin="$(type -P timeout)" || timeout_bin=''
+          timeout_version=''
+          if [[ -z "$timeout_bin" || ! -x "$timeout_bin" ]] \
+            || ! timeout_version="$("$timeout_bin" --version)" \
+            || [[ "$timeout_version" != 'timeout (GNU coreutils)'* ]]; then
+            printf '::error::Native gateway fixtures require GNU timeout; resolved=%s version=%s\n' \
+              "${timeout_bin:-missing}" "${timeout_version:-unavailable}" >&2
+            exit 10
+          fi
+          printf 'Native gateway timeout: %s (%s)\n' "$timeout_bin" "${timeout_version%%$'\n'*}"
 
       - name: Compile gateway dependency closure
         run: |
@@ -89,7 +108,58 @@ jobs:
           # shellcheck disable=SC2086
           python -m py_compile $gateway_paths \
             tests/test_booth_public_contract_runtime.py \
+            code/ops/probe_public_health.py \
+            tests/test_public_health_probe.py \
             tests/test_vps_runtime_diagnostic_workflow.py
+
+      - name: Record timeout prerequisite diagnostics
+        continue-on-error: true
+        timeout-minutes: 1
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          import subprocess
+
+          selected = shutil.which("timeout")
+          resolved = os.path.realpath(selected) if selected else None
+          executable = bool(selected and os.path.isfile(selected) and os.access(selected, os.X_OK))
+          evidence = {
+              "selected_path": selected,
+              "resolved_path": resolved,
+              "executable": executable,
+              "version_timeout_seconds": 5,
+              "version_exit_status": None,
+              "version_stdout": "",
+              "version_stderr": "",
+              "version_output_complete": False,
+          }
+          # Observe the runner prerequisite, never execute an arbitrary PATH shadow.
+          if selected not in ("/usr/bin/timeout", "/bin/timeout") or not executable:
+              evidence["status"] = "SKIPPED_UNTRUSTED_OR_UNAVAILABLE_PATH"
+          else:
+              try:
+                  result = subprocess.run(
+                      [selected, "--version"], stdin=subprocess.DEVNULL,
+                      capture_output=True, timeout=5, check=False,
+                  )
+                  evidence.update(
+                      status="COMPLETED", version_exit_status=result.returncode,
+                      version_stdout=result.stdout.decode("utf-8", errors="backslashreplace"),
+                      version_stderr=result.stderr.decode("utf-8", errors="backslashreplace"),
+                      version_output_complete=True,
+                  )
+              except subprocess.TimeoutExpired as exc:
+                  evidence.update(
+                      status="TIMED_OUT",
+                      version_stdout=(exc.stdout or b"").decode("utf-8", errors="backslashreplace"),
+                      version_stderr=(exc.stderr or b"").decode("utf-8", errors="backslashreplace"),
+                  )
+              except OSError as exc:
+                  evidence.update(status="LAUNCH_FAILED", error=str(exc))
+          print(json.dumps(evidence, indent=2, sort_keys=True))
+          PY
 
       - name: Run public contract tests without third-party dependencies
         run: |
@@ -100,6 +170,7 @@ jobs:
           tests = []
           for path in (
               "tests/test_booth_public_contract_runtime.py",
+              "tests/test_public_health_probe.py",
               "tests/test_vps_runtime_diagnostic_workflow.py",
           ):
               namespace = runpy.run_path(path)

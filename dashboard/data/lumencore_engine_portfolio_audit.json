@@ -1,10 +1,14 @@
 {
   "schema": "lumencore_engine_portfolio_audit_v2",
-  "generated_at_utc": "2026-08-19T14:19:16.519238Z",
+  "scope": "tracked_file_presence_only",
+  "execution_verified_by_this_audit": false,
+  "customer_acceptance_verified_by_this_audit": false,
+  "observed_maturity_contract": "Legacy compatibility enum derived only from configured tracked-file presence; it does not establish execution, test results, operational readiness or customer acceptance.",
+  "generated_at_utc": "2026-10-14T16:50:04.473680Z",
   "source_registry": "config/lumencore_engine_portfolio_v2.json",
-  "source_registry_sha256": "c74af7a6be4bc0cacdf9afd6210dcfb4fef4607fffbe9980bcdeeadd863e4b47",
+  "source_registry_sha256": "1d6930af5d20338210f82b8f6fbf368474d3f793a15de8009a7a5cfabb01c705",
   "source_registry_hash_scope": "canonical JSON: UTF-8, sorted keys, compact separators",
-  "source_note": "The 15 founder engine names are audited as internal platform lanes, not 15 finished products or 15 separate offers. Only repository evidence is scored.",
+  "source_note": "The 15 founder engine names are internal platform lanes, not finished products or separate offers. Observed maturity scores only configured tracked repository files; the October 4 expanded scope review separately records privately recovered source and historical receipts.",
   "primary_offer_binding": {
     "platform": "LumenCore",
     "evidence_layer": "ProofLock",
@@ -17,16 +21,20 @@
     "evidence_graph_sha256": "cabd1378b6597f168f047ab94acce388564e23de2cc58a879a8e74810b7ebd05"
   },
   "summary": {
+    "scope": "tracked_file_presence_only",
+    "execution_verified_by_this_audit": false,
+    "customer_acceptance_verified_by_this_audit": false,
     "portfolio_lane_count": 15,
     "primary_offer_count": 1,
     "priority_lane_id": "lumen_infrastructure_sentinel",
-    "priority_lane_maturity": "runnable_component",
+    "priority_lane_maturity": "tested_implementation",
+    "priority_lane_inventory_label": "Tracked source, entrypoint and test files present",
     "priority_lane_scoping_candidate": true,
     "maturity_counts": {
       "component_only": 2,
       "concept_only": 2,
-      "runnable_component": 8,
-      "tested_implementation": 3
+      "runnable_component": 7,
+      "tested_implementation": 4
     },
     "lane_counts": {
       "concept_lane": 2,
@@ -49,13 +57,17 @@
       "id": "lumen_infrastructure_sentinel",
       "name": "Lumen Infrastructure Sentinel",
       "lane": "priority_validation_lane",
-      "safe_description": "Infrastructure baseline, drift, anomaly, and evidence-packet tooling.",
+      "safe_description": "Infrastructure evidence-readiness and offline forecast-comparison tooling; historical market-screening components remain separately identified.",
       "buyer_profile": "Data-center, utility, hospital IT, telecom, and managed-service operators with an authorized historical or replay dataset.",
-      "scoping_use": "Test one declared infrastructure claim against an accepted incumbent baseline and return replayable decision evidence.",
-      "acceptance_gate": "Detect declared injected or historical failure modes at an agreed false-alert rate on buyer-authorized data.",
-      "claim_boundary": "No outage prevention, realized savings, field validation, safety control, or production deployment claim.",
-      "observed_maturity": "runnable_component",
-      "evidence_classes_present": 5,
+      "scoping_use": "Review one authorized dataset and an owner-accepted precomputed forecast baseline under a separately locked protocol. The included v2 run is synthetic and does not implement outage detection.",
+      "acceptance_gate": "Before an infrastructure-failure claim, implement and independently review the declared failure detector and agreed false-alert rate on buyer-authorized data. The offline forecast reviewer cannot close this gate.",
+      "claim_boundary": "Synthetic local comparisons only. No implemented infrastructure-failure detector, outage prevention, realized savings, field validation, safety control, or production deployment claim.",
+      "observed_maturity": "tested_implementation",
+      "inventory_label": "Tracked source, entrypoint and test files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
+      "evidence_classes_present": 6,
       "evidence_classes_total": 6,
       "missing_paths": [],
       "untracked_paths": [],
@@ -76,27 +88,52 @@
             "git_blob_sha": "8143c65be10734ccc7457d3215c68dff0499ee8b",
             "bytes": 63993,
             "sha256": "e05a39b6622a4546bb13b5578d9901b14a658203e9966c98ac4a8eff8afa1d8e"
+          },
+          {
+            "path": "code/forecast_evaluation_v2.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "38bd94c0aee9135e8518391b0fb21fb1fb003426",
+            "bytes": 18888,
+            "sha256": "bd91cacc1212b6f93944333b3ff535990d3c41966a7ec8568f98433e58e863c5"
           }
         ],
         "entrypoint": [
           {
-            "path": "code/institutional_harmonic_infrastructure.py",
+            "path": "code/forecast_evaluation_v2.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "a7bdd7c3a1e57ecc9f5a9a9a4fb5dd36f7fbe129",
-            "bytes": 9849,
-            "sha256": "e7092c5abd500245a8eb08e4f068a182205732263904a42014cf775645f18e73"
+            "git_blob_sha": "38bd94c0aee9135e8518391b0fb21fb1fb003426",
+            "bytes": 18888,
+            "sha256": "bd91cacc1212b6f93944333b3ff535990d3c41966a7ec8568f98433e58e863c5"
           }
         ],
-        "test": [],
+        "test": [
+          {
+            "path": "tests/test_forecast_evaluation_v2.py",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "29f9350fdaaab348a24f68232585b0eb9ad2caba",
+            "bytes": 31859,
+            "sha256": "e5fe13e9477e0fc2b5223ad0b8e0c0694d543ca0d272d806d9416e89189f4e6a"
+          }
+        ],
         "documentation": [
           {
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
+          },
+          {
+            "path": "docs/FORECAST_EVALUATION_V2_REVIEW.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "8b4c64c2f28a00a908f2b6ab7c91103372bd9083",
+            "bytes": 4376,
+            "sha256": "a3c2a0e1602c0af062e6355b8abe5e6370277f5ac372286a19967c1e1ba66c4d"
           }
         ],
         "artifact": [
@@ -125,12 +162,16 @@
       "id": "echoform_identity_engine",
       "name": "EchoForm Identity Engine",
       "lane": "concept_lane",
-      "safe_description": "Identity-consistent digital-twin architecture concept.",
+      "safe_description": "Identity-consistent digital-twin architecture with privately reviewed conventional memory-boundary prototype evidence; configured repository implementation/test paths remain absent.",
       "buyer_profile": "Future privacy-preserving personal-AI and simulation research partners.",
-      "scoping_use": "Requirements workshop only after privacy, consent, threat-model, and minimization rules are defined.",
+      "scoping_use": "Reproduce the bounded memory/consent/provenance prototype and retain the failed upstream identity challenge before any broader identity claim.",
       "acceptance_gate": "A consent-first prototype passes deletion, provenance, revocation, and identity-consistency tests.",
       "claim_boundary": "No biometric certification, medical inference, identity proof, or continuity-of-person claim.",
       "observed_maturity": "concept_only",
+      "inventory_label": "No tracked source file in the configured evidence",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 1,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -155,6 +196,14 @@
             "git_blob_sha": "8e473237701dd3c163aec518c3f69b17f519afd6",
             "bytes": 4873,
             "sha256": "71e899a8a31052896ee36cf33773cf83bde3e3958f5b5dc33a01306b1b6c45bd"
+          },
+          {
+            "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
+            "exists": true,
+            "tracked": true,
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [],
@@ -171,6 +220,10 @@
       "acceptance_gate": "A deterministic simulator beats a named baseline on a locked latency, resilience, or allocation metric.",
       "claim_boundary": "No city deployment, critical-infrastructure control, latency, resilience, or savings claim.",
       "observed_maturity": "concept_only",
+      "inventory_label": "No tracked source file in the configured evidence",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 1,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -203,6 +256,10 @@
       "acceptance_gate": "Forward labels show useful lift over the named baseline using permitted sources.",
       "claim_boundary": "No investment recommendation, campaign quality guarantee, or return claim.",
       "observed_maturity": "component_only",
+      "inventory_label": "Tracked source files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 1,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -235,6 +292,10 @@
       "acceptance_gate": "A blinded synthetic-case review meets a locked completeness and agreement threshold.",
       "claim_boundary": "No forensic conclusion, chain-of-custody certification, legal admissibility, or autonomous response claim.",
       "observed_maturity": "component_only",
+      "inventory_label": "Tracked source files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 3,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -279,12 +340,16 @@
       "id": "energy_harmonization_engine",
       "name": "Energy Harmonization Engine",
       "lane": "research_lane",
-      "safe_description": "Energy-data evidence pipeline and simulation research component.",
+      "safe_description": "Energy-data evidence pipeline plus historical wave/geothermal research with offline source-history recovery; full data replay and independent evaluation remain open.",
       "buyer_profile": "Utilities, facility operators, energy researchers, and government laboratories with authorized data.",
       "scoping_use": "Run one buyer-authorized forecast replay or evidence-quality assessment on a declared decision.",
       "acceptance_gate": "Meet locked accuracy, calibration, timeliness, and economic-conversion rules against a named baseline.",
       "claim_boundary": "No nuclear control, field validation, outage savings, or universal harmonic-superiority claim.",
       "observed_maturity": "runnable_component",
+      "inventory_label": "Tracked source and entrypoint files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 3,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -337,12 +402,16 @@
       "id": "flowform_hardware_engine",
       "name": "FlowForm Hardware Engine",
       "lane": "research_lane",
-      "safe_description": "Simulation and audit tooling for geometry-informed routing concepts.",
+      "safe_description": "Geometry-informed routing research including privately recovered synthetic LumaJet baseline and assurance receipts; no physical performance established.",
       "buyer_profile": "Aerospace, robotics, EV, and electronics R&D teams with a declared comparator.",
       "scoping_use": "Freeze one geometry, comparator, metric set, mesh, solver, and independent bench plan.",
       "acceptance_gate": "Pre-registered simulation and independent bench tests beat named baselines on declared measures.",
       "claim_boundary": "No physical thermal, electromagnetic, battery, structural, manufacturing, or field-performance claim.",
       "observed_maturity": "runnable_component",
+      "inventory_label": "Tracked source and entrypoint files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 3,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -401,6 +470,10 @@
       "acceptance_gate": "Prospective after-fee paper results, deterministic kill controls, and complete ledger reconciliation.",
       "claim_boundary": "No live trading authority, profit, return, signal service, or investment-advice claim.",
       "observed_maturity": "tested_implementation",
+      "inventory_label": "Tracked source, entrypoint and test files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 5,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -411,9 +484,9 @@
             "path": "code/kraken_execution.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "1c704111b73f224101828658640ccb8f44dbe12d",
-            "bytes": 4780,
-            "sha256": "985860a84269c29a1a81ff906d53fb9c4f76d529964b464cd4c88646aa483b10"
+            "git_blob_sha": "0aaf19380724fc8acc9de8f2b42645e7693bc646",
+            "bytes": 4795,
+            "sha256": "bc0fc48d338a2e2c6b4ed640964045228af9979621b1b140a2b9de6a949360a4"
           },
           {
             "path": "code/kraken_swing_hunter.py",
@@ -439,9 +512,9 @@
             "path": "tests/test_order_safety_gate.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "dc2197adea3d0699e387a4e9217e078fa98dd8ab",
-            "bytes": 6043,
-            "sha256": "657e2f7ed8e5e6b766c48d52376a178446740f0d320c4c6b7d7b8f8d4b6fd658"
+            "git_blob_sha": "012d0efd0abd328934b192563a43433f061a73f5",
+            "bytes": 7650,
+            "sha256": "29eeb6393d5ee29b07025bb8cc3257a61acd96d98d23a1aeb9406fbbe9d5ab2a"
           }
         ],
         "documentation": [
@@ -449,9 +522,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [],
@@ -477,6 +550,10 @@
       "acceptance_gate": "Users complete declared tasks within locked error, latency, and comfort thresholds.",
       "claim_boundary": "No operational command authority, training efficacy, comfort, or safety certification claim.",
       "observed_maturity": "runnable_component",
+      "inventory_label": "Tracked source and entrypoint files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 4,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -544,6 +621,10 @@
       "acceptance_gate": "Forward outcomes improve on a declared baseline using licensed or permitted data.",
       "claim_boundary": "No hit prediction, label adoption, revenue lift, or undocumented data-rights claim.",
       "observed_maturity": "runnable_component",
+      "inventory_label": "Tracked source and entrypoint files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 4,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -619,6 +700,10 @@
       "acceptance_gate": "Prospective paper results meet a locked after-cost threshold without breaching risk or reconciliation gates.",
       "claim_boundary": "No alpha, profitability, institutional readiness, investment advice, or live-capital claim.",
       "observed_maturity": "tested_implementation",
+      "inventory_label": "Tracked source, entrypoint and test files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 6,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -657,9 +742,9 @@
             "path": "tests/test_order_safety_alpaca_paper_boundary.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "b53d76597e0096ba197e3663394eeeab5805eb5a",
-            "bytes": 5107,
-            "sha256": "fe69da2abe53702112894edaecba1bc38edc5efb52ceae90de0a2b10f323c759"
+            "git_blob_sha": "45b0cefc9aeb262ec8125c40d34c9befa3d58c83",
+            "bytes": 7377,
+            "sha256": "9fc28549279515195fe1686635ec225d1c8058683fb77e965bd7b4dfd5132e2a"
           }
         ],
         "documentation": [
@@ -667,9 +752,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [
@@ -704,6 +789,10 @@
       "acceptance_gate": "Prospective calibration and ranking metrics beat declared baselines without hidden selection.",
       "claim_boundary": "No betting advice, guaranteed edge, profit, or consumer wagering automation.",
       "observed_maturity": "runnable_component",
+      "inventory_label": "Tracked source and entrypoint files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 3,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -762,6 +851,10 @@
       "acceptance_gate": "Reproduce declared scenarios and meet a locked decision metric without hidden data or hindsight.",
       "claim_boundary": "No complete world model, operational prediction, policy authority, or cross-sector-superiority claim.",
       "observed_maturity": "runnable_component",
+      "inventory_label": "Tracked source and entrypoint files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 3,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -812,6 +905,10 @@
       "acceptance_gate": "Complete the workflow with fewer verified defects or less preparation time and no approval-boundary breach.",
       "claim_boundary": "No autonomous legal, procurement, financial, trading, safety-critical, or production-gateway authority.",
       "observed_maturity": "runnable_component",
+      "inventory_label": "Tracked source and entrypoint files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 5,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -859,9 +956,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [
@@ -896,6 +993,10 @@
       "acceptance_gate": "Reduce verified preparation latency or conformance defects while preserving source and approval controls.",
       "claim_boundary": "No guaranteed eligibility, submission, award, savings, certification, signature, or portal authority.",
       "observed_maturity": "tested_implementation",
+      "inventory_label": "Tracked source, entrypoint and test files present",
+      "scope": "tracked_file_presence_only",
+      "execution_verified_by_this_audit": false,
+      "customer_acceptance_verified_by_this_audit": false,
       "evidence_classes_present": 6,
       "evidence_classes_total": 6,
       "missing_paths": [],
@@ -906,17 +1007,17 @@
             "path": "code/grant_submission_kit.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
-            "bytes": 28088,
-            "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
+            "git_blob_sha": "d57dc1548da74c2086b6c5513ce652aae6af6fbb",
+            "bytes": 28987,
+            "sha256": "b2cc71f2464b7aca8590ac25ddf450ab64c9267af8b0b2b911aa0c0fa13eff6f"
           },
           {
             "path": "code/grant_application_factory.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "c2af80fe73df85cc7a54adf07318227d502a4b50",
-            "bytes": 100552,
-            "sha256": "d8042eebcc2838f6af602232d630c909d1ae5175774b4eb7ebe37a30846ac7b6"
+            "git_blob_sha": "3548eb662615b78f53122f6c66e332257fa7ef00",
+            "bytes": 95973,
+            "sha256": "310d9901224ac163559697fb780dca772c7a6129882490d130f68adb528c1f42"
           }
         ],
         "entrypoint": [
@@ -924,9 +1025,9 @@
             "path": "code/grant_submission_kit.py",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "817d00dc2b053815be0f79d4a6b2fb9fcc7f6ae2",
-            "bytes": 28088,
-            "sha256": "be1c8aa24dd89c229da0693bc7ef05348fa4f590dcf5d93447c0c10cef7789b2"
+            "git_blob_sha": "d57dc1548da74c2086b6c5513ce652aae6af6fbb",
+            "bytes": 28987,
+            "sha256": "b2cc71f2464b7aca8590ac25ddf450ab64c9267af8b0b2b911aa0c0fa13eff6f"
           }
         ],
         "test": [
@@ -952,9 +1053,9 @@
             "path": "docs/PLATFORM_PROOF_AND_COMMERCIALIZATION_MAP.md",
             "exists": true,
             "tracked": true,
-            "git_blob_sha": "22da7ecb3b74d5177ab0ddeba7f514693e8c9ef5",
-            "bytes": 3968,
-            "sha256": "466c25d008486c93d2a2245ccd3156666b08f3875272ac01d0a5fd28f4c6f565"
+            "git_blob_sha": "d933f6e14b562a6baed2edd363ff670081f2e36c",
+            "bytes": 19683,
+            "sha256": "8705e233ecdb18029fa478eef0dea0fd55d852e71fdedd137df3a6048bf29d45"
           }
         ],
         "artifact": [
@@ -992,6 +1093,6 @@
     "algorithm": "sha256",
     "canonicalization": "utf8-json-sort-keys-compact",
     "hash_scope": "entire payload excluding integrity",
-    "payload_sha256": "983084f99486bc94023686241ecb48ea4a7d6a2880bd5aa6cd978c3d46c4d271"
+    "payload_sha256": "9449e92fb1f4e663e8e49a03bcfc5aa9683845431502592c6ed3285aef5c2c6a"
   }
 }

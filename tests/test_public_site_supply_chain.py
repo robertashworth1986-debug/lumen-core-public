@@ -95,14 +95,14 @@ def test_current_commit_builds_and_verifies_exact_release_inventory(tmp_path):
 
     assert verification["valid"] is True
     assert verification["source_commit"] == commit
-    assert verification["release_file_count"] == 43
-    assert verification["inventoried_release_file_count"] == 43
+    assert verification["release_file_count"] == 246
+    assert verification["inventoried_release_file_count"] == 246
     assert verification["inventory_coverage_ratio"] == 1.0
     assert verification["production_decision"].startswith("HOLD_")
     assert payload["bomFormat"] == "CycloneDX"
     assert payload["specVersion"] == "1.6"
-    assert len(payload["components"]) == 43
-    assert len(payload["dependencies"]) == 44
+    assert len(payload["components"]) == 246
+    assert len(payload["dependencies"]) == 247
     assert local["signed_attestation_state"] == "NOT_CREATED_BY_THIS_LOCAL_BUILDER"
     assert local["coverage"]["exact_release_file_coverage_ratio"] == 1.0
 
@@ -265,12 +265,22 @@ def test_guide_must_keep_slsa_and_live_deployment_boundaries(tmp_path):
 def test_pr_and_main_gates_track_every_release_file():
     for workflow_path in (EXACT_SNAPSHOT_CI, WORKFLOW_PATH):
         workflow = workflow_path.read_text(encoding="utf-8")
-        trigger = workflow.split("permissions:", maxsplit=1)[0]
+        trigger = workflow.split("\nconcurrency:", maxsplit=1)[0].split("\npermissions:", maxsplit=1)[0]
         event_blocks = (
             trigger.split("pull_request:", maxsplit=1)[1].split("push:", maxsplit=1)[0],
             trigger.split("push:", maxsplit=1)[1],
         )
-        for event_block in event_blocks:
+        for event_index, event_block in enumerate(event_blocks):
+            if workflow_path == WORKFLOW_PATH and event_index == 1:
+                # Deployment requires the exact current main source digest even
+                # when a commit changes only docs, tests or private-safe evidence.
+                # No path, tag or other event filter may strand that identity.
+                config_lines = [
+                    line.strip() for line in event_block.splitlines()
+                    if line.strip() and not line.lstrip().startswith("#")
+                ]
+                assert config_lines == ["branches: [main]"]
+                continue
             patterns = re.findall(
                 r"^\s+- ['\"]([^'\"]+)['\"]$", event_block, re.MULTILINE
             )

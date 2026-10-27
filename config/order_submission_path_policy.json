@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-19.live-data-no-orders.v5",
+  "version": "2026-10-13.live-data-no-orders.v6",
   "promotion_stage": "live_data_no_orders",
   "patterns": {
     "kraken_add_order": "\\bAddOrder\\b",
@@ -66,7 +66,9 @@
     {
       "path": "code/luma_experience_gateway_legacy.py",
       "classification": "historical_preserved",
-      "expected_git_blob_sha": "d55b8187fc23d1e8b11fe5be4a09ccad91a5f20b"
+      "expected_git_blob_sha": "069c810af23b472651448afbb23b9e3fbe97bf8c",
+      "custody_note": "Rebound for October 13 bounded executor and owned native lifetime-lock repairs. Gateway order adapters and guarded facade remain unchanged; local delayed-I/O, cancellation and overlap regressions check the repaired lifecycle. Native Windows execution and live installation are separate gates.",
+      "reviewed_base_commit": "c8bfc2f92a38fddc09a79b8c09595d03d6dc881c"
     },
     {
       "path": "code/auto_ticket_producer_legacy.py",
@@ -97,21 +99,71 @@
       "custody_note": "Rebound after reviewed endpoint-secret separation; the fixed paper origin remains mandatory.",
       "reviewed_source_commit": "37f53fdfa3fcfdb68a5938f0e02eb261dbbb10c7"
     },
-    {"path": "code/kraken_execution.py", "classification": "guarded_facade"},
-    {"path": "code/execution/live_executor.py", "classification": "guarded_facade"},
-    {"path": "code/luma_experience_gateway.py", "classification": "guarded_facade"},
-    {"path": "code/kraken_swing_hunter.py", "classification": "guarded_facade"},
-    {"path": "code/micro_position_kraken_bot.py", "classification": "guarded_facade"},
-    {"path": "code/execution/order_safety_gate.py", "classification": "guard_implementation"},
-    {"path": "code/execution/alpaca_paper_executor.py", "classification": "paper_sandbox", "required": true},
-    {"path": "code/run_universal_meta_orchestrator.py", "classification": "paper_only_orchestrator", "required": true},
-    {"path": "code/multi_exchange_paper_ticker.py", "classification": "paper_sandbox"},
-    {"path": "code/alpaca_paper_loop_builder.py", "classification": "source_builder"},
-    {"path": "code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py", "classification": "source_builder"},
-    {"path": "code/HARD_TRUTH_LIVE_MEASUREMENT_AUDIT.py", "classification": "measurement_auditor"},
-    {"path": "code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py", "classification": "policy_auditor"},
-    {"path": "tests/**", "classification": "test_fixture"},
-    {"path": "code/**/*_legacy.py", "classification": "historical_preserved"},
-    {"path": "code/**/*.py.bak", "classification": "historical_backup"}
+    {
+      "path": "code/kraken_execution.py",
+      "classification": "guarded_facade"
+    },
+    {
+      "path": "code/execution/live_executor.py",
+      "classification": "guarded_facade"
+    },
+    {
+      "path": "code/luma_experience_gateway.py",
+      "classification": "guarded_facade"
+    },
+    {
+      "path": "code/kraken_swing_hunter.py",
+      "classification": "guarded_facade"
+    },
+    {
+      "path": "code/micro_position_kraken_bot.py",
+      "classification": "guarded_facade"
+    },
+    {
+      "path": "code/execution/order_safety_gate.py",
+      "classification": "guard_implementation"
+    },
+    {
+      "path": "code/execution/alpaca_paper_executor.py",
+      "classification": "paper_sandbox",
+      "required": true
+    },
+    {
+      "path": "code/run_universal_meta_orchestrator.py",
+      "classification": "paper_only_orchestrator",
+      "required": true
+    },
+    {
+      "path": "code/multi_exchange_paper_ticker.py",
+      "classification": "paper_sandbox"
+    },
+    {
+      "path": "code/alpaca_paper_loop_builder.py",
+      "classification": "source_builder"
+    },
+    {
+      "path": "code/REBUILD_FULL_ADAPTIVE_LIVE_STACK.py",
+      "classification": "source_builder"
+    },
+    {
+      "path": "code/HARD_TRUTH_LIVE_MEASUREMENT_AUDIT.py",
+      "classification": "measurement_auditor"
+    },
+    {
+      "path": "code/ops/AUDIT_ORDER_SUBMISSION_PATHS.py",
+      "classification": "policy_auditor"
+    },
+    {
+      "path": "tests/**",
+      "classification": "test_fixture"
+    },
+    {
+      "path": "code/**/*_legacy.py",
+      "classification": "historical_preserved"
+    },
+    {
+      "path": "code/**/*.py.bak",
+      "classification": "historical_backup"
+    }
   ]
 }

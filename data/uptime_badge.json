@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "label": "status",
-  "message": "outage · static=outage · gateway=outage",
-  "color": "red",
+  "message": "operational · static=operational · gateway=operational",
+  "color": "brightgreen",
   "cacheSeconds": 3600
 }

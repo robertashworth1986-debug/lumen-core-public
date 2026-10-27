@@ -1,4 +1,9 @@
 from pathlib import Path
+import json
+import shutil
+import subprocess
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -279,3 +284,80 @@ def test_customer_path_and_operator_path_are_deliberately_separate():
     assert 'label: "External Review"' in fabric
     assert 'label: "Quant"' not in fabric
     assert 'label: "Grants"' not in fabric
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="requires the JavaScript runtime")
+def test_command_navigation_selects_only_the_complete_current_route():
+    cases = [
+        ("https://lumen-core.ai/", ["Home"]),
+        ("https://lumen-core.ai/index.html", ["Home"]),
+        ("https://lumen-core.ai/operator_home.html", ["Home"]),
+        ("https://lumen-core.ai/evidence/", ["Evidence"]),
+        ("https://lumen-core.ai/evidence", ["Evidence"]),
+        ("https://lumen-core.ai/evidence/index.html?review=1#source", ["Evidence"]),
+        ("https://lumen-core.ai/build_week/prooflock_console/", ["ProofLock"]),
+        ("https://lumen-core.ai/build_week/prooflock_console/index.html", ["ProofLock"]),
+        ("https://lumen-core.ai/external_review.html", ["External Review"]),
+        ("https://lumen-core.ai/cohort/", []),
+        ("https://lumen-core.ai/cohort/index.html", []),
+        ("https://lumen-core.ai/other/external_review.html", []),
+        ("https://lumen-core.ai/other/operator_home.html", []),
+        ("file:///checkout/dashboard/operator_home.html", ["Home"]),
+        ("file:///checkout/dashboard/evidence/index.html", ["Evidence"]),
+    ]
+    harness = r"""
+const fs = require("node:fs");
+const vm = require("node:vm");
+const source = fs.readFileSync(process.argv[1], "utf8");
+const urls = JSON.parse(process.argv[2]);
+const results = urls.map((href) => {
+  const location = new URL(href);
+  const elements = [];
+  function element(tag) {
+    const node = {
+      tag, children: [], dataset: {}, attributes: {},
+      setAttribute(key, value) { this.attributes[key] = value; },
+      appendChild(child) { this.children.push(child); },
+      addEventListener() {},
+    };
+    elements.push(node);
+    return node;
+  }
+  const ids = new Map();
+  const document = {
+    readyState: "complete",
+    currentScript: { src: location.protocol === "file:"
+      ? "file:///checkout/dashboard/assets/luma_command_fabric.js"
+      : "https://lumen-core.ai/assets/luma_command_fabric.js" },
+    body: element("body"),
+    createElement: element,
+    getElementById(id) {
+      if (!ids.has(id)) ids.set(id, element("div"));
+      return ids.get(id);
+    },
+    querySelectorAll() { return []; },
+    addEventListener() {},
+  };
+  const window = { dispatchEvent() {} };
+  window.self = window.top = window;
+  vm.runInNewContext(source, {
+    window, document, location, URL, AbortController,
+    CustomEvent: class {},
+    setTimeout() {}, clearTimeout() {}, setInterval() {},
+    fetch: async () => ({ ok: true, json: async () => ({ status: "ok" }) }),
+  });
+  const links = elements.filter(node => node.tag === "a" && node.className?.startsWith("lcf-link"));
+  return {
+    active: links.filter(node => node.className.split(" ").includes("active")).map(node => node.textContent),
+    current: links.filter(node => node.attributes["aria-current"] === "page").map(node => node.textContent),
+  };
+});
+process.stdout.write(JSON.stringify(results));
+"""
+    result = subprocess.run(
+        ["node", "-e", harness, str(DASHBOARD / "assets/luma_command_fabric.js"),
+         json.dumps([url for url, _ in cases])],
+        check=True, capture_output=True, text=True,
+    )
+    for (url, expected), actual in zip(cases, json.loads(result.stdout), strict=True):
+        assert actual == {"active": expected, "current": expected}, url

@@ -381,8 +381,14 @@ def _fmt_usd(value: float) -> str:
     return f"${value:,.0f}"
 
 
-def _fmt_pct(value: float) -> str:
-    return f"{value * 100.0:,.2f}%"
+def _fmt_pct(value: float | None) -> str:
+    try:
+        percentage = float(value) * 100.0
+    except (TypeError, ValueError, OverflowError):
+        return "Unknown"
+    if isinstance(value, bool) or not math.isfinite(percentage):
+        return "Unknown"
+    return f"{percentage:,.2f}%"
 
 
 def _pct_delta(current: float, baseline: float) -> float:
@@ -961,7 +967,7 @@ def _dashboard_data(report: dict, hashes: dict, status: dict, ledger: list[dict]
     equity = _f(portfolio.get("equity_usd"), 0.0)
     cash = _f(portfolio.get("cash_usd"), 0.0)
     gross = _f(portfolio.get("gross_position_value_usd"), 0.0)
-    ret = _f(portfolio.get("return_pct"), 0.0)
+    ret = portfolio.get("return_pct")
 
     equity_curve = [seed]
     realized = 0.0
@@ -1136,7 +1142,10 @@ def _build_template(include_cross_sector: bool) -> tuple[pn.template.FastListTem
     seed_card, seed_value = _metric_card("Seed Capital", "Reset-aware base capital.")
     equity_card, equity_value = _metric_card("Equity", "Marked portfolio equity.")
     cash_card, cash_value = _metric_card("Cash", "Undeployed reserve.")
-    return_card, return_value = _metric_card("Return Since Seed", "Compounded marked return.")
+    return_card, return_value = _metric_card(
+        "Return Since Seed",
+        "Paper/model metric. Return is Unknown when external cash flows are unreconciled.",
+    )
 
     equity_plot = pn.pane.Plotly(go.Figure(), config={"displayModeBar": False}, sizing_mode="stretch_width")
     concentration_plot = pn.pane.Plotly(go.Figure(), config={"displayModeBar": False}, sizing_mode="stretch_width")

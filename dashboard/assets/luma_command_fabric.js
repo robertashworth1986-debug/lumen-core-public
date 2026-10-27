@@ -20,10 +20,18 @@
   ];
 
   var isFile = location.protocol === "file:";
-  var currentFile = (location.pathname.replace(/\\/g, "/").split("/").pop() || "").toLowerCase();
   var isOperatorSurface = false;
   var ROUTES = PUBLIC_ROUTES;
   var scriptUrl = document.currentScript && document.currentScript.src;
+  var currentPath = location.pathname;
+  if (isFile && scriptUrl) {
+    var dashboardPath = new URL("../", scriptUrl).pathname;
+    if (currentPath.indexOf(dashboardPath) === 0) {
+      currentPath = "/" + currentPath.slice(dashboardPath.length);
+    }
+  }
+  currentPath = normalizeRoutePath(currentPath);
+  if (currentPath === "/operator_home.html") currentPath = "/";
   var markHref = scriptUrl
     ? new URL("./lumaarc_arc_seal_v1.png", scriptUrl).href
     : "/assets/lumaarc_arc_seal_v1.png";
@@ -39,6 +47,10 @@
     publicStatus: null,
     snapshot: null,
   };
+
+  function normalizeRoutePath(path) {
+    return path.replace(/\\/g, "/").replace(/\/index\.html$/, "/").replace(/\/+$/, "") || "/";
+  }
 
   function hrefFor(path) {
     if (!isFile) return path;
@@ -214,11 +226,9 @@
     nav.className = "lcf-nav";
     ROUTES.forEach(function (route) {
       var link = document.createElement("a");
-      var file = route.href.split("/").pop().toLowerCase();
-      var active = route.href === "/"
-        ? (currentFile === "" || currentFile === "operator_home.html")
-        : file === currentFile;
+      var active = normalizeRoutePath(route.href) === currentPath;
       link.className = "lcf-link" + (active ? " active" : "");
+      if (active) link.setAttribute("aria-current", "page");
       link.href = hrefFor(route.href);
       link.textContent = route.label;
       link.title = route.hint;

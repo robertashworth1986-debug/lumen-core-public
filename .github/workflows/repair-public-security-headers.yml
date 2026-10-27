@@ -167,7 +167,8 @@ jobs:
               && grep -Eiq '^x-frame-options:[[:space:]]*DENY$' "$normalized" \
               && grep -Eiq '^strict-transport-security:[[:space:]]*max-age=31536000$' "$normalized" \
               && grep -Eiq "^content-security-policy:.*frame-ancestors 'none'" "$normalized" \
-              && grep -Eiq '^permissions-policy:.*camera=\(\)' "$normalized"; then
+              && grep -Eiq '^permissions-policy:.*camera=\(\)' "$normalized" \
+              && python3 code/ops/repair_public_security_headers.py --verify-response-headers "$headers"; then
               printf 'OK\t%s\tattempt=%s\n' "$route" "$attempt" | tee -a "$receipt"
               rm -f -- "$headers" "$normalized" "$body"
               return 0

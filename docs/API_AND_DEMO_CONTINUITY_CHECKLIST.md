@@ -81,8 +81,12 @@ The fallback should show the proof workflow even if live services are temporaril
 
 ### Cloudflare Pages continuity package
 
-The bounded 43-file public-site snapshot can be materialized as a Pages-compatible
-directory without reading uncommitted worktree bytes:
+This existing continuity package advances outcome 2: reproducible reviewer evidence.
+The bounded public-site allowlist is read as literal data from the exact pinned
+source commit, not from a dirty worktree or executed historical Python. Membership
+can evolve; the manifest records `source_file_count`, `alias_count`, `file_count`,
+and every source blob ID, byte length and SHA-256 rather than promising 43 files.
+The Pages-compatible directory is materialized without uncommitted file bytes:
 
 ```bash
 python code/deploy/build_cloudflare_pages_preview.py \
@@ -142,3 +146,4 @@ Avoid:
 - showing one-time codes,
 - implying API continuity when billing or credits are not verified,
 - committing screenshots that contain account data.
+

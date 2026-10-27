@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -196,6 +197,20 @@ class InstitutionalReadinessTests(unittest.TestCase):
             'test -z "$(git status --porcelain --untracked-files=all)"',
             full_suite,
         )
+
+    def test_readiness_register_pins_python_compatible_runner(self) -> None:
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        verify_job = re.search(
+            r"^  verify:\n(.*?)(?=^  [\w-]+:\n|\Z)",
+            workflow,
+            re.MULTILINE | re.DOTALL,
+        )
+        self.assertIsNotNone(verify_job)
+        assert verify_job is not None
+        job = verify_job.group(1)
+        self.assertIn("\n    runs-on: ubuntu-24.04\n", job)
+        self.assertIn("\n          python-version: '3.11.9'\n", job)
+        self.assertNotIn("runs-on: ubuntu-latest", job)
 
     def test_institutional_dependency_lock_is_complete_and_claim_bounded(self) -> None:
         receipt = LOCK_MODULE.verify_lock()
