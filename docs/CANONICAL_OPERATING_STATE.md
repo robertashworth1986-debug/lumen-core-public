@@ -2339,3 +2339,14 @@ The [proof-to-pilot page](https://lumen-core.ai/proof_to_pilot.html) includes th
 Three scoped emails were sent and verified through authoritative SENT readback: two cohort business invitations to choose one measurable workflow, and one ORNL partnership-routing follow-up with the two frozen EIA windows. One requested written tutorial was posted and read back in the existing EC member thread. Dollar examples were explicitly hypothetical staff-capacity arithmetic; no measured client savings were asserted. Exact recipients, messages and receipts remain in the existing private E-drive estate. No reply accepting a pilot, signed contract, license or cleared payment is established by these sends.
 
 The next commercial gate remains an owner, permissioned baseline, metric, prospective observation plan and agreed scope. Continue substantive responses through the existing threads. Maintain the cohort contribution as free, paper-only or nonclinical where applicable. Our strength is making everyone else stronger.
+
+## October 25 dashboard worker liveness correction (local review)
+
+Outcome 2: reliable reviewer evidence generation. The local dashboard worker
+now uses the gateway's query-only Windows process-check pattern instead of
+`os.kill(pid, 0)`. Access failures and malformed owner records preserve the
+existing lock; only a confirmed absent owner permits reclamation. Native
+Windows and portable API-error regressions cover the correction, with a
+Windows job added to the existing snapshot gate. This is local software
+validation, not independent evaluation or runtime deployment. The separately
+prepared Mission Control PR #261 release remains unchanged.
