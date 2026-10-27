@@ -82,6 +82,11 @@ else:
 if hasattr(app, "add_middleware"):
     install_operator_api_access(app)
 
+if _legacy is not None and hasattr(app, "add_api_route"):
+    from operator_feed_reads import install_private_feed_routes
+
+    install_private_feed_routes(app, _legacy.ROOT)
+
 
 def _operator_health() -> dict[str, Any]:
     """Retain detailed legacy health behind the operator API boundary."""
@@ -126,3 +131,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

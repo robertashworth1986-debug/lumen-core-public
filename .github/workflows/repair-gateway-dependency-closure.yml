@@ -86,7 +86,7 @@ jobs:
           mapfile -t files < <(
             bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --print-files
           )
-          [[ "${#files[@]}" -eq 20 ]]
+          [[ "${#files[@]}" -eq 21 ]]
           for relative in "${files[@]}"; do
             [[ -f "code/$relative" && ! -L "code/$relative" ]]
             install -D -m 0644 "code/$relative" "$source_root/$relative"
@@ -437,3 +437,4 @@ jobs:
             /tmp/gateway-repair/public-verification-outcome.json
           if-no-files-found: warn
           retention-days: 30
+

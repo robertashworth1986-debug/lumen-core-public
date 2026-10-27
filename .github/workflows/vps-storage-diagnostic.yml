@@ -569,7 +569,7 @@ jobs:
           repair_script=code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
           expected_manifest=/tmp/lumencore-approved-gateway-closure.txt
           mapfile -t files < <(bash "$repair_script" --print-files)
-          [[ "${#files[@]}" -eq 20 ]]
+          [[ "${#files[@]}" -eq 21 ]]
           : > "$expected_manifest"
           for relative in "${files[@]}"; do
             [[ "$relative" =~ ^[A-Za-z0-9_./-]+\.py$ ]]
@@ -756,3 +756,4 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/$REPOSITORY/statuses/$COMMIT_SHA" \
             --data-binary @/tmp/runtime-diagnostic-status.json
+

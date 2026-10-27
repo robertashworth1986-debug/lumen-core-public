@@ -211,7 +211,7 @@ def test_gateway_closure_comparison_is_exact_commit_and_read_only() -> None:
     assert "REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh" in text
     assert '--print-files' in text
     assert '--bundle-sha' in text
-    assert '[[ "${#files[@]}" -eq 20 ]]' in text
+    assert '[[ "${#files[@]}" -eq 21 ]]' in text
     assert "approved_gateway_bundle_sha256" in text
     assert "expected_file_count" in text
     assert "closure_file status=match" in text
@@ -242,3 +242,4 @@ def test_runtime_diagnostic_publishes_a_separate_readiness_verdict() -> None:
     assert "VPS runtime gate ACTION_REQUIRED; diagnostic receipt captured" in text
     assert "VPS runtime gate INDETERMINATE; diagnostic receipt captured" in text
     assert "diagnostic/lumencore-vps-runtime" in text
+
