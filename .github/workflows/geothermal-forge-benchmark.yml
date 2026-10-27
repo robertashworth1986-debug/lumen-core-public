@@ -1,0 +1,93 @@
+name: Utah FORGE Geothermal Benchmark Dataset
+
+on:
+  push:
+    branches:
+      - "exp/geothermal-forge-benchmark"
+    paths:
+      - "experiments/geothermal/**"
+      - ".github/workflows/geothermal-forge-benchmark.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: geothermal-forge-benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Download official GDR1683 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/geothermal-forge/raw
+          curl --fail --location \
+            --retry 6 --retry-delay 5 --retry-all-errors \
+            --connect-timeout 20 --max-time 600 \
+            --user-agent "LumenCore-Research/1.0 reproducible-benchmark" \
+            "https://gdr.openei.org/files/1683/Extended%20Circulation%20Test.zip" \
+            --output out/geothermal-forge/Extended_Circulation_Test.zip
+          test -s out/geothermal-forge/Extended_Circulation_Test.zip
+          unzip -t out/geothermal-forge/Extended_Circulation_Test.zip
+          sha256sum out/geothermal-forge/Extended_Circulation_Test.zip \
+            | tee out/geothermal-forge/SOURCE_SHA256.txt
+
+      - name: Extract and inventory source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          unzip -q out/geothermal-forge/Extended_Circulation_Test.zip \
+            -d out/geothermal-forge/raw
+          find out/geothermal-forge/raw -type f -printf '%P\t%s bytes\n' \
+            | sort | tee out/geothermal-forge/FILE_INVENTORY.txt
+          test -s out/geothermal-forge/FILE_INVENTORY.txt
+
+      - name: Build machine-readable acquisition receipt
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib
+          root = pathlib.Path('out/geothermal-forge')
+          archive = root / 'Extended_Circulation_Test.zip'
+          files = []
+          for p in sorted((root / 'raw').rglob('*')):
+              if p.is_file():
+                  files.append({
+                      'path': str(p.relative_to(root / 'raw')),
+                      'size_bytes': p.stat().st_size,
+                      'suffix': p.suffix.lower(),
+                  })
+          receipt = {
+              'dataset': 'Utah FORGE Wells 16A(78)-32 and 16B(78)-32 Extended Circulation Test Data - August and September 2024',
+              'gdr_submission': 1683,
+              'doi': '10.15121/2475065',
+              'source_url': 'https://gdr.openei.org/files/1683/Extended%20Circulation%20Test.zip',
+              'archive_size_bytes': archive.stat().st_size,
+              'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(),
+              'extracted_file_count': len(files),
+              'files': files,
+              'source_state': 'raw_uncorrected_with_calibration_and_final_report',
+              'claim_boundary': 'External field source. No performance claim is authorized by acquisition alone.'
+          }
+          (root / 'ACQUISITION_RECEIPT.json').write_text(json.dumps(receipt, indent=2) + '\n')
+          PY
+          python -m json.tool out/geothermal-forge/ACQUISITION_RECEIPT.json >/dev/null
+
+      - name: Upload geothermal source evidence artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: utah-forge-gdr1683-${{ github.sha }}
+          path: out/geothermal-forge/
+          if-no-files-found: error
+          retention-days: 30
