@@ -245,8 +245,8 @@
     {
       "path": "code/dashboard_unified_refresh.py",
       "purpose": "Local dashboard provenance, explicit enablement, modeled economics and process-owner lock checks.",
-      "bytes": 45557,
-      "sha256": "ba28ca82aa4d0d6f7728e8393ca91697033484d134d255494d60a0a4742c4455",
+      "bytes": 47289,
+      "sha256": "12ac84f58169b03c49129fd69aa0a485cd2c413d78b229aada54da40f2eedf3f",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
@@ -281,8 +281,8 @@
     {
       "path": "tests/test_dashboard_metric_provenance.py",
       "purpose": "Offline wrapper, modeled-value, unknown-liveness and lock-ownership counterexamples.",
-      "bytes": 5194,
-      "sha256": "ca041c0eefaad77dc984c62039da540e1773982d66b787a1e753924126eeed8c",
+      "bytes": 10642,
+      "sha256": "3e4efbe4b2b630bf71dc7bcf6e52b4b1df0ac4165fe3d84bf94ca95f64bcbc66",
       "required_status": null,
       "observed_status": null,
       "claim_boundary": null
