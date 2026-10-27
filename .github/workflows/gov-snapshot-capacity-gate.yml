@@ -8,6 +8,7 @@ on:
       - 'code/dashboard_unified_refresh.py'
       - 'code/deploy/deploy_vps.sh'
       - 'tests/test_gov_snapshot_guard.py'
+      - 'tests/test_dashboard_metric_provenance.py'
       - '.github/workflows/gov-snapshot-capacity-gate.yml'
   push:
     branches: [main]
@@ -17,6 +18,7 @@ on:
       - 'code/dashboard_unified_refresh.py'
       - 'code/deploy/deploy_vps.sh'
       - 'tests/test_gov_snapshot_guard.py'
+      - 'tests/test_dashboard_metric_provenance.py'
       - '.github/workflows/gov-snapshot-capacity-gate.yml'
   workflow_dispatch:
 
@@ -44,4 +46,19 @@ jobs:
       - name: Run capacity and restart-regression tests
         run: |
           python -m pip install --disable-pip-version-check pytest
-          python -m pytest -q tests/test_gov_snapshot_guard.py
+          python -m pytest -q tests/test_gov_snapshot_guard.py tests/test_dashboard_metric_provenance.py
+
+  dashboard-windows-lock:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install bounded test dependency
+        run: python -m pip install --disable-pip-version-check pytest==9.1.0
+      - name: Verify native Windows liveness and snapshot guards
+        run: python -m pytest -q tests/test_dashboard_metric_provenance.py tests/test_gov_snapshot_guard.py

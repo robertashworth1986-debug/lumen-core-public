@@ -1027,6 +1027,7 @@ def loop():
 
 
 def pid_is_running(pid) -> bool:
+    """Treat inaccessible or uncertain owners as live for singleton exclusion."""
     try:
         pid = int(pid)
     except Exception:
@@ -1034,6 +1035,37 @@ def pid_is_running(pid) -> bool:
 
     if pid <= 0:
         return False
+
+    if os.name == "nt":
+        # Reuse the gateway's query-only pattern: os.kill(pid, 0) can send a
+        # console signal on Windows and is not a portable existence check.
+        import ctypes
+        from ctypes import wintypes
+
+        if pid > 0xFFFFFFFF:
+            raise ValueError("process ID exceeds the Windows DWORD range")
+        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel.OpenProcess.restype = wintypes.HANDLE
+        kernel.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+        kernel.GetExitCodeProcess.restype = wintypes.BOOL
+        kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel.CloseHandle.restype = wintypes.BOOL
+        handle = kernel.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION
+        if not handle:
+            error = ctypes.get_last_error()
+            if error == 87:  # ERROR_INVALID_PARAMETER: no such PID.
+                return False
+            if error == 5:  # Access denied cannot rule out a live owner.
+                return True
+            raise OSError(error, "cannot inspect prior dashboard PID")
+        try:
+            exit_code = wintypes.DWORD()
+            if not kernel.GetExitCodeProcess(handle, ctypes.byref(exit_code)):
+                raise OSError(ctypes.get_last_error(), "cannot inspect prior dashboard PID")
+            return exit_code.value == 259  # STILL_ACTIVE
+        finally:
+            kernel.CloseHandle(handle)
 
     try:
         os.kill(pid, 0)
@@ -1043,7 +1075,7 @@ def pid_is_running(pid) -> bool:
     except PermissionError:
         return True
     except OSError:
-        return False
+        return True  # Unknown liveness must not permit lock reclamation.
 
 
 def acquire_loop_lock() -> bool:
@@ -1069,7 +1101,7 @@ def acquire_loop_lock() -> bool:
         try:
             payload = read_json(LOOP_LOCK_PATH, {})
             owner_pid = payload.get("pid") if isinstance(payload, dict) else None
-            if owner_pid and not pid_is_running(owner_pid):
+            if type(owner_pid) is int and owner_pid > 0 and not pid_is_running(owner_pid):
                 LOOP_LOCK_PATH.unlink(missing_ok=True)
                 return acquire_loop_lock()
 

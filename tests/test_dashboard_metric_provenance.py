@@ -4,6 +4,9 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -128,3 +131,123 @@ def test_owned_loop_lock_can_be_acquired_and_released(dashboard):
     assert dashboard.acquire_loop_lock() is True
     dashboard.release_loop_lock()
     assert not dashboard.LOOP_LOCK_PATH.exists()
+
+
+@pytest.mark.skipif(os.name != "nt", reason="native Windows process-query regression")
+def test_windows_liveness_and_live_lock_never_send_a_signal(tmp_path):
+    # Run in our own no-console process group. The audit hook rejects a signal
+    # before it is sent, including when this regression runs against old code.
+    probe = r'''
+import importlib.util, json, os, sys
+from pathlib import Path
+root = Path(sys.argv[2])
+(root / "stack").mkdir()
+(root / "pages").mkdir()
+os.environ["LUMA_STACK_ROOT"] = str(root / "stack")
+os.environ["LUMA_DASHBOARD_DIR"] = str(root / "pages")
+sys.path.insert(0, str(Path(sys.argv[1]).parent))
+def forbid_signal(event, args):
+    if event == "os.kill":
+        raise AssertionError("liveness check attempted to send a signal")
+sys.addaudithook(forbid_signal)
+spec = importlib.util.spec_from_file_location("dashboard_child", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+assert module.pid_is_running(os.getpid()) is True
+module.LOOP_LOCK_PATH.write_text(json.dumps({"pid": os.getpid()}))
+before = module.LOOP_LOCK_PATH.read_bytes()
+assert module.acquire_loop_lock() is False
+assert module.LOOP_LOCK_PATH.read_bytes() == before
+print("LIVE_OWNER_PRESERVED_WITHOUT_SIGNALS", flush=True)
+'''
+    result = subprocess.run(
+        [sys.executable, "-c", probe, str(ROOT / "code/dashboard_unified_refresh.py"), str(tmp_path)],
+        capture_output=True, text=True, timeout=10,
+        creationflags=subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "LIVE_OWNER_PRESERVED_WITHOUT_SIGNALS"
+
+
+@pytest.mark.parametrize("owner", [-1, 0, True, 1.5, "123", {}, []])
+def test_malformed_owner_cannot_be_reclaimed_as_a_dead_process(dashboard, owner):
+    put(dashboard.LOOP_LOCK_PATH, {"pid": owner})
+    original = dashboard.LOOP_LOCK_PATH.read_bytes()
+    assert dashboard.acquire_loop_lock() is False
+    assert dashboard.LOOP_LOCK_PATH.read_bytes() == original
+
+
+def _windows_process_api(monkeypatch, dashboard, *, open_error=0, query_error=0, exit_code=259):
+    import ctypes
+
+    calls = []
+    errors = [open_error]
+
+    class Function:
+        def __init__(self, name, callback):
+            self.name, self.callback = name, callback
+
+        def __call__(self, *args):
+            calls.append((self.name, args))
+            return self.callback(*args)
+
+    def query(handle, output):
+        errors[0] = query_error
+        output._obj.value = exit_code
+        return not query_error
+
+    kernel = SimpleNamespace(
+        OpenProcess=Function("open", lambda *args: None if open_error else 42),
+        GetExitCodeProcess=Function("query", query),
+        CloseHandle=Function("close", lambda handle: True),
+    )
+
+    def forbidden_signal(*args):
+        pytest.fail("Windows liveness must not call os.kill")
+
+    monkeypatch.setattr(dashboard, "os", SimpleNamespace(**{**vars(os), "name": "nt", "kill": forbidden_signal}))
+    monkeypatch.setattr(ctypes, "WinDLL", lambda name, **kwargs: kernel, raising=False)
+    monkeypatch.setattr(ctypes, "get_last_error", lambda: errors[0], raising=False)
+    return calls
+
+
+@pytest.mark.parametrize("exit_code,expected", [(259, True), (0, False), (17, False)])
+def test_windows_process_query_closes_handle_and_uses_query_only_access(dashboard, monkeypatch, exit_code, expected):
+    calls = _windows_process_api(monkeypatch, dashboard, exit_code=exit_code)
+    assert dashboard.pid_is_running(123) is expected
+    assert calls[0] == ("open", (0x1000, False, 123))
+    assert [name for name, _ in calls] == ["open", "query", "close"]
+    assert calls[-1] == ("close", (42,))
+
+
+@pytest.mark.parametrize("open_error,query_error,should_reclaim", [(87, 0, True), (5, 0, False), (8, 0, False), (0, 6, False)])
+def test_windows_lock_reclaim_requires_confirmed_absent_owner(dashboard, monkeypatch, open_error, query_error, should_reclaim):
+    calls = _windows_process_api(monkeypatch, dashboard, open_error=open_error, query_error=query_error)
+    put(dashboard.LOOP_LOCK_PATH, {"pid": 123})
+    original = dashboard.LOOP_LOCK_PATH.read_bytes()
+    assert dashboard.acquire_loop_lock() is should_reclaim
+    if should_reclaim:
+        assert json.loads(dashboard.LOOP_LOCK_PATH.read_text())["pid"] == os.getpid()
+    else:
+        assert dashboard.LOOP_LOCK_PATH.read_bytes() == original
+    assert sum(name == "close" for name, _ in calls) == (0 if open_error else 1)
+
+
+def test_windows_pid_outside_dword_range_cannot_alias_another_owner(dashboard, monkeypatch):
+    calls = _windows_process_api(monkeypatch, dashboard)
+    put(dashboard.LOOP_LOCK_PATH, {"pid": 2**32 + 123})
+    original = dashboard.LOOP_LOCK_PATH.read_bytes()
+    assert dashboard.acquire_loop_lock() is False
+    assert dashboard.LOOP_LOCK_PATH.read_bytes() == original
+    assert calls == []
+
+
+def test_posix_unexpected_probe_error_preserves_the_owner_lock(dashboard, monkeypatch):
+    def unavailable(*args):
+        raise OSError("temporary process-query failure")
+
+    monkeypatch.setattr(dashboard, "os", SimpleNamespace(**{**vars(os), "name": "posix", "kill": unavailable}))
+    put(dashboard.LOOP_LOCK_PATH, {"pid": 123})
+    original = dashboard.LOOP_LOCK_PATH.read_bytes()
+    assert dashboard.acquire_loop_lock() is False
+    assert dashboard.LOOP_LOCK_PATH.read_bytes() == original
