@@ -255,6 +255,11 @@ readonly -a RELEASE_FILES=(
   "art/art.css"
   "art/art.js"
   "art/media-manifest.json"
+  "mission_control_review.html"
+  "assets/mission_control_review.css"
+  "assets/mission_control_review.js"
+  "assets/mission_control_review_snapshots/external_technical_review_packet.json"
+  "assets/mission_control_review_snapshots/lumencore_engine_portfolio_audit.json"
 )
 readonly -a RELEASE_DIRECTORIES=(
   "assets"
@@ -277,6 +282,7 @@ readonly -a RELEASE_DIRECTORIES=(
   "portfolio/data"
   "rights"
   "art"
+  "assets/mission_control_review_snapshots"
 )
 readonly EXPECTED_FILE_COUNT="${#RELEASE_FILES[@]}"
 

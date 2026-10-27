@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from html.parser import HTMLParser
 from email.message import Message
 from http.client import IncompleteRead
 import importlib.util
@@ -116,7 +117,7 @@ def test_package_uses_only_exact_pinned_git_blobs(tmp_path):
 def test_release_allowlist_is_public_only_and_dependency_complete():
     module = load_module(PACKAGER_PATH, "package_public_site_release_allowlist")
     names = [module.archive_name(path) for path in module.RELEASE_PATHS]
-    assert len(names) == len(set(names)) == 246
+    assert len(names) == len(set(names)) == 251
     assert names[:5] == [
         "operator_home.html",
         "opportunity_sprint.html",
@@ -182,10 +183,39 @@ def test_release_allowlist_is_public_only_and_dependency_complete():
     assert len(release_directories) == len(required_directories)
 
 
+def test_mission_control_review_dependencies_are_in_the_exact_release():
+    module = load_module(PACKAGER_PATH, "mission_control_release_dependencies")
+    names = {module.archive_name(path) for path in module.RELEASE_PATHS}
+
+    class Resources(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.paths = set()
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if tag == "script" and attrs.get("src"):
+                self.paths.add(attrs["src"].removeprefix("./"))
+            if tag == "link" and attrs.get("rel") == "stylesheet":
+                self.paths.add(attrs["href"].removeprefix("./"))
+
+    page = "mission_control_review.html"
+    parser = Resources()
+    parser.feed((ROOT / "dashboard" / page).read_text(encoding="utf-8"))
+    script = (ROOT / "dashboard/assets/mission_control_review.js").read_text(encoding="utf-8")
+    snapshots = set(re.findall(r'"\./([^"\n]+\.json)": "[a-f0-9]{64}"', script))
+    assert len(snapshots) == 3
+    required = {page} | parser.paths | snapshots
+    assert required <= names, f"unpackaged review dependencies: {sorted(required - names)}"
+    assert 'href="/mission_control_review.html"' in (
+        ROOT / "dashboard/operator_home.html"
+    ).read_text(encoding="utf-8")
+
+
 def test_release_count_is_bound_to_current_control_records():
     module = load_module(PACKAGER_PATH, "package_public_site_release_control_count")
     release_count = len(module.RELEASE_PATHS)
-    assert release_count == 246
+    assert release_count == 251
 
     protocol = (ROOT / "docs" / "PUBLIC_SITE_EXACT_SNAPSHOT_PROTOCOL.md").read_text(
         encoding="utf-8"
