@@ -242,4 +242,3 @@ def test_runtime_diagnostic_publishes_a_separate_readiness_verdict() -> None:
     assert "VPS runtime gate ACTION_REQUIRED; diagnostic receipt captured" in text
     assert "VPS runtime gate INDETERMINATE; diagnostic receipt captured" in text
     assert "diagnostic/lumencore-vps-runtime" in text
-
