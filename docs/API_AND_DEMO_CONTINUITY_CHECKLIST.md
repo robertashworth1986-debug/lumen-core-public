@@ -146,4 +146,3 @@ Avoid:
 - showing one-time codes,
 - implying API continuity when billing or credits are not verified,
 - committing screenshots that contain account data.
-
