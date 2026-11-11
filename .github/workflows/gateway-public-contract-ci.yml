@@ -7,6 +7,8 @@ on:
       - 'code/luma_experience_gateway.py'
       - 'code/luma_experience_gateway_legacy.py'
       - 'code/operator_api_access.py'
+      - 'code/operator_feed_reads.py'
+      - 'tests/test_operator_feed_reads.py'
       - 'code/execution/order_safety_gate.py'
       - 'code/application_context_resolver.py'
       - 'code/autonomous_agent_manifest.py'
@@ -39,6 +41,8 @@ on:
       - 'code/luma_experience_gateway.py'
       - 'code/luma_experience_gateway_legacy.py'
       - 'code/operator_api_access.py'
+      - 'code/operator_feed_reads.py'
+      - 'tests/test_operator_feed_reads.py'
       - 'code/execution/order_safety_gate.py'
       - 'code/application_context_resolver.py'
       - 'code/autonomous_agent_manifest.py'
@@ -202,7 +206,7 @@ jobs:
           [[ "$first_sha" == "$second_sha" ]]
           [[ "$first_hardening_sha" =~ ^[0-9a-f]{64}$ ]]
           [[ "$first_hardening_sha" == "$second_hardening_sha" ]]
-          [[ "$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --print-files | wc -l)" -eq 20 ]]
+          [[ "$(bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh --print-files | wc -l)" -eq 21 ]]
           LUMENCORE_GATEWAY_TARGET_ROOT="$inspect_target" \
             bash code/ops/REPAIR_GATEWAY_PUBLIC_CONTRACT_ON_VPS.sh
 
@@ -229,3 +233,21 @@ jobs:
             exit 1
           fi
           echo "WRONG_HARDENING_HASH_FAIL_CLOSED_OK"
+
+
+  private-feed-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up matched test Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11.9'
+      - name: Install existing hash-locked test dependencies
+        run: python -m pip install --require-hashes -r requirements-institutional-ubuntu-py311.lock
+      - name: Require HTTP integration dependencies and verify all private feed tests
+        run: |
+          python -c 'import fastapi, httpx, requests'
+          python -m unittest discover -s tests -p test_operator_feed_reads.py -v
