@@ -16,15 +16,16 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   an unmerged branch or tag cannot authorize production access.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (246 for
+- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (251 for
   the cohort, frozen EIA review, Bounded Light Speed concept collection, creator-rights
-  register and four-file art showcase). Artwork and three public previews linked
+  register, four-file art showcase and Mission Control review with its two
+  frozen public inventory inputs). Artwork and three public previews linked
   from `/art/` remain hosted at the canonical Wonder Studio origin; their external
-  bytes are outside this repository release's 246-file exact-byte guarantee.
+  bytes are outside this repository release's 251-file exact-byte guarantee.
   Before the gallery can embed Studio media, the separately approved current-main
   `repair-public-security-headers.yml` action must apply the exact Studio origin
   in `img-src` and `media-src`. A static file release does not change Nginx policy.
-  Earlier 43-file, 119-file and 189-file releases retain their original
+  Earlier 43-file, 119-file, 189-file and 246-file releases retain their original
   membership, reconstructed from their pinned literal allowlists as data.
 - Package bytes are read from immutable Git blobs, not from mutable worktree
   files.
@@ -69,6 +70,16 @@ mark, the ProofLock browser verifier with its protocol fixtures, and noindex
 HOLD stubs for previous operator and research dashboard URLs. The reviewed
 `downloads/eia-two-window-review-20260922.zip` is part of the same immutable
 release and must pass exact-byte and ZIP MIME verification before promotion.
+
+The read-only `mission_control_review.html` is included with its stylesheet,
+script and two frozen JSON files in `assets/mission_control_review_snapshots/`.
+They preserve the exact `dashboard/data/` inventory bytes from source commit
+`2022d0c319c7585ab4d35fbe97f1ba48e6f0e37d`. Its third JSON input is the already
+allowlisted public portfolio catalogue. Runtime `data/` paths remain excluded.
+The view checks the three input digests before rendering inventory counts or
+links. Historical comparisons retain their original source commits. The home
+page's research-interface card links to this review view without reconnecting
+the legacy operator controls.
 
 It deliberately excludes credentials, runtime logs, live order controls,
 private evidence, grant packets, identity documents, and mutable data feeds. The

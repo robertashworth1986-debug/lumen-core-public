@@ -268,6 +268,11 @@ RELEASE_PATHS: Final = (
     "dashboard/art/art.css",
     "dashboard/art/art.js",
     "dashboard/art/media-manifest.json",
+    "dashboard/mission_control_review.html",
+    "dashboard/assets/mission_control_review.css",
+    "dashboard/assets/mission_control_review.js",
+    "dashboard/assets/mission_control_review_snapshots/external_technical_review_packet.json",
+    "dashboard/assets/mission_control_review_snapshots/lumencore_engine_portfolio_audit.json",
 )
 
 

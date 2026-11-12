@@ -55,7 +55,7 @@ def test_full_retained_history_reconstructs_every_release() -> None:
 
 def test_historical_allowlist_is_read_as_data_after_current_membership_expands():
     packager = MODULE._load(MODULE.PACKAGER_PATH, "historical_allowlist_regression")
-    assert len(packager.RELEASE_PATHS) == 246
+    assert len(packager.RELEASE_PATHS) == 251
     pinned = packager.release_paths_at_commit(ROOT, MODULE.DEFAULT_SOURCE_COMMIT)
     assert len(pinned) == 43
     assert not any(path.startswith("dashboard/cohort/") for path in pinned)
@@ -65,6 +65,11 @@ def test_historical_allowlist_is_read_as_data_after_current_membership_expands()
     )
     assert len(cohort_release) == 119
     assert tuple(packager.RELEASE_PATHS[:119]) == cohort_release
+    prior_public_release = packager.release_paths_at_commit(
+        ROOT, "2022d0c319c7585ab4d35fbe97f1ba48e6f0e37d"
+    )
+    assert len(prior_public_release) == 246
+    assert tuple(packager.RELEASE_PATHS[:246]) == prior_public_release
 
 
 def test_repository_receipt_path_must_match_source_commit(tmp_path: Path) -> None:
