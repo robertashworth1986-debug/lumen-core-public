@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "experiment": "stage3_exact_time_separate_year_replication",
+  "branch": "exp/energy-stage3-integrity-20260905",
+  "protocol_commit": "c33f86e999268169dcd6ddd2b8eb06680e1d99c6",
+  "code_execution_commit": "e70be67fb9b9b2086de9b3f8795b418167beea6e",
+  "execution": {
+    "run_id": 33968332369,
+    "job_conclusion": "success",
+    "research_status": "COMPLETE_WITH_SOURCE_HOLD",
+    "artifact_id": 9970144275,
+    "artifact_sha256": "c419656e4b351ba65f039a098bc9cf0fb1ff793149c1f346e0e3faba90d6e368",
+    "artifact_expires_utc": "2026-10-05T13:15:15Z",
+    "integrity_tests_passed": 12,
+    "comparisons_predeclared": 63,
+    "comparisons_scored": 54,
+    "comparisons_withheld_missing_source": 9,
+    "bootstrap_replicates_per_scored_comparison": 10000,
+    "local_and_github_all_54_score_records_match_exactly": true,
+    "independent_external_validation": false
+  },
+  "source_acquisition": {
+    "run_id": 33967956418,
+    "job_conclusion": "failure",
+    "explanation": "11 of 12 predeclared historical source files were acquired; NOAA station 46042 year 2024 returned HTTP 404. The failure receipt and successful downloads were preserved. No alternate year was substituted after outcomes were inspected.",
+    "artifact_id": 9970027256,
+    "artifact_sha256": "ae6d24e849043fc0175c63fafce20a78a7852711bb85e87de266eabaf2efd4dc",
+    "historical_not_live": true,
+    "authentication": "public source files; no user API key required"
+  },
+  "corrections_to_earlier_claims": {
+    "affected_prior_files": ["experiments/energy_multisource/NEXT_STAGE_FINDINGS_2026-09-05.json", "experiments/energy_multisource/FINDINGS_2026-09-04.json"],
+    "retain_prior_files": true,
+    "current_claim_decision": "Earlier geothermal percentages and zero-selected-loss language are exploratory historical outputs, not reliable evidence of deployable superiority or fail-safe performance.",
+    "raw_forge_rows": 81239,
+    "old_filtered_rows": 71851,
+    "old_retained_forward_filled_flow_cells": 17,
+    "old_row_based_horizon_audit": {
+      "10_min": {"affected_pairs": 342, "total_pairs": 71831, "max_actual_minutes": 326.5},
+      "30_min": {"affected_pairs": 1002, "total_pairs": 71791, "max_actual_minutes": 346.5},
+      "60_min": {"affected_pairs": 1832, "total_pairs": 71731, "max_actual_minutes": 444.5}
+    },
+    "additional_code_review_findings": ["Earlier next-stage validation selection did not purge all target timestamps crossing the evaluation boundary", "Earlier whole-block drift feedback became visible in code before every horizon-delayed outcome from that block had matured"],
+    "comparison_caveat": "This round changes preprocessing, origin sampling, window selection and evaluation splits together. The change in scores must not be attributed quantitatively to one bug alone."
+  },
+  "forge1683_reanalysis": {
+    "source_sha256": "cdb00fe3d4ee375902d421ac01dba9233b2701570d9f142e510d0a914188e9a0",
+    "target": "raw uncorrected SEP FLOW TOTAL in gpm",
+    "heldout_status": "previously examined campaign; exploratory only",
+    "rolling_gain_pct_vs_persistence": {"10_min": -3.1429, "30_min": -0.7424, "60_min": -0.5628},
+    "gate_gain_pct_vs_persistence": {"10_min": 0.0, "30_min": 0.0, "60_min": 0.0},
+    "gate_rolling_coverage": 0.0,
+    "interpretation": "The conservative gate used persistence throughout evaluation. That avoids using this losing smoother but is not an improvement over persistence and does not demonstrate intelligent optimization."
+  },
+  "separate_year_wave_screen": {
+    "calibration_year": 2023,
+    "evaluation_year": 2024,
+    "paired_stations_analyzed": ["41002", "42001", "44025", "46050", "46237"],
+    "target": "WVHT squared multiplied by APD, units m^2 s; wave activity proxy, not generated electricity or calibrated wave power",
+    "only_comparison_passing_full_predeclared_screen": {
+      "station": "46237",
+      "horizon_minutes": 60,
+      "model": "standard elapsed-time rolling mean",
+      "selected_window_minutes": 60,
+      "comparator": "persistence",
+      "matched_forecasts": 14790,
+      "scored_days": 324,
+      "days_worse_than_persistence": 99,
+      "baseline_mae": 3.944283713657877,
+      "rolling_mae": 3.7420687411761486,
+      "mae_improvement_pct": 5.126785676738175,
+      "pointwise_bootstrap_95pct_interval_pct": [3.7661879032551635, 6.410070410285163],
+      "holm_adjusted_p_over_63_comparisons": 0.018598140185981403,
+      "matched_pair_coverage_of_eligible_origins": 0.9746293245469522,
+      "proprietary_lumencore_algorithm": false,
+      "commercial_or_energy_yield_claim_authorized": false
+    },
+    "station46237_other_horizons_gain_pct": {"3_hour": 0.2037, "6_hour": -0.2264},
+    "station46237_gate_1h_gain_pct_vs_persistence": 0.9018,
+    "station46237_gate_1h_gain_pct_vs_rolling": -4.4533,
+    "other_near_misses": [
+      {"station":"41002", "horizon_minutes":60, "rolling_gain_pct":5.7753, "holm_p":0.08539, "decision":"HOLD: multiplicity screen failed"},
+      {"station":"46050", "horizon_minutes":60, "rolling_gain_pct":4.2460, "holm_p":0.0063, "decision":"HOLD: predeclared 5 percent effect threshold not met"}
+    ],
+    "gate_comparisons_passing_full_screen": 0
+  },
+  "claim_boundary": "Standard moving averages are baselines, not evidence of proprietary LumenCore novelty. Data from a different historical year are not third-party validation. No equipment control, operational safety limits, production deployment, measured electricity gains, bankability conclusion, or revenue claim was produced.",
+  "next_research_priority": "Compare a clearly specified LumenCore-specific method against both persistence and this stronger rolling baseline on another predeclared untouched period, with timestamps and label availability locked before scoring."
+}

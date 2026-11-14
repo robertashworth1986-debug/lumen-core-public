@@ -1,0 +1,10 @@
+{
+  "status": "OFFLINE_RECOVERY_VERIFIED",
+  "bundle_sha256": "aff8cd461238f40a386a922a205789971cfbcae6c10dce3311ca176b52887d72",
+  "recovered_checkpoint": "584e88a0f376ca016a085077047052d406081f98",
+  "reachable_commits": 2444,
+  "git_fsck_returncode": 0,
+  "network_used": false,
+  "laptop_vps_local_only_history_included": false,
+  "verification_scope": "Recover exact published checkpoint in a new isolated bare repository from bundle only; git fsck --full succeeds."
+}

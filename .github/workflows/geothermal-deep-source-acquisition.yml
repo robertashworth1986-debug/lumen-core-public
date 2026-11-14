@@ -1,0 +1,152 @@
+name: Geothermal Deep Source Acquisition
+
+on:
+  push:
+    branches:
+      - "exp/energy-multisource-breadth"
+    paths:
+      - ".github/workflows/geothermal-deep-source-acquisition.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Acquire FORGE 1109 injection flow and pressure
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/geothermal-deep/forge1109
+          curl --fail --location --retry 6 --retry-delay 4 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://gdr.openei.org/files/1109/58-32_Phase2B_injection_data_flow.csv" \
+            -o out/geothermal-deep/forge1109/flow.csv
+          curl --fail --location --retry 6 --retry-delay 4 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://gdr.openei.org/files/1109/58-32_Phase2B_injection_data_pressure.csv" \
+            -o out/geothermal-deep/forge1109/pressure.csv
+          test -s out/geothermal-deep/forge1109/flow.csv
+          test -s out/geothermal-deep/forge1109/pressure.csv
+          head -5 out/geothermal-deep/forge1109/flow.csv > out/geothermal-deep/forge1109/flow_head.txt
+          head -5 out/geothermal-deep/forge1109/pressure.csv > out/geothermal-deep/forge1109/pressure_head.txt
+
+      - name: Acquire FORGE 1149 stimulation workbooks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/geothermal-deep/forge1149
+          python - <<'PY'
+          import pathlib, urllib.parse, urllib.request
+          root=pathlib.Path('out/geothermal-deep/forge1149')
+          names=[
+            '58-32_OpenHoleStimulation (1).xlsx',
+            '58-32_LowerPerfStimulation (1).xlsx',
+            '58-32_UpperPerforationStimulation_mm (1).xlsx',
+            'onesecondPason (1).xlsx',
+          ]
+          for name in names:
+              url='https://gdr.openei.org/files/1149/'+urllib.parse.quote(name, safe='()')
+              req=urllib.request.Request(url,headers={'User-Agent':'LumenCore-Research/1.0'})
+              try:
+                  with urllib.request.urlopen(req,timeout=120) as r:
+                      data=r.read()
+                  (root/name).write_bytes(data)
+                  print(name,len(data))
+              except Exception as exc:
+                  (root/(name+'.ERROR.txt')).write_text(repr(exc)+'\n')
+          if not any(p.suffix.lower()=='.xlsx' for p in root.iterdir()):
+              raise SystemExit('no GDR1149 workbook acquired')
+          PY
+
+      - name: Acquire complete USGS OFR 83-250 digital dataset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/geothermal-deep/usgs
+          curl --fail --location --retry 5 --retry-delay 3 --retry-all-errors \
+            --user-agent "LumenCore-Research/1.0" \
+            "https://www.sciencebase.gov/catalog/file/get/5d40b3f3e4b01d82ce8d9df5?f=__disk__63%2Fb7%2F80%2F63b7802742dd1ba7cc367f82981300c8a2b221c8" \
+            -o out/geothermal-deep/usgs/OFR83250_DigitalData.zip
+          unzip -t out/geothermal-deep/usgs/OFR83250_DigitalData.zip
+          unzip -q out/geothermal-deep/usgs/OFR83250_DigitalData.zip -d out/geothermal-deep/usgs/extracted
+          find out/geothermal-deep/usgs/extracted -type f -printf '%P\t%s bytes\n' | sort > out/geothermal-deep/usgs/inventory.txt
+          test -s out/geothermal-deep/usgs/inventory.txt
+
+      - name: Setup Python for schema profiling
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Install schema profiler dependency
+        run: python -m pip install --disable-pip-version-check openpyxl
+
+      - name: Profile table schemas without promoting results
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv, json, pathlib
+          from openpyxl import load_workbook
+          root=pathlib.Path('out/geothermal-deep')
+          profile={'claim_boundary':'schema/data acquisition only; no performance result','files':[]}
+          for p in sorted(root.rglob('*')):
+              if not p.is_file(): continue
+              rec={'path':str(p.relative_to(root)),'size_bytes':p.stat().st_size}
+              try:
+                  if p.suffix.lower()=='.csv':
+                      with p.open('r',encoding='utf-8-sig',errors='replace',newline='') as f:
+                          r=csv.reader(f); rows=[]
+                          for _ in range(6):
+                              try: rows.append(next(r))
+                              except StopIteration: break
+                      rec['preview']=rows
+                  elif p.suffix.lower()=='.xlsx':
+                      wb=load_workbook(p,read_only=True,data_only=True)
+                      rec['sheets']=wb.sheetnames
+                      rec['sheet_shapes']={}
+                      rec['sheet_previews']={}
+                      for ws in wb.worksheets[:5]:
+                          rec['sheet_shapes'][ws.title]=[ws.max_row,ws.max_column]
+                          vals=[]
+                          for row in ws.iter_rows(min_row=1,max_row=min(ws.max_row,8),values_only=True):
+                              vals.append([None if v is None else str(v)[:120] for v in row[:min(ws.max_column,16)]])
+                          rec['sheet_previews'][ws.title]=vals
+              except Exception as exc:
+                  rec['profile_error']=repr(exc)
+              profile['files'].append(rec)
+          (root/'SCHEMA_PROFILE.json').write_text(json.dumps(profile,indent=2)+'\n')
+          PY
+          python -m json.tool out/geothermal-deep/SCHEMA_PROFILE.json >/dev/null
+
+      - name: Hash all acquired evidence
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('out/geothermal-deep')
+          rows=[]
+          for p in sorted(root.rglob('*')):
+              if p.is_file() and p.name!='SHA256_MANIFEST.json':
+                  h=hashlib.sha256()
+                  with p.open('rb') as f:
+                      for b in iter(lambda:f.read(1024*1024),b''): h.update(b)
+                  rows.append({'path':str(p.relative_to(root)),'bytes':p.stat().st_size,'sha256':h.hexdigest()})
+          (root/'SHA256_MANIFEST.json').write_text(json.dumps({'files':rows},indent=2)+'\n')
+          PY
+
+      - name: Upload deep geothermal evidence bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: geothermal-deep-sources-${{ github.sha }}
+          path: out/geothermal-deep/
+          if-no-files-found: error
+          retention-days: 30

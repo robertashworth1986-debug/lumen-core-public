@@ -1,0 +1,64 @@
+name: Resume exact verified research checkpoint publication
+
+on:
+  push:
+    branches: [exp/energy-stage4-delayed-router-20260905]
+    paths: [.github/workflows/energy-research-checkpoint-resume.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: energy-research-publication-resume-383284902
+  cancel-in-progress: false
+
+jobs:
+  resume-existing-draft:
+    if: github.repository == 'robertashworth1986-debug/lumen-core-public' && github.ref == 'refs/heads/exp/energy-stage4-delayed-router-20260905'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Test numeric draft identity and publication refusal gates
+        run: |
+          set -euo pipefail
+          mkdir -p out/checkpoint
+          python -m unittest discover -s evidence/energy_continuity -p 'test_*.py' -v 2>&1 | tee out/checkpoint/PUBLICATION_TESTS.txt
+      - name: Reuse exact already verified research package without rescoring
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/checkpoint/dist
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/9971930681/zip" > out/checkpoint/transfer.zip
+          python - <<'PY'
+          import importlib.util,pathlib,zipfile
+          path=pathlib.Path('evidence/energy_continuity/publication.py')
+          spec=importlib.util.spec_from_file_location('publisher',path)
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          p=pathlib.Path('out/checkpoint/transfer.zip')
+          if m.custody.digest(p)!=m.KNOWN['package_sha256']: raise SystemExit('Package identity mismatch')
+          m.custody.checked_zip(p)
+          with zipfile.ZipFile(p) as z:z.extractall('out/checkpoint/dist')
+          PY
+      - name: Verify every existing asset and publish draft 383284902 by ID
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python evidence/energy_continuity/publication.py --out out/checkpoint --resume-known
+      - name: Retain success or failure receipt and test evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: energy-publication-resume-${{ github.sha }}
+          path: |
+            out/checkpoint/PUBLICATION*.json
+            out/checkpoint/PUBLICATION_TESTS.txt
+          if-no-files-found: error
+          retention-days: 30
