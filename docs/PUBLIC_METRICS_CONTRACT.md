@@ -56,6 +56,18 @@ strings are not persisted. Requests send no credentials, stay on the fixed
 HTTPS origin, refuse redirects, use cache-busting/no-cache, and bound responses
 to one MiB and a ten-second socket timeout.
 
+JSON responses must be UTF-8, have unique object keys at every level, and
+contain finite numbers. Duplicate keys are not resolved by taking the last
+value: conflicting `status` fields cannot become a healthy gateway verdict.
+Invalid encoding, malformed JSON and decoder recursion failures return no
+payload while preserving the safe HTTP status, byte count and body digest.
+The fixed `json_error` codes are `duplicate_key`, `non_finite_number`,
+`invalid_utf8`, `invalid_json` and `excessive_nesting`; remote keys, values and
+parser error messages are never copied into the receipt. JSON rejection does
+not erase transport reachability, validate a legacy feed, or prevent the
+remaining endpoint captures. A normal JSON scalar is parsed but cannot satisfy
+the gateway object contract. The socket timeout is not a total capture deadline.
+
 It reports three independent observations:
 
 - Homepage HTTP reachability, explicitly transport-only.

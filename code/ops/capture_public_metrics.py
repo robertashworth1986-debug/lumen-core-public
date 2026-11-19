@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 import hashlib
 from http.client import HTTPException
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -33,6 +34,30 @@ PUBLIC_FIELDS = {
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+
+
+class InvalidJSONResponse(ValueError):
+    """A fixed diagnostic code, never a remote key, value or parser message."""
+
+
+def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise InvalidJSONResponse("duplicate_key")
+        result[key] = value
+    return result
+
+
+def reject_constant(value: str) -> None:
+    raise InvalidJSONResponse("non_finite_number")
+
+
+def finite_float(value: str) -> float:
+    number = float(value)
+    if not math.isfinite(number):
+        raise InvalidJSONResponse("non_finite_number")
+    return number
 
 
 def utc_now() -> datetime:
@@ -94,9 +119,18 @@ def fetch(path: str, *, now: datetime | None = None, opener=None) -> tuple[dict,
         payload = None
         if receipt["content_type"] == "application/json":
             try:
-                payload = json.loads(body)
-            except (ValueError, UnicodeError):
-                pass
+                payload = json.loads(
+                    body.decode("utf-8"), object_pairs_hook=unique_object,
+                    parse_constant=reject_constant, parse_float=finite_float,
+                )
+            except InvalidJSONResponse as exc:
+                receipt["json_error"] = str(exc)
+            except UnicodeError:
+                receipt["json_error"] = "invalid_utf8"
+            except RecursionError:
+                receipt["json_error"] = "excessive_nesting"
+            except ValueError:
+                receipt["json_error"] = "invalid_json"
         receipt["json_object"] = isinstance(payload, dict)
         return receipt, payload
     except (URLError, TimeoutError, OSError, ValueError, HTTPException) as exc:

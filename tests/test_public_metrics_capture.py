@@ -5,6 +5,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import sys
 from urllib.error import HTTPError, URLError
 
 import pytest
@@ -160,3 +161,84 @@ def test_health_timestamp_after_capture_start_uses_response_completion_time(monk
     result = METRICS.capture(fetcher=fake)
     assert result["public_gateway_state"] == "operational"
     assert result["public_gateway"]["/health"]["age_seconds"] == 1
+
+
+@pytest.mark.parametrize("body,reason", [
+    (b'{"status":"failed","status":"ok"}', "duplicate_key"),
+    (b'{"status":"ok","status":"ok"}', "duplicate_key"),
+    (b'{"status":"failed","sta\\u0074us":"ok"}', "duplicate_key"),
+    (b'{"nested":{"private-secret":1,"private-secret":2}}', "duplicate_key"),
+    (b'{"value":NaN}', "non_finite_number"),
+    (b'{"value":Infinity}', "non_finite_number"),
+    (b'{"value":-Infinity}', "non_finite_number"),
+    (b'{"value":1e999}', "non_finite_number"),
+    (b'{"value":-1e999}', "non_finite_number"),
+    (b'{"private-secret":', "invalid_json"),
+    (b'{"value":"\xff"}', "invalid_utf8"),
+    ('{"value":"private-secret"}'.encode("utf-16"), "invalid_utf8"),
+    ('{"value":"private-secret"}'.encode("utf-32"), "invalid_utf8"),
+    (b'[' * 100_000 + b'0' + b']' * 100_000, "excessive_nesting"),
+])
+def test_untrusted_json_is_rejected_without_losing_safe_receipt(body, reason):
+    row, payload = METRICS.fetch("/health", now=NOW, opener=Opener(body))
+    assert row["transport"] == "response"
+    assert row["http_status"] == 200
+    assert row["body_bytes"] == len(body)
+    assert row["body_sha256"] == METRICS.hashlib.sha256(body).hexdigest()
+    assert row["json_error"] == reason
+    assert row["json_object"] is False
+    assert payload is None
+    assert METRICS.assess_public("/health", row, payload, NOW)["ok"] is False
+    assert "private-secret" not in json.dumps(row)
+
+
+def test_contradictory_duplicate_public_status_cannot_be_healthy():
+    body = b'{"status":"failed",' + json.dumps(public_payload())[1:].encode("utf-8")
+    row, payload = METRICS.fetch("/api/public/status", now=NOW, opener=Opener(body))
+    assert row["json_error"] == "duplicate_key"
+    assert not METRICS.assess_public("/api/public/status", row, payload, NOW)["ok"]
+
+
+@pytest.mark.parametrize("path,payload", [
+    ("/health", public_payload(True)),
+    ("/api/public/status", public_payload()),
+    ("/api/live_status.json", {"finite": 1.25, "small": 1e-30, "unicode": "caf\u00e9"}),
+])
+def test_valid_utf8_json_remains_accepted(path, payload):
+    body = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
+    row, parsed = METRICS.fetch(path, now=NOW, opener=Opener(body))
+    assert parsed == payload
+    assert row["json_object"] is True
+    assert "json_error" not in row
+    if path in ("/health", "/api/public/status"):
+        assert METRICS.assess_public(path, row, parsed, NOW)["ok"]
+    else:
+        assert not METRICS.assess_feed(row, parsed)["data_available"]
+
+
+def test_nested_json_failure_does_not_abort_remaining_endpoint_capture(monkeypatch, tmp_path):
+    visited = []
+    def fake(path, **kwargs):
+        visited.append(path)
+        if path == "/health":
+            body = b'[' * 100_000 + b'0' + b']' * 100_000
+        elif path == "/api/public/status":
+            body = json.dumps(public_payload()).encode("utf-8")
+        else:
+            body = b'{}'
+        return METRICS.fetch(path, now=NOW, opener=Opener(body))
+    result = METRICS.capture(fetcher=fake, now=NOW)
+    assert len(visited) == 7
+    assert result["public_gateway"]["/health"]["json_error"] == "excessive_nesting"
+    assert result["public_gateway"]["/api/public/status"]["ok"]
+    assert result["public_gateway_state"] == "degraded"
+    assert result["available_objects"] == 0
+    assert "Live metrics verdict: degraded" in METRICS.summary(result)
+    monkeypatch.setattr(METRICS, "capture", lambda **kwargs: result)
+    monkeypatch.setattr(sys, "argv", ["capture_public_metrics.py", "--output-dir", str(tmp_path)])
+    monkeypatch.delenv("GITHUB_OUTPUT", raising=False)
+    monkeypatch.delenv("GITHUB_SHA", raising=False)
+    assert METRICS.main() == 0
+    assert json.loads((tmp_path / "live_snapshot.json").read_text()) == result
+    assert json.loads((tmp_path / "site_health_badge.json").read_text())["color"] == "yellow"
+    assert "Live metrics verdict: degraded" in (tmp_path / "metrics_summary.md").read_text()
