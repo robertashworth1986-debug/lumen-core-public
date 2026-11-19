@@ -93,6 +93,7 @@ BUNDLE_FILES=(
   "master_universe_benchmark_v2.py"
   "meta_router.py"
   "operator_api_access.py"
+  "operator_feed_reads.py"
   "opportunities_api.py"
   "universe_v2_fetchers.py"
 )
