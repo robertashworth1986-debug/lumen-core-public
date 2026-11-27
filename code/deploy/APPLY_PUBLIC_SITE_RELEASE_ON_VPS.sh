@@ -271,6 +271,8 @@ readonly -a RELEASE_FILES=(
   "apps/doppelganger/photos/margot-robbie.webp"
   "apps/doppelganger/photos/samara-weaving.webp"
   "apps/doppelganger/photos/zooey-deschanel.webp"
+  "apps/doppelganger/portrait-landmarks.css"
+  "apps/doppelganger/portrait-landmarks.js"
   "apps/doppelganger/portrait-overlay.css"
   "apps/doppelganger/portrait-overlay.js"
   "apps/doppelganger/style.css"

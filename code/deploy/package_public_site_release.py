@@ -284,6 +284,8 @@ RELEASE_PATHS: Final = (
     "dashboard/apps/doppelganger/photos/margot-robbie.webp",
     "dashboard/apps/doppelganger/photos/samara-weaving.webp",
     "dashboard/apps/doppelganger/photos/zooey-deschanel.webp",
+    "dashboard/apps/doppelganger/portrait-landmarks.css",
+    "dashboard/apps/doppelganger/portrait-landmarks.js",
     "dashboard/apps/doppelganger/portrait-overlay.css",
     "dashboard/apps/doppelganger/portrait-overlay.js",
     "dashboard/apps/doppelganger/style.css",

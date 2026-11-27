@@ -16,11 +16,11 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   an unmerged branch or tag cannot authorize production access.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (266 for
+- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (268 for
   the cohort, frozen EIA review, Bounded Light Speed concept collection, creator-rights
   register and four-file art showcase, plus the first two branded app routes). Artwork and three public previews linked
   from `/art/` remain hosted at the canonical Wonder Studio origin; their external
-  bytes are outside this repository release's 266-file exact-byte guarantee.
+  bytes are outside this repository release's 268-file exact-byte guarantee.
   Before the gallery can embed Studio media, the separately approved current-main
   `repair-public-security-headers.yml` action must apply the exact Studio origin
   in `img-src` and `media-src`. A static file release does not change Nginx policy.
@@ -106,7 +106,7 @@ check at both directory URLs; a fallback page or off-domain redirect is not a
 successful migration.
 
 The app hub lists only public app routes actually available from this release.
-The Doppelgänger comparison and overlay are editorial; neither performs
+The Doppelgänger portrait comparison, overlay and manual landmarks are editorial; none performs
 biometric recognition or asks for uploads. Search discovery eligibility is not
 proof any search engine indexed either route. Existing operational pages and
 separately hosted apps are unaffected.

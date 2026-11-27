@@ -117,7 +117,9 @@ class PublicDiscoveryTests(unittest.TestCase):
             self.assertNotIn("<iframe", html.lower())
             self.assertNotIn("http-equiv=\"refresh", html.lower())
             self.assertNotIn('<input type="file"', html)
-        for name in ("style.css", "catalog.js", "app.js"):
+        self.assertIn('id="landmark-lab"', gallery)
+        self.assertIn('id="portrait-overlay"', gallery)
+        for name in ("style.css", "catalog.js", "app.js", "portrait-overlay.css", "portrait-overlay.js", "portrait-landmarks.css", "portrait-landmarks.js"):
             self.assertTrue((DASHBOARD / "apps/doppelganger" / name).is_file())
 
     def test_public_mark_is_exact_founder_confirmed_lumaarc_asset(self):
