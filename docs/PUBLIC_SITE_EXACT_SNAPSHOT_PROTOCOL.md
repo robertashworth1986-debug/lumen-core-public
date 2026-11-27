@@ -16,11 +16,11 @@ The legacy `deploy.yml` path is now a read-only exact-byte audit.
   an unmerged branch or tag cannot authorize production access.
 - An explicit `DEPLOY_PUBLIC_SITE_EXACT_SNAPSHOT` workflow input is required
   before SSH credentials are installed.
-- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (246 for
+- Only the files in the reviewed `RELEASE_PATHS` allowlist are packaged (288 for
   the cohort, frozen EIA review, Bounded Light Speed concept collection, creator-rights
-  register and four-file art showcase). Artwork and three public previews linked
+  register and four-file art showcase, plus the first two branded app routes). Artwork and three public previews linked
   from `/art/` remain hosted at the canonical Wonder Studio origin; their external
-  bytes are outside this repository release's 246-file exact-byte guarantee.
+  bytes are outside this repository release's 288-file exact-byte guarantee.
   Before the gallery can embed Studio media, the separately approved current-main
   `repair-public-security-headers.yml` action must apply the exact Studio origin
   in `img-src` and `media-src`. A static file release does not change Nginx policy.
@@ -94,3 +94,25 @@ deployment of any trading or infrastructure-control system.
 Signed build provenance establishes workflow and artifact identity for the
 archive. It does not establish a SLSA level, whole-product security, or that the
 archive was deployed.
+
+## Native public app paths
+
+`/apps/` and `/apps/doppelganger/` resolve to explicit static files in this
+release. The catalog, scripts, and locally stored, credited WebP portraits are
+reviewed assets in the exact manifest. This does not change DNS, headers, VPS
+routing, CSP, or ownership settings. The checked-in VPS configuration serves
+static directories first, and the release must pass an exact live byte and MIME
+check at both directory URLs; a fallback page or off-domain redirect is not a
+successful migration.
+
+The app hub lists only public app routes actually available from this release.
+The Doppelgänger portrait comparison, overlay and manual landmarks are editorial; none performs
+biometric recognition or asks for uploads. Search discovery eligibility is not
+proof any search engine indexed either route. Existing operational pages and
+separately hosted apps are unaffected.
+
+A prior static release does not remove newly added paths. If needed after
+publication, remove discovery links and replace these pages with reviewed HOLD
+stubs in an explicitly approved release, or follow an explicitly approved VPS
+rollback that reflects newly created paths in the rollback receipt. Do not
+assume replaying the previous archive deletes the new files.

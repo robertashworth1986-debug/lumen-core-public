@@ -55,7 +55,7 @@ class PublicDiscoveryTests(unittest.TestCase):
                 "https://lumen-core.ai/build_week/prooflock_console/",
                 "https://lumen-core.ai/cohort/",
                 "https://lumen-core.ai/cohort/directory.html",
-            ] + member_routes + ["https://lumen-core.ai/bounded-light/", "https://lumen-core.ai/bounded-light/observatory/", "https://lumen-core.ai/portfolio/", "https://lumen-core.ai/portfolio/review.html", "https://lumen-core.ai/art/"],
+            ] + member_routes + ["https://lumen-core.ai/bounded-light/", "https://lumen-core.ai/bounded-light/observatory/", "https://lumen-core.ai/portfolio/", "https://lumen-core.ai/portfolio/review.html", "https://lumen-core.ai/art/", "https://lumen-core.ai/apps/", "https://lumen-core.ai/apps/doppelganger/"],
         )
         serialized = (DASHBOARD / "sitemap.xml").read_text(encoding="utf-8")
         self.assertNotIn("mission_control", serialized)
@@ -89,6 +89,8 @@ class PublicDiscoveryTests(unittest.TestCase):
         pages = {
             "operator_home.html": "https://lumen-core.ai/",
             "art/index.html": "https://lumen-core.ai/art/",
+            "apps/index.html": "https://lumen-core.ai/apps/",
+            "apps/doppelganger/index.html": "https://lumen-core.ai/apps/doppelganger/",
             "opportunity_sprint.html": "https://lumen-core.ai/opportunity_sprint.html",
             "proof_to_pilot.html": "https://lumen-core.ai/proof_to_pilot.html",
             "external_review.html": "https://lumen-core.ai/external_review.html",
@@ -101,6 +103,24 @@ class PublicDiscoveryTests(unittest.TestCase):
                 self.assertIn(f'rel="canonical" href="{canonical}"', text)
                 self.assertIn('rel="icon" href="/assets/lumaarc_arc_seal_v1.png"', text)
                 self.assertIn('rel="manifest" href="/manifest.json"', text)
+
+    def test_branded_apps_are_true_local_paths_without_cross_origin_embedding(self):
+        homepage = (DASHBOARD / "operator_home.html").read_text(encoding="utf-8")
+        hub = (DASHBOARD / "apps/index.html").read_text(encoding="utf-8")
+        gallery = (DASHBOARD / "apps/doppelganger/index.html").read_text(encoding="utf-8")
+        self.assertIn('href="/apps/">Apps</a>', homepage)
+        self.assertIn('href="/apps/doppelganger/"', hub)
+        self.assertIn('href="/apps/"', gallery)
+        self.assertIn('href="/proof_to_pilot.html#start-conversation"', hub)
+        for html in (hub, gallery):
+            self.assertNotIn("chatgpt.site", html)
+            self.assertNotIn("<iframe", html.lower())
+            self.assertNotIn("http-equiv=\"refresh", html.lower())
+            self.assertNotIn('<input type="file"', html)
+        self.assertIn('id="landmark-lab"', gallery)
+        self.assertIn('id="portrait-overlay"', gallery)
+        for name in ("style.css", "catalog.js", "app.js", "portrait-overlay.css", "portrait-overlay.js", "portrait-landmarks.css", "portrait-landmarks.js"):
+            self.assertTrue((DASHBOARD / "apps/doppelganger" / name).is_file())
 
     def test_public_mark_is_exact_founder_confirmed_lumaarc_asset(self):
         public_mark = DASHBOARD / "assets" / "lumaarc_arc_seal_v1.png"
