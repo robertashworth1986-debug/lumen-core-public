@@ -1,0 +1,17 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101823; color: #edf4fc; line-height: 1.55; }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; min-width: 0; }
+.frame { width: min(56rem, 100% - 2rem); margin-inline: auto; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.7rem; padding-block: 1.2rem; }
+.brand, h1, h2, h3 { font-weight: 750; }
+a { color: #9ae3db; text-underline-offset: .2em; }
+a:focus-visible { outline: 3px solid #f9cb83; outline-offset: 4px; }
+main { padding-block: clamp(2.5rem, 8vw, 5rem) 3rem; }
+.eyebrow { font-size: .9rem; font-weight: 750; letter-spacing: .13em; color: #9ae3db; }
+h1 { font-size: clamp(2.7rem, 10vw, 5.7rem); line-height: 1.04; margin: .2em 0; }
+.intro { max-width: 38rem; font-size: 1.15rem; }
+section { margin-top: 2.6rem; }
+.card { background: #17283b; border: 1px solid #50758c; border-radius: 1rem; padding: clamp(1.1rem, 4vw, 2rem); }
+h3 { margin-top: 0; font-size: 1.5rem; }
+.button { display: inline-block; background: #9ae3db; color: #102823; padding: .78rem 1rem; border-radius: .5rem; font-weight: 750; }
+.next, footer { border-top: 1px solid #50758c; padding-block: 1.2rem; }
