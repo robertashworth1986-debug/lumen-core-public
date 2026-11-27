@@ -3,7 +3,7 @@
 const pairs=window.ATLAS_PAIRS||[], $=id=>document.getElementById(id);
 const make=(tag,txt)=>{const el=document.createElement(tag); if(txt!==undefined)el.textContent=txt;return el;};
 const link=(txt,url)=>{const el=make('a',txt);el.href=url;el.target='_blank';el.rel='noopener noreferrer';return el;};
-const matches=(pair,query,cat)=> (!cat||pair.tag===cat)&&query.trim().toLowerCase().split(/\s+/).every(term=>pair.people.map(p=>p.name.toLowerCase()).join(' ').includes(term));
+const matches=(pair,query,cat,basis,era)=> (!cat||pair.tag===cat)&&(!basis||pair.basis===basis)&&(!era||pair.era===era)&&query.trim().toLowerCase().split(/\s+/).every(term=>pair.people.map(p=>p.name.toLowerCase()).join(' ').includes(term));
 const rotate=(i,delta,n)=>(i+delta+n)%n;
 const pick=(i,n,random=Math.random)=>n<2?i:rotate(i,1+Math.floor(random()*(n-1)),n);
 if (typeof module!=='undefined') module.exports={matches,rotate,pick};
@@ -11,11 +11,11 @@ let active=0, visible=pairs;
 const title=p=>p.people.map(x=>x.name).join(' / ');
 const sharedId=hash=>/^#pair-([1-9][0-9]*)$/.exec(hash)?.[1];
 const pairUrl=id=>window.location.origin+'/apps/doppelganger/#pair-'+id;
-const defaultShareStatus='Opens this exact editorial comparison.';
+const defaultShareStatus='Opens these exact portraits.';
 function readSharedPair(){
  const i=pairs.findIndex(p=>String(p.id)===sharedId(window.location.hash));
  if(i<0)return false;
- $('search').value='';$('category').value='';
+ for(const id of ['search','category','basis','era']) $(id).value='';
  visible=pairs;active=i;
  return true;
 }
@@ -26,10 +26,13 @@ function show(){
  $('count').textContent=n+' '+(n===1?'pair':'pairs');
  const p=visible[active];
  $('pair-share').hidden=!p;
+ $('feature-overlay').hidden=!p;
  $('pair-url').value=p?pairUrl(p.id):'';
  $('pair-status').textContent=defaultShareStatus;
- $('tag').textContent=p?.tag||'';
- $('note').textContent=p?.note||'Try another name or category.';
+ $('tag').textContent=p?[p.tag,p.basis,p.era].join(' · '):'';
+ $('note').textContent=p?.note||'Try another name, category, evidence type or era.';
+ const evidence=$('pair-evidence');evidence.hidden=!p?.evidence;
+ evidence.replaceChildren(...(p?.evidence?[link(p.evidence.label,p.evidence.url)]:[]));
  const grid=make('div');grid.className='duo';
  if(p)for(const x of p.people){
    const f=make('figure'),img=make('img'),cap=make('figcaption'),credit=make('details');
@@ -39,10 +42,10 @@ function show(){
    cap.append(make('strong',x.name),credit);f.append(img,cap);grid.append(f);
  }
  $('comparison').replaceChildren(grid);
- const options=visible.map((candidate,i)=>{const btn=make('button');btn.type='button';btn.setAttribute('aria-pressed',String(i===active));btn.append(make('strong',title(candidate)),make('span',candidate.tag));btn.addEventListener('click',()=>{active=i;show();document.querySelector('.stage').scrollIntoView({block:'start'});$('position').tabIndex=-1;$('position').focus({preventScroll:true});});return btn;});
+ const options=visible.map((candidate,i)=>{const btn=make('button');btn.type='button';btn.setAttribute('aria-pressed',String(i===active));btn.append(make('strong',title(candidate)),make('span',[candidate.tag,candidate.basis,candidate.era].join(' · ')));btn.addEventListener('click',()=>{active=i;show();document.querySelector('.stage').scrollIntoView({block:'start'});$('position').tabIndex=-1;$('position').focus({preventScroll:true});});return btn;});
  $('list').replaceChildren(...options);
 }
-for(const id of ['search','category']) $(id).addEventListener(id==='search'?'input':'change',()=>{visible=pairs.filter(p=>matches(p,$('search').value,$('category').value));active=0;show();});
+for(const id of ['search','category','basis','era']) $(id).addEventListener(id==='search'?'input':'change',()=>{visible=pairs.filter(p=>matches(p,$('search').value,$('category').value,$('basis').value,$('era').value));active=0;show();});
 $('next').onclick=()=>{active=rotate(active,1,visible.length);show();};
 $('previous').onclick=()=>{active=rotate(active,-1,visible.length);show();};
 $('shuffle').onclick=()=>{active=pick(active,visible.length);show();};

@@ -15,7 +15,7 @@ const label=(p,fallback)=>p?title(p):fallback;
 const node=(tag,text)=>{const e=document.createElement(tag);if(text)e.textContent=text;return e;};
 const link=(text,href)=>{const a=node('a',text);a.href=href;return a;};
 for(const sel of [base,top]){
- for(const [label,group] of [['Celebrity gallery',modern],['Early photography',history]]){
+ for(const [label,group] of [['Portrait gallery',modern],['Early photography',history]]){
   const opts=node('optgroup');opts.label=label;
   for(const p of group){const o=node('option',title(p));o.value=p.photo;opts.append(o);}sel.append(opts);
  }
@@ -66,7 +66,9 @@ function useComparison(){
  if(photos.has(a)&&photos.has(b)){base.value=a;top.value=b;render();return true;}
  return false;
 }
-$('overlay-use').addEventListener('click',()=>{if(!useComparison())$('overlay-opinion').textContent='Select a featured gallery pair first.';});
+function loadFeatured(){if(!useComparison())$('overlay-opinion').textContent='Select a featured gallery pair first.';}
+$('overlay-use').addEventListener('click',loadFeatured);
+$('feature-overlay')?.addEventListener('click',loadFeatured);
 $('overlay-history').addEventListener('click',()=>{base.value=history[0].photo;top.value=history[1].photo;render();});
 $('overlay-swap').addEventListener('click',()=>{const a=base.value;base.value=top.value;top.value=a;render();});
 $('overlay-reset').addEventListener('click',()=>{for(const k of Object.keys(defaults))controls[k].value=String(defaults[k]);applyAlignment();clearVote();});
